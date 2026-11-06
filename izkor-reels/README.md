@@ -25,6 +25,18 @@
    - אם התחברתם דרך Instagram Login ולא דרך Facebook Login, הגדירו את המשתנה `IG_GRAPH_HOST=graph.instagram.com` (תחת Variables).
 4. **ריצת בדיקה:** הפעילו ידנית את ה-workflow ב-Actions עם `dry_run`, והורידו את הסרטון מה-Artifacts.
 
+## שמירה בגוגל דרייב
+כל סרטון וכל כיתוב נשמרים לפני הפרסום בתיקייה [יזכור - רילס לזכר הנופלים](https://drive.google.com/drive/folders/1XqS-nBpMTpLcsTdI0eNqsnvtCTTUjeoo). השם של כל קובץ בנוי מתאריך, דרגה, שם ומספר.
+
+הגדרה חד-פעמית:
+1. ב-[Google Cloud Console](https://console.cloud.google.com): מפעילים את Google Drive API, ויוצרים OAuth Client מסוג Desktop.
+2. מפיקים Refresh Token עם ההרשאה `https://www.googleapis.com/auth/drive`. אפשר דרך [OAuth Playground](https://developers.google.com/oauthplayground): בגלגל השיניים מסמנים "Use your own OAuth credentials".
+3. ב-GitHub מוסיפים:
+   - Secrets: `GDRIVE_CLIENT_ID`, `GDRIVE_CLIENT_SECRET`, `GDRIVE_REFRESH_TOKEN`
+   - Variable: `GDRIVE_FOLDER_ID=1XqS-nBpMTpLcsTdI0eNqsnvtCTTUjeoo`
+
+בלי ההגדרות האלה המערכת מדלגת על השמירה בדרייב וממשיכה לפרסם כרגיל.
+
 ## הרצה מקומית
 ```bash
 sudo apt-get install ffmpeg libraqm0

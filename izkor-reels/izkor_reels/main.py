@@ -82,6 +82,17 @@ def run(dry_run: bool, legacy_id: str | None) -> int:
         print("--- caption ---\n" + caption)
         return 0
 
+    # Archive to Google Drive first, so the reel is kept even if publishing fails.
+    from . import drive
+    drive_ids = {}
+    if drive.configured():
+        d, m, y = f.death_date.split("-")
+        title = f"{y}-{int(m):02d}-{int(d):02d} {f.rank} {f.full_name} ({f.legacy_id})".replace("  ", " ")
+        drive_ids = drive.archive(video, work / "caption.txt", title)
+        print(f"Archived to Drive: {drive_ids}")
+    else:
+        print("Google Drive not configured - skipping archive.")
+
     from .instagram import publish_reel
     media_id = publish_reel(video, caption)
     published.append({
@@ -89,6 +100,7 @@ def run(dry_run: bool, legacy_id: str | None) -> int:
         "name": f"{f.rank} {f.full_name}".strip(),
         "death_date": f.death_date_display,
         "ig_media_id": media_id,
+        "drive_video_id": drive_ids.get("video_id"),
         "published_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
     })
     save(STATE, published)
