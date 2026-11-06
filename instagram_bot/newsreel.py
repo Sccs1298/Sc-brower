@@ -104,11 +104,13 @@ class ClipReader:
     """קורא פריימים מקובץ וידאו, חתוך ל-MWxMH, בלופ אם צריך."""
 
     def __init__(self, path, start=0.0, zoom=1.0, anchor="center"):
-        sh = int(MH * zoom) // 2 * 2
+        sw, sh = int(MW * zoom) // 2 * 2, int(MH * zoom) // 2 * 2
         y = {"center": f"(in_h-{MH})/2", "bottom": f"in_h-{MH}", "top": "0"}[anchor]
+        # cover: ממלא את אזור המדיה בכל יחס (גם GIF צר/ריבועי), ואז חיתוך
         self.p = subprocess.Popen(
             ["ffmpeg", "-loglevel", "error", "-stream_loop", "-1", "-ss", str(start), "-i", path,
-             "-vf", f"scale=-2:{sh},crop={MW}:{MH}:(in_w-{MW})/2:{y},fps={FPS}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+             "-vf", f"scale={sw}:{sh}:force_original_aspect_ratio=increase:flags=lanczos,crop={MW}:{MH}:(in_w-{MW})/2:{y},fps={FPS}",
+             "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
             stdout=subprocess.PIPE)
 
     def frame(self):

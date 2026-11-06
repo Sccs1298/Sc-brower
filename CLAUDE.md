@@ -35,8 +35,8 @@
 | קריאת עמודים אחרים | Apify דרך Comp (`APIFY_SCRAPE_INSTAGRAM_POSTS`), חשבון הבעלים, $5/חודש חינם | ✅ |
 | רשימת העוקבים של הבעלים | לא אפשרי בלי התחברות – הבעלים ישלח רשימת עמודים | ❌ |
 | Pixabay (וידאו מורשה, מסחרי) | משתנה סביבה `PIXABAY_API_KEY` (בפרמטר URL, לא header). `.claude/skills/daily-recap/pixabay_video.py` | ✅ נבדק 06.11 (אם המשתנה חסר בסשן – לבקש מהבעלים להוסיף ב-Edit environment) |
-| GIPHY (ממים זזים) | משתנה סביבה `GIPHY_API_KEY` | ❌ ממתין למפתח (הבעלים אישר) |
-| קול חינמי | Azure Speech F0 (he-IL-AvriNeural/HilaNeural) – ממתין לחשבון. edge-tts עובד לבדיקות בלבד (`--proxy $HTTPS_PROXY`) | ⚠️ |
+| GIPHY (ממים זזים) | משתנה סביבה `GIPHY_API_KEY`. `.claude/skills/daily-recap/giphy_meme.py` (search/get → MP4) | ✅ נבדק 06.11 (אם המשתנה חסר – לבקש מהבעלים) |
+| קול חינמי | Azure Speech F0 (he-IL-AvriNeural) – ממתין לחשבון. edge-tts עובד לטיוטות בלבד: `.claude/skills/daily-recap/tts_avri.py` | ⚠️ טיוטות בלבד |
 | Higgsfield (תמונות/וידאו AI) | MCP מחובר | ⚠️ 0 קרדיטים |
 | ארנק Composio (כלים "instant") | – | ⚠️ ריק |
 
@@ -58,4 +58,4 @@
   4. שם המותג על כל תוצר: **CRYPTO ILS**.
   5. קול: **Brian** (ElevenLabs `nPczCjzI2devNBz1zQrb`, `eleven_v3`, `he`) – עד שיהיו קולות דוברי עברית.
 - 06.11 – הבעלים לא עושה מנוי ElevenLabs כרגע → לחפש קול חינמי מסחרי (Azure Speech F0). Pixabay במקום Pexels.
-- חסר למימוש 3: מקור לממים זזים (למשל מפתח GIPHY) – ממתין לבעלים.
+- 06.11 – GIPHY מחובר; רילס ראשון עם אברי + מם זז (This Is Fine) + Pixabay נמסר כטיוטה (ממתין לציון).
