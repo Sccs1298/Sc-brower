@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import urllib.parse
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -26,8 +27,15 @@ QUERIES = [
 HE_QUERIES = ["קריפטו when:2d", "ביטקוין when:2d"]
 
 
-def get_json(url):
-    return json.load(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30))
+def get_json(url, tries=5):
+    import time
+    for i in range(tries):
+        try:
+            return json.load(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30))
+        except urllib.error.HTTPError as e:
+            if e.code != 429 or i == tries - 1:
+                raise
+            time.sleep(15 * (i + 1))  # CoinGecko מגביל קצב – מחכים ומנסים שוב
 
 
 def news(q, hl="en-US", gl="US", ceid="US:en", n=6):

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<!-- קרוסלה יומית בשפה של הרילס (סגול, 3D, טיפוגרפיה ענקית, שרטוט טכני). 1080x1350 לשקף.
+     תוכן: data.js (window.CAROUSEL = {slides:[...], coins:[[sym,mcap,ch],...]}). צילום: shoot.js -->
+<style>
+@font-face { font-family: Heebo; font-weight: 400; src: url(../../fonts/Heebo-400.ttf); }
+@font-face { font-family: Heebo; font-weight: 700; src: url(../../fonts/Heebo-700.ttf); }
+@font-face { font-family: Heebo; font-weight: 900; src: url(../../fonts/Heebo-900.ttf); }
+:root { --acc: #9D5CFF; --acc2: #C4A1FF; --red: #FF5A5F; --green: #2BD07F; --ink: #111113; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Heebo; background: #222; direction: rtl; }
+.slide { width: 1080px; height: 1350px; position: relative; overflow: hidden; margin-bottom: 20px; }
+.dark { color: #F4F4F6; background: radial-gradient(ellipse 70% 45% at 50% 38%, rgba(157,92,255,.30), transparent 70%), linear-gradient(#141218, #050407); }
+.light { color: var(--ink); background: radial-gradient(ellipse 70% 45% at 50% 38%, #fff, transparent 75%), linear-gradient(#EEEDF2, #D8D6DE); }
+.red { color: #F4F4F6; background: radial-gradient(ellipse 70% 45% at 50% 40%, rgba(255,70,80,.32), transparent 70%), linear-gradient(#1a0b0e, #050304); }
+.grid { position: absolute; inset: 0; opacity: .9;
+  background-image: linear-gradient(var(--g) 1px, transparent 1px), linear-gradient(90deg, var(--g) 1px, transparent 1px),
+                    linear-gradient(var(--G) 2px, transparent 2px), linear-gradient(90deg, var(--G) 2px, transparent 2px);
+  background-size: 54px 54px, 54px 54px, 270px 270px, 270px 270px; }
+.dark .grid, .red .grid { --g: rgba(255,255,255,.04); --G: rgba(255,255,255,.07); }
+.light .grid { --g: rgba(0,0,0,.045); --G: rgba(0,0,0,.07); }
+.vig { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 55%, rgba(0,0,0,.45)); pointer-events: none; }
+.light .vig { background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 60%, rgba(0,0,0,.14)); }
+.grain { position: absolute; inset: 0; opacity: .07; mix-blend-mode: overlay; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.brand { position: absolute; top: 56px; right: 64px; font: 900 30px Heebo; letter-spacing: 6px; direction: ltr; display: flex; align-items: center; gap: 14px; }
+.brand i { width: 18px; height: 18px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 20px var(--acc); }
+.tag { position: absolute; top: 52px; left: 64px; font: 700 26px "DejaVu Sans Mono", monospace; letter-spacing: 3px; direction: ltr; opacity: .55; }
+.pg { position: absolute; bottom: 52px; left: 64px; font: 700 26px "DejaVu Sans Mono", monospace; direction: ltr; opacity: .5; }
+.swipe { position: absolute; bottom: 44px; right: 64px; font: 700 34px Heebo; color: var(--acc); }
+.c { position: absolute; left: 0; right: 0; text-align: center; }
+.giga { font: 900 260px/0.95 Heebo; letter-spacing: -8px; }
+.h1 { font: 900 104px/1.05 Heebo; letter-spacing: -2px; }
+.h2 { font: 700 56px/1.25 Heebo; }
+.p { font: 400 46px/1.4 Heebo; }
+.acc { color: var(--acc); } .light .acc { color: #7B3FF2; }
+.num { direction: ltr; unicode-bidi: isolate; }
+.icon { position: absolute; left: 50%; filter: drop-shadow(0 50px 45px rgba(0,0,0,.5)); transform: translateX(-50%) rotate(-6deg); }
+svg.bp { position: absolute; inset: 0; overflow: visible; }
+svg.bp * { fill: none; }
+svg.bp text { font: 700 22px "DejaVu Sans Mono", monospace; letter-spacing: 2px; direction: ltr; }
+.cards { position: absolute; left: 70px; right: 70px; display: flex; gap: 28px; }
+.card { flex: 1; border-radius: 40px; padding: 40px 36px; }
+.dark .card, .red .card { background: linear-gradient(160deg, rgba(255,255,255,.11), rgba(255,255,255,.03)); border: 1.5px solid rgba(255,255,255,.14); box-shadow: 0 40px 70px rgba(0,0,0,.5); }
+.light .card { background: rgba(255,255,255,.92); box-shadow: 0 40px 80px rgba(0,0,0,.13); }
+.card .k { font: 700 38px Heebo; opacity: .6; }
+.card .v { font: 900 92px/1.1 Heebo; direction: ltr; text-align: right; margin-top: 10px; }
+.card .s { font: 400 34px Heebo; opacity: .6; margin-top: 8px; }
+.dn { color: var(--red); } .up { color: var(--green); }
+.hm { position: absolute; left: 60px; right: 60px; top: 330px; height: 760px; border-radius: 36px; overflow: hidden; background: #0b0a0e; box-shadow: 0 40px 80px rgba(0,0,0,.5); }
+.hm div { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; overflow: hidden; border: 3px solid #0b0a0e; }
+.hm b { font-weight: 900; direction: ltr; } .hm span { font-weight: 700; opacity: .9; direction: ltr; }
+.src { font: 400 28px Heebo; opacity: .5; }
+</style></head>
+<body>
+<script src="data.js"></script>
+<script>
+const ICON = n => `../../assets/icons3d/${n}.png`;
+const bp = (items, light) => {
+  const col = light ? 'rgba(20,20,30,.4)' : 'rgba(196,161,255,.55)';
+  let s = `<svg class="bp" width="1080" height="1350">`;
+  for (const it of items) {
+    if (it.c) { const [x, y, r] = it.c; s += `<circle cx="${x}" cy="${y}" r="${r}" stroke="${col}" stroke-width="2.5"/>`;
+      let d = ''; for (let k = 0; k < 72; k++) { const a = k * 5 * Math.PI / 180, l = k % 6 ? 10 : 22; d += `M${x + (r + 8) * Math.cos(a)} ${y + (r + 8) * Math.sin(a)}L${x + (r + 8 + l) * Math.cos(a)} ${y + (r + 8 + l) * Math.sin(a)}`; }
+      s += `<path d="${d}" stroke="${col}" stroke-width="1.5"/>`; }
+    if (it.d) { const [x1, y1, x2, y2] = it.d; s += `<path d="M${x1} ${y1}L${x2} ${y2}M${x1} ${y1 - 14}L${x1} ${y1 + 14}M${x2} ${y2 - 14}L${x2} ${y2 + 14}" stroke="${col}" stroke-width="2"/>`;
+      if (it.label) s += `<text x="${(x1 + x2) / 2}" y="${y1 - 18}" text-anchor="middle" style="fill:${col}">${it.label}</text>`; }
+    if (it.t) s += `<text x="${it.t[0]}" y="${it.t[1]}" text-anchor="${it.anchor || 'start'}" style="fill:${col}">${it.t[2]}</text>`;
+    if (it.x) { const [x, y] = it.x; s += `<path d="M${x - 34} ${y}L${x + 34} ${y}M${x} ${y - 34}L${x} ${y + 34}" stroke="${col}" stroke-width="2"/>`; }
+  }
+  return s + '</svg>';
+};
+function squarify(items, x, y, w, h) {
+  const out = [], total = items.reduce((a, b) => a + b[1], 0);
+  const rec = (its, x, y, w, h) => {
+    if (!its.length) return;
+    if (its.length === 1) { out.push([its[0], x, y, w, h]); return; }
+    const tot = its.reduce((a, b) => a + b[1], 0); let acc = 0, i = 0;
+    while (i < its.length - 1 && acc + its[i][1] < tot / 2) acc += its[i++][1];
+    if (i === 0) { acc = its[0][1]; i = 1; }
+    const f = acc / tot;
+    if (w >= h) { rec(its.slice(0, i), x, y, w * f, h); rec(its.slice(i), x + w * f, y, w * (1 - f), h); }
+    else { rec(its.slice(0, i), x, y, w, h * f); rec(its.slice(i), x, y + h * f, w, h * (1 - f)); }
+  };
+  rec(items, x, y, w, h); return out;
+}
+function heat(coins) {
+  const its = coins.map(c => [c[0], Math.pow(c[1], .62), c[2]]);
+  return squarify(its, 0, 0, 960, 760).map(([c, x, y, w, h]) => {
+    const ch = c[2], a = Math.min(1, Math.abs(ch) / 9), col = ch < 0 ? `rgba(${170 + 70 * a},${45 - 20 * a},${60 - 20 * a},1)` : `rgba(30,${120 + 80 * a},80,1)`;
+    const fs = Math.max(14, Math.min(w, h) / 3.4);
+    return `<div style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${col}">${w > 60 && h > 40 ? `<b style="font-size:${fs}px">${c[0]}</b><span style="font-size:${fs * .55}px">${ch > 0 ? '+' : ''}${ch.toFixed(1)}%</span>` : ''}</div>`;
+  }).join('');
+}
+const S = CAROUSEL.slides, N = S.length;
+S.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'slide ' + s.theme; el.id = 's' + (i + 1);
+  let h = `<div class="grid"></div>`;
+  if (s.bp) h += bp(s.bp, s.theme === 'light');
+  if (s.icon) h += `<img class="icon" src="${ICON(s.icon[0])}" style="top:${s.icon[1]}px;width:${s.icon[2]}px">`;
+  if (s.heat) h += `<div class="hm">${heat(CAROUSEL.coins)}</div>`;
+  h += s.html || '';
+  h += `<div class="brand"><i></i>CRYPTO ILS</div><div class="tag">${s.tag || ''}</div><div class="pg">${i + 1}/${N}</div>`;
+  if (i < N - 1) h += `<div class="swipe">החליקו ←</div>`;
+  h += `<div class="vig"></div><div class="grain"></div>`;
+  el.innerHTML = h; document.body.appendChild(el);
+});
+window.READY = true;
+</script></body></html>
