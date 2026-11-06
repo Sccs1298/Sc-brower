@@ -1,0 +1,71 @@
+name: Instagram crypto post
+
+on:
+  schedule:
+    - cron: "47 5 * * *"   # ~07:47-08:47 שעון ישראל – עדכון שוק
+    - cron: "47 16 * * *"  # ~18:47-19:47 שעון ישראל – פוסט לימודי
+  workflow_dispatch:
+    inputs:
+      type:
+        description: "סוג פוסט"
+        type: choice
+        options: [auto, market, education]
+        default: auto
+      dry_run:
+        description: "רק ליצור תמונה, בלי לפרסם"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: instagram-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: instagram_bot/requirements.txt
+
+      - run: pip install -r instagram_bot/requirements.txt
+
+      - name: Configure git
+        run: |
+          git config user.name "crypto-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate & publish
+        working-directory: instagram_bot
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IMGBB_API_KEY: ${{ secrets.IMGBB_API_KEY }}
+          IMAGE_HOST: ${{ vars.IMAGE_HOST || 'github' }}
+          PAGE_HANDLE: ${{ vars.PAGE_HANDLE || '@crypto.ivrit' }}
+        run: |
+          ARGS="--type ${{ inputs.type || 'auto' }}"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          python main.py $ARGS
+
+      - name: Save post record
+        if: always()
+        run: |
+          git add posts || true
+          git diff --cached --quiet || (git commit -m "bot: post record" && git push origin HEAD:${GITHUB_REF_NAME})
+
+      - name: Upload image as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post
+          path: posts/*/
+          retention-days: 14

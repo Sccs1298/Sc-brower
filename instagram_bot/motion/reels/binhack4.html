@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../cine.css">
+<style>
+  .job .logo { width: 110px; height: 110px; border-radius: 30px; background: linear-gradient(135deg,#2b2b30,#0d0d0f); }
+  .job .title { font: 700 58px Heebo; margin: 30px 0 8px; direction: ltr; text-align: right; }
+  .job .meta { font: 400 42px Heebo; opacity: .6; }
+  .tag { display: inline-block; margin: 26px 0 32px; padding: 14px 30px; border-radius: 999px; background: rgba(48,164,108,.16); color: #1f8a57; font: 700 40px Heebo; }
+  .step { text-align: center; padding: 70px 40px !important; }
+  .step .n { font: 900 64px Heebo; color: var(--accent); direction: ltr; }
+  .step .ic { font: 900 170px/1.1 Heebo; }
+  .step .lb { font: 900 110px Heebo; }
+  .bar { height: 22px; border-radius: 11px; background: rgba(255,255,255,.15); overflow: hidden; margin-top: 40px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+  .wallet .lab { font: 700 42px Heebo; opacity: .65; }
+  .wallet .bal { font: 900 118px Heebo; direction: ltr; text-align: right; margin: 22px 0 36px; letter-spacing: -2px; }
+  .live { display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: var(--green); margin-left: 14px; }
+  .sw { display: inline-block; width: 260px; height: 146px; border-radius: 73px; background: var(--green); position: relative; vertical-align: middle; }
+  .sw i { position: absolute; top: 13px; width: 120px; height: 120px; border-radius: 50%; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  .coins { position: absolute; top: 600px; left: 80px; right: 80px; display: flex; gap: 40px; transform-style: preserve-3d; }
+  .coin { flex: 1; height: 520px; border-radius: 50px; text-align: center; padding-top: 150px; position: relative; overflow: hidden;
+    background: linear-gradient(160deg, rgba(255,255,255,.13), rgba(255,255,255,.03)); border: 1.5px solid rgba(255,255,255,.15); }
+  .coin b { font: 900 100px Heebo; display: block; direction: ltr; }
+  .coin span { font: 400 46px Heebo; opacity: .6; }
+  .ice { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(170,215,255,.75), rgba(120,170,255,.2)); }
+  .ice:after { content: '❄'; position: absolute; top: 30px; left: 30px; font-size: 70px; }
+  .ownes .k { font: 700 46px Heebo; opacity: .6; }
+  .ownes .v { font: 900 170px Heebo; direction: ltr; text-align: right; margin: 16px 0 6px; }
+  .follow { text-align: center; }
+  .follow .lg { width: 230px; height: 230px; border-radius: 50%; margin: 0 auto 30px; background: radial-gradient(circle at 35% 30%, #c4a1ff, #9D5CFF 55%, #5b21b6);
+    font: 900 110px/230px Heebo; color: #fff; box-shadow: 0 30px 60px rgba(157,92,255,.35); }
+  .follow .nm { font: 900 76px Heebo; direction: ltr; }
+  .follow .hd { font: 400 44px Heebo; opacity: .55; margin: 4px 0 40px; direction: ltr; }
+  .cursor { position: absolute; width: 84px; height: 84px; }
+  .stamp { display: inline-block; padding: 26px 60px; border: 10px solid var(--red); color: var(--red); border-radius: 26px; font: 900 130px Heebo; }
+  .redtint .bgfill { background: radial-gradient(ellipse 70% 45% at 50% 45%, rgba(229,72,77,.35), transparent 70%), linear-gradient(#1a0c0d, #050303) !important; }
+  .icetint .bgfill { background: radial-gradient(ellipse 70% 45% at 50% 45%, rgba(120,180,255,.30), transparent 70%), linear-gradient(#0c1220, #03050a) !important; }
+</style></head>
+<body><div id="stage"></div>
+<script src="binhack4_timing.js"></script>
+<script src="../cine2.js"></script>
+<script>
+const G = (t, cls, top, st = '') => KT(t, cls, `top:${top}px;${st}`);
+function auto(lt, el) {
+  $$(el, '.kt').forEach((r, i) => kin(r, lt, .02 + i * .12, .06));
+  $$(el, '.card').forEach((c, i) => card3d(c, lt, i * .1));
+  $$(el, '.icon').forEach(c => icon3d(c, lt, 0));
+}
+const AV = (x, y, evil) => `<div class="avatar ${evil ? 'evil' : ''}" style="left:${x - 140}px;top:${y - 140}px;transform-origin:center"><span class="eye" style="right:76px"></span><span class="eye" style="left:76px"></span></div>`;
+function avatar(el, lt) { const a = $(el, '.avatar'); if (!a) return; const p = P(lt, 0, .5, back);
+  a.style.opacity = clamp(p); a.style.transform = `translate3d(0,${Math.sin(lt * 2) * 12}px,${-300 * (1 - p)}px) scale(${1.6 * (.7 + .3 * p)}) rotateY(${Math.sin(lt * 1.3) * 22}deg)`; }
+
+window.SCENES = [
+ // ── 0  $6.3B
+ { at: [0, 'שישה'], theme: 'dark', ring: [610, 700, 150],
+   bp: [{ c: [610, 700, 200], at: .1 }, { d: [160, 1130, 920, 1130], label: '6,300,000,000 USD', at: .3 }],
+   mid: ICON('locker', 540, 720, 760) + `<div class="row giga num" style="top:1090px;font-size:260px">$0.0B</div>`,
+   anim(lt, dur, el) { auto(lt, el); const m = $(el, '.giga'), p = P(lt, 0, 1.4, easeInOut);
+     m.textContent = '$' + (6.3 * p).toFixed(1) + 'B'; show(m, P(lt, 0, .25), 40, -300); m.style.transform += ` scale(${1 + .08 * Math.sin(lt * 9) * (1 - p)})`; } },
+ // ── 1  20 דקות
+ { at: [1, 'עשרים'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 760, 330],
+   bp: [{ c: [540, 760, 380], red: 1, at: 0 }, { t: [540, 1250, 'T + 00:20:00'], anchor: 'middle', red: 1, at: .2 }],
+   mid: ICON('clock', 540, 760, 640) + G('20 דקות', 'giga', 1050, 'font-size:190px;color:#ff5a5f') + G('פחות מפרק בנטפליקס', 'h2', 1260, 'font-size:72px;font-weight:700;opacity:.8'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 2  השוד
+ { at: [2, 'השוד'], theme: 'light', ring: [540, 820, 0],
+   bp: [{ d: [120, 1130, 960, 1130], label: 'HEIST', at: .1 }],
+   mid: G('שוד', 'giga', 560, 'font-size:300px') + G('המאה.', 'giga acc', 880, 'font-size:240px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 3  הכי גדול בהיסטוריה
+ { at: [2, 'בהיסטוריה'], theme: 'dark', ring: [540, 720, 300],
+   bp: [{ d: [130, 380, 130, 1080], label: 'ALL-TIME', at: 0 }, { x: [540, 720], at: .1 }],
+   mid: ICON('fire', 540, 720, 700) + G('#1', 'giga acc', 1000, 'font-size:250px;direction:ltr') + G('שיא כל הזמנים', 'h2', 1260, 'font-size:72px;font-weight:700;opacity:.8'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 4  והכל התחיל
+ { at: [3, 'והכל'], theme: 'black', ring: [540, 900, 0],
+   mid: G('והכל התחיל ב...', 'h1', 820, 'font-size:120px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 5  ראיון עבודה
+ { at: [3, 'בראיון'], theme: 'light', tr: 'zoom', ring: [862, 760, 95],
+   bp: [{ t: [120, 600, 'LINKEDIN // DM'], at: .2 }],
+   mid: G('ראיון עבודה.', 'h1', 430, 'font-size:120px') + G('כן, באמת.', 'h2 acc', 580, 'font-size:64px;font-weight:700') + `<div class="card job" style="top:700px"><div class="logo"></div><div class="title">Senior Engineer</div>
+        <div class="meta">Remote · משכורת חלומית</div><div class="tag">✓ מתאים לך ב-98%</div><a class="btn">קבע ראיון</a></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 7  מהנדס בבינאנס
+ { at: [4, 'מהנדס'], theme: 'dark', tr: 'whipL', ring: [540, 760, 260],
+   bp: [{ t: [540, 1120, 'ENGINEER // BINANCE'], anchor: 'middle', at: .2 }],
+   mid: AV(540, 760) + G('מהנדס אחד.', 'giga', 1080, 'font-size:170px'),
+   anim(lt, dur, el) { auto(lt, el); avatar(el, lt); } },
+ // ── 8  הצעה חלומית
+ { at: [4, 'הצעה'], theme: 'light', ring: [540, 800, 0],
+   mid: G('טוב מכדי', 'giga', 560, 'font-size:200px') + G('להיות אמיתי.', 'giga acc', 820, 'font-size:170px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 9-11  ראיון / מטלה / קובץ
+ { at: [5, 'ראיון'], theme: 'light', tr: 'whipR', ring: [540, 830, 0],
+   mid: `<div class="card step" style="top:520px"><div class="n">01</div><div class="ic">💬</div><div class="lb">ראיון</div></div>`, anim(lt, dur, el) { auto(lt, el); } },
+ { at: [5, 'מטלה'], theme: 'light', tr: 'whipR', ring: [540, 830, 0],
+   mid: `<div class="card step" style="top:520px"><div class="n">02</div><div class="ic">📝</div><div class="lb">מטלה</div></div>`, anim(lt, dur, el) { auto(lt, el); } },
+ { at: [5, 'וקובץ'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 830, 0],
+   bp: [{ t: [540, 470, 'TASK_FINAL.ZIP'], anchor: 'middle', red: 1, at: .1 }],
+   mid: `<div class="card step" style="top:520px;background:#141416"><div class="n" style="color:var(--red)">03</div><div class="ic">⬇</div><div class="lb">קובץ</div><div class="bar"><i></i></div></div>`,
+   anim(lt, dur, el) { auto(lt, el); $(el, '.bar i').style.width = (100 * P(lt, .3, 1.2, easeInOut)) + '%'; } },
+ // ── 12  המחשב נדבק
+ { at: [6, 'הקובץ'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 680, 230],
+   bp: [{ c: [540, 680, 280], red: 1, dash: 1, ticks: false, at: 0 }, { t: [130, 400, 'MALWARE.EXE'], red: 1, at: .2 }, { t: [950, 400, 'ACCESS: ROOT'], anchor: 'end', red: 1, at: .5 }],
+   mid: ICON('computer', 540, 720, 720) + `<div class="abs scan" style="left:180px;width:720px;height:8px;background:linear-gradient(90deg,transparent,#E5484D,transparent);box-shadow:0 0 34px #E5484D"></div>`
+        + G('קובץ אחד. זהו.', 'giga', 1080, 'font-size:150px;color:#ff5a5f'),
+   anim(lt, dur, el, A) { auto(lt, el); const sc = $(el, '.scan'); sc.style.top = (380 + ((lt * 600) % 640)) + 'px';
+     const g = $(el, '.giga'); kin(g, lt, A.w('הדביק') - .05, .06); g.style.transform += ` translateX(${Math.sin(lt * 50) * 6 * P(lt, A.w('הדביק'), .1)}px)`; } },
+ // ── 13  ומשם ישר
+ { at: [7, 'ומשם'], theme: 'dark', tr: 'whipL', ring: [270, 640, 120],
+   bp: [{ l: 'M270 640C470 640 600 1240 820 1240', at: 0, w: 5 }, { c: [270, 640, 150], at: 0, ticks: false }, { c: [820, 1240, 150], at: .4, ticks: false }],
+   mid: ICON('computer', 270, 640, 300) + ICON('wallet', 820, 1240, 320),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 14  לארנק החם
+ { at: [7, 'לארנק'], theme: 'dark', tr: 'zoom', ring: [540, 720, 300],
+   bp: [{ c: [540, 720, 360], at: 0 }],
+   mid: ICON('wallet', 540, 720, 720) + G('ארנק חם', 'giga', 1070, 'font-size:190px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 16  מתרוקן (Match Cut: אותו כרטיס, כהה)
+ { at: [8, 'עשרים'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 820, 250],
+   bp: [{ d: [110, 1250, 970, 1250], label: '00:00 ──── 20:00', red: 1, at: 0 }],
+   mid: `<div class="card wallet" style="top:620px"><div class="lab"><span class="live" style="background:var(--red)"></span>Hot Wallet</div><div class="bal">$6,300,000,000</div><a class="btn" style="background:#2a2a2e;color:#777">משיכה</a></div>`,
+   anim(lt, dur, el) { auto(lt, el); const p = P(lt, .1, dur - .2, easeInOut), b = $(el, '.bal'); b.textContent = '$' + fmt(6.3e9 * (1 - p));
+     const w = $(el, '.wallet'); w.style.transform += ` translateX(${Math.sin(lt * 60) * 6}px)`; } },
+ // ── 17  $0
+ { at: [8, 'ריק'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 860, 330],
+   mid: G('$0', 'giga', 700, 'font-size:420px;color:#ff5a5f;direction:ltr'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 18  עצרה משיכות
+ { at: [9, 'בינאנס'], theme: 'dark', tr: 'whipL', ring: [540, 820, 0],
+   mid: G('משיכות', 'giga', 470, 'font-size:180px') + `<div class="row" style="top:760px"><span class="sw"><i></i></span></div>` + G('נעצרו.', 'h1 muted', 1020, 'font-size:120px'),
+   anim(lt, dur, el, A) { auto(lt, el); const off = P(lt, A.w('עצרה'), .3, easeInOut), sw = $(el, '.sw');
+     sw.style.background = off > .5 ? '#3a3a3f' : 'var(--green)'; $(el, '.sw i').style.left = (13 + 114 * (1 - off)) + 'px'; } },
+ // ── 19  טת'ר וסירקל
+ { at: [10, 'טת'], theme: 'dark', tr: 'whipR', ring: [540, 860, 0],
+   mid: `<div class="coins"><div class="coin"><b>USDT</b><span>Tether</span></div><div class="coin"><b>USDC</b><span>Circle</span></div></div>`,
+   anim(lt, dur, el) { $$(el, '.coin').forEach((c, i) => card3d(c, lt, i * .15, .6)); } },
+ // ── 20  הקפיאו (Match Cut: אותם מטבעות, קפואים)
+ { at: [10, 'הקפיאו'], theme: 'dark', cls: 'icetint', tr: 'zoom', ring: [540, 860, 0],
+   mid: `<div class="coins"><div class="coin"><b>USDT</b><span>Tether</span><div class="ice"></div></div><div class="coin"><b>USDC</b><span>Circle</span><div class="ice"></div></div></div>` + G('קפוא. בלחיצת כפתור.', 'h1', 1100, 'font-size:100px;color:#a8d2ff'),
+   anim(lt, dur, el) { $$(el, '.coin').forEach((c, i) => card3d(c, lt, -1, .6)); $$(el, '.ice').forEach((c, i) => c.style.opacity = P(lt, i * .1, .3)); auto(lt, el); } },
+ // ── 21  $2.3B
+ { at: [10, 'שניים'], theme: 'dark', cls: 'icetint', tr: 'zoom', ring: [540, 860, 340],
+   mid: G('$2.3B', 'giga', 700, 'font-size:300px;color:#cfe6ff;direction:ltr') + G('תוך שעות', 'h1 muted', 970, 'font-size:100px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 22  FBI
+ { at: [11, 'FBI'], theme: 'dark', tr: 'whipL', ring: [540, 840, 0],
+   mid: G('FBI', 'giga', 720, 'font-size:300px;letter-spacing:16px;direction:ltr'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 23  מצביע על צפון קוריאה
+ { at: [11, 'מצביע'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 1050, 230],
+   bp: [{ l: 'M150 420L470 360L800 450L930 640M150 420L360 640L540 820M800 450L640 660L540 820', at: 0, red: 1, dash: 1 },
+        { c: [150, 420, 34], ticks: false, at: .05 }, { c: [470, 360, 34], ticks: false, at: .1 }, { c: [800, 450, 34], ticks: false, at: .15 }, { c: [930, 640, 34], ticks: false, at: .2 },
+        { c: [360, 640, 34], ticks: false, at: .25 }, { c: [640, 660, 34], ticks: false, at: .3 }],
+   mid: AV(540, 1050, true),
+   anim(lt, dur, el) { auto(lt, el); avatar(el, lt); } },
+ // ── 25  מכחישה
+ { at: [11, 'מכחישה'], theme: 'light', tr: 'whipR', ring: [540, 860, 0],
+   mid: `<div class="row" style="top:640px"><span class="stamp">מכחישה</span></div>` + G('״זה לא אנחנו״', 'h1', 1000, 'font-size:100px') + G('(כמובן)', 'h2 muted', 1150, 'font-size:64px'),
+   anim(lt, dur, el) { auto(lt, el); const s = $(el, '.stamp'), p = P(lt, 0, .3, back);
+     s.style.display = 'inline-block'; s.style.opacity = clamp(p); s.style.transform = `rotate(-8deg) scale(${2.4 - 1.4 * p})`; } },
+ // ── 27  כסף בבורסה
+ { at: [12, 'כסף'], theme: 'light', tr: 'whipL', ring: [600, 790, 230],
+   bp: [{ t: [120, 560, 'YOUR BALANCE'], at: .1 }],
+   mid: `<div class="card ownes" style="top:600px"><div class="k">יתרה בבורסה</div><div class="v">1.00 BTC</div></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 28  לא ביטקוין
+ { at: [12, 'לא'], theme: 'light', tr: 'zoom', ring: [540, 760, 300],
+   bp: [{ l: 'M260 480L820 1040M820 480L260 1040', red: 1, w: 18, at: .15 }],
+   mid: ICON('3d-coin', 540, 760, 640) + G('זה לא ביטקוין.', 'h1', 1060, 'font-size:110px') + G('זה מספר במסך.', 'h1 acc', 1200, 'font-size:84px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 29  הבטחה
+ { at: [12, 'הבטחה'], theme: 'dark', tr: 'whipR', ring: [540, 720, 280],
+   mid: ICON('key', 540, 700, 560) + G('אין מפתח?', 'giga', 960, 'font-size:150px') + G('אין ביטקוין.', 'giga acc', 1140, 'font-size:130px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ── 30  עקבו
+ { at: [13, 'עקבו'], theme: 'light', tr: 'zoom', ring: [540, 760, 140],
+   mid: `<div class="card follow" style="top:580px"><div class="lg">₿</div><div class="nm">CRYPTO ILS</div><div class="hd">@crypto_ils</div><a class="btn" id="fb">עקבו</a></div>
+         <svg class="cursor" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#111" stroke="#fff" stroke-width="1.5"/></svg>`,
+   anim(lt, dur, el) { auto(lt, el); const c = $(el, '.cursor'), p = P(lt, .3, .7, easeInOut);
+     c.style.left = (900 - 400 * p) + 'px'; c.style.top = (1650 - 470 * p) + 'px';
+     const click = lt > 1.05, b = $(el, '#fb'); b.textContent = click ? 'עוקבים ✓' : 'עקבו'; b.style.background = click ? '#e3e3e5' : 'var(--accent)';
+     b.style.transform = `scale(${1 - .07 * (P(lt, .95, .1) - P(lt, 1.05, .15))})`; } },
+];
+// מחלקות צבע נוספות לסצנה
+window.addEventListener('load', () => SCENES.forEach(s => s.cls && s.el.classList.add(s.cls)));
+</script></body></html>
