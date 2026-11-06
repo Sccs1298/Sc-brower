@@ -229,7 +229,7 @@ def make_background() -> np.ndarray:
     return bg / 255.0
 
 
-def make_grain(n: int = 8, amp: float = 0.018) -> list[np.ndarray]:
+def make_grain(n: int = 1, amp: float = 0.010) -> list[np.ndarray]:
     rng = np.random.default_rng(7)
     return [(rng.standard_normal((H, W, 1)).astype(np.float32) * amp) for _ in range(n)]
 
@@ -495,7 +495,8 @@ def build_reel(f: Fallen, excerpt: Excerpt | None, photo: Path | None, out: Path
         cmd += ["-i", str(audio), "-filter_complex",
                 f"[1:a]atrim=0:{total},afade=t=in:st=0:d=2,afade=t=out:st={total - 3}:d=3,"
                 f"aresample=48000[a]", "-map", "0:v", "-map", "[a]", "-c:a", "aac", "-b:a", "192k"]
-    cmd += ["-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p",
+    cmd += ["-c:v", "libx264", "-preset", "slow", "-crf", "20", "-tune", "film",
+            "-maxrate", "8M", "-bufsize", "16M", "-g", "60", "-pix_fmt", "yuv420p",
             "-profile:v", "high", "-r", str(FPS), "-t", f"{total}", "-movflags", "+faststart", str(out)]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
 
