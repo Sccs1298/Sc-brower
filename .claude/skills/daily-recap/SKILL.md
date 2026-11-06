@@ -12,7 +12,7 @@ description: Produce today's Hebrew crypto "daily market recap" for the @crypto_
 1. **כל עובדה ומספר – מ-2 מקורות לפחות** (CoinGecko + כותרת חדשות, או שתי כותרות ממקורות שונים). מה שלא אומת – לא נכנס. אל תנחש.
 2. **לא מפרסמים לאינסטגרם בלי אישור מפורש של הבעלים** בהודעה הנוכחית.
 3. **אין תמונות מזויפות/ערוכות של אנשים אמיתיים.** ממים קלאסיים מ-imgflip – מותר.
-4. **רק מדיה מורשית:** תמונות CC0/Public Domain (Openverse), וידאו רק עם רישיון מסחרי (Pexels). Mixkit מסומן "Personal use only" – אסור.
+4. **רק מדיה מורשית:** תמונות CC0/Public Domain (Openverse), וידאו רק עם רישיון מסחרי (Pixabay). Mixkit מסומן "Personal use only" – אסור.
 5. אם חיבור/מפתח לא עובד – **עצור ודווח לבעלים מה חסר**. לא לעקוף חסימות ולא להמציא תחליף.
 6. ציין תמיד מה **נבדק** ומה **הנחה**.
 
@@ -53,7 +53,7 @@ python3 .claude/skills/daily-recap/build_carousel.py $W
 - תקן ובנה מחדש עד שזה נקי.
 
 ### 6. רילס (חובה כל יום – החלטת הבעלים)
-דרוש: מקור וידאו מורשה (Pexels) + ElevenLabs במסלול עם רישיון מסחרי. אם חסר אחד מהם – **הפק טיוטה, סמן "לא לפרסום" ודווח מה חסר**.
+דרוש: וידאו מורשה – `python3 .claude/skills/daily-recap/pixabay_video.py "<query באנגלית>" $W/clips/c.mp4 --n 3` (צריך `PIXABAY_API_KEY`; שמור את ה-json של הרישוי) + קול ברישיון מסחרי (ראה CLAUDE.md). אם חסר אחד מהם – **הפק טיוטה, סמן "לא לפרסום" ודווח מה חסר**.
 - מבנה (25–35 שניות): הוק עם המספר → "השוק באדום/ירוק" עם מחירים → הסיבה → מם (זז אם יש) → שאלה לקהל.
 - קול: **Brian** `nPczCjzI2devNBz1zQrb`, `eleven_v3`, `language_code: he`, endpoint `/v1/text-to-speech/{voice}/with-timestamps` (המפתח מוזרק ע"י ה-proxy; שלח `xi-api-key: proxy-injected`). טייק אחד לכל התסריט. מספרים במילים ("שבעים ושישה אלף"); סימולים באותיות ("אקס אר פי") עם `replace` לתצוגה.
 - המנוע: `instagram_bot/newsreel.py` (spec: vo_json, vo_mp3, replace, scenes[title, video/image/heatmap, start, zoom, anchor, tickers]).
