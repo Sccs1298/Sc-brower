@@ -1,0 +1,64 @@
+name: Daily memorial reel
+
+on:
+  schedule:
+    # Sunday-Friday at 10:07 UTC (12:07/13:07 Israel time). No posts on Shabbat.
+    - cron: "7 10 * * 0-5"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Render only (don't publish)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-reel
+  cancel-in-progress: false
+
+jobs:
+  reel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: System packages
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg libraqm0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Render and publish
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_GRAPH_HOST: ${{ vars.IG_GRAPH_HOST || 'graph.facebook.com' }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python -m izkor_reels.main --dry-run
+          else
+            python -m izkor_reels.main
+          fi
+
+      - name: Keep the rendered reel
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reel-${{ github.run_id }}
+          path: output/
+          retention-days: 30
+
+      - name: Record progress
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          git config user.name "izkor-reels-bot"
+          git config user.email "izkor-reels-bot@users.noreply.github.com"
+          git add state/
+          git diff --cached --quiet || (git commit -m "Published: $(python -c "import json;print(json.load(open('state/published.json'))[-1]['name'])")" && git push)
