@@ -54,13 +54,13 @@ window.SCENES = [
  // ── 0  $6.3B
  { at: [0, 'שישה'], theme: 'dark', ring: [610, 700, 150],
    bp: [{ c: [610, 700, 200], at: .1 }, { d: [160, 1130, 920, 1130], label: '6,300,000,000 USD', at: .3 }],
-   mid: ICON('locker', 540, 720, 760) + `<div class="row giga num" style="top:1180px;font-size:280px">$0.0B</div>`,
+   mid: ICON('locker', 540, 720, 760) + `<div class="row giga num" style="top:1090px;font-size:260px">$0.0B</div>`,
    anim(lt, dur, el) { auto(lt, el); const m = $(el, '.giga'), p = P(lt, 0, 1.4, easeInOut);
      m.textContent = '$' + (6.3 * p).toFixed(1) + 'B'; show(m, P(lt, 0, .25), 40, -300); m.style.transform += ` scale(${1 + .08 * Math.sin(lt * 9) * (1 - p)})`; } },
  // ── 1  20 דקות
  { at: [1, 'עשרים'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 760, 330],
    bp: [{ c: [540, 760, 380], red: 1, at: 0 }, { t: [540, 1250, 'T + 00:20:00'], anchor: 'middle', red: 1, at: .2 }],
-   mid: ICON('clock', 540, 760, 640) + G('20 דקות', 'giga', 1280, 'font-size:200px;color:#ff5a5f'),
+   mid: ICON('clock', 540, 760, 640) + G('20 דקות', 'giga', 1190, 'font-size:200px;color:#ff5a5f'),
    anim(lt, dur, el) { auto(lt, el); } },
  // ── 2  השוד
  { at: [2, 'השוד'], theme: 'light', ring: [540, 820, 0],
@@ -70,7 +70,7 @@ window.SCENES = [
  // ── 3  הכי גדול בהיסטוריה
  { at: [2, 'בהיסטוריה'], theme: 'dark', ring: [540, 720, 300],
    bp: [{ d: [130, 380, 130, 1080], label: 'ALL-TIME', at: 0 }, { x: [540, 720], at: .1 }],
-   mid: ICON('fire', 540, 720, 700) + G('#1', 'giga acc', 1150, 'font-size:300px;direction:ltr'),
+   mid: ICON('fire', 540, 720, 700) + G('#1', 'giga acc', 1060, 'font-size:300px;direction:ltr'),
    anim(lt, dur, el) { auto(lt, el); } },
  // ── 4  והכל התחיל
  { at: [3, 'והכל'], theme: 'black', ring: [540, 900, 0],
@@ -90,7 +90,7 @@ window.SCENES = [
  // ── 7  מהנדס בבינאנס
  { at: [5, 'מהנדס'], theme: 'dark', tr: 'whipL', ring: [540, 760, 260],
    bp: [{ t: [540, 1120, 'ENGINEER // BINANCE'], anchor: 'middle', at: .2 }],
-   mid: AV(540, 760) + G('מהנדס בבינאנס', 'h1', 1180, 'font-size:110px'),
+   mid: AV(540, 760) + G('מהנדס בבינאנס', 'h1', 1090, 'font-size:110px'),
    anim(lt, dur, el) { auto(lt, el); avatar(el, lt); } },
  // ── 8  הצעה חלומית
  { at: [5, 'הצעה'], theme: 'light', ring: [540, 800, 0],
@@ -109,7 +109,7 @@ window.SCENES = [
  { at: [7, 'הקובץ'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 680, 230],
    bp: [{ c: [540, 680, 280], red: 1, dash: 1, ticks: false, at: 0 }, { t: [130, 400, 'MALWARE.EXE'], red: 1, at: .2 }, { t: [950, 400, 'ACCESS: ROOT'], anchor: 'end', red: 1, at: .5 }],
    mid: ICON('computer', 540, 720, 720) + `<div class="abs scan" style="left:180px;width:720px;height:8px;background:linear-gradient(90deg,transparent,#E5484D,transparent);box-shadow:0 0 34px #E5484D"></div>`
-        + G('נדבק.', 'giga', 1160, 'font-size:260px;color:#ff5a5f'),
+        + G('נדבק.', 'giga', 1070, 'font-size:260px;color:#ff5a5f'),
    anim(lt, dur, el, A) { auto(lt, el); const sc = $(el, '.scan'); sc.style.top = (380 + ((lt * 600) % 640)) + 'px';
      const g = $(el, '.giga'); kin(g, lt, A.w('הדביק') - .05, .06); g.style.transform += ` translateX(${Math.sin(lt * 50) * 6 * P(lt, A.w('הדביק'), .1)}px)`; } },
  // ── 13  ומשם ישר
@@ -120,7 +120,7 @@ window.SCENES = [
  // ── 14  לארנק החם
  { at: [8, 'לארנק'], theme: 'dark', tr: 'zoom', ring: [540, 720, 300],
    bp: [{ c: [540, 720, 360], at: 0 }],
-   mid: ICON('wallet', 540, 720, 720) + G('ארנק חם', 'giga', 1160, 'font-size:190px'),
+   mid: ICON('wallet', 540, 720, 720) + G('ארנק חם', 'giga', 1070, 'font-size:190px'),
    anim(lt, dur, el) { auto(lt, el); } },
  // ── 15  מחובר לאינטרנט
  { at: [9, 'הכסף'], theme: 'light', tr: 'whipR', ring: [540, 820, 250],
@@ -148,11 +148,11 @@ window.SCENES = [
    anim(lt, dur, el) { $$(el, '.coin').forEach((c, i) => card3d(c, lt, i * .15, .6)); } },
  // ── 20  הקפיאו (Match Cut: אותם מטבעות, קפואים)
  { at: [12, 'הקפיאו'], theme: 'dark', cls: 'icetint', tr: 'zoom', ring: [540, 860, 0],
-   mid: `<div class="coins"><div class="coin"><b>USDT</b><span>Tether</span><div class="ice"></div></div><div class="coin"><b>USDC</b><span>Circle</span><div class="ice"></div></div></div>` + G('הוקפאו.', 'h1', 1180, 'font-size:130px;color:#a8d2ff'),
+   mid: `<div class="coins"><div class="coin"><b>USDT</b><span>Tether</span><div class="ice"></div></div><div class="coin"><b>USDC</b><span>Circle</span><div class="ice"></div></div></div>` + G('הוקפאו.', 'h1', 1090, 'font-size:130px;color:#a8d2ff'),
    anim(lt, dur, el) { $$(el, '.coin').forEach((c, i) => card3d(c, lt, -1, .6)); $$(el, '.ice').forEach((c, i) => c.style.opacity = P(lt, i * .1, .3)); auto(lt, el); } },
  // ── 21  $2.3B
  { at: [12, 'שניים'], theme: 'dark', cls: 'icetint', tr: 'zoom', ring: [540, 860, 340],
-   mid: G('$2.3B', 'giga', 700, 'font-size:300px;color:#cfe6ff;direction:ltr') + G('תוך שעות', 'h1 muted', 1060, 'font-size:100px'),
+   mid: G('$2.3B', 'giga', 700, 'font-size:300px;color:#cfe6ff;direction:ltr') + G('תוך שעות', 'h1 muted', 970, 'font-size:100px'),
    anim(lt, dur, el) { auto(lt, el); } },
  // ── 22  FBI
  { at: [13, 'FBI'], theme: 'dark', tr: 'whipL', ring: [540, 840, 0],
@@ -167,7 +167,7 @@ window.SCENES = [
    anim(lt, dur, el) { auto(lt, el); avatar(el, lt); } },
  // ── 24  צפון קוריאה?
  { at: [14, 'צפון'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 700, 260],
-   mid: AV(540, 700, true) + G('צפון קוריאה?', 'h1', 1100, 'font-size:130px'),
+   mid: AV(540, 700, true) + G('צפון קוריאה?', 'h1', 1010, 'font-size:130px'),
    anim(lt, dur, el) { auto(lt, el); avatar(el, lt); } },
  // ── 25  מכחישה
  { at: [14, 'מכחישה'], theme: 'light', tr: 'whipR', ring: [540, 860, 0],
@@ -187,11 +187,11 @@ window.SCENES = [
  // ── 28  לא ביטקוין
  { at: [16, 'לא'], theme: 'light', tr: 'zoom', ring: [540, 760, 300],
    bp: [{ l: 'M260 480L820 1040M820 480L260 1040', red: 1, w: 18, at: .15 }],
-   mid: ICON('3d-coin', 540, 760, 640) + G('לא ביטקוין.', 'h1', 1150, 'font-size:120px'),
+   mid: ICON('3d-coin', 540, 760, 640) + G('לא ביטקוין.', 'h1', 1060, 'font-size:120px'),
    anim(lt, dur, el) { auto(lt, el); } },
  // ── 29  הבטחה
  { at: [16, 'הבטחה'], theme: 'dark', tr: 'whipR', ring: [540, 720, 280],
-   mid: ICON('key', 540, 700, 560) + G('הבטחה.', 'giga acc', 1080, 'font-size:190px'),
+   mid: ICON('key', 540, 700, 560) + G('הבטחה.', 'giga acc', 990, 'font-size:190px'),
    anim(lt, dur, el) { auto(lt, el); } },
  // ── 30  עקבו
  { at: [17, 'עקבו'], theme: 'light', tr: 'zoom', ring: [540, 760, 140],

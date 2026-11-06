@@ -96,7 +96,7 @@ function drawBP(el, lt) {
 let ringSVG, capEl, grainCtx, grainImg;
 function buildStage() {
   const stage = document.getElementById('stage');
-  stage.innerHTML = `<div id="world"><div id="cam"></div></div><div id="top"></div><div id="brand">CRYPTO ILS</div>
+  stage.innerHTML = `<div id="world"><div id="cam"></div></div><div id="cap"></div><div id="brand">CRYPTO ILS</div>
     <canvas id="grain" width="360" height="640"></canvas><div id="vig"></div><div id="leak"></div><div id="flash"></div>`;
   const cam = $(stage, '#cam');
   SCENES.forEach(sc => {
@@ -121,9 +121,18 @@ function buildStage() {
   ringSVG.setAttribute('id', 'ring'); ringSVG.setAttribute('width', 1080); ringSVG.setAttribute('height', 1920);
   ringSVG.innerHTML = `<circle id="r1" fill="none" stroke="var(--accent)" stroke-width="3"/><circle id="r2" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 14" opacity=".8"/>
     <path id="r3" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
-  ringSVG.style.transform = 'translateZ(150px) scale(.909)';  // מישור נפרד מהכרטיסים (אין חיתוך תלת-ממדי)
+  // הטבעת ב-Z=150 + מיפוי זהה ל-Lmid (scale .82 מלמעלה-מרכז) אחרי פרספקטיבה
+  ringSVG.style.transformOrigin = '0 0'; ringSVG.style.transform = 'translateZ(150px) translate(141.4px,86.4px) scale(.738)';  // מישור נפרד מהכרטיסים (אין חיתוך תלת-ממדי)
   cam.appendChild(ringSVG);
-  capEl = $(stage, '#top');
+  capEl = $(stage, '#cap');
+  // קבוצות כתוביות (עד 3 מילים, לא חוצות משפט/פיסוק)
+  window.CAPS = []; let cur = null;
+  TIMING.words.forEach(w => {
+    if (!cur || cur.k !== w[2] || cur.w.length >= 3 || /[,.?!:]$/.test(cur.w[cur.w.length - 1][0])) { cur = { k: w[2], w: [] }; CAPS.push(cur); }
+    cur.w.push(w);
+  });
+  CAPS.forEach(c => c.s = c.w[0][1]);
+  CAPS.forEach((c, i) => { c.e = i + 1 < CAPS.length ? Math.min(CAPS[i + 1].s, c.w[c.w.length - 1][1] + .9) : c.s + 2; });
   const g = $(stage, '#grain'); grainCtx = g.getContext('2d'); grainImg = grainCtx.createImageData(360, 640);
 }
 
@@ -159,7 +168,7 @@ window.renderAt = function (t) {
   // ---------- מצלמה רציפה ----------
   const B = TIMING.beat, ph = ((t % B) + B) % B / B, bump = Math.exp(-ph * 7);
   // מוקד המצלמה: בין מרכז המסך לטבעת (שלא ייחתך הפריים כשהטבעת בקצה)
-  const fx = sc.focus ? sc.focus[0] : lerp(540, R[0], .45), fy = sc.focus ? sc.focus[1] : lerp(900, R[1], .45);
+  const fx = .82 * (sc.focus ? sc.focus[0] : lerp(540, R[0], .45)) + 97.2, fy = .82 * (sc.focus ? sc.focus[1] : lerp(900, R[1], .45));
   const tr = TR(sc), nxt = SCENES[k + 1];
   const ip = k > 0 ? 1 - P(lt, 0, .38, easeOut) : 1 - P(lt, 0, .9, easeOut);        // כניסה מהירה
   const zoomIn = tr === 'zoom' || k === 0 ? ip : 0, whip = tr.startsWith('whip') ? ip * (tr === 'whipR' ? 1 : -1) : 0;
@@ -172,10 +181,20 @@ window.renderAt = function (t) {
   const cam = document.getElementById('cam');
   cam.style.transformOrigin = `${fx}px ${fy}px`;
   cam.style.transform = `translate3d(${dx}px,${dy}px,0) rotateX(${rxx}deg) rotateY(${ryy}deg) rotateZ(${rz}deg) scale(${scale})`;
-  // ---------- מילה אחת למעלה (כמו ברפרנסים) ----------
-  let cw = ''; for (const w of TIMING.words) if (w[1] <= t + .03) cw = w[0];
-  capEl.textContent = sc.noTop || t > TIMING.total - .6 ? '' : cw.replace(/[,.:]/g, '');
-  capEl.className = sc.theme === 'light' ? 'onlight' : '';
+  // ---------- כתוביות באזור הבטוח (y≈1235, משמאל לעמודת הכפתורים) ----------
+  const c = CAPS.find(c => t >= c.s - .02 && t < c.e);
+  if (!c || sc.noCap) { capEl.innerHTML = ''; capEl._c = null; } else {
+    if (capEl._c !== c) { capEl.innerHTML = c.w.map(w => `<span class="cw">${w[0]}</span>`).join(' '); capEl._c = c; }
+    const gp = P(t, c.s - .02, .2, back);
+    capEl.style.opacity = clamp(gp * 1.6); capEl.style.transform = `translateY(${30 * (1 - gp)}px) scale(${.9 + .1 * gp})`;
+    const light = sc.theme === 'light';
+    $$(capEl, '.cw').forEach((e, i) => {
+      const on = t >= c.w[i][1] - .04 && (i + 1 >= c.w.length || t < c.w[i + 1][1] - .04);
+      const pp = P(t, c.w[i][1] - .04, .16, back);
+      e.className = 'cw' + (on ? ' on' : '') + (light ? ' lt' : '');
+      e.style.transform = on ? `scale(${1.12 - .08 * clamp(pp)})` : 'scale(1)';
+    });
+  }
   document.getElementById('brand').className = sc.theme === 'light' ? 'onlight' : '';
   // ---------- גימור קולנועי ----------
   let seed = (Math.floor(t * 60) * 2654435761) >>> 0; const d = grainImg.data;

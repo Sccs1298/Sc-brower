@@ -58,3 +58,16 @@ svg.bp .lbl { font: 700 22px "DejaVu Sans Mono", monospace; letter-spacing: 2px;
 #top { position: absolute; top: 215px; width: 100%; text-align: center; font: 700 46px Heebo; color: rgba(255,255,255,.95); z-index: 6; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
 #top.onlight { color: #111; text-shadow: 0 2px 20px rgba(255,255,255,.8); }
 .giga { font: 900 330px/1 Heebo; letter-spacing: -10px; }
+
+/* v3: אזור בטוח לרילס – תוכן ב-82% (350..1190), כתוביות ב-1235, משמאל לכפתורי אינסטגרם */
+.Lmid { transform: scale(.82); transform-origin: 50% 0; }
+#cap { left: 70px !important; right: 170px !important; top: 1235px !important; font: 900 76px/1.2 Heebo !important; text-shadow: none !important; color: #fff; }
+#cap .cw { display: inline-block; padding: 2px 16px 8px; margin: 0 2px; border-radius: 18px; color: #fff;
+  text-shadow: 0 4px 0 rgba(0,0,0,.35), 0 0 24px rgba(0,0,0,.6); }
+#cap .cw.lt { color: #111; text-shadow: 0 0 22px rgba(255,255,255,.95); }
+#cap .cw.on { background: var(--accent); color: #111; text-shadow: none; box-shadow: 0 10px 30px rgba(247,147,26,.45); }
+#brand { top: 300px !important; }
+
+/* v3.1: כתוביות שורה אחת, נמוך יותר; מותג מתחת לכתוביות */
+#cap { top: 1300px !important; font: 900 64px/1.2 Heebo !important; white-space: nowrap; }
+#brand { top: 1420px !important; }

@@ -1,6 +1,6 @@
 ---
 name: daily-recap
-description: Produce today's Hebrew crypto "daily market recap" for the @crypto_ils Instagram page - a coinsauce-style 5-slide carousel (and a reel when licensed video + commercial voice are available) built from real, double-sourced data, quality-checked frame by frame, and uploaded to Google Drive for the owner's approval. Use when asked for a daily recap, סיכום שוק, today's post, or /daily-recap.
+description: Produce today's Hebrew crypto daily recap for @crypto_ils - a coinsauce-style 5-slide carousel AND a fast cinematic explainer reel (instagram_bot/motion engine, Instagram safe-zone captions) on the same story, built from real double-sourced data, quality-checked frame by frame, and uploaded to Google Drive for the owner's approval. Use when asked for a daily recap, סיכום שוק, today's post, or /daily-recap.
 ---
 
 # סיכום שוק יומי – CRYPTO ILS
@@ -52,12 +52,21 @@ python3 .claude/skills/daily-recap/build_carousel.py $W
 - פתח את `$W/sheet.jpg` (Read) ובדוק: עברית קריאה ובכיוון נכון, אין שבירות שורה יתומות, המם מתאים לכיתוב, התמונה לא סותרת את הטקסט, המספרים זהים ל-market.json.
 - תקן ובנה מחדש עד שזה נקי.
 
-### 6. רילס (חובה כל יום – החלטת הבעלים)
-דרוש: וידאו מורשה – `python3 .claude/skills/daily-recap/pixabay_video.py "<query באנגלית>" $W/clips/c.mp4 --n 3` (צריך `PIXABAY_API_KEY`; שמור את ה-json של הרישוי) + קול ברישיון מסחרי (ראה CLAUDE.md). אם חסר אחד מהם – **הפק טיוטה, סמן "לא לפרסום" ודווח מה חסר**.
-- מבנה (25–35 שניות): הוק עם המספר → "השוק באדום/ירוק" עם מחירים → הסיבה → מם (זז אם יש) → שאלה לקהל.
-- קול: **Brian** `nPczCjzI2devNBz1zQrb`, `eleven_v3`, `language_code: he`, endpoint `/v1/text-to-speech/{voice}/with-timestamps` (המפתח מוזרק ע"י ה-proxy; שלח `xi-api-key: proxy-injected`). טייק אחד לכל התסריט. מספרים במילים ("שבעים ושישה אלף"); סימולים באותיות ("אקס אר פי") עם `replace` לתצוגה.
-- המנוע: `instagram_bot/newsreel.py` (spec: vo_json, vo_mp3, replace, scenes[title, video/image/heatmap, start, zoom, anchor, tickers]).
-- וידאו חייב להתאים לטקסט (גרף יורד = "קריסה"). חלץ פריימים ובדוק לפני מסירה.
+### 6. רילס (חובה כל יום) – מנוע "אקספליינר קולנועי" (התבנית האחרונה: v4, 5/10 ועולה)
+קרא קודם ב-CLAUDE.md את "7 עקרונות הרילס" ו"אזור בטוח". **התבנית לשכפול: `instagram_bot/motion/reels/binhack3.html`.**
+1. **תסריט** (`$W/reel_script.json` – רשימת משפטים קצרים, 15–20 משפטים, ~80 מילים, ~40 שניות):
+   הוק במספר ("שישה פסיק שלושה מיליארד דולר.") → טוויסט קצר → "בואו נסביר." → הסבר בצעדים → הנבל/הסיבה → "החלק שכדאי לזכור" (לקח) → "עקבו, ותבינו קריפטו לפני כולם."
+   מספרים במילים; ראשי תיבות באותיות ("ה אף בי איי") + `--replace` לתצוגה.
+2. **קול + ביט:**
+   `SSL_CERT_FILE=/root/.ccr/ca-bundle.crt python3 instagram_bot/motion/voice_beat.py $W/reel_script.json $W/reel --bpm 120 --rate +25% --gap 0.0 --impacts 0,1 --replace '{"ה אף בי איי":"ה-FBI"}' --timing instagram_bot/motion/reels/<slug>_timing.js`
+   (אברי דרך edge-tts = **טיוטה בלבד** עד Azure F0 – ראה CLAUDE.md.)
+3. **שוטים:** העתק את binhack3.html ל-`reels/<slug>.html`, החלף את קובץ ה-timing ואת `SCENES`. **שוט חדש כל ~1.3ש'**, מתחלף על מילה: `at:[מספר_משפט,'מילה']`.
+   אוצר מילים: `G('טקסט','giga',top,'font-size:..')` מילה/מספר ענק · `ICON('locker'|'fire'|'wallet'|'computer'|'key'|'clock'|'3d-coin'|...,cx,cy,w)` · `card` (UI: ארנק/משרה/מעקב) · `AV(x,y,evil)` דמות · `bp:[...]` שרטוט טכני · `ring:[x,y,r]` Match Cut · `cls:'redtint'|'icetint'` צבע לפי רגש · `tr:'zoom'|'whipR'|'whipL'`.
+   קואורדינטות 1080x1920 "לוגיות" (המנוע מכווץ ל-82% לאזור הבטוח). תוכן בין y≈430 ל-y≈1350; לא לשים כלום מתחת.
+4. **בדיקה לפני רינדור:** `node instagram_bot/motion/shots.js $PWD/instagram_bot/motion/reels/<slug>.html OUT_DIR "t1,t2,..."` (צילומי מסך בזמנים) – בדוק: אין חפיפה עם הכתוביות, אין מילים שגולשות מהמסך, טקסט לא נחתך.
+5. **רינדור:** `node instagram_bot/motion/render.js reels/<slug>.html $W/reel/silent60.mp4 <total> 60` ואז
+   `ffmpeg -i silent60.mp4 -i mix.wav -vf "tmix=frames=2:weights='1 1',fps=30" -crf 22 ...` (+ גרסה עם `vo_sfx.wav` בלי ביט).
+6. אייקונים חדשים: 3dicons.co (CC0) premium → rembg (ראה `instagram_bot/assets/icons3d/SOURCE.txt`).
 
 ### 7. מסירה לדרייב
 1. צור תיקייה: `mcp__Google_Drive__create_file` (mimeType folder) בשם `YYYY-MM-DD – <נושא>` תחת התיקייה הראשית `1oLdCvgVtPt_C8nqVm09yBm4i3uwyNMls`.
