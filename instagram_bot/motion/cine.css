@@ -1,7 +1,7 @@
 @font-face { font-family: Heebo; font-weight: 400; src: url(../fonts/Heebo-400.ttf); }
 @font-face { font-family: Heebo; font-weight: 700; src: url(../fonts/Heebo-700.ttf); }
 @font-face { font-family: Heebo; font-weight: 900; src: url(../fonts/Heebo-900.ttf); }
-:root { --accent: #F7931A; --red: #E5484D; --green: #30A46C; --ink: #111113; --bp: rgba(247,147,26,.55); }
+:root { --accent: #9D5CFF; --red: #E5484D; --green: #30A46C; --ink: #111113; --bp: rgba(157,92,255,.55); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
 body { font-family: Heebo, sans-serif; direction: rtl; -webkit-font-smoothing: antialiased; }
@@ -13,10 +13,10 @@ body { font-family: Heebo, sans-serif; direction: rtl; -webkit-font-smoothing: a
 .Lbg { transform: translateZ(-700px) scale(1.47); }
 .Lfg { transform: translateZ(220px) scale(.853); pointer-events: none; }
 .bgfill { position: absolute; inset: -300px; }
-.dark .bgfill { background: radial-gradient(ellipse 60% 34% at 50% 44%, rgba(247,147,26,.20), transparent 70%), linear-gradient(#131315, #040405); }
+.dark .bgfill { background: radial-gradient(ellipse 60% 34% at 50% 44%, rgba(157,92,255,.20), transparent 70%), linear-gradient(#131315, #040405); }
 .black .bgfill { background: radial-gradient(ellipse 50% 30% at 50% 47%, rgba(255,255,255,.05), transparent 70%), #000; }
 .light .bgfill { background: radial-gradient(ellipse 65% 38% at 50% 42%, #fff, transparent 75%), linear-gradient(#EEEEEF, #D6D6D9); }
-.dark, .black { color: #F4F4F5; --bp: rgba(247,147,26,.5); --grid: rgba(255,255,255,.045); }
+.dark, .black { color: #F4F4F5; --bp: rgba(157,92,255,.5); --grid: rgba(255,255,255,.045); }
 .light { color: var(--ink); --bp: rgba(20,20,25,.42); --grid: rgba(0,0,0,.05); }
 svg.bp { position: absolute; left: 0; top: 0; overflow: visible; }
 svg.bp .lbl { font: 700 22px "DejaVu Sans Mono", monospace; letter-spacing: 2px; direction: ltr; }
@@ -34,7 +34,7 @@ svg.bp .lbl { font: 700 22px "DejaVu Sans Mono", monospace; letter-spacing: 2px;
   box-shadow: 0 50px 90px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.18); }
 .light .card { background: rgba(255,255,255,.92); border: 1.5px solid rgba(0,0,0,.06); box-shadow: 0 50px 100px rgba(0,0,0,.16); }
 .pill { display: inline-block; padding: 18px 42px; border-radius: 999px; font: 700 42px Heebo; }
-.btn { display: block; text-align: center; padding: 30px; border-radius: 26px; font: 700 44px Heebo; background: var(--accent); color: #111; }
+.btn { display: block; text-align: center; padding: 30px; border-radius: 26px; font: 700 44px Heebo; background: var(--accent); color: #fff; }
 .avatar { position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #3a3a40, #101012 70%);
   border: 2px solid rgba(255,255,255,.14); box-shadow: 0 30px 70px rgba(0,0,0,.7); }
 .avatar .eye { position: absolute; top: 120px; width: 38px; height: 13px; border-radius: 7px; background: #fff; }
@@ -51,7 +51,7 @@ svg.bp .lbl { font: 700 22px "DejaVu Sans Mono", monospace; letter-spacing: 2px;
 #grain { position: absolute; inset: 0; width: 1080px; height: 1920px; z-index: 7; opacity: .085; mix-blend-mode: overlay; image-rendering: pixelated; }
 #vig { position: absolute; inset: 0; z-index: 7; background: radial-gradient(ellipse 80% 70% at 50% 46%, transparent 55%, rgba(0,0,0,.55)); }
 #leak { position: absolute; inset: -200px; z-index: 8; mix-blend-mode: screen; opacity: 0;
-  background: radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255,170,60,.9), rgba(247,100,26,.35) 45%, transparent 70%); }
+  background: radial-gradient(ellipse 40% 30% at 50% 50%, rgba(185,140,255,.9), rgba(120,60,255,.35) 45%, transparent 70%); }
 #flash { position: absolute; inset: 0; z-index: 8; background: #fff; opacity: 0; }
 
 /* v2: מילה אחת למעלה */
@@ -65,7 +65,7 @@ svg.bp .lbl { font: 700 22px "DejaVu Sans Mono", monospace; letter-spacing: 2px;
 #cap .cw { display: inline-block; padding: 2px 16px 8px; margin: 0 2px; border-radius: 18px; color: #fff;
   text-shadow: 0 4px 0 rgba(0,0,0,.35), 0 0 24px rgba(0,0,0,.6); }
 #cap .cw.lt { color: #111; text-shadow: 0 0 22px rgba(255,255,255,.95); }
-#cap .cw.on { background: var(--accent); color: #111; text-shadow: none; box-shadow: 0 10px 30px rgba(247,147,26,.45); }
+#cap .cw.on { background: var(--accent); color: #fff; text-shadow: none; box-shadow: 0 10px 30px rgba(157,92,255,.45); }
 #brand { top: 300px !important; }
 
 /* v3.1: כתוביות שורה אחת, נמוך יותר; מותג מתחת לכתוביות */

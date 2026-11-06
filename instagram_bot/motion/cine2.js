@@ -152,7 +152,7 @@ window.renderAt = function (t) {
     const sx = (i * 397) % 1080, sy = (i * 733) % 1920, sz = 4 + (i % 5) * 5;
     const x = (sx + t * (12 + i % 7 * 4)) % 1180 - 50, y = (sy - t * (20 + i % 5 * 9) + 4000) % 2000 - 40;
     p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.width = p.style.height = sz + 'px';
-    p.style.background = sc.theme === 'light' ? 'rgba(255,255,255,.9)' : 'rgba(255,190,120,.55)';
+    p.style.background = sc.theme === 'light' ? 'rgba(255,255,255,.9)' : 'rgba(190,160,255,.55)';
     p.style.filter = `blur(${i % 3 * 2 + 1}px)`; p.style.opacity = .25 + .35 * Math.abs(Math.sin(t * .7 + i));
   });
   // ---------- טבעת Match Cut ----------
