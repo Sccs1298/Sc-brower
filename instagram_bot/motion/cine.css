@@ -53,3 +53,8 @@ svg.bp .lbl { font: 700 22px "DejaVu Sans Mono", monospace; letter-spacing: 2px;
 #leak { position: absolute; inset: -200px; z-index: 8; mix-blend-mode: screen; opacity: 0;
   background: radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255,170,60,.9), rgba(247,100,26,.35) 45%, transparent 70%); }
 #flash { position: absolute; inset: 0; z-index: 8; background: #fff; opacity: 0; }
+
+/* v2: מילה אחת למעלה */
+#top { position: absolute; top: 215px; width: 100%; text-align: center; font: 700 46px Heebo; color: rgba(255,255,255,.95); z-index: 6; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
+#top.onlight { color: #111; text-shadow: 0 2px 20px rgba(255,255,255,.8); }
+.giga { font: 900 330px/1 Heebo; letter-spacing: -10px; }

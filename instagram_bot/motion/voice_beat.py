@@ -85,14 +85,20 @@ def main():
     rate = opt("--rate", "+6%")
     os.makedirs(out, exist_ok=True)
 
-    clips = [asyncio.run(tts(s, rate)) for s in seg]
+    clips = []
+    for s in seg:  # חיתוך שקט בהתחלה ובסוף כל משפט (edge-tts מוסיף ~0.3–0.8ש')
+        pcm, ws = asyncio.run(tts(s, rate))
+        loud = np.where(np.abs(pcm) > 0.012)[0]
+        a0 = max(0, loud[0] - int(.03 * SR)) if len(loud) else 0
+        a1 = min(len(pcm), loud[-1] + int(.08 * SR)) if len(loud) else len(pcm)
+        clips.append((pcm[a0:a1], [[w, max(0.0, o - a0 / SR)] for w, o in ws]))
     starts, words, t = [], [], 0.0  # ההוק מתחיל מיד, על ביט 0
     for k, (pcm, ws) in enumerate(clips):
         starts.append(t)
         for w, o in ws:
             words.append([w, round(t + o, 3), k])
         end = t + len(pcm) / SR
-        t = (np.ceil((end + .12) / B)) * B  # הביט הבא אחרי סוף המשפט
+        t = (np.ceil((end + float(opt("--gap", .12))) / B)) * B  # הביט הבא אחרי סוף המשפט
     total = t + B * 2
     # החלפות תצוגה (רצף מילים → מילה אחת)
     for src, dst in rep.items():
