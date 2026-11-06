@@ -1,0 +1,2 @@
+אייקונים: 3dicons.co (CC0, Vijay Verma), סגנון premium, רקע הוסר עם rembg.
+להוספה: sizes/<id>/dynamic/500/premium.webp ואז rembg (isnet-general-use).
