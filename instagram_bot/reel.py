@@ -290,7 +290,7 @@ class Number(Scene):
 
     def fmt(self, v):
         d = self.s.get("decimals", 0)
-        s = f"{v:,.{d}f}"
+        s = f"{v:.{d}f}" if self.s.get("raw") else f"{v:,.{d}f}"
         return f"{self.s.get('prefix', '')}{s}{self.s.get('suffix', '')}"
 
     def draw(self, f, t):
