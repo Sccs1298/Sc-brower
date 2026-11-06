@@ -30,7 +30,8 @@ python3 .claude/skills/daily-recap/fetch_market.py $W
 - לכל עובדה בטקסט – רשום לעצמך את 2 המקורות. אם צריך, הרחב חיפוש: `news.google.com/rss/search?q=...`.
 - זמנים: כתוב "ביממה האחרונה"/"היום" רק אם זה נכון לשעת ההפקה.
 
-### 3. כתיבה (עברית חדה, לא "AI")
+### 3. כתיבה (עברית חדה וצינית, לא "AI")
+טון מחייב (החלטת הבעלים): **חד וציני** – כמו חבר שמבין בשוק ולא מתרגש מהייפ. ציניות על השוק/ההייפ/המינוף, לא על הקהל. אף פעם לא על חשבון דיוק.
 - **cover_head**: 1–3 מילים, הנושא ("שוק הקריפטו", "בינאנס", "ביטקוין").
 - **cover_sub**: הפרט המפתיע עם המספר ("איבד כ-175 מיליארד דולר ביממה").
 - **meme captions**: משפט אחד, ציני-מצחיק, בגרשיים כשזה "ציטוט" ("זה רק תיקון בריא").
@@ -43,15 +44,20 @@ python3 .claude/skills/daily-recap/fetch_market.py $W
 ```bash
 python3 .claude/skills/daily-recap/build_carousel.py $W
 ```
-ממים מומלצים (שמות imgflip): This Is Fine, Sad Pablo Escobar, Panik Kalm Panik (בלי טקסט פנימי), Disaster Girl, Hide the Pain Harold, Two Buttons.
+**ממים – עדיפות לזזים** (החלטת הבעלים): אם יש מקור GIF מחובר (ראה CLAUDE.md) – השתמש במם זז; אחרת סטטי מ-imgflip.
+ממים סטטיים מומלצים (שמות imgflip): This Is Fine, Sad Pablo Escobar, Panik Kalm Panik (בלי טקסט פנימי), Disaster Girl, Hide the Pain Harold, Two Buttons.
+אל תחזור על אותו מם שני ימים ברצף.
 
 ### 5. בדיקת איכות (חובה – לפני מסירה)
 - פתח את `$W/sheet.jpg` (Read) ובדוק: עברית קריאה ובכיוון נכון, אין שבירות שורה יתומות, המם מתאים לכיתוב, התמונה לא סותרת את הטקסט, המספרים זהים ל-market.json.
 - תקן ובנה מחדש עד שזה נקי.
 
-### 6. רילס (רק אם יש תנאים)
-דרוש: מפתח Pexels (וידאו מורשה) + ElevenLabs במסלול עם רישיון מסחרי. אם חסר – **דלג ודווח**.
-המנוע: `instagram_bot/newsreel.py` (spec עם vo_json/vo_mp3/scenes). קריינות: ElevenLabs `eleven_v3`, `language_code: he`, endpoint `with-timestamps` (המפתח מוזרק אוטומטית ע"י ה-proxy, header `xi-api-key`). אחרי רינדור – חלץ פריימים ובדוק כמו בשלב 5.
+### 6. רילס (חובה כל יום – החלטת הבעלים)
+דרוש: מקור וידאו מורשה (Pexels) + ElevenLabs במסלול עם רישיון מסחרי. אם חסר אחד מהם – **הפק טיוטה, סמן "לא לפרסום" ודווח מה חסר**.
+- מבנה (25–35 שניות): הוק עם המספר → "השוק באדום/ירוק" עם מחירים → הסיבה → מם (זז אם יש) → שאלה לקהל.
+- קול: **Brian** `nPczCjzI2devNBz1zQrb`, `eleven_v3`, `language_code: he`, endpoint `/v1/text-to-speech/{voice}/with-timestamps` (המפתח מוזרק ע"י ה-proxy; שלח `xi-api-key: proxy-injected`). טייק אחד לכל התסריט. מספרים במילים ("שבעים ושישה אלף"); סימולים באותיות ("אקס אר פי") עם `replace` לתצוגה.
+- המנוע: `instagram_bot/newsreel.py` (spec: vo_json, vo_mp3, replace, scenes[title, video/image/heatmap, start, zoom, anchor, tickers]).
+- וידאו חייב להתאים לטקסט (גרף יורד = "קריסה"). חלץ פריימים ובדוק לפני מסירה.
 
 ### 7. מסירה לדרייב
 1. צור תיקייה: `mcp__Google_Drive__create_file` (mimeType folder) בשם `YYYY-MM-DD – <נושא>` תחת התיקייה הראשית `1oLdCvgVtPt_C8nqVm09yBm4i3uwyNMls`.
