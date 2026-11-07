@@ -18,11 +18,15 @@ window.STORE = {
   packages: {
     1: { title: "בקבוק אחד", qty: 1, price: 79, compare: 0 },
     2: { title: "זוג (לשני רכבים)", qty: 2, price: 119, compare: 158, badge: "הכי משתלם" },
-    3: { title: "שלישייה (לכל המשפחה)", qty: 3, price: 149, compare: 237 }
+    3: { title: "שלישייה", qty: 3, price: 149, compare: 237 }
   },
 
   // מתנה לחבילות 2+ (רק אם הספק באמת שולח מטלית — אחרת למחוק את השורה)
   gift: "מטלית מיקרופייבר מתנה",
+
+  // תמונות/סרטונים אמיתיים של המוצר (מהספק באישור, או שצילמת). לשים בתיקייה docs/media/
+  // דוגמה: ["media/1.jpg", "media/2.jpg", "media/demo.mp4"]. כשהרשימה ריקה מוצג האיור.
+  photos: [],
 
   // ביקורות אמיתיות בלבד. דוגמה:
   // { name: "יוסי מ.", city: "חיפה", stars: 5, text: "...", img: "reviews/yossi.jpg" }

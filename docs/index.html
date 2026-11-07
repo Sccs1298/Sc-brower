@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>KLARO | השמשה שלך שקופה גם בגשם וגם בלילה</title>
-<meta name="description" content="מסיר שכבת שומן לשמשות הרכב עם ספוג מובנה. מורחים, שוטפים — והשמשה שקופה. בלי פסים, בלי סנוור בלילה. משלוח חינם עד הבית.">
-<meta property="og:title" content="KLARO — נגב את השמשה ותראה את ההבדל">
+<title>KLARO | מסיר שכבת שומן לשמשות</title>
+<meta name="description" content="מסיר שכבת שומן לשמשות הרכב, עם ספוג שמחובר לבקבוק. מורחים, שוטפים במים, והמגבים מפסיקים למרוח. משלוח חינם עד הבית.">
+<meta property="og:title" content="KLARO: תנגב את השמשה ותראה את ההבדל">
 <meta property="og:description" content="מסיר שכבת שומן לשמשות. 5 דקות, שמשה שקופה. משלוח חינם.">
 <meta property="og:type" content="product">
 <meta name="theme-color" content="#060d17">
@@ -149,6 +149,8 @@ h2{font-size:40px;line-height:1.12;margin:0 0 12px;font-weight:900;text-align:ce
 .box{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
 .bottle{max-width:360px;margin:0 auto;animation:float 5s ease-in-out infinite;filter:drop-shadow(0 30px 40px rgba(11,28,44,.25))}
 @keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-14px) rotate(3deg)}}
+.gallery{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:22px;-webkit-overflow-scrolling:touch}
+.gallery>*{flex:0 0 100%;scroll-snap-align:center;aspect-ratio:1;object-fit:cover;border-radius:22px;background:#eee}
 .specs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
 .specs div{background:var(--soft);border-radius:14px;padding:14px}
 .specs b{display:block;font-size:22px;color:var(--ink)}
@@ -252,9 +254,9 @@ footer a:hover{text-decoration:underline}
 <body>
 
 <div class="bar" id="bar">
-  <div class="on">🚚 משלוח חינם עד הבית — בכל הארץ</div>
-  <div>🔥 זוג ב-119 ₪ במקום 158 ₪</div>
-  <div>↩️ 14 יום להחזרה — בראש שקט</div>
+  <div class="on">🚚 משלוח חינם עד הבית, לכל הארץ</div>
+  <div>🔥 זוג ב-119 ₪ (במקום 158)</div>
+  <div>↩️ יש 14 יום להחזיר</div>
 </div>
 
 <header class="nav">
@@ -268,23 +270,23 @@ footer a:hover{text-decoration:underline}
 <section class="hero" style="padding-top:22px">
   <div class="wrap grid">
     <div class="copy">
-      <span class="kicker">🌧️ החורף כבר כאן</span>
-      <h1>תפסיק לנחש<br>מה יש <span class="hl">מעבר לשמשה.</span></h1>
-      <p class="lead">שכבת השומן השקופה על השמשה היא הסיבה שהמגבים מורחים ושכל פנס בלילה מסנוור אותך. KLARO מסיר אותה ב-5 דקות — עם ספוג מובנה ומים בלבד.</p>
+      <span class="kicker">🌧️ החורף התחיל. השמשה מוכנה?</span>
+      <h1>סוף סוף לראות<br>את הכביש <span class="hl">בגשם.</span></h1>
+      <p class="lead">על השמשה יש שכבה שמנונית שביום בכלל לא רואים. בגשם בגללה המגבים מורחים, ובלילה כל פנס נהיה כדור אור. KLARO מוריד אותה בכמה דקות, עם הספוג שמחובר לבקבוק ומים מהצינור.</p>
       <ul class="ticks">
-        <li><i>✓</i>בלי פסים ומריחות של המגבים</li>
-        <li><i>✓</i>פחות סנוור מפנסים בנהיגת לילה</li>
-        <li><i>✓</i>מורחים, שוטפים — זהו. בלי כלים</li>
+        <li><i>✓</i>המגבים מפסיקים למרוח</li>
+        <li><i>✓</i>פחות סנוור מפנסים בלילה</li>
+        <li><i>✓</i>בלי כלים, בלי מכון, בלי ליטוש</li>
       </ul>
       <div class="priceRow"><span class="now">79 ₪</span><span class="save">או 2 ב-119 ₪</span></div>
-      <a href="#order" class="btn block" onclick="track('AddToCart',{value:79,currency:'ILS'})">אני רוצה לראות ברור <span class="arrow">←</span></a>
-      <div class="mini-trust"><span>🚚 משלוח חינם</span><span>🔒 תשלום מאובטח</span><span>↩️ 14 יום להחזרה</span></div>
+      <a href="#order" class="btn block" onclick="track('AddToCart',{value:79,currency:'ILS'})">אני רוצה שמשה נקייה <span class="arrow">←</span></a>
+      <div class="mini-trust"><span>🚚 משלוח חינם</span><span>🔒 תשלום מאובטח</span><span>↩️ 14 יום להחזיר</span></div>
     </div>
 
     <div class="stage" id="stage">
       <canvas id="heroGlass" aria-label="הדגמה אינטראקטיבית: נגב את השמשה עם האצבע"></canvas>
-      <div class="hint pulse" id="hint">👆 <b>נסה בעצמך:</b> נגב את השמשה</div>
-      <div class="wow" id="wow"><span class="e">😮</span><div><b>זה ההבדל.</b><small>ככה השמשה שלך יכולה להיראות</small></div><a href="#order">רוצה כזה ←</a></div>
+      <div class="hint pulse" id="hint">👆 <b>תנגב עם האצבע</b> ותראה</div>
+      <div class="wow" id="wow"><span class="e">😮</span><div><b>רואה את ההבדל?</b><small>ככה נראית שמשה בלי שכבת שומן</small></div><a href="#order">בא לי ←</a></div>
       <button class="reset" id="reset" type="button">↺ שוב</button>
       <div class="meter"><div class="track"><div class="fill" id="fill"></div></div><div class="pct" id="pct">נקי: 0%</div></div>
     </div>
@@ -296,13 +298,13 @@ footer a:hover{text-decoration:underline}
 <!-- ================= PAINS ================= -->
 <section class="dark">
   <div class="wrap">
-    <span class="eyebrow">נשמע מוכר?</span>
-    <h2>השמשה "נקייה". אז למה אתה לא רואה?</h2>
-    <p class="sub">שעווה משטיפות, פיח מהכביש ושאריות גומי מהמגבים יוצרים שכבה שקופה ושמנונית. ביום היא כמעט לא נראית — אבל בגשם ובלילה היא משתלטת.</p>
+    <span class="eyebrow">מכירים את זה?</span>
+    <h2>שטפת את האוטו אתמול.<br>אז למה בגשם לא רואים כלום?</h2>
+    <p class="sub">שעווה מהשטיפה, פיח מהכביש וגומי מהמגבים נדבקים לזכוכית. ביום כמעט לא מרגישים. בגשם ובלילה רואים את זה מיד.</p>
     <div class="pains">
-      <div class="pain reveal"><div class="ic">🌧️</div><h3>המגבים מורחים</h3><p>במקום לנקות, המגבים מורחים קשתות שמנוניות על כל שדה הראייה.</p></div>
-      <div class="pain reveal"><div class="ic">🌙</div><h3>כל פנס = כוכב מסנוור</h3><p>האור מתפזר בשכבה ויוצר הילות וקרניים. נוהגים בעיניים מכווצות ומתעייפים.</p></div>
-      <div class="pain reveal"><div class="ic">🧽</div><h3>שום שטיפה לא עוזרת</h3><p>נוזל שמשות ושטיפה רגילה לא מורידים אותה — היא נצמדת לזכוכית.</p></div>
+      <div class="pain reveal"><div class="ic">🌧️</div><h3>המגבים מורחים</h3><p>מפעילים מגבים ומקבלים קשתות שמנוניות בדיוק בגובה העיניים.</p></div>
+      <div class="pain reveal"><div class="ic">🌙</div><h3>פנסים שמסנוורים</h3><p>נוסעים בלילה בגשם וכל פנס מולך נמרח על כל השמשה. מכווצים עיניים כל הדרך הביתה.</p></div>
+      <div class="pain reveal"><div class="ic">🧽</div><h3>שטיפה לא מורידה את זה</h3><p>נוזל שמשות ושטיפה בתחנת דלק מנקים לכלוך. את השכבה הזו הם לא מורידים.</p></div>
     </div>
   </div>
 </section>
@@ -311,13 +313,13 @@ footer a:hover{text-decoration:underline}
 <div class="story" id="story">
   <div class="sticky">
     <div>
-      <span class="eyebrow" style="text-align:right">ככה זה עובד</span>
-      <h2>5 דקות. ספוג אחד.<br>שמשה חדשה.</h2>
+      <span class="eyebrow" style="text-align:right">איך משתמשים</span>
+      <h2>כמה דקות בחניה,<br>וזהו.</h2>
       <ul class="steps" id="steps">
-        <li class="on"><span class="n">1</span><div><h3>מרטיבים את השמשה</h3><p>שוטפים קלות במים כדי להוריד אבק וחול.</p></div></li>
-        <li><span class="n">2</span><div><h3>מורחים עם הספוג המובנה</h3><p>תנועות סיבוביות, אזור אחרי אזור. אין צורך בכוח.</p></div></li>
-        <li><span class="n">3</span><div><h3>שוטפים במים</h3><p>השכבה השמנונית יורדת יחד עם המשחה.</p></div></li>
-        <li><span class="n">4</span><div><h3>שקוף. גם כשיורד גשם.</h3><p>המים זורמים על הזכוכית במקום להימרח.</p></div></li>
+        <li class="on"><span class="n">1</span><div><h3>מרטיבים</h3><p>קצת מים על השמשה, שלא יישאר חול שישרוט.</p></div></li>
+        <li><span class="n">2</span><div><h3>מורחים עם הספוג</h3><p>סיבובים קטנים, חלק אחרי חלק. לא צריך ללחוץ חזק.</p></div></li>
+        <li><span class="n">3</span><div><h3>שוטפים</h3><p>צינור או דלי. השכבה יורדת יחד עם המשחה.</p></div></li>
+        <li><span class="n">4</span><div><h3>נוסעים</h3><p>בגשם הבא המים פשוט זורמים מהשמשה.</p></div></li>
       </ul>
       <div class="progressbar"><i id="storyBar"></i></div>
     </div>
@@ -331,16 +333,16 @@ footer a:hover{text-decoration:underline}
 <!-- ================= BENEFITS ================= -->
 <section>
   <div class="wrap">
-    <span class="eyebrow">למה KLARO</span>
-    <h2>קטן בבקבוק. ענק על הכביש.</h2>
-    <p class="sub">כל מה שצריך כדי לראות ברור — בבקבוק אחד שנכנס לתא הכפפות.</p>
+    <span class="eyebrow">למה דווקא זה</span>
+    <h2>בקבוק קטן שנכנס לתא הכפפות</h2>
+    <p class="sub">בלי אבקות, בלי מכשירים ובלי לקבוע תור.</p>
     <div class="bens">
-      <div class="ben reveal"><div class="ic">🧴</div><h3>ספוג מובנה</h3><p>הבקבוק הוא גם המוליך. בלי מטליות, בלי ידיים שמנוניות.</p></div>
-      <div class="ben reveal"><div class="ic">💧</div><h3>רק מים</h3><p>מורחים ושוטפים בצינור או בדלי. בלי חומרים נוספים.</p></div>
-      <div class="ben reveal"><div class="ic">🚘</div><h3>לכל הזכוכיות</h3><p>שמשה קדמית, אחורית, חלונות ומראות. גם מראות אופנוע וקסדה.</p></div>
-      <div class="ben reveal"><div class="ic">⏱️</div><h3>5 דקות לשמשה</h3><p>מהר יותר משטיפה. בלי לקבוע תור במכון.</p></div>
-      <div class="ben reveal"><div class="ic">🌙</div><h3>נהיגת לילה רגועה</h3><p>פחות הילות וקרניים סביב פנסים של רכבים מולך.</p></div>
-      <div class="ben reveal"><div class="ic">📦</div><h3>הרבה טיפולים</h3><p>כמות קטנה לכל שמשה — בקבוק אחד מחזיק טיפולים רבים.</p></div>
+      <div class="ben reveal"><div class="ic">🧴</div><h3>הספוג כבר בבקבוק</h3><p>לא צריך מטליות ולא מתלכלכים בידיים.</p></div>
+      <div class="ben reveal"><div class="ic">💧</div><h3>רק מים</h3><p>מורחים, שוטפים בצינור. זה כל הסיפור.</p></div>
+      <div class="ben reveal"><div class="ic">🚘</div><h3>לכל הזכוכיות</h3><p>קדמית, אחורית, חלונות ומראות. גם מראות של אופנוע.</p></div>
+      <div class="ben reveal"><div class="ic">⏱️</div><h3>כמה דקות לשמשה</h3><p>פחות ממה שמחכים בתור לשטיפה.</p></div>
+      <div class="ben reveal"><div class="ic">🌙</div><h3>נהיגה בלילה</h3><p>פחות הילות וקרניים סביב הפנסים של מי שבא מולך.</p></div>
+      <div class="ben reveal"><div class="ic">📦</div><h3>מחזיק הרבה זמן</h3><p>צריך מעט לכל שמשה, אז בקבוק אחד מספיק להמון פעמים.</p></div>
     </div>
   </div>
 </section>
@@ -348,9 +350,9 @@ footer a:hover{text-decoration:underline}
 <!-- ================= COMPARE ================= -->
 <section class="soft">
   <div class="wrap">
-    <span class="eyebrow">ההשוואה</span>
+    <span class="eyebrow">שאלה טובה</span>
     <h2>למה לא פשוט נוזל שמשות?</h2>
-    <p class="sub">כי נוזל שמשות מנקה לכלוך. הוא לא נבנה להסיר שכבת שומן.</p>
+    <p class="sub">כי נוזל שמשות נועד לאבק וללכלוך. על שכבה שמנונית הוא לא עושה כלום.</p>
     <div class="cmp reveal">
       <table>
         <thead><tr><th></th><th class="us">KLARO</th><th>נוזל שמשות</th><th>ליטוש במכון</th></tr></thead>
@@ -358,7 +360,7 @@ footer a:hover{text-decoration:underline}
           <tr><td>מסיר שכבת שומן</td><td class="us"><span class="y">✓</span></td><td><span class="x">✗</span></td><td><span class="y">✓</span></td></tr>
           <tr><td>עושים לבד בבית</td><td class="us"><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="x">✗</span></td></tr>
           <tr><td>זמן</td><td class="us">5 דק'</td><td>2 דק'</td><td>תור + חצי יום</td></tr>
-          <tr><td>מחיר</td><td class="us">79 ₪</td><td>15 ₪ (ולא עוזר)</td><td>₪₪₪</td></tr>
+          <tr><td>מחיר</td><td class="us">79 ₪</td><td>15 ₪, לא מוריד את השכבה</td><td>₪₪₪</td></tr>
         </tbody>
       </table>
     </div>
@@ -368,6 +370,7 @@ footer a:hover{text-decoration:underline}
 <!-- ================= IN THE BOX ================= -->
 <section>
   <div class="wrap box">
+    <div class="gallery" id="gallery" hidden></div>
     <svg class="bottle" viewBox="0 0 300 320" role="img" aria-label="בקבוק KLARO עם ספוג מובנה">
       <defs>
         <linearGradient id="btl" x1="0" x2="1"><stop offset="0" stop-color="#dde5ec"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d4de"/></linearGradient>
@@ -386,12 +389,12 @@ footer a:hover{text-decoration:underline}
       <path d="M104 120 q6 70 0 160" stroke="#fff" stroke-width="6" opacity=".7" fill="none" stroke-linecap="round"/>
     </svg>
     <div>
-      <span class="eyebrow" style="text-align:right">מה מקבלים</span>
-      <h2 style="text-align:right">הכל בבקבוק אחד</h2>
-      <p style="color:var(--muted);font-size:17px;margin:0">משחה מרוכזת לניקוי זכוכית עם ספוג מובנה בראש הבקבוק. סוגרים את המכסה ושמים בתא הכפפות.</p>
+      <span class="eyebrow" style="text-align:right">מה בחבילה</span>
+      <h2 style="text-align:right">בקבוק אחד עם ספוג מחובר</h2>
+      <p style="color:var(--muted);font-size:17px;margin:0">משחה לניקוי זכוכית, והספוג מחובר לראש הבקבוק. מסיימים, סוגרים מכסה וזורקים לתא הכפפות.</p>
       <div class="specs">
         <div><b>~100 מ"ל</b><small>משחה מרוכזת</small></div>
-        <div><b>ספוג מובנה</b><small>בלי צורך במטליות</small></div>
+        <div><b>ספוג מובנה</b><small>לא צריך מטליות</small></div>
         <div><b>5 דקות</b><small>לשמשה</small></div>
         <div><b>זכוכית</b><small>שמשות, חלונות, מראות</small></div>
       </div>
@@ -404,7 +407,7 @@ footer a:hover{text-decoration:underline}
 <section class="soft" id="reviews" hidden>
   <div class="wrap">
     <span class="eyebrow">לקוחות מספרים</span>
-    <h2>מה אומרים הנהגים</h2>
+    <h2>מה אומרים מי שכבר קנו</h2>
     <p class="sub"></p>
     <div class="revs" id="revs"></div>
   </div>
@@ -414,18 +417,18 @@ footer a:hover{text-decoration:underline}
 <section id="order">
   <div class="wrap">
     <span class="eyebrow">מחירי השקה</span>
-    <h2>בחר חבילה</h2>
-    <p class="sub">משלוח חינם בכל החבילות. הזוג הוא הבחירה המשתלמת — אחד לכל רכב בבית.</p>
+    <h2>כמה לשלוח לך?</h2>
+    <p class="sub">המשלוח חינם בכל מקרה. הכי משתלם לקחת זוג, אחד לכל אוטו בבית.</p>
     <div class="order">
       <div class="pkgs" id="pkgs"></div>
       <div class="summary">
         <h3>סיכום הזמנה</h3>
         <div class="line"><span id="sumTitle">—</span><span id="sumPrice">—</span></div>
-        <div class="line" id="saveLine"><span>חיסכון לעומת יחידות בודדות</span><span id="sumSave" style="color:var(--lime)">—</span></div>
+        <div class="line" id="saveLine"><span>חוסכים לעומת קנייה בנפרד</span><span id="sumSave" style="color:var(--lime)">—</span></div>
         <div class="line"><span>משלוח עד הבית</span><span class="free">חינם</span></div>
         <div class="line" id="giftLine" hidden><span id="giftTxt"></span><span class="free">חינם</span></div>
         <div class="line tot"><span>סה"כ לתשלום</span><span id="sumTotal">—</span></div>
-        <div class="eta">📦 <span>מזמינים היום ← מגיע עד הבית בין <b id="eta">—</b></span></div>
+        <div class="eta">📦 <span>מזמינים היום, וזה אצלך בין <b id="eta">—</b></span></div>
         <button class="btn block" id="buyBtn" type="button">לתשלום מאובטח <span class="arrow">←</span></button>
         <div class="secure"><span>🔒 SSL</span><span>💳 אשראי</span><span>Bit</span><span>Apple Pay</span><span>Google Pay</span></div>
       </div>
@@ -439,8 +442,8 @@ footer a:hover{text-decoration:underline}
     <div class="guarantee reveal">
       <div class="seal"><div><b>14</b>יום<br>להחזרה</div></div>
       <div>
-        <h3>לא מרוצה? לא נשארים תקועים.</h3>
-        <p>אפשר לבטל עסקה תוך 14 יום מקבלת המוצר, בהתאם לחוק הגנת הצרכן ול<a href="terms.html#cancel">מדיניות הביטולים</a>. מוצר שהגיע פגום — מוחלף או מוחזר במלואו. ואנחנו זמינים בוואטסאפ לכל שאלה.</p>
+        <h3>לא מרוצה? מחזירים.</h3>
+        <p>יש 14 יום לבטל מהרגע שהחבילה אצלך, לפי חוק הגנת הצרכן ו<a href="terms.html#cancel">מדיניות הביטולים</a>. הגיע פגום? מחליפים או מחזירים את כל הכסף. ואם משהו לא ברור, יש וואטסאפ.</p>
       </div>
     </div>
   </div>
@@ -449,32 +452,32 @@ footer a:hover{text-decoration:underline}
 <!-- ================= FAQ ================= -->
 <section class="soft" id="faq">
   <div class="wrap faq">
-    <span class="eyebrow">שאלות נפוצות</span>
-    <h2>יש שאלה? יש תשובה</h2>
+    <span class="eyebrow">לפני שמזמינים</span>
+    <h2>שאלות שחוזרות אצלנו</h2>
     <p class="sub"></p>
-    <details><summary>זה פוגע בשמשה, בגומיות או בצבע?</summary><p>המשחה מיועדת לזכוכית. מומלץ למרוח רק על הזכוכית, לא בשמש ישירה ולא על שמשה חמה, ולשטוף היטב במים בסיום. לפני שימוש ראשון כדאי לנסות על פינה קטנה.</p></details>
-    <details><summary>אפשר על שמשה עם כהה / מדבקה?</summary><p>מיועד לצד החיצוני של הזכוכית. אין למרוח על מדבקות או על ציפוי הכהיה (שבדרך כלל נמצא בצד הפנימי).</p></details>
-    <details><summary>תוך כמה זמן זה מגיע?</summary><p>משלוח חינם עד הבית, תוך 10–18 ימי עסקים. ברגע שהחבילה יוצאת נשלח לך מספר מעקב.</p></details>
-    <details><summary>כמה טיפולים יש בבקבוק?</summary><p>מספיקה כמות קטנה לכל שמשה, ולכן בקבוק אחד מספיק לטיפולים רבים. רוב הנהגים מטפלים בשמשות פעם בכמה שבועות.</p></details>
-    <details><summary>זה מחליף נוזל שמשות?</summary><p>לא. נוזל שמשות מנקה לכלוך יומיומי. KLARO מסיר את שכבת השומן שנוזל רגיל לא מוריד. ביחד — השמשה נשארת נקייה לאורך זמן.</p></details>
-    <details><summary>איך משלמים? זה בטוח?</summary><p>התשלום מתבצע בדף סליקה מאובטח של חברת סליקה מורשית בישראל. פרטי האשראי לא עוברים דרכנו ולא נשמרים אצלנו.</p></details>
-    <details><summary>איך מבטלים?</summary><p>שולחים הודעה בוואטסאפ או במייל עם מספר ההזמנה, תוך 14 יום מקבלת המוצר. פרטים מלאים ב<a href="terms.html#cancel">מדיניות הביטולים</a>.</p></details>
+    <details><summary>זה פוגע בשמשה, בגומיות או בצבע?</summary><p>המשחה מיועדת לזכוכית, אז מורחים רק על הזכוכית. לא בשמש ישירה ולא כשהשמשה חמה, ובסוף שוטפים טוב. בפעם הראשונה כדאי לנסות קודם על פינה קטנה.</p></details>
+    <details><summary>יש לי כהה / מדבקה על החלון. זה בעיה?</summary><p>משתמשים רק בצד החיצוני של הזכוכית. לא מורחים על מדבקות ולא על הכהה, שבדרך כלל נמצא בצד הפנימי.</p></details>
+    <details><summary>תוך כמה זמן זה מגיע?</summary><p>בין 10 ל-18 ימי עסקים, עד הבית ובלי תשלום על משלוח. כשהחבילה יוצאת אנחנו שולחים מספר מעקב.</p></details>
+    <details><summary>לכמה פעמים מספיק בקבוק?</summary><p>לכל שמשה צריך כמות קטנה, אז הבקבוק מחזיק הרבה. רוב האנשים עושים את זה פעם בכמה שבועות, בעיקר בחורף.</p></details>
+    <details><summary>זה מחליף נוזל שמשות?</summary><p>לא, הם עושים דברים שונים. נוזל שמשות מנקה לכלוך של היום-יום. KLARO מוריד את השכבה השמנונית שהנוזל לא מוריד. כדאי להשתמש בשניהם.</p></details>
+    <details><summary>איך משלמים? זה בטוח?</summary><p>התשלום נעשה בדף מאובטח של חברת סליקה ישראלית. אנחנו לא רואים את פרטי האשראי ולא שומרים אותם.</p></details>
+    <details><summary>איך מבטלים?</summary><p>שולחים לנו וואטסאפ או מייל עם מספר ההזמנה, עד 14 יום מהיום שקיבלת את החבילה. כל הפרטים ב<a href="terms.html#cancel">מדיניות הביטולים</a>.</p></details>
   </div>
 </section>
 
 <!-- ================= FINAL CTA ================= -->
 <section class="dark final">
   <div class="wrap">
-    <h2>הגשם הבא כבר בדרך.<br><span style="color:var(--lime)">תהיה מוכן.</span></h2>
-    <p class="sub">79 ₪ · משלוח חינם · 14 יום להחזרה</p>
-    <a href="#order" class="btn" style="min-width:300px">אני רוצה KLARO <span class="arrow">←</span></a>
+    <h2>הגשם הבא כבר בתחזית.<br><span style="color:var(--lime)">שהשמשה תהיה מוכנה.</span></h2>
+    <p class="sub">79 ₪, משלוח חינם, ואפשר להחזיר תוך 14 יום</p>
+    <a href="#order" class="btn" style="min-width:300px">להזמנה <span class="arrow">←</span></a>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
     <div class="cols">
-      <div><div class="logo">KLA<span>RO</span></div><p style="margin:8px 0 0">שמשה שקופה. נסיעה רגועה.</p></div>
+      <div><div class="logo">KLA<span>RO</span></div><p style="margin:8px 0 0">שמשה נקייה, נסיעה רגועה.</p></div>
       <div>
         <div>שירות לקוחות: <span data-biz="phone">—</span></div>
         <div>מייל: <span data-biz="email">—</span></div>
@@ -505,7 +508,7 @@ footer a:hover{text-decoration:underline}
     setTimeout(function(){ bars.forEach(function(b,i){ if(i!==bi) b.className=''; }); }, 500); }, 3500);
 
   /* marquee */
-  var items = ['🌧️ <b>ראות מלאה</b> בגשם','🌙 <b>פחות סנוור</b> בלילה','🧴 <b>ספוג מובנה</b>','💧 <b>רק מים</b>','🚚 <b>משלוח חינם</b>','↩️ <b>14 יום</b> להחזרה'];
+  var items = ['🌧️ רואים <b>גם בגשם</b>','🌙 <b>פחות סנוור</b> בלילה','🧴 הספוג <b>כבר בבקבוק</b>','💧 צריך <b>רק מים</b>','🚚 משלוח <b>חינם</b>','↩️ <b>14 יום</b> להחזיר'];
   var mq = document.getElementById('mq'), h = '';
   for (var k=0;k<4;k++) items.forEach(function(t){ h += '<span>'+t+'</span>'; });
   mq.innerHTML = h;
@@ -573,6 +576,15 @@ footer a:hover{text-decoration:underline}
     var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); }, { threshold: .15 });
     revs.forEach(function(el){ io.observe(el); });
   } else revs.forEach(function(el){ el.classList.add('in'); });
+
+  /* ===== real product media from config ===== */
+  if (S.photos && S.photos.length) {
+    var gal = document.getElementById('gallery');
+    gal.innerHTML = S.photos.map(function(src){ return /\.(mp4|webm)$/i.test(src)
+      ? '<video src="'+src+'" autoplay muted loop playsinline></video>'
+      : '<img src="'+src+'" alt="KLARO" loading="lazy">'; }).join('');
+    gal.hidden = false; document.querySelector('.bottle').style.display = 'none';
+  }
 
   /* ===== reviews (real only) ===== */
   if (S.reviews && S.reviews.length) {
