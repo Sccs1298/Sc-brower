@@ -16,9 +16,9 @@ window.STORE = {
 
   // compare = מחיר אותה כמות ביחידות בודדות (79 ₪ ליח') — חיסכון אמיתי, לא מחיר "לפני" מומצא
   packages: {
-    1: { title: "בקבוק אחד", qty: 1, price: 79, compare: 0 },
-    2: { title: "זוג (לשני רכבים)", qty: 2, price: 119, compare: 158, badge: "הכי משתלם" },
-    3: { title: "שלישייה", qty: 3, price: 149, compare: 237 }
+    1: { title: "ערכה אחת", qty: 1, price: 79, compare: 0 },
+    2: { title: "זוג ערכות", qty: 2, price: 119, compare: 158, badge: "הכי משתלם" },
+    3: { title: "3 ערכות", qty: 3, price: 149, compare: 237 }
   },
 
   // מתנה לחבילות 2+ (רק אם הספק באמת שולח מטלית — אחרת למחוק את השורה)
@@ -26,11 +26,19 @@ window.STORE = {
 
   // תמונות/סרטונים אמיתיים של המוצר (מהספק באישור, או שצילמת). לשים בתיקייה docs/media/
   // דוגמה: ["media/1.jpg", "media/2.jpg", "media/demo.mp4"]. כשהרשימה ריקה מוצג האיור.
-  photos: ["media/product-zoom.mp4", "media/product.jpg", "media/bundle.jpg", "media/rinse.jpg", "media/door-pocket.jpg"],
+  photos: ["media/product-zoom.mp4", "media/bundle.jpg", "media/apply.jpg", "media/rinse.jpg", "media/door-pocket.jpg"],
 
   // ביקורות אמיתיות בלבד. דוגמה:
   // { name: "יוסי מ.", city: "חיפה", stars: 5, text: "...", img: "reviews/yossi.jpg" }
   reviews: [],
+
+  // ביקורות שהעתקת מדף המוצר ב-AliExpress — מוצגות בנפרד ועם מקור, לא כביקורות על KLARO.
+  // דוגמה: { name: "D***n", country: "IL", stars: 5, text: "תרגום הביקורת לעברית" }
+  marketplaceReviews: {
+    source: "AliExpress",
+    url: "https://www.aliexpress.com/item/1005007805619545.html",
+    items: []
+  },
 
   shippingText:"משלוח חינם עד הבית · 10–18 ימי עסקים",
 
