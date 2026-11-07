@@ -2,420 +2,630 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KLARO | מסיר שכבת שומן לשמשות הרכב — ראות מושלמת בגשם ובלילה</title>
-<meta name="description" content="משחה עם ספוג מובנה שמסירה את שכבת השומן מהשמשה. מורחים, שוטפים — והשמשה שקופה. בלי פסים, בלי סנוור בלילה. משלוח חינם.">
-<meta property="og:title" content="KLARO — השמשה שלך שקופה כמו ביום שקנית את הרכב">
-<meta property="og:description" content="מסיר שכבת שומן לשמשות. מורחים, שוטפים, רואים. משלוח חינם עד הבית.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KLARO | השמשה שלך שקופה גם בגשם וגם בלילה</title>
+<meta name="description" content="מסיר שכבת שומן לשמשות הרכב עם ספוג מובנה. מורחים, שוטפים — והשמשה שקופה. בלי פסים, בלי סנוור בלילה. משלוח חינם עד הבית.">
+<meta property="og:title" content="KLARO — נגב את השמשה ותראה את ההבדל">
+<meta property="og:description" content="מסיר שכבת שומן לשמשות. 5 דקות, שמשה שקופה. משלוח חינם.">
 <meta property="og:type" content="product">
-<meta name="theme-color" content="#0b1c2c">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b1c2c'/%3E%3Ctext x='32' y='44' font-size='34' font-family='Arial' font-weight='900' fill='%23b6f000' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#060d17">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23060d17'/%3E%3Ctext x='32' y='44' font-size='34' font-family='Arial' font-weight='900' fill='%23c6ff1a' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <script src="config.js"></script>
 <script src="store.js"></script>
+<script src="glass.js"></script>
 <style>
 :root{
-  --ink:#0b1c2c; --ink2:#14304a; --lime:#b6f000; --lime-d:#8fc000;
-  --bg:#ffffff; --soft:#f3f6f9; --text:#13202d; --muted:#5b6b7b; --line:#e2e8ef;
-  --red:#e5484d; --radius:18px;
+  --night:#060d17; --ink:#0b1c2c; --ink2:#12283f; --lime:#c6ff1a; --lime-d:#93c400; --lime-soft:#effcc6;
+  --bg:#ffffff; --soft:#f2f5f8; --text:#101c28; --muted:#5a6a7a; --line:#e1e7ee; --red:#ff3b47; --gold:#ffb800;
+  --r:20px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;font-family:Heebo,system-ui,Arial,sans-serif;color:var(--text);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
-img,svg{max-width:100%;display:block}
+body{margin:0;font-family:Heebo,system-ui,Arial,sans-serif;color:var(--text);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg,canvas{max-width:100%;display:block}
 a{color:inherit}
-.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
-.bar{background:var(--ink);color:#fff;text-align:center;font-size:14px;padding:8px 12px;font-weight:500}
-.bar b{color:var(--lime)}
-header.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
-.logo{font-weight:900;font-size:26px;letter-spacing:2px;color:var(--ink)}
-.logo span{color:var(--lime-d)}
-.nav a.small{font-size:14px;color:var(--muted);text-decoration:none}
-
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--lime);color:var(--ink);font-weight:900;font-size:19px;border:0;border-radius:14px;padding:16px 26px;cursor:pointer;text-decoration:none;box-shadow:0 6px 0 var(--lime-d);transition:transform .08s, box-shadow .08s;font-family:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--lime);color:var(--night);font-weight:900;font-size:20px;border:0;border-radius:16px;padding:18px 28px;cursor:pointer;text-decoration:none;box-shadow:0 6px 0 var(--lime-d),0 14px 30px rgba(198,255,26,.25);transition:transform .08s,box-shadow .08s;font-family:inherit;overflow:hidden}
 .btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--lime-d)}
+.btn:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.65) 50%,transparent 70%);transform:translateX(120%);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{0%,60%{transform:translateX(120%)}100%{transform:translateX(-120%)}}
 .btn.block{width:100%}
+.btn .arrow{display:inline-block;transition:transform .2s}
+.btn:hover .arrow{transform:translateX(-4px)}
 
-/* hero */
-.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:36px;align-items:center;padding:12px 0 40px}
-.kicker{display:inline-block;background:#eaf8c4;color:#3d5200;font-weight:700;font-size:13px;padding:5px 12px;border-radius:99px;margin-bottom:12px}
-h1{font-size:44px;line-height:1.12;margin:0 0 14px;font-weight:900;color:var(--ink)}
-h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--lime) 62%)}
-.lead{font-size:19px;color:var(--muted);margin:0 0 20px}
-.ticks{list-style:none;padding:0;margin:0 0 24px;display:grid;gap:8px}
-.ticks li{display:flex;gap:10px;align-items:flex-start;font-weight:500}
-.ticks li:before{content:"✓";flex:none;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--lime);font-size:13px;display:grid;place-items:center;font-weight:900;margin-top:2px}
-.price-line{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}
-.price-line .now{font-size:36px;font-weight:900;color:var(--ink)}
-.price-line .was{color:var(--muted);text-decoration:line-through;font-size:18px}
-.price-line .save{background:var(--red);color:#fff;font-weight:700;font-size:13px;padding:3px 9px;border-radius:8px}
-.trust{display:flex;flex-wrap:wrap;gap:14px;margin-top:16px;font-size:14px;color:var(--muted)}
-.trust span{display:flex;gap:6px;align-items:center}
+/* announcement */
+.bar{background:var(--lime);color:var(--night);font-weight:800;font-size:14px;height:36px;overflow:hidden;position:relative;text-align:center}
+.bar div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;opacity:0;transform:translateY(100%);transition:all .5s}
+.bar div.on{opacity:1;transform:none}
+.bar div.out{opacity:0;transform:translateY(-100%)}
 
-/* before/after */
-.ba{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3.4;background:#000;box-shadow:0 20px 50px rgba(11,28,44,.25);user-select:none;touch-action:pan-y}
-.ba svg.scene{position:absolute;inset:0;width:100%;height:100%}
-.ba .dirty{position:absolute;inset:0;clip-path:inset(0 0 0 50%)}
-.ba .dirty svg.scene{filter:blur(2.6px) saturate(.7) brightness(1.05)}
-.ba .dirty .smear{position:absolute;inset:0;width:100%;height:100%}
-.ba .handle{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);pointer-events:none}
-.ba .handle:after{content:"⇆";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;font-weight:900;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
-.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
-.ba .tag{position:absolute;top:12px;font-size:13px;font-weight:700;padding:4px 10px;border-radius:8px;pointer-events:none}
-.ba .tag.l{left:12px;background:var(--lime);color:var(--ink)}
-.ba .tag.r{right:12px;background:rgba(0,0,0,.65);color:#fff}
-.ba-cap{text-align:center;font-size:13px;color:var(--muted);margin-top:8px}
+/* header */
+header.nav{position:sticky;top:0;z-index:40;background:rgba(6,13,23,.88);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
+header.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-weight:900;font-size:26px;letter-spacing:3px;color:#fff;text-decoration:none}
+.logo span{color:var(--lime)}
+.nav-cta{background:var(--lime);color:var(--night);font-weight:800;font-size:15px;border-radius:12px;padding:9px 16px;text-decoration:none}
 
-section{padding:56px 0}
-section.soft{background:var(--soft)}
-h2{font-size:32px;line-height:1.2;margin:0 0 10px;font-weight:900;color:var(--ink);text-align:center}
-.sub{text-align:center;color:var(--muted);max-width:640px;margin:0 auto 32px;font-size:17px}
+/* HERO */
+.hero{background:radial-gradient(1200px 600px at 70% -10%,#16314f 0%,var(--night) 60%);color:#fff;padding:22px 0 44px;overflow:hidden}
+.hero .grid{display:grid;grid-template-columns:1fr 1.05fr;gap:44px;align-items:center}
+.stage{position:relative;border-radius:26px;overflow:hidden;aspect-ratio:4/4.3;box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08) inset;background:#000}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+.stage:before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:26px;box-shadow:inset 0 0 60px rgba(0,0,0,.6)}
+.hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:3;background:rgba(6,13,23,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);padding:8px 14px;border-radius:99px;font-weight:700;font-size:14px;white-space:nowrap;pointer-events:none;transition:opacity .4s}
+.hint b{color:var(--lime)}
+.pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,255,26,.5)}50%{box-shadow:0 0 0 10px rgba(198,255,26,0)}}
+.meter{position:absolute;bottom:14px;right:14px;left:14px;z-index:3;display:flex;align-items:center;gap:10px;pointer-events:none}
+.meter .track{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.meter .fill{height:100%;width:0;background:linear-gradient(90deg,#8fc000,var(--lime));border-radius:99px;transition:width .15s}
+.meter .pct{font-weight:900;font-size:15px;min-width:76px;text-align:left;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.reset{position:absolute;top:14px;left:14px;z-index:4;background:rgba(6,13,23,.75);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:10px;font:700 12px Heebo;padding:6px 10px;cursor:pointer;display:none}
+.wow{position:absolute;inset:auto 14px 46px 14px;z-index:4;background:rgba(6,13,23,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(198,255,26,.45);border-radius:16px;padding:12px 14px;display:flex;gap:12px;align-items:center;opacity:0;transform:translateY(12px);transition:all .45s;pointer-events:none}
+.wow.on{opacity:1;transform:none;pointer-events:auto}
+.wow .e{font-size:28px}
+.wow b{display:block;font-size:16px}
+.wow small{color:#b9c7d6}
+.wow a{margin-right:auto;background:var(--lime);color:var(--night);font-weight:900;border-radius:10px;padding:8px 12px;text-decoration:none;white-space:nowrap;font-size:14px}
+.tag{position:absolute;z-index:3;top:56px;font-size:12px;font-weight:800;padding:4px 9px;border-radius:8px;pointer-events:none}
+.kicker{display:inline-flex;gap:8px;align-items:center;background:rgba(198,255,26,.12);color:var(--lime);border:1px solid rgba(198,255,26,.3);font-weight:700;font-size:13px;padding:6px 12px;border-radius:99px;margin-bottom:14px}
+h1{font-size:54px;line-height:1.05;margin:0 0 16px;font-weight:900;letter-spacing:-.5px}
+h1 .hl{color:var(--lime)}
+.lead{font-size:19px;color:#b9c7d6;margin:0 0 22px;max-width:520px}
+.ticks{list-style:none;padding:0;margin:0 0 24px;display:grid;gap:10px}
+.ticks li{display:flex;gap:10px;align-items:center;font-weight:500;font-size:17px}
+.ticks li i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--lime);color:var(--night);font-style:normal;font-size:13px;display:grid;place-items:center;font-weight:900}
+.priceRow{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
+.priceRow .now{font-size:42px;font-weight:900;line-height:1}
+.priceRow .was{color:#8193a5;text-decoration:line-through;font-size:20px}
+.priceRow .save{background:var(--red);color:#fff;font-weight:800;font-size:14px;padding:4px 10px;border-radius:8px}
+.mini-trust{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;font-size:14px;color:#b9c7d6}
+.pay{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.pay span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;color:#dfe8f1}
 
-.pains{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-.card .ic{font-size:30px;margin-bottom:8px}
-.card h3{margin:0 0 6px;font-size:19px;color:var(--ink)}
-.card p{margin:0;color:var(--muted)}
+/* marquee */
+.marquee{background:var(--ink);color:#fff;overflow:hidden;white-space:nowrap;border-top:1px solid rgba(255,255,255,.06)}
+.marquee .track{display:inline-flex;gap:46px;padding:14px 0;animation:mq 26s linear infinite;font-weight:700;font-size:15px}
+.marquee .track span{display:inline-flex;gap:10px;align-items:center}
+.marquee .track b{color:var(--lime)}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(50%)}}
 
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:s}
-.step{position:relative;background:#fff;border-radius:var(--radius);padding:26px 22px 22px;border:1px solid var(--line)}
-.step:before{counter-increment:s;content:counter(s);position:absolute;top:-16px;right:20px;width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--lime);font-weight:900;display:grid;place-items:center;font-size:18px}
-.step h3{margin:6px 0 6px;color:var(--ink)}
-.step p{margin:0;color:var(--muted)}
+section{padding:76px 0}
+.dark{background:var(--night);color:#fff}
+.soft{background:var(--soft)}
+.eyebrow{display:block;text-align:center;color:var(--lime-d);font-weight:800;font-size:14px;letter-spacing:1px;margin-bottom:8px}
+.dark .eyebrow{color:var(--lime)}
+h2{font-size:40px;line-height:1.12;margin:0 0 12px;font-weight:900;text-align:center;letter-spacing:-.3px}
+.sub{text-align:center;color:var(--muted);max-width:660px;margin:0 auto 40px;font-size:18px}
+.dark .sub{color:#a9b9c9}
 
-.split{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
-.why{list-style:none;padding:0;margin:0;display:grid;gap:14px}
-.why li{display:flex;gap:12px}
-.why li b{display:block;color:var(--ink)}
-.why .dot{flex:none;width:40px;height:40px;border-radius:12px;background:var(--ink);display:grid;place-items:center;font-size:20px}
+/* pains */
+.pains{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pain{background:linear-gradient(180deg,#0e1e31,#0a1522);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:26px}
+.pain .ic{width:52px;height:52px;border-radius:14px;background:rgba(255,59,71,.12);display:grid;place-items:center;font-size:26px;margin-bottom:14px}
+.pain h3{margin:0 0 6px;font-size:21px}
+.pain p{margin:0;color:#a9b9c9}
 
-/* packages */
-.pkgs{display:grid;gap:12px;max-width:560px;margin:0 auto}
-.pkg{display:flex;align-items:center;gap:14px;border:2px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;background:#fff;position:relative;transition:border-color .15s, background .15s}
-.pkg input{accent-color:var(--ink);width:20px;height:20px;flex:none}
+/* scroll story */
+.story{position:relative;height:340vh;background:var(--night);color:#fff}
+.story .sticky{position:sticky;top:60px;height:calc(100vh - 60px);display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center;max-width:1120px;margin:0 auto;padding:20px 16px}
+.story .screen{position:relative;border-radius:26px;overflow:hidden;height:min(72vh,620px);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.story .screen canvas{position:absolute;inset:0;width:100%;height:100%}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.steps li{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.08);opacity:.38;transition:all .35s;background:transparent}
+.steps li.on{opacity:1;background:rgba(198,255,26,.07);border-color:rgba(198,255,26,.35)}
+.steps li .n{flex:none;width:40px;height:40px;border-radius:12px;background:#132840;display:grid;place-items:center;font-weight:900;font-size:18px;color:var(--lime)}
+.steps li.on .n{background:var(--lime);color:var(--night)}
+.steps h3{margin:0 0 2px;font-size:20px}
+.steps p{margin:0;color:#a9b9c9;font-size:15px}
+.story h2{text-align:right}
+.story .timer{position:absolute;top:14px;right:14px;z-index:3;background:rgba(6,13,23,.75);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:6px 12px;font-weight:900;font-size:15px}
+.progressbar{height:4px;background:rgba(255,255,255,.1);border-radius:4px;margin-top:18px;overflow:hidden}
+.progressbar i{display:block;height:100%;width:0;background:var(--lime)}
+
+/* benefits */
+.bens{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ben{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;transition:transform .2s,box-shadow .2s}
+.ben:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(11,28,44,.08)}
+.ben .ic{width:52px;height:52px;border-radius:14px;background:var(--night);display:grid;place-items:center;font-size:24px;margin-bottom:14px}
+.ben h3{margin:0 0 6px;font-size:20px;color:var(--ink)}
+.ben p{margin:0;color:var(--muted)}
+
+/* compare */
+.cmp{max-width:820px;margin:0 auto;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#fff}
+.cmp table{width:100%;border-collapse:collapse;font-size:16px}
+.cmp th,.cmp td{padding:14px 12px;text-align:center;border-bottom:1px solid var(--line)}
+.cmp th:first-child,.cmp td:first-child{text-align:right;font-weight:700;color:var(--ink)}
+.cmp thead th{background:var(--soft);font-size:15px}
+.cmp thead th.us{background:var(--night);color:var(--lime);font-size:18px;font-weight:900}
+.cmp td.us{background:#f7fde6;font-weight:800}
+.y{color:#2fa84f;font-weight:900;font-size:20px}.x{color:var(--red);font-weight:900;font-size:20px}
+.cmp tr:last-child td{border-bottom:0}
+
+/* box */
+.box{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.bottle{max-width:360px;margin:0 auto;animation:float 5s ease-in-out infinite;filter:drop-shadow(0 30px 40px rgba(11,28,44,.25))}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-14px) rotate(3deg)}}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.specs div{background:var(--soft);border-radius:14px;padding:14px}
+.specs b{display:block;font-size:22px;color:var(--ink)}
+.specs small{color:var(--muted)}
+
+/* reviews */
+.revs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.rev{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.rev .st{color:var(--gold);letter-spacing:2px}
+.rev img{border-radius:12px;margin-bottom:10px;width:100%;aspect-ratio:1;object-fit:cover}
+
+/* order */
+#order{background:linear-gradient(180deg,var(--soft),#fff)}
+.order{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;max-width:1000px;margin:0 auto}
+.pkgs{display:grid;gap:14px}
+.pkg{display:flex;align-items:center;gap:14px;border:2px solid var(--line);border-radius:18px;padding:18px;cursor:pointer;background:#fff;position:relative;transition:all .15s}
+.pkg:hover{border-color:#b9c6d3}
+.pkg input{accent-color:var(--night);width:22px;height:22px;flex:none;margin:0}
 .pkg .t{flex:1}
-.pkg .t b{display:block;font-size:18px;color:var(--ink)}
-.pkg .t small{color:var(--muted)}
+.pkg .t b{display:block;font-size:19px;color:var(--ink)}
+.pkg .t small{color:var(--muted);display:block}
+.pkg .t .gift{display:inline-block;margin-top:4px;background:var(--lime-soft);color:#3d5200;font-weight:700;font-size:12px;padding:2px 8px;border-radius:6px}
 .pkg .p{text-align:left}
-.pkg .p b{display:block;font-size:22px;color:var(--ink)}
+.pkg .p b{display:block;font-size:24px;color:var(--ink);line-height:1.1}
 .pkg .p s{color:var(--muted);font-size:14px}
-.pkg.on{border-color:var(--ink);background:#f6fbe6}
-.pkg .badge{position:absolute;top:-11px;left:16px;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px}
-.pkg-cta{max-width:560px;margin:18px auto 0}
-.secure{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:12px}
+.pkg.on{border-color:var(--night);background:#fbfff0;box-shadow:0 10px 30px rgba(11,28,44,.08)}
+.pkg .badge{position:absolute;top:-12px;left:16px;background:var(--red);color:#fff;font-size:12px;font-weight:800;padding:3px 12px;border-radius:99px}
+.summary{background:var(--night);color:#fff;border-radius:24px;padding:26px;position:sticky;top:80px}
+.summary h3{margin:0 0 14px;font-size:22px}
+.summary .line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.12);color:#c9d6e2}
+.summary .line.tot{border:0;color:#fff;font-weight:900;font-size:24px;padding-top:14px}
+.summary .free{color:var(--lime);font-weight:800}
+.eta{display:flex;gap:10px;align-items:center;background:rgba(198,255,26,.08);border:1px solid rgba(198,255,26,.25);border-radius:14px;padding:12px;margin:16px 0;font-size:14px}
+.eta b{color:var(--lime)}
+.secure{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.secure span{background:rgba(255,255,255,.08);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700}
 
-.guarantee{display:flex;gap:20px;align-items:center;background:var(--ink);color:#fff;border-radius:var(--radius);padding:28px;max-width:760px;margin:0 auto}
-.guarantee .seal{flex:none;width:96px;height:96px;border-radius:50%;border:3px dashed var(--lime);display:grid;place-items:center;text-align:center;font-weight:900;color:var(--lime);font-size:15px;line-height:1.1}
-.guarantee h3{margin:0 0 6px;font-size:22px}
-.guarantee p{margin:0;color:#c9d6e2}
+.guarantee{display:flex;gap:24px;align-items:center;background:#fff;border:2px solid var(--night);border-radius:24px;padding:28px;max-width:820px;margin:0 auto}
+.seal{flex:none;width:110px;height:110px;border-radius:50%;background:var(--night);color:var(--lime);display:grid;place-items:center;text-align:center;font-weight:900;font-size:15px;line-height:1.15;box-shadow:0 0 0 6px var(--lime-soft)}
+.seal b{font-size:30px;display:block}
+.guarantee h3{margin:0 0 6px;font-size:24px;color:var(--ink)}
+.guarantee p{margin:0;color:var(--muted)}
 
-.faq{max-width:760px;margin:0 auto}
-details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:10px}
-summary{font-weight:700;cursor:pointer;color:var(--ink);list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq{max-width:780px;margin:0 auto}
+details{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:10px}
+summary{font-weight:800;cursor:pointer;color:var(--ink);list-style:none;display:flex;justify-content:space-between;gap:12px;font-size:17px}
 summary::-webkit-details-marker{display:none}
-summary:after{content:"+";font-size:22px;line-height:1;color:var(--muted)}
-details[open] summary:after{content:"–"}
+summary:after{content:"+";font-size:24px;line-height:1;color:var(--muted);transition:transform .2s}
+details[open] summary:after{transform:rotate(45deg)}
 details p{margin:10px 0 0;color:var(--muted)}
 
-footer{background:var(--ink);color:#c9d6e2;padding:36px 0 110px;font-size:14px}
-footer .cols{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between}
-footer a{color:#fff}
-footer .logo{color:#fff}
+.final{text-align:center;background:radial-gradient(800px 400px at 50% 0%,#17365a,var(--night))}
+.final h2{font-size:46px}
 
-.sticky{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:none;z-index:50;box-shadow:0 -6px 20px rgba(0,0,0,.08)}
-.sticky .row{display:flex;gap:12px;align-items:center;max-width:560px;margin:0 auto}
-.sticky .row div{flex:none;line-height:1.15}
-.sticky .row div b{font-size:20px;color:var(--ink)}
-.sticky .row div small{display:block;color:var(--muted);font-size:12px}
-.sticky .btn{flex:1;font-size:17px;padding:13px}
+footer{background:#03070d;color:#a9b9c9;padding:40px 0 120px;font-size:14px}
+footer .cols{display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between}
+footer a{color:#fff;text-decoration:none}
+footer a:hover{text-decoration:underline}
+
+.stickybar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(6,13,23,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:10px 16px calc(10px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .3s;border-top:1px solid rgba(255,255,255,.08)}
+.stickybar.show{transform:none}
+.stickybar .row{display:flex;gap:12px;align-items:center;max-width:560px;margin:0 auto;color:#fff}
+.stickybar .row div{flex:none;line-height:1.1}
+.stickybar .row b{font-size:22px}
+.stickybar .row small{display:block;color:var(--lime);font-size:12px;font-weight:700}
+.stickybar .btn{flex:1;font-size:18px;padding:14px}
 .wa[hidden]{display:none}
-.wa{position:fixed;left:16px;bottom:90px;width:54px;height:54px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:51}
+.wa{position:fixed;left:16px;bottom:96px;width:56px;height:56px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 8px 22px rgba(0,0,0,.3);z-index:51}
 
-@media (max-width:860px){
-  .hero{grid-template-columns:1fr;gap:20px;padding-top:4px}
-  .hero .media{order:-1}
-  h1{font-size:32px}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:900px){
+  .hero{padding:10px 0 34px}
+  .hero .grid{grid-template-columns:1fr;gap:22px}
+  .stage{aspect-ratio:auto;height:min(58vh,500px);margin:0 -4px;order:-1}
+  .hero .kicker{margin-top:4px}
+  h1{font-size:36px}
   .lead{font-size:17px}
-  h2{font-size:26px}
-  .pains,.steps{grid-template-columns:1fr}
-  .steps{gap:26px}
-  .split{grid-template-columns:1fr}
+  h2{font-size:30px}
+  .sub{font-size:16px;margin-bottom:28px}
+  section{padding:56px 0}
+  .pains,.bens,.revs{grid-template-columns:1fr}
+  .story{height:300vh}
+  .story .sticky{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:14px;align-content:start;padding-top:14px}
+  .story .screen{height:44vh;order:-1}
+  .story h2{display:none}
+  .steps{gap:8px}
+  .steps li{padding:10px 12px;display:none}
+  .steps li.on{display:flex}
+  .box,.order{grid-template-columns:1fr}
+  .summary{position:static}
   .guarantee{flex-direction:column;text-align:center}
-  .sticky.show{display:block}
-  section{padding:44px 0}
+  .cmp table{font-size:14px}
+  .cmp th,.cmp td{padding:12px 6px}
+  .final h2{font-size:32px}
 }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
-<div class="bar">🚚 <b>משלוח חינם</b> עד הבית בכל הארץ · ✨ מבצע השקה: <b>2 ב-119 ₪</b></div>
+<div class="bar" id="bar">
+  <div class="on">🚚 משלוח חינם עד הבית — בכל הארץ</div>
+  <div>🔥 זוג ב-119 ₪ במקום 158 ₪</div>
+  <div>↩️ 14 יום להחזרה — בראש שקט</div>
+</div>
 
-<div class="wrap">
-  <header class="nav">
-    <div class="logo">KLA<span>RO</span></div>
-    <a class="small" href="#faq">שאלות נפוצות</a>
-  </header>
+<header class="nav">
+  <div class="wrap">
+    <a href="#" class="logo">KLA<span>RO</span></a>
+    <a href="#order" class="nav-cta">להזמנה</a>
+  </div>
+</header>
 
-  <!-- ===== HERO ===== -->
-  <div class="hero">
-    <div>
-      <span class="kicker">🌧️ לקראת עונת הגשמים</span>
-      <h1>השמשה שלך <em>שקופה</em> כמו ביום שקנית את הרכב</h1>
-      <p class="lead">משחה עם ספוג מובנה שמסירה את שכבת השומן והלכלוך העקשן מהשמשה — זו שגורמת למגבים למרוח, לפסים ולסנוור מפנסים בלילה.</p>
+<!-- ================= HERO ================= -->
+<section class="hero" style="padding-top:22px">
+  <div class="wrap grid">
+    <div class="copy">
+      <span class="kicker">🌧️ החורף כבר כאן</span>
+      <h1>תפסיק לנחש<br>מה יש <span class="hl">מעבר לשמשה.</span></h1>
+      <p class="lead">שכבת השומן השקופה על השמשה היא הסיבה שהמגבים מורחים ושכל פנס בלילה מסנוור אותך. KLARO מסיר אותה ב-5 דקות — עם ספוג מובנה ומים בלבד.</p>
       <ul class="ticks">
-        <li>מורחים, שוטפים במים — וזהו. כ-5 דקות לשמשה</li>
-        <li>פחות סנוור מפנסים של רכבים מולך בלילה</li>
-        <li>המגבים מפסיקים "למרוח" ולהשאיר פסים</li>
-        <li>מתאים לשמשה קדמית, אחורית, חלונות ומראות</li>
+        <li><i>✓</i>בלי פסים ומריחות של המגבים</li>
+        <li><i>✓</i>פחות סנוור מפנסים בנהיגת לילה</li>
+        <li><i>✓</i>מורחים, שוטפים — זהו. בלי כלים</li>
       </ul>
-      <div class="price-line">
-        <span class="now">79 ₪</span><span class="was">119 ₪</span><span class="save">חיסכון 33%</span>
-      </div>
-      <a href="#order" class="btn block" onclick="track('AddToCart',{value:79,currency:'ILS'})">אני רוצה שמשה שקופה ←</a>
-      <div class="trust">
-        <span>🚚 משלוח חינם</span><span>🔒 תשלום מאובטח</span><span>↩️ החזר כספי לפי החוק</span>
-      </div>
+      <div class="priceRow"><span class="now">79 ₪</span><span class="save">או 2 ב-119 ₪</span></div>
+      <a href="#order" class="btn block" onclick="track('AddToCart',{value:79,currency:'ILS'})">אני רוצה לראות ברור <span class="arrow">←</span></a>
+      <div class="mini-trust"><span>🚚 משלוח חינם</span><span>🔒 תשלום מאובטח</span><span>↩️ 14 יום להחזרה</span></div>
     </div>
 
-    <div class="media">
-      <div class="ba" id="ba" aria-label="השוואה: שמשה עם שכבת שומן לעומת שמשה נקייה">
-        <svg class="scene" viewBox="0 0 400 340" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#nightScene"/></svg>
-        <div class="dirty" id="dirty">
-          <svg class="scene" viewBox="0 0 400 340" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><use href="#nightScene"/></svg>
-          <svg class="smear" viewBox="0 0 400 340" preserveAspectRatio="none" aria-hidden="true">
-            <defs>
-              <radialGradient id="glare"><stop offset="0" stop-color="#fff6d0" stop-opacity=".9"/><stop offset="1" stop-color="#fff6d0" stop-opacity="0"/></radialGradient>
-              <linearGradient id="oil" x1="0" x2="1"><stop offset="0" stop-color="#ffd4a8" stop-opacity=".18"/><stop offset=".5" stop-color="#b9e6ff" stop-opacity=".22"/><stop offset="1" stop-color="#e8c8ff" stop-opacity=".16"/></linearGradient>
-            </defs>
-            <rect width="400" height="340" fill="#9fb3c4" opacity=".22"/>
-            <g fill="none" stroke="url(#oil)" stroke-width="26" stroke-linecap="round">
-              <path d="M-20 300 Q 200 40 420 300"/><path d="M-20 340 Q 200 90 420 340"/><path d="M-20 250 Q 200 -10 420 250"/>
-            </g>
-            <g fill="none" stroke="#ffffff" stroke-opacity=".28" stroke-width="3">
-              <path d="M10 320 Q 200 60 390 320"/><path d="M30 330 Q 200 110 370 330"/><path d="M0 280 Q 200 20 400 280"/>
-            </g>
-            <circle cx="150" cy="205" r="70" fill="url(#glare)"/><circle cx="250" cy="205" r="70" fill="url(#glare)"/>
-            <circle cx="90" cy="70" r="40" fill="url(#glare)"/><circle cx="320" cy="60" r="44" fill="url(#glare)"/>
-            <g fill="#fff" opacity=".35">
-              <circle cx="40" cy="60" r="4"/><circle cx="70" cy="140" r="3"/><circle cx="120" cy="90" r="5"/><circle cx="180" cy="40" r="3"/><circle cx="230" cy="120" r="4"/><circle cx="300" cy="150" r="5"/><circle cx="350" cy="100" r="3"/><circle cx="270" cy="250" r="4"/><circle cx="60" cy="250" r="5"/><circle cx="360" cy="270" r="4"/><circle cx="200" cy="290" r="3"/>
-            </g>
-          </svg>
-        </div>
-        <div class="handle" id="handle"></div>
-        <span class="tag l">אחרי ✓</span><span class="tag r">לפני</span>
-        <input type="range" min="0" max="100" value="50" id="baRange" aria-label="גרור כדי להשוות">
-      </div>
-      <div class="ba-cap">👆 גרור כדי לראות את ההבדל בנהיגת לילה (המחשה)</div>
+    <div class="stage" id="stage">
+      <canvas id="heroGlass" aria-label="הדגמה אינטראקטיבית: נגב את השמשה עם האצבע"></canvas>
+      <div class="hint pulse" id="hint">👆 <b>נסה בעצמך:</b> נגב את השמשה</div>
+      <div class="wow" id="wow"><span class="e">😮</span><div><b>זה ההבדל.</b><small>ככה השמשה שלך יכולה להיראות</small></div><a href="#order">רוצה כזה ←</a></div>
+      <button class="reset" id="reset" type="button">↺ שוב</button>
+      <div class="meter"><div class="track"><div class="fill" id="fill"></div></div><div class="pct" id="pct">נקי: 0%</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="track" id="mq"></div></div>
+
+<!-- ================= PAINS ================= -->
+<section class="dark">
+  <div class="wrap">
+    <span class="eyebrow">נשמע מוכר?</span>
+    <h2>השמשה "נקייה". אז למה אתה לא רואה?</h2>
+    <p class="sub">שעווה משטיפות, פיח מהכביש ושאריות גומי מהמגבים יוצרים שכבה שקופה ושמנונית. ביום היא כמעט לא נראית — אבל בגשם ובלילה היא משתלטת.</p>
+    <div class="pains">
+      <div class="pain reveal"><div class="ic">🌧️</div><h3>המגבים מורחים</h3><p>במקום לנקות, המגבים מורחים קשתות שמנוניות על כל שדה הראייה.</p></div>
+      <div class="pain reveal"><div class="ic">🌙</div><h3>כל פנס = כוכב מסנוור</h3><p>האור מתפזר בשכבה ויוצר הילות וקרניים. נוהגים בעיניים מכווצות ומתעייפים.</p></div>
+      <div class="pain reveal"><div class="ic">🧽</div><h3>שום שטיפה לא עוזרת</h3><p>נוזל שמשות ושטיפה רגילה לא מורידים אותה — היא נצמדת לזכוכית.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCROLL STORY ================= -->
+<div class="story" id="story">
+  <div class="sticky">
+    <div>
+      <span class="eyebrow" style="text-align:right">ככה זה עובד</span>
+      <h2>5 דקות. ספוג אחד.<br>שמשה חדשה.</h2>
+      <ul class="steps" id="steps">
+        <li class="on"><span class="n">1</span><div><h3>מרטיבים את השמשה</h3><p>שוטפים קלות במים כדי להוריד אבק וחול.</p></div></li>
+        <li><span class="n">2</span><div><h3>מורחים עם הספוג המובנה</h3><p>תנועות סיבוביות, אזור אחרי אזור. אין צורך בכוח.</p></div></li>
+        <li><span class="n">3</span><div><h3>שוטפים במים</h3><p>השכבה השמנונית יורדת יחד עם המשחה.</p></div></li>
+        <li><span class="n">4</span><div><h3>שקוף. גם כשיורד גשם.</h3><p>המים זורמים על הזכוכית במקום להימרח.</p></div></li>
+      </ul>
+      <div class="progressbar"><i id="storyBar"></i></div>
+    </div>
+    <div class="screen">
+      <canvas id="storyGlass" aria-hidden="true"></canvas>
+      <div class="timer" id="timer">⏱ 0:00</div>
     </div>
   </div>
 </div>
 
-<!-- shared night-road scene -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07111d"/><stop offset=".55" stop-color="#132a44"/><stop offset="1" stop-color="#1b1f26"/></linearGradient>
-    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2f37"/><stop offset="1" stop-color="#0d0f12"/></linearGradient>
-    <radialGradient id="hl"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#fff8d6"/><stop offset="1" stop-color="#fff8d6" stop-opacity="0"/></radialGradient>
-    <radialGradient id="sl"><stop offset="0" stop-color="#ffd58a"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient>
-    <symbol id="nightScene" viewBox="0 0 400 340">
-      <rect width="400" height="340" fill="url(#sky)"/>
-      <path d="M0 175 L120 150 L170 160 L230 140 L300 158 L400 145 L400 190 L0 190Z" fill="#0c1826"/>
-      <polygon points="170,185 230,185 400,340 0,340" fill="url(#road)"/>
-      <polygon points="197,190 203,190 206,215 194,215" fill="#e9e9e9" opacity=".8"/>
-      <polygon points="192,232 208,232 214,268 186,268" fill="#e9e9e9" opacity=".8"/>
-      <polygon points="182,295 218,295 228,340 172,340" fill="#e9e9e9" opacity=".8"/>
-      <line x1="172" y1="186" x2="10" y2="340" stroke="#f2c94c" stroke-width="3"/>
-      <line x1="228" y1="186" x2="390" y2="340" stroke="#ddd" stroke-width="3"/>
-      <rect x="62" y="40" width="4" height="150" fill="#2f3a46"/><rect x="62" y="40" width="34" height="4" fill="#2f3a46"/>
-      <circle cx="92" cy="48" r="26" fill="url(#sl)"/>
-      <rect x="330" y="30" width="4" height="150" fill="#2f3a46"/><rect x="300" y="30" width="34" height="4" fill="#2f3a46"/>
-      <circle cx="304" cy="38" r="30" fill="url(#sl)"/>
-      <rect x="215" y="188" width="40" height="18" rx="4" fill="#1c232c"/>
-      <circle cx="220" cy="200" r="16" fill="url(#hl)"/><circle cx="250" cy="200" r="16" fill="url(#hl)"/>
-      <rect x="120" y="114" width="80" height="20" rx="3" fill="#1f6f45" opacity=".85"/>
-      <text x="160" y="128" fill="#ffffff" font-size="11" font-family="Arial" font-weight="700" text-anchor="middle">יציאה 12 ←</text>
-    </symbol>
-  </defs>
-</svg>
-
-<!-- ===== PAINS ===== -->
-<section class="soft">
-  <div class="wrap">
-    <h2>מכיר את זה?</h2>
-    <p class="sub">שמשה "נקייה" מבחוץ יכולה עדיין להיות מכוסה בשכבה שקופה של שומן, שעווה מהשטיפה, פיח ושאריות מגבים. ברגע שיורד גשם או שמגיע לילה — היא מתגלה.</p>
-    <div class="pains">
-      <div class="card"><div class="ic">🌧️</div><h3>המגבים מורחים</h3><p>במקום לנקות, המגבים משאירים קשתות ופסים שחוסמים את שדה הראייה.</p></div>
-      <div class="card"><div class="ic">🌙</div><h3>סנוור בלילה</h3><p>כל פנס מולך הופך ל"כוכב" מרוח. נוהגים בעיניים מכווצות ומתעייפים מהר.</p></div>
-      <div class="card"><div class="ic">🧽</div><h3>שטיפה לא עוזרת</h3><p>שטיפת רכב ונוזל שמשות רגיל לא מורידים את השכבה הזו — היא נדבקת לזכוכית.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== HOW ===== -->
+<!-- ================= BENEFITS ================= -->
 <section>
   <div class="wrap">
-    <h2>3 צעדים. 5 דקות. שמשה חדשה.</h2>
-    <p class="sub">בלי מכונות, בלי ליטוש, בלי לבזבז שעה במכון.</p>
-    <div class="steps">
-      <div class="step"><h3>מרטיבים ומורחים</h3><p>מרטיבים מעט את השמשה, ומורחים את המשחה בתנועות סיבוביות עם הספוג המובנה.</p></div>
-      <div class="step"><h3>שוטפים במים</h3><p>שוטפים היטב במים. השכבה השמנונית יורדת יחד עם המשחה.</p></div>
-      <div class="step"><h3>מייבשים ונוהגים</h3><p>מייבשים עם מטלית — והשמשה שקופה, חלקה ובלי פסים.</p></div>
+    <span class="eyebrow">למה KLARO</span>
+    <h2>קטן בבקבוק. ענק על הכביש.</h2>
+    <p class="sub">כל מה שצריך כדי לראות ברור — בבקבוק אחד שנכנס לתא הכפפות.</p>
+    <div class="bens">
+      <div class="ben reveal"><div class="ic">🧴</div><h3>ספוג מובנה</h3><p>הבקבוק הוא גם המוליך. בלי מטליות, בלי ידיים שמנוניות.</p></div>
+      <div class="ben reveal"><div class="ic">💧</div><h3>רק מים</h3><p>מורחים ושוטפים בצינור או בדלי. בלי חומרים נוספים.</p></div>
+      <div class="ben reveal"><div class="ic">🚘</div><h3>לכל הזכוכיות</h3><p>שמשה קדמית, אחורית, חלונות ומראות. גם מראות אופנוע וקסדה.</p></div>
+      <div class="ben reveal"><div class="ic">⏱️</div><h3>5 דקות לשמשה</h3><p>מהר יותר משטיפה. בלי לקבוע תור במכון.</p></div>
+      <div class="ben reveal"><div class="ic">🌙</div><h3>נהיגת לילה רגועה</h3><p>פחות הילות וקרניים סביב פנסים של רכבים מולך.</p></div>
+      <div class="ben reveal"><div class="ic">📦</div><h3>הרבה טיפולים</h3><p>כמות קטנה לכל שמשה — בקבוק אחד מחזיק טיפולים רבים.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ===== WHY ===== -->
+<!-- ================= COMPARE ================= -->
 <section class="soft">
-  <div class="wrap split">
-    <div>
-      <svg viewBox="0 0 300 300" aria-label="בקבוק KLARO עם ספוג מובנה" role="img" style="max-width:340px;margin:0 auto">
-        <defs>
-          <linearGradient id="btl" x1="0" x2="1"><stop offset="0" stop-color="#e9eef3"/><stop offset=".5" stop-color="#ffffff"/><stop offset="1" stop-color="#d5dde5"/></linearGradient>
-          <linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c8ff2e"/><stop offset="1" stop-color="#8fc000"/></linearGradient>
-        </defs>
-        <ellipse cx="150" cy="282" rx="80" ry="10" fill="#0b1c2c" opacity=".12"/>
-        <rect x="88" y="96" width="124" height="184" rx="26" fill="url(#btl)" stroke="#c4cfda"/>
-        <rect x="100" y="140" width="100" height="104" rx="10" fill="#0b1c2c"/>
-        <text x="150" y="182" fill="#fff" font-size="28" font-family="Heebo,Arial" font-weight="900" text-anchor="middle" letter-spacing="2">KLARO</text>
-        <text x="150" y="204" fill="#b6f000" font-size="8.5" font-family="Heebo,Arial" font-weight="700" text-anchor="middle">GLASS OIL FILM REMOVER</text>
-        <text x="150" y="226" fill="#c9d6e2" font-size="10" font-family="Heebo,Arial" text-anchor="middle" direction="rtl">מסיר שומן לשמשות</text>
-        <rect x="96" y="70" width="108" height="34" rx="8" fill="#1d2a36"/>
-        <rect x="86" y="30" width="128" height="46" rx="16" fill="url(#sp)"/>
-        <g stroke="#7aa300" stroke-width="2" opacity=".6"><line x1="100" y1="40" x2="200" y2="40"/><line x1="96" y1="52" x2="204" y2="52"/><line x1="100" y1="64" x2="200" y2="64"/></g>
-      </svg>
-    </div>
-    <div>
-      <h2 style="text-align:right">למה דווקא KLARO?</h2>
-      <ul class="why">
-        <li><span class="dot">🧴</span><div><b>ספוג מובנה בבקבוק</b>לא צריך מטליות או כלים — הבקבוק הוא גם המוליך. הידיים נשארות נקיות.</div></li>
-        <li><span class="dot">💧</span><div><b>יורד רק עם מים</b>אין צורך בכימיקלים נוספים. מורחים, שוטפים, וזה עובד.</div></li>
-        <li><span class="dot">🚗</span><div><b>לכל הזכוכיות ברכב</b>שמשה קדמית, אחורית, חלונות צד ומראות. גם לקסדה ולמראות אופנוע.</div></li>
-        <li><span class="dot">📦</span><div><b>בקבוק אחד = הרבה טיפולים</b>מספיק כמות קטנה לכל שמשה, כך שבקבוק אחד מחזיק טיפולים רבים.</div></li>
-      </ul>
+  <div class="wrap">
+    <span class="eyebrow">ההשוואה</span>
+    <h2>למה לא פשוט נוזל שמשות?</h2>
+    <p class="sub">כי נוזל שמשות מנקה לכלוך. הוא לא נבנה להסיר שכבת שומן.</p>
+    <div class="cmp reveal">
+      <table>
+        <thead><tr><th></th><th class="us">KLARO</th><th>נוזל שמשות</th><th>ליטוש במכון</th></tr></thead>
+        <tbody>
+          <tr><td>מסיר שכבת שומן</td><td class="us"><span class="y">✓</span></td><td><span class="x">✗</span></td><td><span class="y">✓</span></td></tr>
+          <tr><td>עושים לבד בבית</td><td class="us"><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="x">✗</span></td></tr>
+          <tr><td>זמן</td><td class="us">5 דק'</td><td>2 דק'</td><td>תור + חצי יום</td></tr>
+          <tr><td>מחיר</td><td class="us">79 ₪</td><td>15 ₪ (ולא עוזר)</td><td>₪₪₪</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
 
-<!-- ===== ORDER ===== -->
+<!-- ================= IN THE BOX ================= -->
+<section>
+  <div class="wrap box">
+    <svg class="bottle" viewBox="0 0 300 320" role="img" aria-label="בקבוק KLARO עם ספוג מובנה">
+      <defs>
+        <linearGradient id="btl" x1="0" x2="1"><stop offset="0" stop-color="#dde5ec"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d4de"/></linearGradient>
+        <linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9ff52"/><stop offset="1" stop-color="#8fc000"/></linearGradient>
+        <linearGradient id="lbl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d2238"/><stop offset="1" stop-color="#060d17"/></linearGradient>
+      </defs>
+      <rect x="86" y="104" width="128" height="196" rx="28" fill="url(#btl)" stroke="#c4cfda"/>
+      <rect x="98" y="146" width="104" height="116" rx="12" fill="url(#lbl)"/>
+      <text x="150" y="192" fill="#fff" font-size="29" font-family="Heebo,Arial" font-weight="900" text-anchor="middle" letter-spacing="3">KLARO</text>
+      <rect x="118" y="202" width="64" height="2" fill="#c6ff1a"/>
+      <text x="150" y="222" fill="#c6ff1a" font-size="8.5" font-family="Heebo,Arial" font-weight="700" text-anchor="middle">GLASS OIL FILM REMOVER</text>
+      <text x="150" y="244" fill="#b9c7d6" font-size="11" font-family="Heebo,Arial" text-anchor="middle" direction="rtl">מסיר שומן לשמשות</text>
+      <rect x="96" y="76" width="108" height="36" rx="8" fill="#1d2a36"/>
+      <rect x="84" y="30" width="132" height="52" rx="18" fill="url(#sp)"/>
+      <g stroke="#6f9400" stroke-width="2" opacity=".55"><line x1="98" y1="44" x2="202" y2="44"/><line x1="94" y1="56" x2="206" y2="56"/><line x1="98" y1="68" x2="202" y2="68"/></g>
+      <path d="M104 120 q6 70 0 160" stroke="#fff" stroke-width="6" opacity=".7" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <span class="eyebrow" style="text-align:right">מה מקבלים</span>
+      <h2 style="text-align:right">הכל בבקבוק אחד</h2>
+      <p style="color:var(--muted);font-size:17px;margin:0">משחה מרוכזת לניקוי זכוכית עם ספוג מובנה בראש הבקבוק. סוגרים את המכסה ושמים בתא הכפפות.</p>
+      <div class="specs">
+        <div><b>~100 מ"ל</b><small>משחה מרוכזת</small></div>
+        <div><b>ספוג מובנה</b><small>בלי צורך במטליות</small></div>
+        <div><b>5 דקות</b><small>לשמשה</small></div>
+        <div><b>זכוכית</b><small>שמשות, חלונות, מראות</small></div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">* האיורים והאנימציות באתר הם להמחשה. מפרט המוצר עשוי להשתנות מעט.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REVIEWS (only real ones, from config) ================= -->
+<section class="soft" id="reviews" hidden>
+  <div class="wrap">
+    <span class="eyebrow">לקוחות מספרים</span>
+    <h2>מה אומרים הנהגים</h2>
+    <p class="sub"></p>
+    <div class="revs" id="revs"></div>
+  </div>
+</section>
+
+<!-- ================= ORDER ================= -->
 <section id="order">
   <div class="wrap">
-    <h2>בחר את החבילה שלך</h2>
-    <p class="sub">כל החבילות כוללות משלוח חינם עד הבית.</p>
-    <div class="pkgs" id="pkgs"></div>
-    <div class="pkg-cta">
-      <button class="btn block" id="buyBtn" type="button">לתשלום מאובטח ←</button>
-      <div class="secure"><span>🔒 סליקה מאובטחת</span><span>💳 אשראי · Bit · Apple Pay · Google Pay</span></div>
-      <p style="text-align:center;color:var(--muted);font-size:14px;margin:10px 0 0" id="shipText"></p>
-    </div>
-  </div>
-</section>
-
-<!-- ===== GUARANTEE ===== -->
-<section class="soft">
-  <div class="wrap">
-    <div class="guarantee">
-      <div class="seal">14 יום<br>החזר<br>כספי</div>
-      <div>
-        <h3>קונים בראש שקט</h3>
-        <p>אפשר לבטל את העסקה תוך 14 יום מקבלת המוצר ולקבל החזר כספי, בהתאם לחוק הגנת הצרכן ולתקנון האתר. יש שאלה? אנחנו זמינים בוואטסאפ ובמייל.</p>
+    <span class="eyebrow">מחירי השקה</span>
+    <h2>בחר חבילה</h2>
+    <p class="sub">משלוח חינם בכל החבילות. הזוג הוא הבחירה המשתלמת — אחד לכל רכב בבית.</p>
+    <div class="order">
+      <div class="pkgs" id="pkgs"></div>
+      <div class="summary">
+        <h3>סיכום הזמנה</h3>
+        <div class="line"><span id="sumTitle">—</span><span id="sumPrice">—</span></div>
+        <div class="line" id="saveLine"><span>חיסכון לעומת יחידות בודדות</span><span id="sumSave" style="color:var(--lime)">—</span></div>
+        <div class="line"><span>משלוח עד הבית</span><span class="free">חינם</span></div>
+        <div class="line" id="giftLine" hidden><span id="giftTxt"></span><span class="free">חינם</span></div>
+        <div class="line tot"><span>סה"כ לתשלום</span><span id="sumTotal">—</span></div>
+        <div class="eta">📦 <span>מזמינים היום ← מגיע עד הבית בין <b id="eta">—</b></span></div>
+        <button class="btn block" id="buyBtn" type="button">לתשלום מאובטח <span class="arrow">←</span></button>
+        <div class="secure"><span>🔒 SSL</span><span>💳 אשראי</span><span>Bit</span><span>Apple Pay</span><span>Google Pay</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== FAQ ===== -->
-<section id="faq">
+<!-- ================= GUARANTEE ================= -->
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="guarantee reveal">
+      <div class="seal"><div><b>14</b>יום<br>להחזרה</div></div>
+      <div>
+        <h3>לא מרוצה? לא נשארים תקועים.</h3>
+        <p>אפשר לבטל עסקה תוך 14 יום מקבלת המוצר, בהתאם לחוק הגנת הצרכן ול<a href="terms.html#cancel">מדיניות הביטולים</a>. מוצר שהגיע פגום — מוחלף או מוחזר במלואו. ואנחנו זמינים בוואטסאפ לכל שאלה.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="soft" id="faq">
   <div class="wrap faq">
-    <h2>שאלות נפוצות</h2>
+    <span class="eyebrow">שאלות נפוצות</span>
+    <h2>יש שאלה? יש תשובה</h2>
     <p class="sub"></p>
-    <details><summary>זה פוגע בשמשה או בגומיות?</summary><p>המשחה מיועדת לזכוכית רכב. מומלץ למרוח רק על הזכוכית, לא בשמש ישירה ולא על שמשה חמה, ולשטוף היטב במים בסיום. לפני שימוש ראשון כדאי לנסות על פינה קטנה.</p></details>
-    <details><summary>אפשר להשתמש על שמשה עם ציפוי כהה / ויניל?</summary><p>מיועד לצד החיצוני של הזכוכית. אין למרוח על מדבקות או על ציפוי הכהיה, שבדרך כלל נמצא בצד הפנימי.</p></details>
-    <details><summary>כמה זמן לוקח המשלוח?</summary><p>המשלוח חינם ומגיע עד הבית בתוך 10–18 ימי עסקים. ברגע שההזמנה יוצאת נשלח לך מספר מעקב.</p></details>
-    <details><summary>כמה פעמים אפשר להשתמש בבקבוק אחד?</summary><p>מספיקה כמות קטנה לכל שמשה, ולכן בקבוק אחד מספיק לטיפולים רבים. רוב האנשים מטפלים בשמשות פעם בכמה שבועות.</p></details>
-    <details><summary>זה מחליף נוזל לשמשות?</summary><p>לא. נוזל שמשות מנקה לכלוך יומיומי. KLARO מסיר את שכבת השומן העקשנית שנוזל רגיל לא מוריד. ביחד — השמשה נשארת נקייה לאורך זמן.</p></details>
-    <details><summary>איך מבטלים הזמנה?</summary><p>שולחים הודעה בוואטסאפ או במייל עם מספר ההזמנה. ביטול אפשרי בתוך 14 יום מקבלת המוצר, בהתאם ל<a href="terms.html#cancel">מדיניות הביטולים</a>.</p></details>
+    <details><summary>זה פוגע בשמשה, בגומיות או בצבע?</summary><p>המשחה מיועדת לזכוכית. מומלץ למרוח רק על הזכוכית, לא בשמש ישירה ולא על שמשה חמה, ולשטוף היטב במים בסיום. לפני שימוש ראשון כדאי לנסות על פינה קטנה.</p></details>
+    <details><summary>אפשר על שמשה עם כהה / מדבקה?</summary><p>מיועד לצד החיצוני של הזכוכית. אין למרוח על מדבקות או על ציפוי הכהיה (שבדרך כלל נמצא בצד הפנימי).</p></details>
+    <details><summary>תוך כמה זמן זה מגיע?</summary><p>משלוח חינם עד הבית, תוך 10–18 ימי עסקים. ברגע שהחבילה יוצאת נשלח לך מספר מעקב.</p></details>
+    <details><summary>כמה טיפולים יש בבקבוק?</summary><p>מספיקה כמות קטנה לכל שמשה, ולכן בקבוק אחד מספיק לטיפולים רבים. רוב הנהגים מטפלים בשמשות פעם בכמה שבועות.</p></details>
+    <details><summary>זה מחליף נוזל שמשות?</summary><p>לא. נוזל שמשות מנקה לכלוך יומיומי. KLARO מסיר את שכבת השומן שנוזל רגיל לא מוריד. ביחד — השמשה נשארת נקייה לאורך זמן.</p></details>
+    <details><summary>איך משלמים? זה בטוח?</summary><p>התשלום מתבצע בדף סליקה מאובטח של חברת סליקה מורשית בישראל. פרטי האשראי לא עוברים דרכנו ולא נשמרים אצלנו.</p></details>
+    <details><summary>איך מבטלים?</summary><p>שולחים הודעה בוואטסאפ או במייל עם מספר ההזמנה, תוך 14 יום מקבלת המוצר. פרטים מלאים ב<a href="terms.html#cancel">מדיניות הביטולים</a>.</p></details>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section class="dark final">
+  <div class="wrap">
+    <h2>הגשם הבא כבר בדרך.<br><span style="color:var(--lime)">תהיה מוכן.</span></h2>
+    <p class="sub">79 ₪ · משלוח חינם · 14 יום להחזרה</p>
+    <a href="#order" class="btn" style="min-width:300px">אני רוצה KLARO <span class="arrow">←</span></a>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
     <div class="cols">
-      <div>
-        <div class="logo">KLARO</div>
-        <p style="margin:8px 0 0">שמשה שקופה. נסיעה בטוחה יותר.</p>
-      </div>
+      <div><div class="logo">KLA<span>RO</span></div><p style="margin:8px 0 0">שמשה שקופה. נסיעה רגועה.</p></div>
       <div>
         <div>שירות לקוחות: <span data-biz="phone">—</span></div>
         <div>מייל: <span data-biz="email">—</span></div>
-        <div>עוסק: <span data-biz="name"></span> · <span data-biz="id"></span></div>
+        <div><span data-biz="name"></span> · עוסק <span data-biz="id"></span></div>
       </div>
       <div>
-        <div><a href="terms.html">תקנון ותנאי שימוש</a></div>
-        <div><a href="terms.html#cancel">מדיניות ביטולים והחזרות</a></div>
-        <div><a href="terms.html#privacy">מדיניות פרטיות</a></div>
+        <div><a href="terms.html">תקנון</a></div>
+        <div><a href="terms.html#cancel">ביטולים והחזרות</a></div>
+        <div><a href="terms.html#privacy">פרטיות</a></div>
         <div><a href="terms.html#a11y">הצהרת נגישות</a></div>
       </div>
     </div>
-    <p style="margin-top:24px;font-size:12px;opacity:.7">© <span id="year"></span> KLARO. כל הזכויות שמורות. התמונות באתר הן המחשה.</p>
+    <p style="margin-top:26px;font-size:12px;opacity:.6">© <span id="year"></span> KLARO · האיורים וההדגמות באתר הם להמחשה בלבד.</p>
   </div>
 </footer>
 
-<div class="sticky" id="sticky">
-  <div class="row">
-    <div><b id="stPrice">79 ₪</b><small>משלוח חינם</small></div>
-    <a href="#order" class="btn">להזמנה ←</a>
-  </div>
-</div>
-<a class="wa" id="wa" hidden aria-label="וואטסאפ" target="_blank" rel="noopener">
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>
-</a>
+<div class="stickybar" id="stickybar"><div class="row"><div><b id="stPrice">79 ₪</b><small>משלוח חינם</small></div><a href="#order" class="btn">להזמנה <span class="arrow">←</span></a></div></div>
+<a class="wa" id="wa" hidden aria-label="וואטסאפ" target="_blank" rel="noopener"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg></a>
 
 <script>
 (function(){
   var S = window.STORE;
-  // before/after slider
-  var r = document.getElementById('baRange'), d = document.getElementById('dirty'), h = document.getElementById('handle');
-  function upd(){ var v = r.value; d.style.clipPath = 'inset(0 0 0 '+v+'%)'; h.style.left = v+'%'; }
-  r.addEventListener('input', upd); upd();
-  // gentle auto-demo once
-  var t0 = null, done = false;
-  function demo(ts){ if(done) return; if(!t0) t0 = ts; var k = (ts - t0)/2200; if(k>1){ done=true; return; }
-    r.value = 50 + 32*Math.sin(k*Math.PI*2); upd(); requestAnimationFrame(demo); }
-  setTimeout(function(){ requestAnimationFrame(demo); }, 900);
-  r.addEventListener('pointerdown', function(){ done = true; });
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // packages
-  var box = document.getElementById('pkgs'), sel = 2, html = '';
+  /* announcement rotator */
+  var bars = document.querySelectorAll('#bar div'), bi = 0;
+  setInterval(function(){ bars[bi].className='out'; bi=(bi+1)%bars.length; bars[bi].className='on';
+    setTimeout(function(){ bars.forEach(function(b,i){ if(i!==bi) b.className=''; }); }, 500); }, 3500);
+
+  /* marquee */
+  var items = ['🌧️ <b>ראות מלאה</b> בגשם','🌙 <b>פחות סנוור</b> בלילה','🧴 <b>ספוג מובנה</b>','💧 <b>רק מים</b>','🚚 <b>משלוח חינם</b>','↩️ <b>14 יום</b> להחזרה'];
+  var mq = document.getElementById('mq'), h = '';
+  for (var k=0;k<4;k++) items.forEach(function(t){ h += '<span>'+t+'</span>'; });
+  mq.innerHTML = h;
+
+  /* ===== HERO interactive glass ===== */
+  var hint = document.getElementById('hint'), fill = document.getElementById('fill'), pct = document.getElementById('pct'),
+      wow = document.getElementById('wow'), reset = document.getElementById('reset');
+  var hero = new Glass(document.getElementById('heroGlass'), { interactive: true, onProgress: function(p){
+    var v = Math.round(p*100); fill.style.width = v+'%'; pct.textContent = 'נקי: '+v+'%';
+    if (hero && hero.userTouched) { hint.style.opacity = 0; reset.style.display = 'block'; }
+    if (p > 0.45 && hero && hero.userTouched && !hero.celebrated) { hero.celebrated = true; wow.classList.add('on'); track('ViewContent',{content_name:'wipe_demo'}); }
+  }});
+  hero.start();
+  reset.addEventListener('click', function(){ hero.reset(); wow.classList.remove('on'); fill.style.width='0'; pct.textContent='נקי: 0%'; });
+
+  // auto sponge demo: one sweeping pass, then hand over to the user
+  if (!reduce) {
+    var t0 = null, demoDur = 2600;
+    hero.onTick = function(now){
+      if (hero.userTouched) { hero.sponge = null; hero.onTick = null; return; }
+      if (t0 === null) t0 = now + 700;
+      var k = (now - t0) / demoDur;
+      if (k < 0) return;
+      if (k > 1) { hero.sponge = null; hero.onTick = null; return; }
+      var w = hero.w, hh = hero.h;
+      var x = w * (0.85 - 0.7 * k), y = hh * (0.5 + 0.12 * Math.sin(k * Math.PI * 3));
+      if (hero.sponge) hero.stroke({x:hero.sponge.x,y:hero.sponge.y+hh*0.02},{x:x,y:y+hh*0.02});
+      hero.sponge = { x:x, y:y, a: Math.sin(now/120)*0.12 };
+      hero.userTouched = false;
+    };
+  }
+  // pause hero when offscreen
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(es){ es.forEach(function(e){ e.isIntersecting ? hero.start() : hero.stop(); }); }).observe(document.getElementById('stage'));
+
+  /* ===== SCROLL STORY ===== */
+  var story = document.getElementById('story'), steps = document.querySelectorAll('#steps li'),
+      bar = document.getElementById('storyBar'), timer = document.getElementById('timer');
+  var sg = new Glass(document.getElementById('storyGlass'), { interactive:false, rain: 1 });
+  var path = Glass.path(5), done = 0;
+  function storyProgress(){
+    var r = story.getBoundingClientRect(), total = story.offsetHeight - innerHeight;
+    return Math.min(1, Math.max(0, -r.top / Math.max(1,total)));
+  }
+  function applyStory(p){
+    var a = Math.min(1, Math.max(0, (p - 0.12) / 0.62));      // sponge phase
+    var target = Math.floor(a * (path.length - 1));
+    if (target < done) { sg.reset(); done = 0; }
+    var w = sg.w, h = sg.h;
+    for (var i = done; i < target; i++) sg.stroke({x:path[i][0]*w,y:path[i][1]*h},{x:path[i+1][0]*w,y:path[i+1][1]*h});
+    done = Math.max(done, target);
+    sg.sponge = (a > 0 && a < 1) ? { x: path[target][0]*w, y: path[target][1]*h - h*0.02, a: Math.sin(target/3)*0.15 } : null;
+    if (p > 0.8) sg.clearAll(); // rinse: fully clean
+    sg.opts.rain = p > 0.82 ? 3 : 1;
+    var idx = p < 0.12 ? 0 : p < 0.74 ? 1 : p < 0.86 ? 2 : 3;
+    steps.forEach(function(li,i){ li.classList.toggle('on', i===idx); });
+    bar.style.width = (p*100)+'%';
+    var secs = Math.round(p*300); timer.textContent = '⏱ ' + Math.floor(secs/60) + ':' + ('0'+secs%60).slice(-2);
+  }
+  if (!('IntersectionObserver' in window)) sg.start();
+  else new IntersectionObserver(function(es){ es.forEach(function(e){ e.isIntersecting ? sg.start() : sg.stop(); }); }).observe(story);
+
+  /* ===== reveal on scroll ===== */
+  var revs = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); }, { threshold: .15 });
+    revs.forEach(function(el){ io.observe(el); });
+  } else revs.forEach(function(el){ el.classList.add('in'); });
+
+  /* ===== reviews (real only) ===== */
+  if (S.reviews && S.reviews.length) {
+    document.getElementById('reviews').hidden = false;
+    document.getElementById('revs').innerHTML = S.reviews.map(function(r){
+      return '<div class="rev">'+(r.img?'<img src="'+r.img+'" alt="" loading="lazy">':'')+'<div class="st">'+'★★★★★'.slice(0,r.stars||5)+'</div><p>'+r.text+'</p><b>'+r.name+'</b> <small style="color:var(--muted)">'+(r.city||'')+'</small></div>';
+    }).join('');
+  }
+
+  /* ===== packages + summary ===== */
+  var box = document.getElementById('pkgs'), sel = '2', html = '';
   Object.keys(S.packages).forEach(function(k){
     var p = S.packages[k], unit = Math.round(p.price / p.qty);
-    html += '<label class="pkg'+(k==sel?' on':'')+'" data-k="'+k+'">'+
-      (p.badge ? '<span class="badge">'+p.badge+'</span>' : '')+
-      '<input type="radio" name="pkg" value="'+k+'"'+(k==sel?' checked':'')+'>'+
-      '<span class="t"><b>'+p.title+'</b><small>'+unit+' ₪ ליחידה · משלוח חינם</small></span>'+
-      '<span class="p"><b>'+p.price+' ₪</b><s>'+p.compare+' ₪</s></span></label>';
+    html += '<label class="pkg'+(k===sel?' on':'')+'" data-k="'+k+'">'+(p.badge?'<span class="badge">'+p.badge+'</span>':'')+
+      '<input type="radio" name="pkg" value="'+k+'"'+(k===sel?' checked':'')+'>'+
+      '<span class="t"><b>'+p.title+'</b><small>'+unit+' ₪ ליחידה · משלוח חינם</small>'+(S.gift && p.qty>1?'<span class="gift">🎁 '+S.gift+'</span>':'')+'</span>'+
+      '<span class="p"><b>'+p.price+' ₪</b>'+(p.compare?'<s>'+p.compare+' ₪</s>':'')+'</span></label>';
   });
   box.innerHTML = html;
-  box.addEventListener('change', function(e){
-    sel = e.target.value;
-    box.querySelectorAll('.pkg').forEach(function(el){ el.classList.toggle('on', el.getAttribute('data-k')==sel); });
-    document.getElementById('stPrice').textContent = S.packages[sel].price + ' ₪';
-  });
+  function summary(){
+    var p = S.packages[sel];
+    document.getElementById('sumTitle').textContent = p.title;
+    document.getElementById('sumPrice').textContent = p.price + ' ₪';
+    document.getElementById('saveLine').hidden = !p.compare;
+    document.getElementById('sumSave').textContent = (p.compare - p.price) + ' ₪';
+    document.getElementById('sumTotal').textContent = p.price + ' ₪';
+    document.getElementById('stPrice').textContent = p.price + ' ₪';
+    var gl = document.getElementById('giftLine'); gl.hidden = !(S.gift && p.qty > 1);
+    document.getElementById('giftTxt').textContent = '🎁 ' + (S.gift || '');
+    box.querySelectorAll('.pkg').forEach(function(el){ el.classList.toggle('on', el.getAttribute('data-k')===sel); });
+  }
+  box.addEventListener('change', function(e){ sel = e.target.value; summary(); track('AddToCart',{value:S.packages[sel].price,currency:'ILS'}); });
+  summary();
   document.getElementById('buyBtn').addEventListener('click', function(){ checkout(sel); });
-  document.getElementById('shipText').textContent = S.shippingText;
-  document.getElementById('stPrice').textContent = S.packages[sel].price + ' ₪';
+
+  /* delivery window: 10–18 business days (Sun–Thu) */
+  function addBiz(d, n){ d = new Date(d); while(n>0){ d.setDate(d.getDate()+1); var w=d.getDay(); if(w!==5 && w!==6) n--; } return d; }
+  function fmt(d){ return d.getDate() + '.' + (d.getMonth()+1); }
+  var now = new Date(); document.getElementById('eta').textContent = fmt(addBiz(now,10)) + '–' + fmt(addBiz(now,18));
 
   track('ViewContent', { value: S.packages[1].price, currency: 'ILS', content_ids: ['klaro-1'], content_type: 'product' });
 
-  // sticky CTA on mobile after hero
-  var st = document.getElementById('sticky'), order = document.getElementById('order');
+  /* scroll handler: story + sticky bar */
+  var sb = document.getElementById('stickybar'), order = document.getElementById('order'), ticking = false;
   function onScroll(){
-    var y = window.scrollY, o = order.getBoundingClientRect();
-    var inOrder = o.top < window.innerHeight && o.bottom > 0;
-    st.classList.toggle('show', y > 500 && !inOrder);
+    ticking = false;
+    applyStory(storyProgress());
+    var o = order.getBoundingClientRect();
+    sb.classList.toggle('show', scrollY > 700 && !(o.top < innerHeight && o.bottom > 0));
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('scroll', function(){ if(!ticking){ ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  addEventListener('resize', onScroll);
+  setTimeout(onScroll, 50);
 })();
 </script>
 </body>
