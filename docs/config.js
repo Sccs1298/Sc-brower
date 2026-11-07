@@ -26,7 +26,7 @@ window.STORE = {
 
   // תמונות/סרטונים אמיתיים של המוצר (מהספק באישור, או שצילמת). לשים בתיקייה docs/media/
   // דוגמה: ["media/1.jpg", "media/2.jpg", "media/demo.mp4"]. כשהרשימה ריקה מוצג האיור.
-  photos: [],
+  photos: ["media/product-zoom.mp4", "media/product.jpg", "media/bundle.jpg", "media/rinse.jpg", "media/door-pocket.jpg"],
 
   // ביקורות אמיתיות בלבד. דוגמה:
   // { name: "יוסי מ.", city: "חיפה", stars: 5, text: "...", img: "reviews/yossi.jpg" }

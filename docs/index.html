@@ -109,6 +109,10 @@ h2{font-size:40px;line-height:1.12;margin:0 0 12px;font-weight:900;text-align:ce
 .pain h3{margin:0 0 6px;font-size:21px}
 .pain p{margin:0;color:#a9b9c9}
 
+.ba-vid{max-width:560px;margin:34px auto 0}
+.ba-vid .bt{position:absolute;top:12px;font-weight:800;font-size:14px;padding:4px 12px;border-radius:8px}
+.ba-vid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:22px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+.ba-vid figcaption{text-align:center;color:#a9b9c9;font-size:14px;margin-top:10px}
 /* scroll story */
 .story{position:relative;height:340vh;background:var(--night);color:#fff}
 .story .sticky{position:sticky;top:60px;height:calc(100vh - 60px);display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center;max-width:1120px;margin:0 auto;padding:20px 16px}
@@ -149,8 +153,13 @@ h2{font-size:40px;line-height:1.12;margin:0 0 12px;font-weight:900;text-align:ce
 .box{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
 .bottle{max-width:360px;margin:0 auto;animation:float 5s ease-in-out infinite;filter:drop-shadow(0 30px 40px rgba(11,28,44,.25))}
 @keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-14px) rotate(3deg)}}
-.gallery{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:22px;-webkit-overflow-scrolling:touch}
-.gallery>*{flex:0 0 100%;scroll-snap-align:center;aspect-ratio:1;object-fit:cover;border-radius:22px;background:#eee}
+.gwrap{position:relative;min-width:0;width:100%;max-width:520px;margin:0 auto}
+.box>*{min-width:0}
+.gdots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.gdots i{width:8px;height:8px;border-radius:50%;background:#cfd8e1;transition:all .2s}
+.gdots i.on{background:var(--night);width:22px;border-radius:6px}
+.gallery{scrollbar-width:none;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:22px;-webkit-overflow-scrolling:touch}
+.gallery>*{flex:0 0 100%;width:100%;min-width:0;scroll-snap-align:center;aspect-ratio:1;object-fit:cover;border-radius:22px;background:#eee}
 .specs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
 .specs div{background:var(--soft);border-radius:14px;padding:14px}
 .specs b{display:block;font-size:22px;color:var(--ink)}
@@ -202,7 +211,7 @@ summary:after{content:"+";font-size:24px;line-height:1;color:var(--muted);transi
 details[open] summary:after{transform:rotate(45deg)}
 details p{margin:10px 0 0;color:var(--muted)}
 
-.final{text-align:center;background:radial-gradient(800px 400px at 50% 0%,#17365a,var(--night))}
+.final{text-align:center;background:linear-gradient(180deg,rgba(6,13,23,.55),rgba(6,13,23,.92)),url(media/night-clear.jpg) center/cover}
 .final h2{font-size:46px}
 
 footer{background:#03070d;color:#a9b9c9;padding:40px 0 120px;font-size:14px}
@@ -306,6 +315,11 @@ footer a:hover{text-decoration:underline}
       <div class="pain reveal"><div class="ic">🌙</div><h3>פנסים שמסנוורים</h3><p>נוסעים בלילה בגשם וכל פנס מולך נמרח על כל השמשה. מכווצים עיניים כל הדרך הביתה.</p></div>
       <div class="pain reveal"><div class="ic">🧽</div><h3>שטיפה לא מורידה את זה</h3><p>נוזל שמשות ושטיפה בתחנת דלק מנקים לכלוך. את השכבה הזו הם לא מורידים.</p></div>
     </div>
+    <figure class="ba-vid reveal">
+      <div style="position:relative"><img src="media/before-after.jpg" alt="שמשה לפני ואחרי ניקוי שכבת השומן, בנסיעת לילה בגשם" loading="lazy">
+      <span class="bt" style="left:12px;background:rgba(0,0,0,.65);color:#fff">לפני</span><span class="bt" style="right:12px;background:var(--lime);color:var(--night)">אחרי</span></div>
+      <figcaption>אותו כביש, אותו גשם. ההבדל זה השכבה על השמשה.</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -370,7 +384,7 @@ footer a:hover{text-decoration:underline}
 <!-- ================= IN THE BOX ================= -->
 <section>
   <div class="wrap box">
-    <div class="gallery" id="gallery" hidden></div>
+    <div class="gwrap" id="gwrap" hidden><div class="gallery" id="gallery"></div><div class="gdots" id="gdots"></div></div>
     <svg class="bottle" viewBox="0 0 300 320" role="img" aria-label="בקבוק KLARO עם ספוג מובנה">
       <defs>
         <linearGradient id="btl" x1="0" x2="1"><stop offset="0" stop-color="#dde5ec"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#c9d4de"/></linearGradient>
@@ -398,7 +412,7 @@ footer a:hover{text-decoration:underline}
         <div><b>5 דקות</b><small>לשמשה</small></div>
         <div><b>זכוכית</b><small>שמשות, חלונות, מראות</small></div>
       </div>
-      <p style="font-size:12px;color:var(--muted);margin-top:12px">* האיורים והאנימציות באתר הם להמחשה. מפרט המוצר עשוי להשתנות מעט.</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">* התמונות באתר הן הדמיה. המוצר שמגיע עשוי להיראות מעט שונה.</p>
     </div>
   </div>
 </section>
@@ -422,6 +436,7 @@ footer a:hover{text-decoration:underline}
     <div class="order">
       <div class="pkgs" id="pkgs"></div>
       <div class="summary">
+        <img src="media/bundle.jpg" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin-bottom:14px" loading="lazy">
         <h3>סיכום הזמנה</h3>
         <div class="line"><span id="sumTitle">—</span><span id="sumPrice">—</span></div>
         <div class="line" id="saveLine"><span>חוסכים לעומת קנייה בנפרד</span><span id="sumSave" style="color:var(--lime)">—</span></div>
@@ -490,7 +505,7 @@ footer a:hover{text-decoration:underline}
         <div><a href="terms.html#a11y">הצהרת נגישות</a></div>
       </div>
     </div>
-    <p style="margin-top:26px;font-size:12px;opacity:.6">© <span id="year"></span> KLARO · האיורים וההדגמות באתר הם להמחשה בלבד.</p>
+    <p style="margin-top:26px;font-size:12px;opacity:.6">© <span id="year"></span> KLARO · התמונות וההדגמות באתר הן הדמיה.</p>
   </div>
 </footer>
 
@@ -583,7 +598,10 @@ footer a:hover{text-decoration:underline}
     gal.innerHTML = S.photos.map(function(src){ return /\.(mp4|webm)$/i.test(src)
       ? '<video src="'+src+'" autoplay muted loop playsinline></video>'
       : '<img src="'+src+'" alt="KLARO" loading="lazy">'; }).join('');
-    gal.hidden = false; document.querySelector('.bottle').style.display = 'none';
+    document.getElementById('gwrap').hidden = false; document.querySelector('.bottle').style.display = 'none';
+    var dots = document.getElementById('gdots'); dots.innerHTML = S.photos.map(function(_,i){ return '<i'+(i?'':' class="on"')+'></i>'; }).join('');
+    gal.addEventListener('scroll', function(){ var i = Math.round(Math.abs(gal.scrollLeft) / gal.clientWidth);
+      dots.querySelectorAll('i').forEach(function(d,j){ d.classList.toggle('on', i===j); }); }, { passive: true });
   }
 
   /* ===== reviews (real only) ===== */
