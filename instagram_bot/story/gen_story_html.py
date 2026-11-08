@@ -20,7 +20,7 @@ html = '''<!doctype html>
 <script>
 ''' + squar + '''
 const D = STORY, el = document.createElement('div'); el.className = 'slide dark';
-const pct = v => `${v > 0 ? '+' : ''}${v.toFixed(1)}%`, cls = v => v < 0 ? 'dn' : 'up';
+const pct = v => Math.abs(v) < .05 ? '0.0%' : `${v > 0 ? '+' : ''}${v.toFixed(1)}%`, cls = v => Math.abs(v) < .05 ? '' : v < 0 ? 'dn' : 'up';
 const usd = v => '$' + (v >= 1000 ? Math.round(v).toLocaleString('en-US') : v.toLocaleString('en-US', { maximumFractionDigits: 2 }));
 const coin = s => D.coins.find(c => c[0] === s);
 function heat(coins) {
