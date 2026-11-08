@@ -17,9 +17,9 @@
 
 | חבילה | שם המוצר בדף | מחיר | כתובת הצלחה (Success URL) |
 |---|---|---|---|
-| 1 | KLARO — בקבוק אחד | 79 ₪ | `https://sccs1298.github.io/Sc-brower/thanks.html?p=1` |
-| 2 | KLARO — זוג | 119 ₪ | `https://sccs1298.github.io/Sc-brower/thanks.html?p=2` |
-| 3 | KLARO — שלישייה | 149 ₪ | `https://sccs1298.github.io/Sc-brower/thanks.html?p=3` |
+| 2 | KLARO — זוג ערכות | 149 ₪ | `https://sccs1298.github.io/Sc-brower/thanks.html?p=2` |
+| 3 | KLARO — 3 ערכות | 199 ₪ | `https://sccs1298.github.io/Sc-brower/thanks.html?p=3` |
+| 4 | KLARO — 4 ערכות | 249 ₪ | `https://sccs1298.github.io/Sc-brower/thanks.html?p=4` |
 
 בכל דף:
 - שדות חובה: שם מלא, טלפון, מייל, **כתובת למשלוח (רחוב+מספר), עיר, מיקוד** (כשדות נוספים).

@@ -190,6 +190,7 @@ h2{font-size:40px;line-height:1.12;margin:0 0 12px;font-weight:900;text-align:ce
 .summary{background:var(--night);color:#fff;border-radius:24px;padding:26px;position:sticky;top:80px}
 .summary h3{margin:0 0 14px;font-size:22px}
 .summary .line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.12);color:#c9d6e2}
+.summary .line[hidden]{display:none}
 .summary .line.tot{border:0;color:#fff;font-weight:900;font-size:24px;padding-top:14px}
 .summary .free{color:var(--lime);font-weight:800}
 .eta{display:flex;gap:10px;align-items:center;background:rgba(198,255,26,.08);border:1px solid rgba(198,255,26,.25);border-radius:14px;padding:12px;margin:16px 0;font-size:14px}
@@ -264,7 +265,7 @@ footer a:hover{text-decoration:underline}
 
 <div class="bar" id="bar">
   <div class="on">🚚 משלוח חינם עד הבית, לכל הארץ</div>
-  <div>🔥 זוג ב-119 ₪ (במקום 158)</div>
+  <div>🔥 זוג ערכות ב-149 ₪, עם משלוח חינם</div>
   <div>↩️ יש 14 יום להחזיר</div>
 </div>
 
@@ -287,8 +288,8 @@ footer a:hover{text-decoration:underline}
         <li><i>✓</i>פחות סנוור מפנסים בלילה</li>
         <li><i>✓</i>בלי כלים, בלי מכון, בלי ליטוש</li>
       </ul>
-      <div class="priceRow"><span class="now">79 ₪</span><span class="save">או 2 ב-119 ₪</span></div>
-      <a href="#order" class="btn block" onclick="track('AddToCart',{value:79,currency:'ILS'})">אני רוצה שמשה נקייה <span class="arrow">←</span></a>
+      <div class="priceRow"><span class="now">149 ₪</span><span class="was" style="text-decoration:none">לזוג ערכות</span><span class="save">74.5 ₪ לערכה</span></div>
+      <a href="#order" class="btn block" onclick="track('AddToCart',{value:149,currency:'ILS'})">אני רוצה שמשה נקייה <span class="arrow">←</span></a>
       <div class="mini-trust"><span>🚚 משלוח חינם</span><span>🔒 תשלום מאובטח</span><span>↩️ 14 יום להחזיר</span></div>
     </div>
 
@@ -374,7 +375,7 @@ footer a:hover{text-decoration:underline}
           <tr><td>מסיר שכבת שומן</td><td class="us"><span class="y">✓</span></td><td><span class="x">✗</span></td><td><span class="y">✓</span></td></tr>
           <tr><td>עושים לבד בבית</td><td class="us"><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="x">✗</span></td></tr>
           <tr><td>זמן</td><td class="us">5 דק'</td><td>2 דק'</td><td>תור + חצי יום</td></tr>
-          <tr><td>מחיר</td><td class="us">79 ₪</td><td>15 ₪, לא מוריד את השכבה</td><td>₪₪₪</td></tr>
+          <tr><td>מחיר</td><td class="us">75 ₪ לערכה</td><td>15 ₪, לא מוריד את השכבה</td><td>₪₪₪</td></tr>
         </tbody>
       </table>
     </div>
@@ -442,14 +443,14 @@ footer a:hover{text-decoration:underline}
   <div class="wrap">
     <span class="eyebrow">מחירי השקה</span>
     <h2>כמה לשלוח לך?</h2>
-    <p class="sub">המשלוח חינם בכל מקרה. הכי משתלם לקחת זוג, אחד לכל אוטו בבית.</p>
+    <p class="sub">המשלוח חינם בכל מקרה. ככה כל אוטו בבית מקבל ערכה, וכל ערכה יוצאת זולה יותר.</p>
     <div class="order">
       <div class="pkgs" id="pkgs"></div>
       <div class="summary">
         <img src="media/bundle.jpg" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin-bottom:14px" loading="lazy">
         <h3>סיכום הזמנה</h3>
         <div class="line"><span id="sumTitle">—</span><span id="sumPrice">—</span></div>
-        <div class="line" id="saveLine"><span>חוסכים לעומת קנייה בנפרד</span><span id="sumSave" style="color:var(--lime)">—</span></div>
+        <div class="line" id="saveLine"><span>חוסכים לעומת מחיר הזוג</span><span id="sumSave" style="color:var(--lime)">—</span></div>
         <div class="line"><span>משלוח עד הבית</span><span class="free">חינם</span></div>
         <div class="line" id="giftLine" hidden><span id="giftTxt"></span><span class="free">חינם</span></div>
         <div class="line tot"><span>סה"כ לתשלום</span><span id="sumTotal">—</span></div>
@@ -494,7 +495,7 @@ footer a:hover{text-decoration:underline}
 <section class="dark final">
   <div class="wrap">
     <h2>הגשם הבא כבר בתחזית.<br><span style="color:var(--lime)">שהשמשה תהיה מוכנה.</span></h2>
-    <p class="sub">79 ₪, משלוח חינם, ואפשר להחזיר תוך 14 יום</p>
+    <p class="sub">זוג ערכות ב-149 ₪, משלוח חינם, ואפשר להחזיר תוך 14 יום</p>
     <a href="#order" class="btn" style="min-width:300px">להזמנה <span class="arrow">←</span></a>
   </div>
 </section>
@@ -519,7 +520,7 @@ footer a:hover{text-decoration:underline}
   </div>
 </footer>
 
-<div class="stickybar" id="stickybar"><div class="row"><div><b id="stPrice">79 ₪</b><small>משלוח חינם</small></div><a href="#order" class="btn">להזמנה <span class="arrow">←</span></a></div></div>
+<div class="stickybar" id="stickybar"><div class="row"><div><b id="stPrice">149 ₪</b><small>משלוח חינם</small></div><a href="#order" class="btn">להזמנה <span class="arrow">←</span></a></div></div>
 <a class="wa" id="wa" hidden aria-label="וואטסאפ" target="_blank" rel="noopener"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9 0-1.4.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg></a>
 
 <script>
@@ -633,12 +634,12 @@ footer a:hover{text-decoration:underline}
   }
 
   /* ===== packages + summary ===== */
-  var box = document.getElementById('pkgs'), sel = '2', html = '';
+  var box = document.getElementById('pkgs'), sel = String(S.defaultPackage || Object.keys(S.packages)[0]), html = '';
   Object.keys(S.packages).forEach(function(k){
-    var p = S.packages[k], unit = Math.round(p.price / p.qty);
+    var p = S.packages[k], unit = String(Math.round(p.price / p.qty * 10) / 10);
     html += '<label class="pkg'+(k===sel?' on':'')+'" data-k="'+k+'">'+(p.badge?'<span class="badge">'+p.badge+'</span>':'')+
       '<input type="radio" name="pkg" value="'+k+'"'+(k===sel?' checked':'')+'>'+
-      '<span class="t"><b>'+p.title+'</b><small>'+unit+' ₪ ליחידה · משלוח חינם</small>'+(S.gift && p.qty>1?'<span class="gift">🎁 '+S.gift+'</span>':'')+'</span>'+
+      '<span class="t"><b>'+p.title+'</b><small>'+unit+' ₪ לערכה · משלוח חינם</small>'+(S.gift && p.qty>1?'<span class="gift">🎁 '+S.gift+'</span>':'')+'</span>'+
       '<span class="p"><b>'+p.price+' ₪</b>'+(p.compare?'<s>'+p.compare+' ₪</s>':'')+'</span></label>';
   });
   box.innerHTML = html;
@@ -663,7 +664,7 @@ footer a:hover{text-decoration:underline}
   function fmt(d){ return d.getDate() + '.' + (d.getMonth()+1); }
   var now = new Date(); document.getElementById('eta').textContent = fmt(addBiz(now,10)) + '–' + fmt(addBiz(now,18));
 
-  track('ViewContent', { value: S.packages[1].price, currency: 'ILS', content_ids: ['klaro-1'], content_type: 'product' });
+  track('ViewContent', { value: S.packages[sel].price, currency: 'ILS', content_ids: ['klaro-' + sel], content_type: 'product' });
 
   /* scroll handler: story + sticky bar */
   var sb = document.getElementById('stickybar'), order = document.getElementById('order'), ticking = false;

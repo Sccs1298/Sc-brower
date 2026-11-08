@@ -7,18 +7,20 @@ window.STORE = {
 
   // קישורי דפי תשלום מ-Grow — אחד לכל חבילה.
   // ב-Grow: יצירת דף תשלום → מוצר + מחיר → להוסיף שדות: כתובת למשלוח, עיר, טלפון.
-  // כתובת הצלחה (Success URL) של כל דף: https://sccs1298.github.io/Sc-brower/thanks.html?p=1 (או p=2 / p=3)
+  // כתובת הצלחה (Success URL) של כל דף: https://sccs1298.github.io/Sc-brower/thanks.html?p=2 (או p=3 / p=4)
   growLinks: {
-    1: "",
     2: "",
-    3: ""
+    3: "",
+    4: ""
   },
 
-  // compare = מחיר אותה כמות ביחידות בודדות (79 ₪ ליח') — חיסכון אמיתי, לא מחיר "לפני" מומצא
+  // אין קנייה בודדת. compare = אותה כמות לפי מחיר הזוג (74.5 ₪ ליח') — חיסכון אמיתי מול חבילה שבאמת נמכרת
+  // עלות משוערת: 30 ₪ ליח' כולל משלוח. ראו marketing/PRICING.md
+  defaultPackage: "2",
   packages: {
-    1: { title: "ערכה אחת", qty: 1, price: 79, compare: 0 },
-    2: { title: "זוג ערכות", qty: 2, price: 119, compare: 158, badge: "הכי משתלם" },
-    3: { title: "3 ערכות", qty: 3, price: 149, compare: 237 }
+    2: { title: "זוג ערכות", qty: 2, price: 149, compare: 0, badge: "מומלץ" },
+    3: { title: "3 ערכות", qty: 3, price: 199, compare: 224 },
+    4: { title: "4 ערכות", qty: 4, price: 249, compare: 298, badge: "הכי משתלם" }
   },
 
   // מתנה לחבילות 2+ (רק אם הספק באמת שולח מטלית — אחרת למחוק את השורה)
