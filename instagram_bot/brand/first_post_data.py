@@ -19,7 +19,7 @@ lcard = lambda body: (
 slides = [
     {"theme": "dark", "tag": "WELCOME",
      "bp": [{"c": [540, 420, 250]}, {"t": [540, 740, "CRYPTO // ILS"], "anchor": "middle"}],
-     "html": f'<img src="{B}profile_A_purple.png" style="position:absolute;left:340px;top:220px;width:400px;height:400px;border-radius:50%;box-shadow:0 50px 80px rgba(0,0,0,.6)">'
+     "html": f'<img src="{B}profile_B_gold.png" style="position:absolute;left:340px;top:220px;width:400px;height:400px;border-radius:50%;box-shadow:0 50px 80px rgba(0,0,0,.6)">'
              '<div class="c giga" style="top:800px;font-size:150px;letter-spacing:-2px;direction:ltr">CRYPTO ILS</div>'
              '<div class="c h2" style="top:980px;font-size:52px;padding:0 70px">חדשות הקריפטו של היום, בעברית שכולם מבינים.</div>'
              '<div class="c" style="top:1150px"><span style="display:inline-block;padding:12px 30px;border-radius:999px;background:rgba(157,92,255,.18);border:1.5px solid rgba(157,92,255,.5);font:700 34px Heebo">מה תמצאו כאן ←</span></div>'},
@@ -48,7 +48,7 @@ slides = [
      "html": '<div class="c h1" style="top:230px;padding:0 80px;font-size:84px">יש לכם חבר ששואל כל שבוע מה קורה עם הביטקוין?</div>'
              '<div class="c giga acc" style="top:560px;font-size:120px;letter-spacing:-2px">תייגו אותו 👇</div>'
              '<div class="cards" style="top:800px;left:250px;right:250px"><div class="card" style="text-align:center">'
-             f'<img src="{B}profile_A_purple.png" style="width:150px;height:150px;border-radius:50%">'
+             f'<img src="{B}profile_B_gold.png" style="width:150px;height:150px;border-radius:50%">'
              '<div style="font:900 50px Heebo;direction:ltr;margin-top:12px">CRYPTO ILS</div>'
              '<div style="font:400 34px Heebo;opacity:.55;direction:ltr">@crypto_ils</div>'
              '<div style="margin-top:22px;padding:16px;border-radius:18px;background:#9D5CFF;font:700 38px Heebo">עקבו</div></div></div>'},
