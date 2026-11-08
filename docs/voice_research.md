@@ -26,3 +26,17 @@
 ## חסם פתוח
 מפתח ה-API לא מקבל `voices_read`/`voices_write` (נבדק עם 3 מפתחות) → אי אפשר לחפש/להוסיף קולות ישראליים מהספרייה.
 עקיפה בלי הרשאות: הבעלים מוסיף 3–4 קולות עבריים ב-Voice Library ל-"My Voices" באתר ושולח את ה-Voice ID שלהם – TTS לפי ID עובד גם בלי voices_read.
+
+## עדכון 08.11 ערב – 8 קולות ישראליים מהספרייה (נוספו ע"י הבעלים)
+מפתח מלא נשמר כסוד רשת (proxy) – voices_read עובד. מבחן משפט קצר + תמלול עברי:
+| קול | ID | תוצאה |
+|---|---|---|
+| Itamar – Narrator, crisp | l7Q9rbdCC6j3J5dNlOOg | נקי, מהיר (6.8ש') → **מועמד** |
+| Nimrod – Warm & Confident | ZiofZHcEBTn5sRySe5h8 | נקי, מהיר → **מועמד** |
+| Danit – Natural (נ) | s0T0DT6EAPeX57MQpn3I | נקי במשפט קצר; בתסריט מלא שיבש "שישה פסיק שלושה" |
+| Dorian – Expressive young | PBHwEnXdzx0yfhIO2UCH | נקי |
+| Viktor – Smart & Kind | 8sZ9Z3Jy28CGLLCmKEHn | נקי |
+| Gad Tamir – Casual | SSaO8heNHx6ee5ZRpZ1X | נקי |
+| Herzl Ben – Articulate | 6Ijsl5024dyMrE00loVE | נקי אבל איטי (9.1ש') – פחות לרילס |
+| Zina – Soulful (נ) | Tbj9UQjXon5RB9MPEyc2 | שיבש "הקריפטו" → נפסלה |
+תסריט מלא (449 תווים): Itamar 35.9ש', Nimrod 35.2ש' – שניהם 100% מובנים. עלות כל המחקר: ~1,240 תווים (3%).
