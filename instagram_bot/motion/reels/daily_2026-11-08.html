@@ -51,7 +51,6 @@ function avatar(el, lt) { const a = $(el, '.avatar'); if (!a) return; const p = 
   a.style.opacity = clamp(p); a.style.transform = `translate3d(0,${Math.sin(lt * 2) * 12}px,${-300 * (1 - p)}px) scale(${1.6 * (.7 + .3 * p)}) rotateY(${Math.sin(lt * 1.3) * 22}deg)`; }
 
 window.SCENES = [
- // מנהל הכספים עוזב
  { at: [0, 'מנהל'], theme: 'dark', ring: [540, 720, 260],
    bp: [{ t: [540, 1060, 'BINANCE // CFO'], anchor: 'middle', at: .2 }],
    mid: AV(540, 720) + G('מנהל הכספים', 'h1', 1100, 'font-size:110px'),
@@ -59,7 +58,6 @@ window.SCENES = [
  { at: [0, 'עוזב'], theme: 'light', tr: 'whipR', ring: [540, 860, 0],
    mid: `<div class="row" style="top:700px"><span class="stamp">עוזב</span></div>`,
    anim(lt, dur, el) { const s = $(el, '.stamp'), p = P(lt, 0, .3, back); s.style.opacity = clamp(p); s.style.transform = `rotate(-8deg) scale(${2.4 - 1.4 * p})`; } },
- // פחות משבועיים אחרי השוד
  { at: [1, 'פחות'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 720, 300],
    bp: [{ c: [540, 720, 360], red: 1, at: 0 }],
    mid: ICON('clock', 540, 720, 600) + G('פחות משבועיים', 'h1', 1080, 'font-size:120px;color:#ff8a8e'),
@@ -69,32 +67,35 @@ window.SCENES = [
    mid: ICON('locker', 540, 700, 640) + `<div class="row giga num" style="top:1080px;font-size:250px">$0.0B</div>`,
    anim(lt, dur, el) { auto(lt, el); const m = $(el, '.giga'), p = P(lt, 0, 1.2, easeInOut);
      m.textContent = '$' + (6.3 * p).toFixed(1) + 'B'; show(m, P(lt, 0, .25), 40, -300); } },
- { at: [2, 'השוד'], theme: 'light', tr: 'zoom', ring: [540, 800, 0],
-   mid: G('#1', 'giga acc', 520, 'font-size:300px;direction:ltr') + G('השוד הכי גדול', 'h1', 880, 'font-size:110px') + G('בתולדות הקריפטו', 'h2', 1020, 'font-size:64px'),
-   anim(lt, dur, el) { auto(lt, el); } },
- // מי נכנס
- { at: [3, 'במקומו'], theme: 'dark', tr: 'whipR', ring: [540, 820, 0],
+ { at: [2, 'במקומו'], theme: 'dark', tr: 'whipR', ring: [540, 820, 0],
    mid: `<div class="card" style="top:620px;padding:70px 40px;display:flex;gap:40px;justify-content:center;text-align:center">
      <div><div style="font:700 54px Heebo;color:#ff6b70">יוצא</div><div style="font:900 78px Heebo;margin-top:14px;white-space:nowrap">קייזר נג</div></div>
      <div style="font:900 80px Heebo;opacity:.4">←</div>
      <div><div style="font:700 54px Heebo;color:#2BD07F">נכנס</div><div style="font:900 78px Heebo;margin-top:14px;white-space:nowrap">ג׳סטין יק</div></div></div>`,
    anim(lt, dur, el) { auto(lt, el); } },
- // הסיבה הרשמית
- { at: [4, 'לפי'], theme: 'light', tr: 'zoom', ring: [540, 820, 0],
+ { at: [3, 'לפי'], theme: 'light', tr: 'zoom', ring: [540, 820, 0],
    mid: G('הסיבה הרשמית:', 'h1', 700, 'font-size:110px'),
    anim(lt, dur, el) { auto(lt, el); } },
- { at: [4, 'במיזם'], theme: 'dark', tr: 'zoom', ring: [540, 640, 230],
+ { at: [3, 'במיזם'], theme: 'dark', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('key', 540, 640, 460) + G('מיזם חדש.', 'giga acc', 960, 'font-size:200px'),
    anim(lt, dur, el) { auto(lt, el); } },
- // השוק
- { at: [5, 'ביטקוין'], theme: 'dark', tr: 'whipL', ring: [540, 680, 260],
-   mid: ICON('3d-coin', 540, 680, 560) + G('מתחת ל-', 'h1', 1010, 'font-size:90px') + `<div class="row giga num" style="top:1120px;font-size:220px">$76K</div>`,
-   anim(lt, dur, el) { auto(lt, el); show($(el, '.giga'), P(lt, .1, .4, back), 40, -300); } },
- { at: [6, 'משכו'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 820, 330],
-   mid: G('$1.3B', 'giga', 640, 'font-size:300px;direction:ltr;color:#ff5a5f') + G('יצאו מקרנות הביטקוין השבוע', 'h2', 1000, 'font-size:64px;font-weight:700'),
+ // ועוד בקצרה
+ { at: [4, 'ועוד'], theme: 'black', tr: 'whipL', ring: [540, 900, 0], noTop: true,
+   mid: G('ועוד בקצרה', 'h1', 800, 'font-size:140px') + G('השבוע בקריפטו', 'h2 acc', 960, 'font-size:70px;font-weight:700'),
    anim(lt, dur, el) { auto(lt, el); } },
- // שאלה לקהל
- { at: [7, 'אתם'], theme: 'light', tr: 'whipR', ring: [540, 760, 140],
+ { at: [5, 'בינאנס'], theme: 'light', tr: 'whipR', ring: [540, 820, 0],
+   mid: `<div class="card" style="top:520px;text-align:center"><div style="font:900 60px Heebo;color:#7B3FF2">01 · אירופה</div>
+     <div style="font:900 96px/1.15 Heebo;margin-top:24px">בינאנס סוגרת חשבונות</div><div style="font:400 52px Heebo;opacity:.6;margin-top:20px">עד סוף השנה</div></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [6, 'חוק'], theme: 'light', tr: 'whipR', ring: [540, 820, 0],
+   mid: `<div class="card" style="top:520px;text-align:center"><div style="font:900 60px Heebo;color:#7B3FF2">02 · וושינגטון</div>
+     <div style="font:900 96px/1.15 Heebo;margin-top:24px">חוק הקריפטו נתקע</div><div style="font:400 52px Heebo;opacity:.6;margin-top:20px">בסנאט האמריקאי</div></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [7, 'סנקציות'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 820, 0],
+   mid: `<div class="card" style="top:520px;text-align:center"><div style="font:900 60px Heebo;color:#ff8a8e">03 · איראן</div>
+     <div style="font:900 96px/1.15 Heebo;margin-top:24px">סנקציות על 8 חברות</div><div style="font:400 52px Heebo;opacity:.7;margin-top:20px">שעזרו להעביר כסף בקריפטו</div></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [8, 'אתם'], theme: 'light', tr: 'zoom', ring: [540, 760, 140],
    mid: `<div class="card follow" style="top:580px"><div class="lg">₿</div><div class="nm">CRYPTO ILS</div><div class="hd">@crypto_ils</div><a class="btn" id="fb">עקבו</a></div>
          <svg class="cursor" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#111" stroke="#fff" stroke-width="1.5"/></svg>`,
    anim(lt, dur, el) { auto(lt, el); const c = $(el, '.cursor'), p = P(lt, 1.6, .7, easeInOut);
