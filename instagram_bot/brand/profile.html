@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<!-- תמונת פרופיל @crypto_ils – 3 אפשרויות, 1080x1080 כל אחת. צילום: node shoot_profile.js -->
+<style>
+@font-face { font-family: Heebo; font-weight: 900; src: url(../fonts/Heebo-900.ttf); }
+@font-face { font-family: Heebo; font-weight: 700; src: url(../fonts/Heebo-700.ttf); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #222; }
+.pf { width: 1080px; height: 1080px; position: relative; overflow: hidden; margin-bottom: 20px; font-family: Heebo; }
+.bgp { background: radial-gradient(circle at 50% 38%, #b98bff 0%, #9D5CFF 38%, #5b21b6 78%, #2e1065 100%); }
+.bgd { background: radial-gradient(circle at 50% 45%, #2a1d44 0%, #120d1c 60%, #050407 100%); }
+.grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.06) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,.06) 2px, transparent 2px); background-size: 90px 90px; }
+.coin { position: absolute; left: 50%; top: 50%; width: 840px; height: 840px; margin: -420px 0 0 -420px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #ffffff 0%, #efe6ff 18%, #c9b0ff 45%, #8b5cf6 75%, #4c1d95 100%);
+  box-shadow: 0 60px 90px rgba(0,0,0,.45), inset 0 -26px 40px rgba(60,10,120,.55), inset 0 20px 30px rgba(255,255,255,.7); }
+.coin:before { content: ''; position: absolute; inset: 60px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #a77bff, #7c3aed 55%, #4c1d95);
+  box-shadow: inset 0 18px 30px rgba(0,0,0,.35), inset 0 -10px 20px rgba(255,255,255,.25), 0 2px 0 rgba(255,255,255,.6); }
+.coin.gold { background: radial-gradient(circle at 35% 28%, #fff7d6 0%, #ffe08a 22%, #f7b733 55%, #b7791f 85%, #6b4210 100%);
+  box-shadow: 0 60px 90px rgba(0,0,0,.55), inset 0 -26px 40px rgba(110,60,0,.55), inset 0 20px 30px rgba(255,255,255,.6); }
+.coin.gold:before { background: radial-gradient(circle at 40% 30%, #ffd86b, #e9a21c 55%, #9a5b0c); }
+.sym { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-52%); text-align: center; color: #fff;
+  font: 900 470px/1 Heebo; text-shadow: 0 14px 0 rgba(40,0,90,.35), 0 30px 40px rgba(0,0,0,.35); }
+.gold .bars i { background: #fffaf0; }
+.gold .sym { color: #fffaf0; text-shadow: 0 14px 0 rgba(120,60,0,.4), 0 30px 40px rgba(0,0,0,.35); }
+.bars i { position: absolute; width: 34px; height: 70px; background: #fff; border-radius: 8px; left: 50%; }
+.ticks { position: absolute; inset: 0; }
+.mono { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+.mono b { font: 900 360px/0.9 Heebo; letter-spacing: -14px; direction: ltr; }
+.mono span { font: 700 92px Heebo; letter-spacing: 34px; direction: ltr; margin-top: 30px; margin-right: -34px; opacity: .92; }
+</style></head><body>
+
+<!-- A: מטבע סגול עם ₪ – "קריפטו + שקל" -->
+<div class="pf bgd" id="p1"><div class="grid"></div>
+  <svg class="ticks" viewBox="0 0 1080 1080"><circle cx="540" cy="540" r="505" fill="none" stroke="rgba(196,161,255,.45)" stroke-width="4" stroke-dasharray="6 18"/></svg>
+  <div class="coin"><div class="sym">₪</div><div class="bars"><i style="margin-left:-150px;top:150px"></i><i style="margin-left:-150px;bottom:150px"></i><i style="margin-left:-60px;top:150px"></i><i style="margin-left:-60px;bottom:150px"></i></div></div>
+</div>
+
+<!-- B: מטבע זהב עם ₪ על סגול -->
+<div class="pf bgp" id="p2"><div class="grid"></div>
+  <div class="coin gold"><div class="sym">₪</div><div class="bars"><i style="margin-left:-150px;top:150px"></i><i style="margin-left:-150px;bottom:150px"></i><i style="margin-left:-60px;top:150px"></i><i style="margin-left:-60px;bottom:150px"></i></div></div>
+</div>
+
+<!-- C: מונוגרמה ILS -->
+<div class="pf bgp" id="p3"><div class="grid"></div>
+  <div class="mono"><span style="margin:0 -34px 10px 0">CRYPTO</span><b>ILS</b></div>
+</div>
+<script>window.READY = true;</script>
+</body></html>
