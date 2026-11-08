@@ -85,30 +85,43 @@ def note(freq, dur, kind="pad"):
     return (w * e).astype(np.float32)
 
 
-def music_bed(total, B, vo):
-    """מצע מוזיקלי שקט: אקורדים (Am-F-C-G), בס, קיק רך והאט עדין, עם הנמכה אוטומטית מתחת לקול."""
-    n = len(vo); bed = np.zeros(n, np.float32); drums = np.zeros(n, np.float32)
-    prog = [(110.0, [220.0, 261.63, 329.63]), (87.31, [174.61, 220.0, 261.63]),
-            (130.81, [261.63, 329.63, 392.0]), (98.0, [196.0, 246.94, 293.66])]
+def music_bed(total, B, vo, drops=()):
+    """מצע "מתח" מינימלי לאקספליינר (לפי מחקר 08.11, docs/music_research.md):
+    דרון נמוך + פולס שמיניות עמום (הכל מתחת ל-~900Hz – לא נוגע ב-1–4kHz של הדיבור), טיקים עדינים מעל 6kHz,
+    רמה ~20dB מתחת לקול + הנמכה חלקה נוספת ~4dB בזמן דיבור, ושקט קצר (drop) לפני רגעי חשיפה."""
+    n = len(vo); pad = np.zeros(n, np.float32); pulse = np.zeros(n, np.float32); tick = np.zeros(n, np.float32)
+    prog = [(110.0, [110.0, 130.81, 164.81]), (87.31, [87.31, 130.81, 174.61]),
+            (130.81, [130.81, 164.81, 196.0]), (98.0, [98.0, 146.83, 196.0])]
     bar = 4 * B; k = 0; t = 0.0
     while t < total:
         root, chord = prog[k % 4]
-        for f in chord:
-            add(bed, note(f, bar * 2 + .3) * .16, t)
-        for b in (0, 2, 4, 6):
-            add(bed, note(root / 2, B * 1.8, "bass") * .5, t + b * B)
+        for fq in chord:
+            add(pad, note(fq, bar * 2 + .5) * .2, t)
+        for e in range(16):  # שמיניות על השורש/קווינטה
+            fq = root if e % 4 != 3 else root * 1.5
+            add(pulse, note(fq, B * .45, "bass") * (.55 if e % 2 == 0 else .35), t + e * B / 2)
         t += bar * 2; k += 1
-    bed = lp(bed, 1800)  # בלי צרימות בתדרים של הקול
-    for i in range(int(total / B)):
-        add(drums, kick(70, 45, .25) * (.9 if i % 2 == 0 else .55), i * B)
-        if i % 2 == 1:
-            add(drums, lp(hat(.08, seed=i), 6000) * 2.2, i * B)  # "סנר" רך מרעש
-        add(drums, hat(seed=500 + i) * .45, i * B + B / 2)
-    env = np.abs(vo); w = int(.12 * SR)
-    env = np.convolve(env, np.ones(w) / w, "same"); env = env / max(1e-6, env.max())
-    duck = 1 - .65 * np.clip(env * 4, 0, 1)  # ~-9dB כשיש דיבור
-    duck = np.convolve(duck, np.ones(int(.08 * SR)) / int(.08 * SR), "same")
-    return (bed + .7 * drums) * duck
+    pad = lp(lp(pad, 700), 900); pulse = lp(lp(pulse, 600), 900)
+    for i in range(int(total / B) * 2):
+        h = hat(.03, seed=900 + i); h = h - lp(h, 6000)  # רק מעל 6kHz
+        add(tick, h * (.5 if i % 2 else .25), i * B / 2)
+    bed = pad + pulse + .6 * tick
+    # רמה: 20dB מתחת לרמת הדיבור (RMS על קטעים עם קול)
+    blk = int(.01 * SR); m = len(vo) // blk * blk
+    r = np.sqrt((vo[:m].reshape(-1, blk) ** 2).mean(1)); speech = r > .2 * r.max()
+    v_rms = np.sqrt((r[speech] ** 2).mean()) if speech.any() else .1
+    rb = np.sqrt((bed[:m].reshape(-1, blk) ** 2).mean()) + 1e-9
+    bed *= v_rms * 10 ** (-20 / 20) / rb
+    # הנמכה חלקה: attack 80ms / release 500ms, עד ~4dB
+    g = np.ones(len(r)); cur = 1.0; aa, rr = np.exp(-1 / 8), np.exp(-1 / 50)
+    for i, sp in enumerate(speech):
+        tgt = 10 ** (-4 / 20) if sp else 1.0
+        c = aa if tgt < cur else rr; cur = c * cur + (1 - c) * tgt; g[i] = cur
+    gain = np.ones(n, np.float32); gain[:m] = np.repeat(g, blk)
+    for s0 in drops:  # שקט קצר לפני רגע חשיפה
+        a0, a1 = int(max(0, s0 - .45) * SR), int(s0 * SR)
+        gain[a0:a1] *= np.linspace(1, 0, a1 - a0) ** .5 if a1 > a0 else 1
+    return bed * gain
 
 
 def add(buf, x, at):
@@ -174,8 +187,8 @@ def main():
             add(sfx, boom(), s)
     # מיקס: הביט שקט מתחת לקול
     if opt("--bed", "music") == "music":
-        beat = music_bed(total, B, vo)
-        mix = vo + .5 * beat + .35 * sfx
+        beat = music_bed(total, B, vo, drops=[starts[k] for k in impacts if 0 < k < len(starts)])
+        mix = vo + beat + .3 * sfx
     else:
         mix = vo + .16 * beat + .5 * sfx
     vos = vo + .5 * sfx

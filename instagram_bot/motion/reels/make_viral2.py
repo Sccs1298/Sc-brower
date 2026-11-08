@@ -31,7 +31,7 @@ SC['liquid'] = f'''window.SCENES = [
  {{ at: [0, 'מישהו'], theme: 'dark', ring: [540, 640, 230], mid: AV(540, 680, true) + G('הדפיס ביטקוין.', 'h1', 1060, 'font-size:110px'), anim(lt, dur, el) {{ auto(lt, el); avatar(el, lt); }} }},
  {{ at: [0, '4,000'], theme: 'black', tr: 'zoom', ring: [540, 640, 230], noTop: true,
    mid: ICON('3d-coin', 540, 600, 420) + `<div class="row giga num cnt" data-pre="" data-to="4000" data-post=" ₿" style="top:900px;font-size:220px">0</div>` + G('מזויפים.', 'h1 acc', 1150, 'font-size:100px'), {COUNT}
- {{ at: [1, 'שווי'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 820, 0],
+ {{ at: [1, 'זה'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 820, 0],
    mid: `<div class="row giga num cnt" data-pre="$" data-to="320" data-post="M" style="top:680px;font-size:280px">$0</div>` + G('ביטקוין אמיתי.', 'h1', 980, 'font-size:100px'), {COUNT}
  {{ at: [2, 'נפרץ'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('shield', 540, 620, 440) + G('הביטקוין? בסדר גמור.', 'h1', 960, 'font-size:96px'), {A}
@@ -39,7 +39,7 @@ SC['liquid'] = f'''window.SCENES = [
    bp: [{{ t: [540, 1060, 'SIDECHAIN // BRIDGE'], anchor: 'middle', at: .2 }}],
    mid: `<div class="node" style="left:80px;top:640px">BITCOIN</div><div class="bridge" style="left:380px;right:380px;top:720px"></div><div class="node" style="right:80px;top:640px;color:#C4A1FF">LIQUID</div>`
      + G('הפרצה הייתה בגשר.', 'h1', 900, 'font-size:96px'), {A}
- {{ at: [4, 'שם'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
+ {{ at: [4, 'כל'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('locker', 540, 620, 460) + G('1 מטבע = 1 ביטקוין בכספת', 'h1', 960, 'font-size:80px'), {A}
  {{ at: [5, 'באג'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 640, 230],
    mid: ICON('3d-coin', 540, 600, 400) + `<div class="row" style="top:880px"><span class="stamp" style="border-color:#2BD07F;color:#2BD07F">VALID ✓</span></div>` + G('(לא מגובה בכלום)', 'h2', 1120, 'font-size:56px;opacity:.7'), {STAMP}
@@ -50,7 +50,7 @@ SC['liquid'] = f'''window.SCENES = [
  {{ at: [7, 'כמעט'], theme: 'black', cls: 'redtint', tr: 'zoom', ring: [540, 820, 0], noTop: true,
    mid: `<div class="row giga num" style="top:640px;font-size:240px">598 ₿</div>` + G('לא חזרו.', 'h1 acc', 940, 'font-size:110px'), {A}
  {{ at: [8, 'אתם'], theme: 'dark', tr: 'whipR', ring: [540, 760, 0], noTop: true,
-   mid: G('גשר או ביטקוין עצמו?', 'h1', 680, 'font-size:100px') + G('ספרו בתגובות 👇', 'h2 acc', 850, 'font-size:60px'), {A}
+   mid: G('רשתות כאלה, או רק ביטקוין?', 'h1', 680, 'font-size:100px') + G('ספרו בתגובות 👇', 'h2 acc', 850, 'font-size:60px'), {A}
 ];
 '''
 SC['quantum'] = f'''window.SCENES = [
@@ -64,11 +64,11 @@ SC['quantum'] = f'''window.SCENES = [
    mid: `<div class="row giga num acc" style="top:640px;font-size:250px">500K</div>` + G('קיוביטים. זה מה שצריך.', 'h1', 940, 'font-size:90px'), {A}
  {{ at: [2, 'מיליונים'], theme: 'light', tr: 'whipL', ring: [540, 820, 0],
    mid: `<div class="row giga num" style="top:620px;font-size:230px;text-decoration:line-through;opacity:.45">20M</div>` + G('ההערכה הקודמת.', 'h1', 920, 'font-size:100px'), {A}
- {{ at: [3, 'חשוף'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 640, 230],
+ {{ at: [3, 'הפריצה'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('clock', 540, 620, 460) + G('9 דקות.', 'giga', 940, 'font-size:220px'), {A}
- {{ at: [4, 'בסכנה'], theme: 'dark', tr: 'whipR', ring: [540, 690, 270],
-   mid: `<div class="pie"></div>` + G('שליש מכל הביטקוין.', 'h1', 1040, 'font-size:100px') + G('6.9 מיליון ₿, לפי המחקר', 'h2', 1180, 'font-size:54px;opacity:.7'), {A}
- {{ at: [5, 'החדשות'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
+ {{ at: [4, 'שליש'], theme: 'dark', tr: 'whipR', ring: [540, 690, 270],
+   mid: `<div class="pie"></div>` + G('שליש מכל הביטקוין.', 'h1', 1040, 'font-size:100px') + G('כ-6.9 מיליון ₿, לפי המחקר', 'h2', 1180, 'font-size:54px;opacity:.7'), {A}
+ {{ at: [5, 'אבל'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('shield', 540, 620, 440) + G('רגע, לא להיבהל.', 'h1', 960, 'font-size:100px'), {A}
  {{ at: [5, 'רחוקים'], theme: 'dark', cls: 'icetint', tr: 'whipL', ring: [540, 770, 300],
    mid: `<div class="chip" style="opacity:.35">` + '<i></i>'.repeat(64) + `</div>` + G('היום: רחוק מאוד מזה.', 'h1', 1150, 'font-size:96px'), {A}
@@ -89,7 +89,7 @@ SC['cede'] = f'''window.SCENES = [
    mid: `<div class="card cert" style="top:560px"><div class="t">STOCK CERTIFICATE</div><div class="o">Registered holder</div><div class="n">CEDE &amp; CO.</div></div>` + G('נעים להכיר.', 'h1 acc', 1080, 'font-size:100px'), {A}
  {{ at: [2, 'רוב'], theme: 'dark', tr: 'whipL', ring: [540, 760, 0],
    mid: `<div class="q" style="top:560px">?</div>` + G('אף פעם לא שמעתם?', 'h1', 1000, 'font-size:100px'), {A}
- {{ at: [3, 'מסלקת'], theme: 'dark', tr: 'zoom', ring: [540, 640, 230],
+ {{ at: [3, 'היא'], theme: 'dark', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('locker', 540, 620, 460) + G('מיליוני משקיעים. שם אחד.', 'h1', 960, 'font-size:88px'), {A}
  {{ at: [4, 'הכלכליים'], theme: 'light', tr: 'whipR', ring: [540, 800, 0],
    mid: G('"בעלים כלכליים"', 'h1', 620, 'font-size:120px') + G('ככה קוראים לכם.', 'h1 acc', 800, 'font-size:100px'), {A}

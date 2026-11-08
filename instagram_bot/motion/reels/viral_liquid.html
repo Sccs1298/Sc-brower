@@ -91,7 +91,7 @@ window.SCENES = [
  { at: [0, 'מישהו'], theme: 'dark', ring: [540, 640, 230], mid: AV(540, 680, true) + G('הדפיס ביטקוין.', 'h1', 1060, 'font-size:110px'), anim(lt, dur, el) { auto(lt, el); avatar(el, lt); } },
  { at: [0, '4,000'], theme: 'black', tr: 'zoom', ring: [540, 640, 230], noTop: true,
    mid: ICON('3d-coin', 540, 600, 420) + `<div class="row giga num cnt" data-pre="" data-to="4000" data-post=" ₿" style="top:900px;font-size:220px">0</div>` + G('מזויפים.', 'h1 acc', 1150, 'font-size:100px'), anim(lt, dur, el) { auto(lt, el); const m = $(el, '.cnt'), p = P(lt, 0, 1.1, easeInOut); m.textContent = m.dataset.pre + Math.round(+m.dataset.to * p).toLocaleString('en-US') + m.dataset.post; } },
- { at: [1, 'שווי'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 820, 0],
+ { at: [1, 'זה'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 820, 0],
    mid: `<div class="row giga num cnt" data-pre="$" data-to="320" data-post="M" style="top:680px;font-size:280px">$0</div>` + G('ביטקוין אמיתי.', 'h1', 980, 'font-size:100px'), anim(lt, dur, el) { auto(lt, el); const m = $(el, '.cnt'), p = P(lt, 0, 1.1, easeInOut); m.textContent = m.dataset.pre + Math.round(+m.dataset.to * p).toLocaleString('en-US') + m.dataset.post; } },
  { at: [2, 'נפרץ'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('shield', 540, 620, 440) + G('הביטקוין? בסדר גמור.', 'h1', 960, 'font-size:96px'), anim(lt, dur, el) { auto(lt, el); } },
@@ -99,7 +99,7 @@ window.SCENES = [
    bp: [{ t: [540, 1060, 'SIDECHAIN // BRIDGE'], anchor: 'middle', at: .2 }],
    mid: `<div class="node" style="left:80px;top:640px">BITCOIN</div><div class="bridge" style="left:380px;right:380px;top:720px"></div><div class="node" style="right:80px;top:640px;color:#C4A1FF">LIQUID</div>`
      + G('הפרצה הייתה בגשר.', 'h1', 900, 'font-size:96px'), anim(lt, dur, el) { auto(lt, el); } },
- { at: [4, 'שם'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
+ { at: [4, 'כל'], theme: 'light', tr: 'zoom', ring: [540, 640, 230],
    mid: ICON('locker', 540, 620, 460) + G('1 מטבע = 1 ביטקוין בכספת', 'h1', 960, 'font-size:80px'), anim(lt, dur, el) { auto(lt, el); } },
  { at: [5, 'באג'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 640, 230],
    mid: ICON('3d-coin', 540, 600, 400) + `<div class="row" style="top:880px"><span class="stamp" style="border-color:#2BD07F;color:#2BD07F">VALID ✓</span></div>` + G('(לא מגובה בכלום)', 'h2', 1120, 'font-size:56px;opacity:.7'), anim(lt, dur, el) { auto(lt, el); const s = $(el, '.stamp'), p = P(lt, .15, .3, back); s.style.opacity = clamp(p); s.style.transform = `rotate(-8deg) scale(${2.4 - 1.4 * p})`; } },
@@ -110,7 +110,7 @@ window.SCENES = [
  { at: [7, 'כמעט'], theme: 'black', cls: 'redtint', tr: 'zoom', ring: [540, 820, 0], noTop: true,
    mid: `<div class="row giga num" style="top:640px;font-size:240px">598 ₿</div>` + G('לא חזרו.', 'h1 acc', 940, 'font-size:110px'), anim(lt, dur, el) { auto(lt, el); } },
  { at: [8, 'אתם'], theme: 'dark', tr: 'whipR', ring: [540, 760, 0], noTop: true,
-   mid: G('גשר או ביטקוין עצמו?', 'h1', 680, 'font-size:100px') + G('ספרו בתגובות 👇', 'h2 acc', 850, 'font-size:60px'), anim(lt, dur, el) { auto(lt, el); } },
+   mid: G('רשתות כאלה, או רק ביטקוין?', 'h1', 680, 'font-size:100px') + G('ספרו בתגובות 👇', 'h2 acc', 850, 'font-size:60px'), anim(lt, dur, el) { auto(lt, el); } },
 ];
 window.addEventListener('load', () => SCENES.forEach(s => s.cls && s.el.classList.add(s.cls)));
 </script></body></html>
