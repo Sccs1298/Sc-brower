@@ -93,6 +93,7 @@
 - 08.11 – **3 רילסים ויראליים על-זמניים** – סבב 1 (פיצה/מזבלה/סאטושי) נדחה ("תחפש נושאים הרבה יותר מעניינים"). סבב 2 נבחר לפי נתוני צפיות אמיתיים (Apify): **ליקוויד / גוגל-קוונטים / Cede & Co** – `reels/make_viral2.py`, מקורות `docs/drafts/viral_reels.md`. **09.11 הבעלים אישר** → הוקלטו עם איתמר.
   לקח נושאים: מה שמתפוצץ = מנגנון נסתר במערכת הכסף + מספר דרמטי + שם גדול. טריוויה מוכרת – לא.
 - 08.11 – **מוזיקת רקע** ("הביט לא מסתדר עם הקול"): מחקר `docs/music_research.md` → מצע מתח מינימלי, 20dB מתחת לקול, 1–4kHz נקי, הנמכה עדינה, שקט לפני חשיפה. `voice_beat.py --bed music` (ברירת מחדל).
+- 09.11 – **3 הרילסים הוויראליים פורסמו** (באישור "פרסם את ה-3 בקול של איתמר"): ליקוויד https://www.instagram.com/reel/DfhGXtqlWo-/ · קוונטים https://www.instagram.com/reel/DfhGbquHP2n/ · Cede https://www.instagram.com/reel/DfhGX3PgBIp/ . נוהל רילס: דרייב → s3url → `INSTAGRAM_POST_IG_USER_MEDIA` (REELS, share_to_feed, caption) → publish (max_wait 300, ~20ש' עיבוד). לבדוק ביצועים (insights) אחרי 24–48 שעות.
 - 09.11 – **ElevenLabs במנוע:** `voice_beat.py --eleven l7Q9rbdCC6j3J5dNlOOg --tempo 1.1` (with-timestamps → תזמון מילים). v3 לא תומך ב-previous_text. ~120–150 תווים מחויבים לרילס בפועל. בדיקת ASR עברית לפני רינדור.
 - 08.11 – **משימה מתוזמנת יומית:** "CRYPTO ILS – טיוטה יומית (בסשן הראשי)" (`trig_01PQZjTUb9iQM9G9my6ozHxD`), כל יום 10:00 שעון ישראל (ההרצה מתחילה ב-10 – בקשת הבעלים), **מעירה את הסשן הראשי** (session_019SWfL9s1X76acxLoUkAvkg) שיש בו ריפו + Drive + Comp. טיוטה בלבד. (הגרסה הקודמת, סשן חדש בכל ריצה, נכשלה ב-08.11 כי נפתחה בלי ריפו וחיבורים – נמחקה.)
 
