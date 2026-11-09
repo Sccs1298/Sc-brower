@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#0e0e10">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="גלריה">
-<title>גלריה</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="תמונות">
+<title>תמונות</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;700&family=Secular+One&display=swap">
@@ -19,197 +20,349 @@
 </head>
 <body>
 
-<!-- ===== ספרייה ===== -->
-<section id="lib" class="screen active">
-  <header class="bar">
-    <h1>גלריה</h1>
-    <button id="btnSettings" class="icon" aria-label="הגדרות">⚙︎</button>
+<!-- ===================== הגלריה (מסך הבית המוסווה) ===================== -->
+<section id="photos" class="screen">
+  <header class="pg-head">
+    <div class="pg-titles">
+      <h1 id="pgTitle">ספרייה</h1>
+      <p id="pgCount"></p>
+    </div>
+    <div class="pg-actions">
+      <button class="pg-pill" type="button" id="pgSelect">בחר</button>
+      <button class="pg-circle" type="button" aria-label="חיפוש"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></button>
+    </div>
   </header>
-  <div id="items" class="list"></div>
-  <footer class="dock">
-    <label class="btn primary">
-      + סרטון חדש
-      <input id="fileIn" type="file" accept="video/*" hidden>
-    </label>
-  </footer>
+  <div id="pgGrid" class="pg-grid"></div>
 </section>
 
-<!-- ===== עורך ===== -->
-<section id="edit" class="screen">
-  <header class="bar">
-    <button id="edBack" class="btn small back">→ חזרה</button>
-    <input id="edName" data-i="name" class="title-in" placeholder="שם הסרטון">
-    <button id="edPerform" class="btn small primary">הופעה</button>
+<!-- ===================== ניהול ===================== -->
+<section id="manage" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ גלריה</button>
+    <h1>ניהול</h1>
+    <button class="nav-act" id="mgHelp" type="button">מדריך</button>
   </header>
+  <main class="page">
+    <div id="mgStore" class="banner"></div>
 
-  <div class="ed-body">
-    <div class="preview-wrap"><canvas id="edCanvas"></canvas></div>
+    <div class="group-title">הסרטונים שלך</div>
+    <div id="mgList" class="group"></div>
+
+    <label class="btn-big primary" for="fileIn">הוסף סרטון מהגלריה</label>
+    <input id="fileIn" type="file" accept="video/*" hidden>
+    <p class="foot">כל סרטון שתוסיף יופיע בגלריה. סרטון עם "חשיפה" הוא סרטון טריק, וסרטון בלי חשיפה הוא סרטון רגיל שמוסיף אמינות.</p>
+
+    <div class="group">
+      <button class="row-link" id="mgSettings" type="button"><span>הגדרות</span><span class="chev">‹</span></button>
+      <button class="row-link" id="mgHelp2" type="button"><span>מדריך שימוש והמקשים הנסתרים</span><span class="chev">‹</span></button>
+    </div>
+  </main>
+</section>
+
+<!-- ===================== עריכת סרטון ===================== -->
+<section id="edit" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ ניהול</button>
+    <h1 id="edTitle">עריכה</h1>
+    <button class="nav-act" id="edTry" type="button">נסה</button>
+  </header>
+  <main class="page">
+    <div class="preview">
+      <canvas id="edCanvas"></canvas>
+    </div>
     <div class="transport">
-      <button id="edPlay" class="icon">▶</button>
-      <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0">
+      <button id="edPlay" type="button" class="round" aria-label="נגן">▶</button>
+      <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="זמן בסרטון">
       <span id="edTime" class="mono">0.00</span>
     </div>
-    <label class="row tight"><input id="edShowAll" type="checkbox" checked> הצג חשיפה תמיד (תצוגה מקדימה)</label>
+    <p class="foot">גרור על התמונה כדי לסמן איפה הבחירה תופיע. המסגרת הזהובה היא האזור שנבחר.</p>
 
-    <details open class="card">
-      <summary>1 · מה חושפים ואיך מזינים</summary>
-      <label class="row">סוג
-        <select data-i="content" id="edContent">
-          <option value="number">מספר</option>
-          <option value="word">מילה / שם / מדינה</option>
-          <option value="drawing">ציור</option>
-        </select>
-      </label>
-      <label class="row">שיטת קלט סודית
-        <select data-i="method" id="edMethod"></select>
-      </label>
-      <p id="edMethodHelp" class="help"></p>
-      <label class="col" id="edWordsWrap">רשימת מילים (שורה לכל מילה – המיקום ברשימה = מספר)
-        <textarea id="edWords" rows="5"></textarea>
-      </label>
-      <label class="row">תאריך הצילום (מוצג בגלריה)
-        <input id="edShot" type="datetime-local">
-      </label>
-      <label class="row">טקסט לדוגמה בתצוגה
-        <input id="edSample" placeholder="47">
-      </label>
-    </details>
+    <div class="group-title">1. פרטי הסרטון</div>
+    <div class="group">
+      <label class="row"><span>שם (לניהול בלבד)</span><input id="edName" data-i="name"></label>
+      <label class="row"><span>תאריך הצילום בגלריה</span><input id="edShot" type="datetime-local"></label>
+      <label class="row"><span>סרטון טריק (עם חשיפה)</span><input id="edTrick" type="checkbox" class="switch"></label>
+    </div>
 
-    <details open class="card">
-      <summary>2 · אזורי חשיפה <span class="help">(גרור על התמונה כדי לסמן)</span></summary>
-      <div id="edRegions" class="chips"></div>
-      <div class="row gap">
-        <button id="rgAdd" class="btn small">+ אזור</button>
-        <button id="rgDel" class="btn small danger">מחק אזור</button>
+    <div id="edTrickWrap">
+      <div class="group-title">2. מה הצופה בוחר</div>
+      <div class="group">
+        <label class="row"><span>סוג</span>
+          <select data-i="content" id="edContent">
+            <option value="number">מספר</option>
+            <option value="word">מילה מרשימה</option>
+            <option value="drawing">ציור</option>
+          </select>
+        </label>
+        <label class="row" id="edDigitsRow"><span>כמה ספרות מזינים</span>
+          <select id="edDigits">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          </select>
+        </label>
+        <label class="row col" id="edWordsWrap"><span>רשימת מילים (שורה לכל מילה, מספר השורה הוא מספר המילה)</span>
+          <textarea id="edWords" rows="5"></textarea>
+        </label>
+      </div>
+      <p class="foot" id="edDigitsHelp"></p>
+
+      <div class="group-title">3. איך אתה מזין בסתר</div>
+      <div class="group">
+        <label class="row"><span>שיטה</span><select data-i="method" id="edMethod"></select></label>
+      </div>
+      <p class="foot" id="edMethodHelp"></p>
+
+      <div class="group-title">4. איפה ומתי זה מופיע</div>
+      <div class="group">
+        <div class="row"><span>אזורים</span><div id="edRegions" class="chips"></div></div>
+        <div class="row">
+          <button id="rgAdd" class="btn" type="button">+ אזור נוסף</button>
+          <button id="rgDel" class="btn danger" type="button">מחק אזור</button>
+        </div>
+        <label class="row"><span>שנייה בסרטון שבה זה מופיע</span>
+          <span class="inline"><input data-r="t" type="number" step="0.05" min="0"><button id="rgNow" class="btn" type="button">הזמן הנוכחי</button></span>
+        </label>
+        <label class="row"><span>הצג חשיפה תמיד בתצוגה</span><input id="edShowAll" type="checkbox" class="switch" checked></label>
+        <label class="row"><span>טקסט לדוגמה</span><input id="edSample" placeholder="47"></label>
       </div>
 
-      <div id="rgForm">
-        <label class="row">זמן חשיפה (שנ׳)
-          <span class="inline"><input data-r="t" type="number" step="0.05" min="0"><button id="rgNow" class="btn small">עכשיו</button></span>
-        </label>
-        <label class="row">אפקט
-          <select data-r="effect">
-            <option value="fade">הופעה הדרגתית</option>
-            <option value="wipe">כתיבה / מחיקה</option>
-            <option value="develop">פיתוח (כמו פולרויד)</option>
-            <option value="pop">קפיצה</option>
-            <option value="cut">מיידי</option>
-          </select>
-        </label>
-        <label class="row">משך אפקט (שנ׳) <input data-r="fade" type="number" step="0.1" min="0"></label>
-        <label class="row">גופן
-          <select data-r="font" id="rgFont"></select>
-        </label>
-        <label class="row">צבע <input data-r="color" type="color"></label>
-        <label class="row">אטימות <input data-r="opacity" type="range" min="0.05" max="1" step="0.01"></label>
-        <label class="row">סיבוב° <input data-r="rot" type="range" min="-45" max="45" step="0.5"></label>
-        <label class="row">הטיה° <input data-r="skew" type="range" min="-30" max="30" step="0.5"></label>
-        <label class="row">מיזוג
-          <select data-r="blend">
-            <option value="source-over">רגיל</option>
-            <option value="multiply">דיו על נייר (Multiply)</option>
-            <option value="screen">אור / מסך (Screen)</option>
-            <option value="overlay">שכבה (Overlay)</option>
-            <option value="soft-light">אור רך</option>
-          </select>
-        </label>
-        <label class="row tight"><input data-r="bold" type="checkbox"> מודגש</label>
-        <label class="row tight"><input data-r="shadow" type="checkbox"> צל</label>
-        <fieldset class="track">
-          <legend><label><input data-r="track.on" type="checkbox"> מעקב תנועה (האזור זז)</label></legend>
-          <div class="row gap">
-            <label><input type="radio" name="edTarget" value="start" checked> מיקום התחלה</label>
-            <label><input type="radio" name="edTarget" value="end"> מיקום סיום</label>
-          </div>
-          <label class="row">זמן סיום (שנ׳)
-            <span class="inline"><input data-r="track.t2" type="number" step="0.05" min="0"><button id="rgNow2" class="btn small">עכשיו</button></span>
+      <details class="group-details">
+        <summary>5. מראה החשיפה</summary>
+        <div class="group">
+          <label class="row"><span>אפקט</span>
+            <select data-r="effect">
+              <option value="fade">הופעה הדרגתית</option>
+              <option value="wipe">נכתב משמאל/ימין</option>
+              <option value="develop">מתפתח כמו פולרויד</option>
+              <option value="pop">קפיצה</option>
+              <option value="cut">מיידי</option>
+            </select>
           </label>
-        </fieldset>
-      </div>
-    </details>
+          <label class="row"><span>משך האפקט (שניות)</span><input data-r="fade" type="number" step="0.1" min="0"></label>
+          <label class="row"><span>גופן</span><select data-r="font" id="rgFont"></select></label>
+          <label class="row"><span>צבע</span><input data-r="color" type="color"></label>
+          <label class="row"><span>אטימות</span><input data-r="opacity" type="range" min="0.05" max="1" step="0.01"></label>
+          <label class="row"><span>סיבוב</span><input data-r="rot" type="range" min="-45" max="45" step="0.5"></label>
+          <label class="row"><span>הטיה</span><input data-r="skew" type="range" min="-30" max="30" step="0.5"></label>
+          <label class="row"><span>שילוב עם הרקע</span>
+            <select data-r="blend">
+              <option value="source-over">רגיל</option>
+              <option value="multiply">דיו על נייר</option>
+              <option value="screen">אור על מסך</option>
+              <option value="overlay">שכבה</option>
+              <option value="soft-light">אור רך</option>
+            </select>
+          </label>
+          <label class="row"><span>מודגש</span><input data-r="bold" type="checkbox" class="switch"></label>
+          <label class="row"><span>צל</span><input data-r="shadow" type="checkbox" class="switch"></label>
+        </div>
+      </details>
 
-    <div class="row gap end">
-      <button id="edStage" class="btn">מצב במה</button>
-      <button id="edDup" class="btn">שכפל</button>
-      <button id="edDelete" class="btn danger">מחק סרטון</button>
+      <details class="group-details">
+        <summary>6. מעקב תנועה (אם המשטח זז)</summary>
+        <div class="group">
+          <label class="row"><span>הפעל מעקב</span><input data-r="track.on" type="checkbox" class="switch"></label>
+          <div class="row">
+            <label class="inline"><input type="radio" name="edTarget" value="start" checked> עריכת מיקום התחלה</label>
+            <label class="inline"><input type="radio" name="edTarget" value="end"> מיקום סיום</label>
+          </div>
+          <label class="row"><span>שנייה של מיקום הסיום</span>
+            <span class="inline"><input data-r="track.t2" type="number" step="0.05" min="0"><button id="rgNow2" class="btn" type="button">הזמן הנוכחי</button></span>
+          </label>
+        </div>
+      </details>
     </div>
-  </div>
+
+    <div class="group">
+      <button class="row-link" id="edStage" type="button"><span>הופעה על מסך גדול (מצב במה)</span><span class="chev">‹</span></button>
+      <button class="row-link" id="edHide" type="button"><span id="edHideLabel">הסתר מהגלריה</span><span class="chev">‹</span></button>
+      <button class="row-link" id="edDup" type="button"><span>שכפל</span><span class="chev">‹</span></button>
+      <button class="row-link danger" id="edDelete" type="button"><span>מחק סרטון</span></button>
+    </div>
+  </main>
 </section>
 
-<!-- ===== הגדרות ===== -->
-<section id="settings" class="screen">
-  <header class="bar">
-    <button id="stBack" class="btn small back">→ חזרה</button>
+<!-- ===================== הגדרות ===================== -->
+<section id="settings" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ ניהול</button>
     <h1>הגדרות</h1>
-    <span></span>
+    <span class="nav-act"></span>
   </header>
-  <div class="ed-body">
-    <div class="card">
-      <label class="row tight"><input data-s="vibrate" type="checkbox"> רטט קצר על כל הקשה סודית (אנדרואיד)</label>
-      <label class="row tight"><input data-s="indicator" type="checkbox"> אינדיקטור דיסקרטי (נקודות זעירות בפינה)</label>
-      <label class="row tight"><input data-s="record" type="checkbox"> הקלט את ההופעה לשיתוף עם הצופה</label>
-      <label class="row">תצוגה בהופעה
-        <select data-s="viewStyle"><option value="photos">כמו גלריית אייפון</option><option value="clean">מסך נקי</option></select>
-      </label>
-      <label class="row">מראה הגלריה
-        <select data-s="phTheme"><option value="dark">כהה</option><option value="light">בהיר</option></select>
+  <main class="page">
+    <div class="group-title">הגלריה</div>
+    <div class="group">
+      <label class="row"><span>מראה</span>
+        <select data-s="phTheme"><option value="auto">לפי הטלפון</option><option value="light">בהיר</option><option value="dark">כהה</option></select>
       </label>
     </div>
-    <div class="card">
-      <p class="help">יופיע בכרטיס הסיום של הסרטון המשותף</p>
-      <label class="row">שם <input data-s="contactName" placeholder="הקוסם ..."></label>
-      <label class="row">קישור / אינסטגרם <input data-s="contactLink" placeholder="@my.magic" dir="ltr"></label>
+    <div class="group-title">בזמן הופעה</div>
+    <div class="group">
+      <label class="row"><span>רטט קטן על כל הקשה סודית (אנדרואיד)</span><input data-s="vibrate" type="checkbox" class="switch"></label>
+      <label class="row"><span>נקודות זעירות שמראות כמה הקשת</span><input data-s="indicator" type="checkbox" class="switch"></label>
+      <label class="row"><span>הקלט את ההופעה לשליחה לצופה</span><input data-s="record" type="checkbox" class="switch"></label>
     </div>
-    <div class="card help">
-      <b>מחוות בזמן הופעה</b><br>
-      הקשה ראשונה – מתחיל את הסרטון · לחיצה ארוכה – תפריט נסתר · הקשה בשתי אצבעות – ביטול אחרון · מקלדת Bluetooth: רווח/חץ מתחיל, Esc תפריט.
+    <div class="group-title">כרטיס סיום בסרטון שנשלח לצופה</div>
+    <div class="group">
+      <label class="row"><span>שם</span><input data-s="contactName" placeholder="הקוסם ..."></label>
+      <label class="row"><span>אינסטגרם / אתר</span><input data-s="contactLink" placeholder="@my.magic" dir="ltr"></label>
     </div>
-  </div>
+  </main>
 </section>
 
-<!-- ===== קלט מראש (מוסווה כחיפוש) ===== -->
-<section id="pre" class="screen">
-  <header class="bar">
-    <button id="preBack" class="btn small back">→ חזרה</button>
-    <h1>חיפוש</h1><span></span>
+<!-- ===================== מדריך ===================== -->
+<section id="help" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ חזרה</button>
+    <h1>מדריך</h1>
+    <span class="nav-act"></span>
   </header>
-  <form id="preForm" class="ed-body">
-    <input id="preIn" class="search" placeholder="🔍 חיפוש בגלריה" autocomplete="off">
-    <button class="btn primary" type="submit">חפש</button>
+  <main class="page help">
+    <div class="group pad">
+      <h2>מה האפליקציה עושה</h2>
+      <p>האפליקציה נראית בדיוק כמו גלריית התמונות של הטלפון. אתה מראה לצופה סרטון "רגיל" מהגלריה, הצופה חושב על מספר, מילה או ציור, והבחירה שלו מופיעה בתוך הסרטון.</p>
+    </div>
+
+    <div class="group pad">
+      <h2>הכניסה הנסתרת</h2>
+      <p><b>לחיצה ארוכה (שנייה) על המילה "ספרייה"</b> בראש הגלריה פותחת את מסך הניהול. שם מוסיפים סרטונים, עורכים ומגדירים.</p>
+    </div>
+
+    <div class="group pad">
+      <h2>הכנה, פעם אחת לכל סרטון</h2>
+      <ol>
+        <li>בניהול לוחצים <b>הוסף סרטון מהגלריה</b> ובוחרים סרטון.</li>
+        <li>בוחרים <b>מה הצופה בוחר</b>: מספר, מילה או ציור. במספר בוחרים כמה ספרות.</li>
+        <li>בוחרים <b>שיטת הזנה סודית</b>.</li>
+        <li>מזיזים את הסרגל לרגע שבו הבחירה צריכה להופיע ולוחצים <b>הזמן הנוכחי</b>.</li>
+        <li><b>גוררים מלבן</b> על התמונה במקום שבו היא תופיע.</li>
+        <li>לוחצים <b>נסה</b> כדי לראות את התוצאה.</li>
+      </ol>
+    </div>
+
+    <div class="group pad">
+      <h2>המקשים הנסתרים</h2>
+      <p>בזמן שהסרטון מתנגן, המסך מחולק ל-9 מקשים בלתי נראים. הצופה רואה רק את הסרטון.</p>
+      <div class="keypad-demo" aria-hidden="true">
+        <div class="phone"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+      </div>
+      <ul>
+        <li>1 בפינה <b>השמאלית העליונה</b>, 9 בפינה <b>הימנית התחתונה</b>, כמו מקלדת טלפון.</li>
+        <li>אחרי מספר הספרות שהגדרת (למשל 2), <b>שאר הנגיעות לא נחשבות</b>, אז אפשר לגעת במסך בחופשיות.</li>
+        <li>אין 0. אם בחרו מספר עם 0, כדאי לבקש מספר בטווח 11–99 בלי 0, או להשתמש במילים.</li>
+        <li>במילים: הספרה היא מספר המילה ברשימה (1 = המילה הראשונה).</li>
+        <li><b>טעית?</b> הקשה עם שתי אצבעות מוחקת את הספרה האחרונה.</li>
+      </ul>
+    </div>
+
+    <div class="group pad">
+      <h2>הופעה</h2>
+      <ol>
+        <li>פותחים את הגלריה ונוגעים בסרטון.</li>
+        <li>לוחצים ▶ כדי לנגן. כל הכפתורים נעלמים כמו בגלריה אמיתית.</li>
+        <li>מזינים את הבחירה בסתר לפני רגע החשיפה. אפשר גם קצת אחרי, והחשיפה תתחיל ברגע שהזנת.</li>
+        <li>בסוף הכפתורים חוזרים, ואפשר לנגן שוב. החשיפה תופיע שוב.</li>
+      </ol>
+      <p>תפריט סודי: <b>לחיצה ארוכה על הסרטון</b> (התחל מחדש / יציאה).</p>
+    </div>
+
+    <div class="group pad">
+      <h2>שיטות הזנה נוספות</h2>
+      <ul>
+        <li><b>מקלדת Bluetooth או שלט:</b> מקלידים בכיס, והצופה יכול להחזיק את הטלפון.</li>
+        <li><b>לפני ההופעה:</b> לפני שהסרטון נפתח מופיע מסך חיפוש, ושם מקלידים את הבחירה.</li>
+        <li><b>ציור נסתר:</b> מציירים באצבע על המסך בזמן הסרטון, והציור מופיע באזור החשיפה.</li>
+      </ul>
+    </div>
+
+    <div class="group pad">
+      <h2>התקנה באייפון ושמירה לתמיד</h2>
+      <ol>
+        <li>פותחים ב-<b>Safari</b> את כתובת האפליקציה.</li>
+        <li>כפתור השיתוף ← <b>הוסף למסך הבית</b>.</li>
+        <li>האייקון נראה כמו אייקון הגלריה, והאפליקציה נפתחת במסך מלא.</li>
+      </ol>
+      <p>באפליקציה המותקנת הסרטונים נשמרים במכשיר לתמיד. בקישור של Claude הם נשמרים בחשבון שלך (עד 20MB לסרטון).</p>
+    </div>
+
+    <button class="btn-big primary" id="helpDone" type="button">הבנתי</button>
+  </main>
+</section>
+
+<!-- ===================== הזנה לפני ההופעה (מוסווה כחיפוש) ===================== -->
+<section id="pre" class="screen pg">
+  <form id="preForm" class="pre">
+    <div class="pre-bar">
+      <input id="preIn" class="pre-in" placeholder="תמונות, אנשים, מקומות…" autocomplete="off">
+      <button type="button" class="pre-cancel" data-back>ביטול</button>
+    </div>
+    <button type="submit" hidden></button>
   </form>
 </section>
 
-<!-- ===== הופעה ===== -->
+<!-- ===================== צפייה בסרטון ===================== -->
 <section id="perform" class="screen">
   <canvas id="stage"></canvas>
   <div id="touch"></div>
-  <button id="pBack" class="btn small back">→ חזרה</button>
+  <button id="pBack" class="stage-back" type="button">‹ חזרה</button>
+
   <div id="ph" hidden>
     <div class="ph-top">
-      <button id="phBack" class="ph-round" aria-label="חזרה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
-      <div class="ph-title"><b id="phDay">היום</b><span id="phTime">12:00</span></div>
-      <button id="phMore" class="ph-round" aria-label="עוד"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg></button>
+      <button id="phBack" class="ph-round" type="button" aria-label="חזרה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      <div class="ph-title"><b id="phDay"></b><span id="phTime"></span></div>
+      <button id="phMore" class="ph-round" type="button" aria-label="עוד"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg></button>
     </div>
     <div class="ph-bottom">
       <div class="ph-scrub-row">
-        <button id="phPlay" class="ph-round sm" aria-label="נגן"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.6v14.8c0 .8.9 1.3 1.6.9l12-7.4c.6-.4.6-1.4 0-1.8l-12-7.4C7.9 3.3 7 3.8 7 4.6z"/></svg></button>
+        <button id="phPlay" class="ph-round sm" type="button" aria-label="נגן"></button>
         <div class="ph-strip" id="phStripBox"><canvas id="phStrip"></canvas><div id="phHead"></div></div>
-        <button id="phMute" class="ph-round sm" aria-label="שמע"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4.5 4.5 0 010 6M18 6.5a8 8 0 010 11"/></svg></button>
+        <button id="phMute" class="ph-round sm" type="button" aria-label="שמע"></button>
       </div>
       <div class="ph-tools">
-        <button id="phShare" aria-label="שיתוף"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11M8.2 7.2L12 3.5l3.8 3.7"/><path d="M8.5 10.5H7a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1.5"/></svg></button>
-        <button id="phHeart" aria-label="מועדף"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></svg></button>
-        <button id="phInfo" aria-label="מידע"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg></button>
-        <button id="phEdit" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M18 7h2M4 17h3M12 17h8"/><circle cx="15.5" cy="7" r="2.3"/><circle cx="9.5" cy="17" r="2.3"/></svg></button>
-        <button id="phTrash" aria-label="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13a1.5 1.5 0 001.5 1.4h6a1.5 1.5 0 001.5-1.4l1-13M10 10.5v6.5M14 10.5v6.5"/></svg></button>
+        <button id="phShare" type="button" aria-label="שיתוף"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11M8.2 7.2L12 3.5l3.8 3.7"/><path d="M8.5 10.5H7a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1.5"/></svg></button>
+        <button id="phHeart" type="button" aria-label="מועדף"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></svg></button>
+        <button id="phInfo" type="button" aria-label="מידע"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg></button>
+        <button id="phEdit" type="button" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M18 7h2M4 17h3M12 17h8"/><circle cx="15.5" cy="7" r="2.3"/><circle cx="9.5" cy="17" r="2.3"/></svg></button>
+        <button id="phTrash" type="button" aria-label="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13a1.5 1.5 0 001.5 1.4h6a1.5 1.5 0 001.5-1.4l1-13M10 10.5v6.5M14 10.5v6.5"/></svg></button>
       </div>
     </div>
+
+    <!-- תפריט ⋯ -->
+    <div id="phMenu" class="ph-pop" hidden>
+      <button type="button" data-pm="copy"><span>העתק</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M5 15V6a2 2 0 012-2h8"/></svg></button>
+      <button type="button" data-pm="dup"><span>שכפל</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="11" height="11" rx="2"/><rect x="9" y="9" width="11" height="11" rx="2"/></svg></button>
+      <button type="button" data-pm="hide"><span>הסתר</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="12" cy="12" r="2.5"/><path d="M4 4l16 16"/></svg></button>
+      <button type="button" data-pm="replay"><span>הצג מההתחלה</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12a8 8 0 108-8H8M8 4L5 7l3 3"/></svg></button>
+    </div>
+
+    <!-- גיליון מידע -->
+    <div id="phSheet" class="ph-sheet" hidden>
+      <div class="grab"></div>
+      <input class="ph-caption" placeholder="הוספת כיתוב" aria-label="כיתוב">
+      <p id="phiDate" class="ph-sheet-date"></p>
+      <div class="ph-sheet-card">
+        <div class="ph-sheet-row"><b id="phiDevice">מצלמה ראשית</b><span class="ph-tag">HEVC</span></div>
+        <div class="ph-sheet-row dim" id="phiName"></div>
+        <div class="ph-sheet-row dim" id="phiSpec"></div>
+      </div>
+    </div>
+
+    <!-- אישור מחיקה -->
+    <div id="phAction" class="ph-action" hidden>
+      <div class="ph-action-box">
+        <p>הסרטון יועבר לתיקייה "נמחקו לאחרונה" ויימחק לצמיתות בעוד 30 יום.</p>
+        <button type="button" class="ph-del" id="phDelOk">מחק סרטון</button>
+      </div>
+      <button type="button" class="ph-cancel" id="phDelCancel">ביטול</button>
+    </div>
   </div>
+
+  <!-- תפריט סודי (לחיצה ארוכה) -->
   <div id="pmenu" hidden>
-    <button data-m="resume" class="btn">המשך</button>
-    <button data-m="restart" class="btn">התחל מחדש</button>
-    <button data-m="share" class="btn primary">שתף סרטון</button>
-    <button data-m="exit" class="btn danger">יציאה</button>
+    <button data-m="resume" type="button">המשך</button>
+    <button data-m="restart" type="button">התחל מחדש (מחק את מה שהוזן)</button>
+    <button data-m="share" type="button">שתף את ההקלטה</button>
+    <button data-m="exit" type="button" class="danger">יציאה</button>
   </div>
 </section>
 

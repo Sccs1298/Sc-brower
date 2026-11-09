@@ -1,5 +1,6 @@
 'use strict';
-/* גלריה – חיזוי בתוך סרטון. הכל רץ מקומית בדפדפן, בלי שרת. */
+/* גלריה – אפליקציית מנטליזם שנראית כמו גלריית התמונות.
+   מבנה הקובץ: עזרים · אחסון · מקורות וידאו · רינדור חשיפה · ניווט · גלריה · ניהול · עורך · הגדרות · צפייה/הופעה */
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -9,135 +10,153 @@ const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(3
 const easeOut = p => 1 - Math.pow(1 - clamp(p), 3);
 const backOut = p => { p = clamp(p); const c = 1.70158; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
 const isRTL = s => /[֐-׿؀-ۿ]/.test(s);
+const fmtDur = s => `${Math.floor((s || 0) / 60)}:${String(Math.floor((s || 0) % 60)).padStart(2, '0')}`;
+const getPath = (o, p) => p.split('.').reduce((a, k) => a && a[k], o);
+const setPath = (o, p, v) => { const ks = p.split('.'); const last = ks.pop(); ks.reduce((a, k) => a[k], o)[last] = v; };
 
 const FONTS = {
-  hand:    { name: 'כתב יד',       css: '"Amatic SC", "Caveat", cursive' },
-  script:  { name: 'כתב יד (לטיני)', css: '"Caveat", "Amatic SC", cursive' },
-  bold:    { name: 'כותרת',         css: '"Secular One", sans-serif' },
-  clean:   { name: 'נקי',           css: '"Rubik", sans-serif' },
-  serif:   { name: 'עיתון',         css: '"Frank Ruhl Libre", serif' },
-  digital: { name: 'דיגיטלי',       css: '"Courier New", ui-monospace, monospace' },
+  hand:    { name: 'כתב יד',          css: '"Amatic SC", "Caveat", cursive' },
+  script:  { name: 'כתב יד (אנגלית)', css: '"Caveat", "Amatic SC", cursive' },
+  bold:    { name: 'כותרת',            css: '"Secular One", sans-serif' },
+  clean:   { name: 'נקי',              css: '"Rubik", sans-serif' },
+  serif:   { name: 'עיתון',            css: '"Frank Ruhl Libre", serif' },
+  digital: { name: 'דיגיטלי',          css: '"Courier New", ui-monospace, monospace' },
 };
 const DEFAULT_WORDS = ['ישראל', 'צרפת', 'יפן', 'ברזיל', 'מצרים', 'קנדה', 'איטליה', 'הודו', 'מקסיקו', 'יוון', 'תאילנד', 'ספרד'];
 
 const METHODS = {
-  grid:     { name: 'מקלדת נסתרת (מסך = 12 מקשים)', for: ['number', 'word'],
-              help: 'המסך מחולק לרשת בלתי נראית 3×4 כמו מקלדת טלפון: \u20661 2 3 / 4 5 6 / 7 8 9\u2069, ובשורה התחתונה: נקה (שמאל) · 0 · מחק (ימין). במילים – מקישים את מספר המילה ברשימה.' },
-  list:     { name: 'הקשה אחת (12 אזורים = 12 מילים)', for: ['word'],
-              help: 'הקשה אחת באחד מ-12 אזורי המסך בוחרת את המילה המתאימה מהרשימה (שמאל-למעלה = 1, ימין-למטה = 12).' },
+  grid:     { name: 'מקשים נסתרים 3×3', for: ['number', 'word'],
+              help: 'בזמן שהסרטון מתנגן, המסך מחולק ל-9 מקשים בלתי נראים: 1 בפינה השמאלית העליונה ו-9 בימנית התחתונה. אחרי מספר הספרות שהגדרת, שאר הנגיעות לא נחשבות. שתי אצבעות מוחקות ספרה.' },
   keyboard: { name: 'מקלדת Bluetooth / שלט', for: ['number', 'word'],
-              help: 'הקלדה במקלדת חיצונית מוסתרת. נגיעות במסך לא עושות כלום, אז הצופה יכול להחזיק את הטלפון. רווח או חץ מתחיל.' },
-  pre:      { name: 'לפני ההופעה (מוסווה כחיפוש)', for: ['number', 'word'],
-              help: 'לפני שהסרטון עולה מופיע מסך "חיפוש בגלריה". מקלידים שם את הבחירה ולוחצים חפש.' },
+              help: 'מקלידים במקלדת או בשלט Bluetooth מחוברים. נגיעות במסך לא עושות כלום, אז הצופה יכול להחזיק את הטלפון. רווח או חץ מתחיל את הסרטון.' },
+  pre:      { name: 'לפני ההופעה (מסך חיפוש)', for: ['number', 'word'],
+              help: 'כשנוגעים בסרטון בגלריה, נפתח קודם מסך חיפוש של הגלריה. מקלידים שם את הבחירה ולוחצים "חפש" במקלדת, והסרטון נפתח.' },
   draw:     { name: 'ציור נסתר', for: ['drawing'],
-              help: 'מציירים באצבע על המסך בזמן שהסרטון רץ. הקווים לא נראים, והציור מופיע באזור החשיפה. שתי אצבעות = ביטול קו אחרון.' },
+              help: 'בזמן שהסרטון מתנגן מציירים באצבע על המסך. הקווים לא נראים, והציור מופיע באזור החשיפה. שתי אצבעות מבטלות את הקו האחרון.' },
 };
 
 /* ---------- הגדרות ---------- */
-const SKEY = 'gallery.settings';
-const S = Object.assign(
-  { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', viewStyle: 'photos', phTheme: 'dark' },
-  (() => { try { return JSON.parse(localStorage.getItem(SKEY)) || {}; } catch (e) { return {}; } })()
-);
-const saveSettings = () => { try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) { /* ignore */ } };
+const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false };
 
-/* ---------- אחסון (IndexedDB) ---------- */
-const DB = {
-  db: null,
-  mem: null, // גיבוי בזיכרון כשהדפדפן חוסם אחסון (מסגרת מוגבלת, גלישה פרטית)
-  async open() {
+/* ===================== אחסון =====================
+   local  – IndexedDB באפליקציה המותקנת (קבוע במכשיר)
+   cloud  – בתוך הקישור של Claude: מסמכים פרטיים + קבצי וידאו בחשבון
+   memory – גיבוי זמני כשאין אף אחד מהם */
+const Store = {
+  mode: 'memory', idb: null, cdb: null, assets: null, uid: null, mem: new Map(),
+  async init() {
     try {
       await new Promise((res, rej) => {
         const r = indexedDB.open('gallery', 1);
         r.onupgradeneeded = () => r.result.createObjectStore('videos', { keyPath: 'id' });
-        r.onsuccess = () => { this.db = r.result; res(); };
+        r.onsuccess = () => { this.idb = r.result; res(); };
         r.onerror = () => rej(r.error);
         r.onblocked = () => rej(new Error('blocked'));
         setTimeout(() => rej(new Error('timeout')), 4000);
       });
-      return true;
-    } catch (e) {
-      this.db = null; this.mem = new Map();
-      return false;
+      this.mode = 'local';
+      try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) { /* ignore */ }
+      return;
+    } catch (e) { this.idb = null; }
+    if (window.claude && window.claude.use) {
+      try {
+        const [db, assets, user] = await Promise.all([claude.use('db'), claude.use('assets'), claude.use('user')]);
+        const id = user ? await user.id() : null;
+        if (db && id) { this.cdb = db; this.assets = assets; this.uid = id; this.mode = 'cloud'; return; }
+      } catch (e) { /* ignore */ }
     }
+    this.mode = 'memory';
   },
-  run(mode, fn) {
+  _idb(mode, fn) {
     return new Promise((res, rej) => {
-      const tx = this.db.transaction('videos', mode);
-      const req = fn(tx.objectStore('videos'));
-      tx.oncomplete = () => res(req.result);
-      tx.onerror = tx.onabort = () => rej(tx.error);
+      const tx = this.idb.transaction('videos', mode), req = fn(tx.objectStore('videos'));
+      tx.oncomplete = () => res(req.result); tx.onerror = tx.onabort = () => rej(tx.error);
     });
   },
-  all() { return this.mem ? Promise.resolve([...this.mem.values()]) : this.run('readonly', s => s.getAll()); },
-  put(v) { if (this.mem) { this.mem.set(v.id, v); return Promise.resolve(); } return this.run('readwrite', s => s.put(v)); },
-  del(id) { if (this.mem) { this.mem.delete(id); return Promise.resolve(); } return this.run('readwrite', s => s.delete(id)); },
+  _col() { return this.cdb.collection('data/users/' + this.uid); },
+  async all() {
+    if (this.mode === 'local') return (await this._idb('readonly', s => s.getAll())).filter(x => x.id !== '__settings');
+    if (this.mode === 'cloud') {
+      const snap = await this._col().get();
+      return snap.docs.map(d => d.data()).filter(d => d && d.kind === 'video').map(d => ({ ...d }));
+    }
+    return [...this.mem.values()];
+  },
+  async put(item) {
+    if (this.mode === 'local') return this._idb('readwrite', s => s.put(item));
+    if (this.mode === 'cloud') {
+      const { blob, ...rest } = item; void blob;
+      return this._col().doc('v_' + item.id).set(JSON.parse(JSON.stringify({ ...rest, kind: 'video' })));
+    }
+    this.mem.set(item.id, item);
+  },
+  async del(item) {
+    if (this.mode === 'local') return this._idb('readwrite', s => s.delete(item.id));
+    if (this.mode === 'cloud') {
+      await this._col().doc('v_' + item.id).delete();
+      if (item.assetId && this.assets) { try { await this.assets.delete(item.assetId); } catch (e) { /* ignore */ } }
+      return;
+    }
+    this.mem.delete(item.id);
+  },
+  async loadSettings() {
+    let saved = null;
+    try {
+      if (this.mode === 'cloud') { const d = await this._col().doc('settings').get(); saved = d.exists ? d.data() : null; }
+      else saved = JSON.parse(localStorage.getItem('gallery.settings'));
+    } catch (e) { /* ignore */ }
+    if (saved) Object.assign(S, saved);
+  },
+  async saveSettings() {
+    try {
+      if (this.mode === 'cloud') await this._col().doc('settings').set({ ...S });
+      else localStorage.setItem('gallery.settings', JSON.stringify(S));
+    } catch (e) { /* ignore */ }
+  },
 };
+let settingsT = 0;
+const saveSettings = () => { clearTimeout(settingsT); settingsT = setTimeout(() => Store.saveSettings(), 400); };
 
+/* שמירה בתור – כתיבה אחת בכל פעם לכל סרטון */
+const saveChains = {};
+function persist(item) {
+  const snap = { ...item, regions: JSON.parse(JSON.stringify(item.regions || [])) };
+  saveChains[item.id] = (saveChains[item.id] || Promise.resolve())
+    .then(() => Store.put(snap))
+    .catch(() => toast('השמירה נכשלה. נסה שוב'));
+  return saveChains[item.id];
+}
+
+/* ---------- מודל ---------- */
 function newRegion(t, extra) {
   const base = { x: .2, y: .4, w: .6, h: .15 };
   return Object.assign({
     id: uid(), ...base, t, fade: 1.5, effect: 'fade', font: 'hand', color: '#ffffff', opacity: .95,
-    rot: 0, skew: 0, blend: 'source-over', shadow: true, bold: true,
-    track: { on: false, t2: t + 2, ...base },
+    rot: 0, skew: 0, blend: 'source-over', shadow: true, bold: true, track: { on: false, t2: t + 2, ...base },
   }, extra || {});
 }
-
 function demoItem() {
   const rect = { x: 205 / 720, y: 430 / 1280, w: 310 / 720, h: 400 / 1280 };
   return {
-    id: 'demo', builtin: 'demo', name: 'הדגמה · התמונה בגלריה', w: 720, h: 1280, duration: 20, created: 0,
-    content: 'number', method: 'grid', words: DEFAULT_WORDS.slice(),
-    regions: [newRegion(15.5, { ...rect, fade: 2.6, color: '#2a1d12', opacity: .9, rot: -4, blend: 'multiply',
-      shadow: false, track: { on: false, t2: 18, ...rect } })],
+    id: 'demo', builtin: 'demo', name: 'הדגמה: התמונה בגלריה', fileName: 'IMG_4817.MOV', w: 720, h: 1280, duration: 20, created: 0,
+    content: 'number', method: 'grid', digits: 2, trick: true, words: DEFAULT_WORDS.slice(),
+    regions: [newRegion(15.5, { ...rect, fade: 2.6, color: '#2a1d12', opacity: .9, rot: -4, blend: 'multiply', shadow: false,
+      track: { on: false, t2: 18, ...rect } })],
   };
 }
-
-/* ---------- מקורות וידאו ---------- */
-class VideoSource {
-  constructor(blob) {
-    const v = this.el = document.createElement('video');
-    v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
-    v.preload = 'auto';
-    this.url = URL.createObjectURL(blob);
-    v.src = this.url;
-    $('#vhost').appendChild(v);
-  }
-  ready() {
-    return new Promise((res, rej) => {
-      const v = this.el; let done = false;
-      const ok = () => { if (!done) { done = true; res(); } };
-      if (v.readyState >= 2) return ok();
-      v.addEventListener('loadeddata', ok, { once: true });
-      v.addEventListener('loadedmetadata', () => setTimeout(ok, 900), { once: true });
-      v.addEventListener('error', () => { if (!done) { done = true; rej(new Error('לא ניתן לטעון את הסרטון')); } }, { once: true });
-      // אייפון לא טוען פריים לפני ניגון: מנגנים שנייה בשקט ועוצרים
-      v.muted = true;
-      const p = v.play();
-      if (p && p.then) p.then(() => { v.pause(); v.currentTime = 0; v.muted = false; ok(); }).catch(() => { v.muted = false; });
-      else v.muted = false;
-      setTimeout(ok, 4000);
-    });
-  }
-  get w() { return this.el.videoWidth || 720; }
-  get h() { return this.el.videoHeight || 1280; }
-  get duration() { return isFinite(this.el.duration) ? this.el.duration : 0; }
-  get time() { return this.el.currentTime; }
-  set time(v) { this.el.currentTime = v; }
-  get paused() { return this.el.paused; }
-  get ended() { return this.el.ended; }
-  play() { return this.el.play(); }
-  pause() { this.el.pause(); }
-  draw(ctx, w, h) { if (this.el.readyState >= 2) ctx.drawImage(this.el, 0, 0, w, h); }
-  destroy() {
-    this.el.pause();
-    if (this.ac) this.ac.close().catch(() => {});
-    this.el.removeAttribute('src'); this.el.load(); this.el.remove();
-    URL.revokeObjectURL(this.url);
-  }
+/* התאמת סרטונים שנשמרו בגרסאות קודמות */
+function normalize(it) {
+  if (it.method === 'list') { it.method = 'grid'; it.digits = 1; }
+  if (!METHODS[it.method]) it.method = it.content === 'drawing' ? 'draw' : 'grid';
+  if (!it.digits) it.digits = 2;
+  if (it.trick === undefined) it.trick = true;
+  if (!it.words) it.words = DEFAULT_WORDS.slice();
+  if (!it.regions) it.regions = [];
+  return it;
 }
+const shotTime = it => it.shotAt || (it.builtin ? Date.now() - 2 * 3600e3 : it.created || Date.now());
+const activeRegions = it => (it.trick === false ? [] : it.regions);
 
-/* סרטון הדגמה מובנה – מצויר בזמן אמת, לא קובץ */
 class DemoSource {
   constructor() { this.w = 720; this.h = 1280; this.duration = 20; this._t = 0; this._start = 0; this.paused = true; this.ended = false; }
   async ready() {
@@ -208,7 +227,6 @@ function drawDemo(ctx, t) {
   ctx.direction = 'ltr';
 }
 
-const makeSource = item => item.builtin === 'demo' ? new DemoSource() : new VideoSource(item.blob);
 
 /* ---------- רינדור החשיפה ---------- */
 function regionRect(r, t) {
@@ -289,129 +307,309 @@ function composeFrame(ctx, src, item, payload, payloadAt, W, H, forceFull) {
 }
 const fitRect = (sw, sh, cw, ch) => { const s = Math.min(cw / sw, ch / sh), w = sw * s, h = sh * s; return { x: (cw - w) / 2, y: (ch - h) / 2, w, h }; };
 
-/* ---------- עזרים ---------- */
-let toastT;
-function toast(msg) { const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2600); }
-const curScreen = () => ($('.screen.active') || {}).id;
-function show(id) {
-  // כפתור "אחורה" של הטלפון: כל מסך פנימי מקבל רשומה בהיסטוריה
-  if (id !== 'lib' && curScreen() === 'lib') { try { history.pushState({ g: 1 }, ''); } catch (e) { /* ignore */ } }
-  $$('.screen').forEach(s => s.classList.toggle('active', s.id === id)); window.scrollTo(0, 0);
-}
-/* חזרה אחורה מכל מסך */
-function goBack() {
-  const cur = curScreen();
-  if (cur === 'edit') $('#edBack').click();
-  else if (cur === 'perform') exitPerform();
-  else if (cur === 'settings') show('lib');
-  else if (cur === 'pre') backTo();
-}
-addEventListener('popstate', () => {
-  if (curScreen() === 'lib') return;
-  goBack();
-  if (curScreen() !== 'lib') { try { history.pushState({ g: 1 }, ''); } catch (e) { /* ignore */ } }
-});
-const buzz = () => { if (S.vibrate && navigator.vibrate) navigator.vibrate(12); };
-const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-const getPath = (o, p) => p.split('.').reduce((a, k) => a && a[k], o);
-const setPath = (o, p, v) => { const ks = p.split('.'); const last = ks.pop(); ks.reduce((a, k) => a[k], o)[last] = v; };
-
-function probe(blob) {
-  return new Promise((res, rej) => {
-    const v = document.createElement('video'); const u = URL.createObjectURL(blob);
-    v.preload = 'metadata'; v.muted = true; v.playsInline = true;
-    v.onloadedmetadata = () => { res({ w: v.videoWidth, h: v.videoHeight, duration: isFinite(v.duration) ? v.duration : 0 }); URL.revokeObjectURL(u); };
-    v.onerror = () => { URL.revokeObjectURL(u); rej(new Error('פורמט הווידאו לא נתמך בדפדפן הזה')); };
-    v.src = u;
-    setTimeout(() => res({ w: v.videoWidth, h: v.videoHeight, duration: isFinite(v.duration) ? v.duration : 0 }), 6000);
-  });
-}
-
-/* ---------- ספרייה ---------- */
-let ITEMS = [];
-async function loadItems() {
-  ITEMS = await DB.all();
-  if (!ITEMS.some(i => i.builtin === 'demo')) { const d = demoItem(); await DB.put(d); ITEMS.push(d); }
-  ITEMS.sort((a, b) => (b.builtin ? 1 : 0) - (a.builtin ? 1 : 0) || b.created - a.created);
-  renderLib();
-}
-function renderLib() {
-  const box = $('#items'); box.innerHTML = '';
-  if (!ITEMS.length) { box.innerHTML = '<p class="empty">אין סרטונים עדיין</p>'; return; }
-  for (const it of ITEMS) {
-    const el = document.createElement('div'); el.className = 'item';
-    const kind = { number: 'מספר', word: 'מילה', drawing: 'ציור' }[it.content];
-    el.innerHTML = `<h3></h3><div class="meta"></div>
-      <div class="acts"><button class="btn primary" data-a="go">הופעה</button>
-      <button class="btn" data-a="stage">במה</button><button class="btn" data-a="edit">עריכה</button></div>`;
-    $('h3', el).textContent = it.name;
-    $('.meta', el).textContent = `${fmt(it.duration || 0)} · ${kind} · ${(METHODS[it.method] || {}).name || ''} · ${it.regions.length} אזורים`;
-    el.addEventListener('click', e => {
-      const a = e.target.dataset.a; if (!a) return;
-      if (a === 'edit') openEditor(it); else startPerform(it, a === 'stage');
+/* ===================== מקורות וידאו ===================== */
+const mediaSrc = it => it.blob || it.assetUrl || null;
+class VideoSource {
+  constructor(src) {
+    const v = this.el = document.createElement('video');
+    v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+    v.preload = 'auto';
+    this.owned = src instanceof Blob;
+    this.url = this.owned ? URL.createObjectURL(src) : src;
+    v.src = this.url;
+    $('#vhost').appendChild(v);
+  }
+  ready() {
+    return new Promise((res, rej) => {
+      const v = this.el; let done = false;
+      const ok = () => { if (!done) { done = true; res(); } };
+      if (v.readyState >= 2) return ok();
+      v.addEventListener('loadeddata', ok, { once: true });
+      v.addEventListener('loadedmetadata', () => setTimeout(ok, 900), { once: true });
+      v.addEventListener('error', () => { if (!done) { done = true; rej(new Error('לא ניתן לטעון את הסרטון')); } }, { once: true });
+      // אייפון לא טוען פריים לפני ניגון: מנגנים רגע בשקט ועוצרים
+      v.muted = true;
+      const p = v.play();
+      if (p && p.then) p.then(() => { v.pause(); v.currentTime = 0; v.muted = false; ok(); }).catch(() => { v.muted = false; });
+      else v.muted = false;
+      setTimeout(ok, 4000);
     });
-    box.appendChild(el);
+  }
+  get w() { return this.el.videoWidth || 720; }
+  get h() { return this.el.videoHeight || 1280; }
+  get duration() { return isFinite(this.el.duration) ? this.el.duration : 0; }
+  get time() { return this.el.currentTime; }
+  set time(v) { this.el.currentTime = v; }
+  get paused() { return this.el.paused; }
+  get ended() { return this.el.ended; }
+  play() { return this.el.play(); }
+  pause() { this.el.pause(); }
+  draw(ctx, w, h) { if (this.el.readyState >= 2) ctx.drawImage(this.el, 0, 0, w, h); }
+  destroy() {
+    this.el.pause();
+    if (this.ac) this.ac.close().catch(() => {});
+    this.el.removeAttribute('src'); this.el.load(); this.el.remove();
+    if (this.owned) URL.revokeObjectURL(this.url);
   }
 }
+const makeSource = item => {
+  if (item.builtin === 'demo') return new DemoSource();
+  const src = mediaSrc(item);
+  if (!src) throw new Error('קובץ הווידאו חסר');
+  return new VideoSource(src);
+};
+
+/* בדיקת קובץ חדש: מידות, אורך ותמונה ממוזערת */
+async function inspect(file) {
+  const v = document.createElement('video'), u = URL.createObjectURL(file);
+  v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = u;
+  $('#vhost').appendChild(v);
+  try {
+    await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error('הדפדפן לא מצליח לפתוח את הסרטון הזה')); setTimeout(res, 6000); });
+    try { await v.play(); v.pause(); } catch (e) { /* ignore */ }
+    const info = { w: v.videoWidth, h: v.videoHeight, duration: isFinite(v.duration) ? v.duration : 0 };
+    await new Promise(res => { v.onseeked = res; v.currentTime = Math.min(.5, (info.duration || 1) / 2); setTimeout(res, 1500); });
+    info.thumb = thumbOf(c => c.drawImage(v, 0, 0, info.w || 1, info.h || 1), info.w || 1, info.h || 1);
+    return info;
+  } finally { v.remove(); URL.revokeObjectURL(u); }
+}
+function thumbOf(drawFn, w, h) {
+  try {
+    const c = document.createElement('canvas'), size = 220; c.width = c.height = size;
+    const x = c.getContext('2d'), s = Math.max(size / w, size / h);
+    x.translate((size - w * s) / 2, (size - h * s) / 2); x.scale(s, s);
+    drawFn(x);
+    return c.toDataURL('image/jpeg', .72);
+  } catch (e) { return ''; }
+}
+let DEMO_THUMB = '';
+function demoThumb() {
+  if (!DEMO_THUMB) { const d = new DemoSource(); d.time = 1.2; DEMO_THUMB = thumbOf(x => d.draw(x, 720, 1280), 720, 1280); }
+  return DEMO_THUMB;
+}
+const thumbFor = it => it.builtin === 'demo' ? demoThumb() : (it.thumb || '');
+
+/* ===================== עזרי ממשק ===================== */
+let toastT;
+function toast(msg, ms = 2800) { const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, ms); }
+const buzz = () => { if (S.vibrate && navigator.vibrate) navigator.vibrate(12); };
+function applyTheme() {
+  document.body.classList.toggle('pg-light', S.phTheme === 'light');
+  document.body.classList.toggle('pg-dark', S.phTheme === 'dark');
+}
+
+/* ===================== ניווט =====================
+   מחסנית מסכים. כל מסך יכול לקבל פעולת כניסה ויציאה.
+   כפתור "אחורה" של הטלפון/הדפדפן מחזיר מסך אחד. */
+const NAV = { stack: [], skipPop: 0 };
+const ENTER = {}, LEAVE = {};
+function paint(id) {
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  if (id !== 'photos') window.scrollTo(0, 0);
+}
+async function go(id, opts = {}) {
+  const cur = NAV.stack[NAV.stack.length - 1];
+  if (cur && LEAVE[cur]) await LEAVE[cur]();
+  if (opts.replace) NAV.stack.pop();
+  else { try { history.pushState({ g: NAV.stack.length + 1 }, ''); } catch (e) { /* ignore */ } }
+  NAV.stack.push(id); paint(id);
+  if (ENTER[id]) await ENTER[id]();
+}
+async function popScreen() {
+  if (NAV.stack.length <= 1) return;
+  const cur = NAV.stack.pop();
+  if (LEAVE[cur]) await LEAVE[cur]();
+  const prev = NAV.stack[NAV.stack.length - 1];
+  paint(prev);
+  if (ENTER[prev]) await ENTER[prev]();
+}
+function uiBack() {
+  if (NAV.stack.length <= 1) return;
+  NAV.skipPop++;
+  try { history.back(); } catch (e) { NAV.skipPop--; }
+  popScreen();
+}
+addEventListener('popstate', () => {
+  if (NAV.skipPop > 0) { NAV.skipPop--; return; }
+  popScreen();
+});
+document.addEventListener('click', e => { if (e.target.closest('[data-back]')) { e.preventDefault(); uiBack(); } });
+const curScreen = () => NAV.stack[NAV.stack.length - 1];
+
+/* ===================== הגלריה (מסך הבית) ===================== */
+let ITEMS = [];
+const byId = id => ITEMS.find(x => x.id === id);
+function renderGrid() {
+  const grid = $('#pgGrid'), list = ITEMS.filter(x => !x.hidden).sort((a, b) => shotTime(a) - shotTime(b));
+  $('#pgCount').textContent = list.length === 1 ? 'סרטון 1' : `${list.length} סרטונים`;
+  grid.innerHTML = '';
+  for (const it of list) {
+    const b = document.createElement('button'); b.className = 'pg-cell'; b.type = 'button';
+    const th = thumbFor(it);
+    b.innerHTML = `${th ? '<img alt="">' : ''}<span class="dur"></span>${it.fav ? '<svg class="fav" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></svg>' : ''}`;
+    if (th) $('img', b).src = th;
+    $('.dur', b).textContent = fmtDur(it.duration);
+    b.addEventListener('click', () => openViewer(it.id, { from: 'photos' }));
+    grid.appendChild(b);
+  }
+  requestAnimationFrame(() => window.scrollTo(0, document.body.scrollHeight)); // כמו בגלריה: החדש למטה
+}
+ENTER.photos = () => { applyTheme(); renderGrid(); };
+
+/* לחיצה ארוכה על "ספרייה" = כניסה נסתרת לניהול */
+(() => {
+  const t = $('#pgTitle').parentElement; let timer = 0;
+  t.addEventListener('pointerdown', () => { clearTimeout(timer); timer = setTimeout(() => { buzz(); go('manage'); }, 900); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => t.addEventListener(ev, () => clearTimeout(timer)));
+  t.addEventListener('contextmenu', e => e.preventDefault());
+})();
+
+/* ===================== ניהול ===================== */
+function renderManage() {
+  const st = $('#mgStore');
+  const msg = {
+    local: ['#34c759', 'הסרטונים נשמרים במכשיר הזה לצמיתות.'],
+    cloud: ['#0a84ff', 'הסרטונים נשמרים בחשבון Claude שלך ונשארים גם אחרי סגירה. עד 20MB לכל סרטון.'],
+    memory: ['#ff9f0a', 'שמירה זמנית בלבד: הסרטונים יימחקו כשהדף ייסגר. כדי לשמור לתמיד, התקן את האפליקציה (ראה מדריך).'],
+  }[Store.mode];
+  st.innerHTML = '<span class="dot"></span><span></span>';
+  $('.dot', st).style.background = msg[0]; $('span:last-child', st).textContent = msg[1];
+
+  const box = $('#mgList'); box.innerHTML = '';
+  const list = ITEMS.slice().sort((a, b) => shotTime(b) - shotTime(a));
+  for (const it of list) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'mg-item';
+    const kind = { number: `מספר, ${it.digits} ספרות`, word: 'מילה מרשימה', drawing: 'ציור' }[it.content];
+    const isTrick = it.trick !== false && it.regions.length;
+    b.innerHTML = '<img alt=""><div class="txt"><b></b><span></span></div><span class="tag"></span>';
+    const th = thumbFor(it); if (th) $('img', b).src = th;
+    $('b', b).textContent = it.name;
+    $('.txt span', b).textContent = `${fmtDur(it.duration)} · ` + (isTrick ? `${kind} · ${METHODS[it.method].name}` : 'סרטון רגיל');
+    const tag = $('.tag', b);
+    tag.textContent = it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
+    if (isTrick && !it.hidden) tag.classList.add('trick');
+    b.addEventListener('click', () => { E.id = it.id; go('edit'); });
+    box.appendChild(b);
+  }
+}
+ENTER.manage = renderManage;
+$('#mgHelp').onclick = () => go('help');
+$('#mgHelp2').onclick = () => go('help');
+$('#mgSettings').onclick = () => go('settings');
+$('#helpDone').onclick = () => { if (!S.seenHelp) { S.seenHelp = true; saveSettings(); } uiBack(); };
+
 $('#fileIn').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try {
-    const m = await probe(f);
-    const t = m.duration ? +(m.duration * .75).toFixed(2) : 3;
-    const it = { id: uid(), name: f.name.replace(/\.[^.]+$/, ''), blob: f, ...m, created: Date.now(), shotAt: f.lastModified || Date.now(),
-      content: 'number', method: 'grid', words: DEFAULT_WORDS.slice(), regions: [newRegion(t)] };
-    await DB.put(it); ITEMS.unshift(it); renderLib(); openEditor(it);
-    toast('גרור על התמונה כדי לסמן איפה תופיע החשיפה');
-  } catch (err) { toast(err.message || 'שגיאה בטעינת הסרטון'); }
+  toast('טוען את הסרטון…', 10000);
+  let info;
+  try { info = await inspect(f); } catch (err) { toast(err.message || 'לא ניתן לפתוח את הסרטון'); return; }
+  const t = info.duration ? +(info.duration * .75).toFixed(2) : 3;
+  const it = normalize({
+    id: uid(), name: f.name.replace(/\.[^.]+$/, ''), fileName: f.name, size: f.size, blob: f,
+    w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, created: Date.now(), shotAt: f.lastModified || Date.now(),
+    content: 'number', method: 'grid', digits: 2, trick: true, words: DEFAULT_WORDS.slice(), regions: [newRegion(t)],
+  });
+  if (Store.mode === 'cloud') {
+    if (!Store.assets) { toast('אין הרשאה לשמור קבצים בקישור הזה. הסרטון יישמר רק עד הסגירה'); }
+    else {
+      toast('שומר את הסרטון בחשבון…', 60000);
+      try { const r = await Store.assets.upload(f); it.assetId = r.id; it.assetUrl = r.url; it.size = r.sizeBytes; }
+      catch (err) {
+        toast(err && err.code === 'too_large' ? 'הסרטון גדול מ-20MB. קצר אותו או השתמש באפליקציה המותקנת' : 'שמירת הסרטון נכשלה. נסה שוב', 6000);
+        return;
+      }
+    }
+  }
+  ITEMS.push(it);
+  await persist(it);
+  toast('נוסף. עכשיו סמן איפה ומתי הבחירה תופיע');
+  E.id = it.id; go('edit');
 });
 
-/* ---------- עורך ---------- */
-const E = { item: null, src: null, sel: 0, target: 'start', raf: 0, drag: null, saveT: 0, scrubbing: false };
+/* ===================== עורך ===================== */
+const E = { id: null, item: null, src: null, sel: 0, target: 'start', raf: 0, drag: null, saveT: 0, scrubbing: false };
 const SAMPLE_DRAW = { type: 'draw', strokes: [
   Array.from({ length: 33 }, (_, i) => [100 + 80 * Math.cos(i / 32 * Math.PI * 2), 100 + 80 * Math.sin(i / 32 * Math.PI * 2)]),
   [[70, 80]], [[130, 80]],
   Array.from({ length: 12 }, (_, i) => [60 + i * 7.3, 120 + 25 * Math.sin(i / 11 * Math.PI)]),
 ] };
+function fillSelect(sel, entries, value) { sel.innerHTML = entries.map(([v, n]) => `<option value="${v}">${n}</option>`).join(''); sel.value = value; }
+const curRegion = () => E.item && E.item.regions[E.sel];
 
-function fillSelect(sel, entries, value) {
-  sel.innerHTML = entries.map(([v, n]) => `<option value="${v}">${n}</option>`).join('');
-  sel.value = value;
-}
-function syncMethodOptions() {
-  const it = E.item, ok = Object.entries(METHODS).filter(([, m]) => m.for.includes(it.content));
+function syncEditorForm() {
+  const it = E.item;
+  const ok = Object.entries(METHODS).filter(([, m]) => m.for.includes(it.content));
   if (!ok.some(([k]) => k === it.method)) it.method = ok[0][0];
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
   $('#edWordsWrap').hidden = it.content !== 'word';
+  $('#edDigitsRow').hidden = it.content === 'drawing';
+  $('#edDigits').value = String(it.digits);
+  $('#edDigitsHelp').textContent = it.content === 'number'
+    ? `מזינים ${it.digits} ספרות. אחרי ${it.digits} נגיעות, שאר הנגיעות לא נחשבות.`
+    : it.content === 'word' ? 'הספרות הן מספר המילה ברשימה. עם ספרה אחת בוחרים מבין 9 המילים הראשונות.' : '';
+  $('#edTrickWrap').hidden = it.trick === false;
+  $('#edTrick').checked = it.trick !== false;
+  $('#edHideLabel').textContent = it.hidden ? 'הצג בגלריה' : 'הסתר מהגלריה';
+  $('#edDelete').hidden = it.id === 'demo';
+  $('#edTitle').textContent = it.name || 'עריכה';
 }
-const curRegion = () => E.item.regions[E.sel];
-
-async function openEditor(item) {
-  closeEditorSrc();
-  E.item = structuredClone(item); E.sel = 0; E.target = 'start';
-  show('edit');
+function renderRegions() {
+  const box = $('#edRegions'); box.innerHTML = '';
+  E.item.regions.forEach((r, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (i === E.sel ? ' on' : '');
+    b.textContent = `${i + 1} · ${(+r.t).toFixed(1)} שנ׳`;
+    b.onclick = () => { E.sel = i; renderRegions(); };
+    box.appendChild(b);
+  });
+  const r = curRegion();
+  $$('[data-r]').forEach(el => {
+    el.disabled = !r; if (!r) return;
+    const v = getPath(r, el.dataset.r);
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
+  });
+  $$('input[name=edTarget]').forEach(el => el.checked = el.value === E.target);
+}
+ENTER.edit = async () => {
+  const src = byId(E.id); if (!src) { uiBack(); return; }
+  E.item = { ...src, regions: JSON.parse(JSON.stringify(src.regions)), words: (src.words || []).slice() };
+  E.sel = Math.min(E.sel, Math.max(0, E.item.regions.length - 1)); E.target = 'start';
   $('#edName').value = E.item.name;
   $('#edContent').value = E.item.content;
-  $('#edWords').value = (E.item.words || []).join('\n');
+  $('#edWords').value = E.item.words.join('\n');
   $('#edSample').value = S.sample;
   const ts = shotTime(E.item);
   $('#edShot').value = new Date(ts - new Date(ts).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-  $('#edDelete').hidden = E.item.id === 'demo';
   fillSelect($('#rgFont'), Object.entries(FONTS).map(([k, f]) => [k, f.name]), 'hand');
-  syncMethodOptions(); renderRegions();
-  E.src = makeSource(E.item);
-  try { await E.src.ready(); } catch (err) { toast(err.message); return; }
+  syncEditorForm(); renderRegions();
+  try { E.src = makeSource(E.item); await E.src.ready(); } catch (err) { toast(err.message); return; }
+  if (curScreen() !== 'edit') { E.src.destroy(); E.src = null; return; }
   if (!E.item.duration && E.src.duration) E.item.duration = E.src.duration;
   E.item.w = E.src.w; E.item.h = E.src.h;
   $('#edScrub').max = E.src.duration || E.item.duration || 10;
   sizeEdCanvas();
   const r = curRegion(); if (r) E.src.time = Math.min(r.t + (r.fade || 0), (E.src.duration || 10) - .05);
   cancelAnimationFrame(E.raf); edLoop();
+};
+LEAVE.edit = async () => {
+  cancelAnimationFrame(E.raf);
+  if (E.src) { E.src.destroy(); E.src = null; }
+  await flushEdit();
+};
+function commitEdit() {
+  const it = E.item; if (!it) return;
+  const i = ITEMS.findIndex(x => x.id === it.id);
+  const keep = i >= 0 ? ITEMS[i] : {};
+  const merged = { ...keep, ...it, blob: keep.blob || it.blob };
+  if (i >= 0) ITEMS[i] = merged; else ITEMS.push(merged);
+  return merged;
 }
-function closeEditorSrc() { cancelAnimationFrame(E.raf); if (E.src) { E.src.destroy(); E.src = null; } }
+function scheduleSave() { clearTimeout(E.saveT); E.saveT = setTimeout(() => { const m = commitEdit(); if (m) persist(m); }, 400); }
+async function flushEdit() { clearTimeout(E.saveT); const m = commitEdit(); if (m) await persist(m); }
+
 function sizeEdCanvas() {
   if (!E.src) return;
-  const c = $('#edCanvas'), maxW = Math.min($('.preview-wrap').clientWidth || 360, 720), maxH = innerHeight * .52;
+  const c = $('#edCanvas'), maxW = Math.min($('.preview').clientWidth || 360, 680), maxH = innerHeight * .48;
   const s = Math.min(maxW / E.src.w, maxH / E.src.h), dpr = Math.min(devicePixelRatio || 1, 2);
   c.style.width = `${Math.round(E.src.w * s)}px`; c.style.height = `${Math.round(E.src.h * s)}px`;
   c.width = Math.round(E.src.w * s * dpr); c.height = Math.round(E.src.h * s * dpr);
@@ -423,100 +621,86 @@ function edPayload() {
 }
 function edLoop() {
   E.raf = requestAnimationFrame(edLoop);
+  if (!E.src) return;
   const c = $('#edCanvas'), ctx = c.getContext('2d'), W = c.width, H = c.height, t = E.src.time;
   ctx.clearRect(0, 0, W, H);
-  composeFrame(ctx, E.src, E.item, edPayload(), 0, W, H, $('#edShowAll').checked);
-  E.item.regions.forEach((r, i) => {
+  composeFrame(ctx, E.src, { regions: activeRegions(E.item) }, edPayload(), 0, W, H, $('#edShowAll').checked);
+  if (E.item.trick !== false) E.item.regions.forEach((r, i) => {
     const R = regionRect(r, t), on = i === E.sel;
     ctx.save(); ctx.setLineDash([8, 6]); ctx.lineWidth = on ? 2.5 : 1.2;
-    ctx.strokeStyle = on ? '#d8b46a' : 'rgba(255,255,255,.55)';
+    ctx.strokeStyle = on ? '#ffcc00' : 'rgba(255,255,255,.55)';
     ctx.strokeRect(R.x * W, R.y * H, R.w * W, R.h * H);
-    if (on) { ctx.setLineDash([]); ctx.fillStyle = '#d8b46a'; ctx.fillRect((R.x + R.w) * W - 9, (R.y + R.h) * H - 9, 14, 14); }
-    if (on && r.track.on) { ctx.strokeStyle = '#6ac0d8'; ctx.setLineDash([3, 4]); ctx.strokeRect(r.track.x * W, r.track.y * H, r.track.w * W, r.track.h * H); }
+    if (on) { ctx.setLineDash([]); ctx.fillStyle = '#ffcc00'; ctx.fillRect((R.x + R.w) * W - 10, (R.y + R.h) * H - 10, 16, 16); }
+    if (on && r.track.on) { ctx.strokeStyle = '#5ac8fa'; ctx.setLineDash([3, 4]); ctx.strokeRect(r.track.x * W, r.track.y * H, r.track.w * W, r.track.h * H); }
     ctx.restore();
   });
   if (!E.scrubbing) $('#edScrub').value = t;
   $('#edTime').textContent = t.toFixed(2);
   $('#edPlay').textContent = E.src.paused ? '▶' : '❚❚';
 }
-function renderRegions() {
-  const box = $('#edRegions'); box.innerHTML = '';
-  E.item.regions.forEach((r, i) => {
-    const b = document.createElement('button'); b.className = 'chip' + (i === E.sel ? ' on' : '');
-    b.textContent = `אזור ${i + 1} · ${(+r.t).toFixed(1)} שנ׳`;
-    b.onclick = () => { E.sel = i; renderRegions(); };
-    box.appendChild(b);
-  });
-  const r = curRegion(); $('#rgForm').hidden = !r;
-  if (!r) return;
-  $$('[data-r]').forEach(el => {
-    const v = getPath(r, el.dataset.r);
-    if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
-  });
-  $$('input[name=edTarget]').forEach(el => el.checked = el.value === E.target);
-}
-function scheduleSave() {
-  clearTimeout(E.saveT);
-  E.saveT = setTimeout(async () => {
-    const it = E.item; await DB.put(it);
-    const i = ITEMS.findIndex(x => x.id === it.id); if (i >= 0) ITEMS[i] = structuredClone(it); else ITEMS.unshift(structuredClone(it));
-    renderLib();
-  }, 350);
-}
-async function flushSave() { clearTimeout(E.saveT); if (!E.item) return; await DB.put(E.item);
-  const i = ITEMS.findIndex(x => x.id === E.item.id); if (i >= 0) ITEMS[i] = structuredClone(E.item); renderLib(); }
 
 $('#edit').addEventListener('input', e => {
   const el = e.target, it = E.item; if (!it) return;
-  if (el.dataset.i) { it[el.dataset.i] = el.value; if (el.dataset.i === 'content') syncMethodOptions(); if (el.dataset.i === 'method') $('#edMethodHelp').textContent = METHODS[it.method].help; }
-  else if (el.dataset.r && curRegion()) {
+  if (el.dataset.i) {
+    it[el.dataset.i] = el.value;
+    if (el.dataset.i === 'content' || el.dataset.i === 'method') syncEditorForm();
+    if (el.dataset.i === 'name') $('#edTitle').textContent = el.value || 'עריכה';
+  } else if (el.dataset.r && curRegion()) {
     const v = el.type === 'checkbox' ? el.checked : (el.type === 'number' || el.type === 'range') ? parseFloat(el.value) || 0 : el.value;
     setPath(curRegion(), el.dataset.r, v);
     if (el.dataset.r === 'track.on' && v) { const r = curRegion(); Object.assign(r.track, { x: r.x, y: r.y, w: r.w, h: r.h }); if (r.track.t2 <= r.t) r.track.t2 = r.t + 2; renderRegions(); }
     if (el.dataset.r === 't') renderRegions();
   } else if (el.id === 'edWords') it.words = el.value.split('\n').map(s => s.trim()).filter(Boolean);
+  else if (el.id === 'edDigits') { it.digits = parseInt(el.value, 10) || 2; syncEditorForm(); }
+  else if (el.id === 'edTrick') { it.trick = el.checked; syncEditorForm(); }
+  else if (el.id === 'edShot') it.shotAt = new Date(el.value).getTime() || undefined;
   else if (el.id === 'edSample') { S.sample = el.value; saveSettings(); return; }
   else if (el.name === 'edTarget') { E.target = el.value; return; }
-  else if (el.id === 'edShot') it.shotAt = new Date(el.value).getTime() || undefined;
   else return;
   scheduleSave();
 });
 $('#edScrub').addEventListener('input', e => { E.scrubbing = true; if (E.src) { E.src.pause(); E.src.time = parseFloat(e.target.value); } });
 $('#edScrub').addEventListener('change', () => { E.scrubbing = false; });
 $('#edPlay').onclick = () => { if (!E.src) return; if (E.src.paused) { if (E.src.ended || E.src.time >= E.src.duration - .05) E.src.time = 0; E.src.play(); } else E.src.pause(); };
-$('#rgAdd').onclick = () => { E.item.regions.push(newRegion(+(E.src ? E.src.time : 0).toFixed(2))); E.sel = E.item.regions.length - 1; E.target = 'start'; renderRegions(); scheduleSave(); toast('גרור על התמונה כדי לסמן את האזור'); };
+$('#rgAdd').onclick = () => { E.item.regions.push(newRegion(+(E.src ? E.src.time : 0).toFixed(2))); E.sel = E.item.regions.length - 1; E.target = 'start'; renderRegions(); scheduleSave(); toast('גרור על התמונה כדי לסמן את האזור החדש'); };
 $('#rgDel').onclick = () => { if (!curRegion()) return; E.item.regions.splice(E.sel, 1); E.sel = Math.max(0, E.sel - 1); renderRegions(); scheduleSave(); };
 $('#rgNow').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.t = +E.src.time.toFixed(2); if (r.track.t2 <= r.t) r.track.t2 = r.t + 2; renderRegions(); scheduleSave(); };
 $('#rgNow2').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.track.on = true; r.track.t2 = +E.src.time.toFixed(2); E.target = 'end'; renderRegions(); scheduleSave(); toast('עכשיו גרור את המיקום בזמן הזה'); };
-$('#edBack').onclick = async () => { await flushSave(); closeEditorSrc(); E.item = null; show('lib'); };
-$('#edPerform').onclick = async () => { await flushSave(); const it = E.item; closeEditorSrc(); startPerform(it, false, 'edit'); };
-$('#edStage').onclick = async () => { await flushSave(); const it = E.item; closeEditorSrc(); startPerform(it, true, 'edit'); };
+$('#edTry').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit' }); };
+$('#edStage').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit', stage: true }); };
+$('#edHide').onclick = () => { E.item.hidden = !E.item.hidden; syncEditorForm(); scheduleSave(); toast(E.item.hidden ? 'הסרטון הוסתר מהגלריה' : 'הסרטון מוצג בגלריה'); };
 $('#edDup').onclick = async () => {
-  await flushSave(); const c = structuredClone(E.item);
-  c.id = uid(); c.name += ' (עותק)'; c.created = Date.now();
-  await DB.put(c); ITEMS.unshift(c); renderLib(); openEditor(c); toast('נוצר עותק');
+  await flushEdit();
+  const src = byId(E.item.id);
+  const c = { ...src, regions: JSON.parse(JSON.stringify(src.regions)), id: uid(), name: src.name + ' (עותק)', created: Date.now() };
+  if (c.builtin) c.id = 'demo_' + uid();
+  ITEMS.push(c); await persist(c); toast('נוצר עותק');
+  E.id = c.id; go('edit', { replace: true });
 };
 $('#edDelete').onclick = async () => {
   const b = $('#edDelete');
-  if (!b.dataset.armed) { // אישור בלחיצה שנייה (confirm חסום בחלק מהדפדפנים)
-    b.dataset.armed = '1'; b.textContent = 'לחץ שוב למחיקה';
-    setTimeout(() => { delete b.dataset.armed; b.textContent = 'מחק סרטון'; }, 3000);
+  if (!b.dataset.armed) {
+    b.dataset.armed = '1'; $('span', b).textContent = 'לחץ שוב כדי למחוק לצמיתות';
+    setTimeout(() => { delete b.dataset.armed; $('span', b).textContent = 'מחק סרטון'; }, 3000);
     return;
   }
-  delete b.dataset.armed; b.textContent = 'מחק סרטון';
-  await DB.del(E.item.id); ITEMS = ITEMS.filter(x => x.id !== E.item.id); closeEditorSrc(); E.item = null; renderLib(); show('lib');
+  delete b.dataset.armed; $('span', b).textContent = 'מחק סרטון';
+  const it = byId(E.item.id); clearTimeout(E.saveT); E.item = null;
+  ITEMS = ITEMS.filter(x => x !== it);
+  if (it) await Store.del(it);
+  toast('הסרטון נמחק'); uiBack();
 };
 
 /* גרירה על התצוגה: סימון / הזזה / שינוי גודל של אזור */
 const edCanvas = $('#edCanvas');
 const normPt = e => { const b = edCanvas.getBoundingClientRect(); return { x: clamp((e.clientX - b.left) / b.width), y: clamp((e.clientY - b.top) / b.height) }; };
 edCanvas.addEventListener('pointerdown', e => {
-  const r = curRegion(); if (!r) return;
+  const r = curRegion(); if (!r || E.item.trick === false) return;
   const tgt = E.target === 'end' && r.track.on ? r.track : r, p = normPt(e), b = edCanvas.getBoundingClientRect();
-  const nearCorner = Math.abs(p.x - (tgt.x + tgt.w)) * b.width < 22 && Math.abs(p.y - (tgt.y + tgt.h)) * b.height < 22;
+  const nearCorner = Math.abs(p.x - (tgt.x + tgt.w)) * b.width < 24 && Math.abs(p.y - (tgt.y + tgt.h)) * b.height < 24;
   const inside = p.x > tgt.x && p.x < tgt.x + tgt.w && p.y > tgt.y && p.y < tgt.y + tgt.h;
   E.drag = { tgt, mode: nearCorner ? 'size' : inside ? 'move' : 'new', sx: p.x, sy: p.y, o: { ...tgt } };
-  if (E.drag.mode === 'new') Object.assign(tgt, { x: p.x, y: p.y, w: 0.001, h: 0.001 });
+  if (E.drag.mode === 'new') Object.assign(tgt, { x: p.x, y: p.y, w: .001, h: .001 });
   edCanvas.setPointerCapture(e.pointerId);
 });
 edCanvas.addEventListener('pointermove', e => {
@@ -527,21 +711,29 @@ edCanvas.addEventListener('pointermove', e => {
 });
 const endDrag = () => { if (E.drag) { E.drag = null; scheduleSave(); } };
 edCanvas.addEventListener('pointerup', endDrag); edCanvas.addEventListener('pointercancel', endDrag);
-addEventListener('resize', () => { sizeEdCanvas(); if (P.active) { sizeStage(); buildStrip(); } });
 
-/* ---------- הגדרות ---------- */
-$('#btnSettings').onclick = () => {
+/* ===================== הגדרות ===================== */
+ENTER.settings = () => {
   $$('[data-s]').forEach(el => { if (el.type === 'checkbox') el.checked = !!S[el.dataset.s]; else el.value = S[el.dataset.s] || ''; });
-  show('settings');
 };
-$('#settings').addEventListener('input', e => { const el = e.target; if (!el.dataset.s) return; S[el.dataset.s] = el.type === 'checkbox' ? el.checked : el.value; saveSettings(); });
-$('#stBack').onclick = () => show('lib');
-$('#pBack').onclick = () => exitPerform();
+$('#settings').addEventListener('input', e => {
+  const el = e.target; if (!el.dataset.s) return;
+  S[el.dataset.s] = el.type === 'checkbox' ? el.checked : el.value;
+  if (el.dataset.s === 'phTheme') applyTheme();
+  saveSettings();
+});
 
-/* ---------- קלט סודי ---------- */
+/* ===================== צפייה / הופעה ===================== */
 class SecretInput {
   constructor(item) { this.item = item; this.buf = ''; this.strokes = []; }
-  key(k) { if (k === 'C') this.buf = ''; else if (k === 'B') this.buf = this.buf.slice(0, -1); else this.buf += k; }
+  get cap() { return this.item.content === 'drawing' ? Infinity : (this.item.digits || 2); }
+  digit(d) { if (this.buf.length >= this.cap) return false; this.buf += d; return true; } // שאר הנגיעות לא נחשבות
+  typeKey(k) {
+    const it = this.item;
+    if (it.content === 'number' && (!/\d/.test(k) || this.buf.length >= this.cap)) return false;
+    if (it.content === 'word' && /\d/.test(k) && /^\d*$/.test(this.buf) && this.buf.length >= this.cap) return false;
+    this.buf += k; return true;
+  }
   undo() { if (this.item.content === 'drawing') this.strokes.pop(); else this.buf = this.buf.slice(0, -1); }
   get count() { return this.item.content === 'drawing' ? this.strokes.length : this.buf.length; }
   payload() {
@@ -552,173 +744,54 @@ class SecretInput {
     return { type: 'text', text: b };
   }
 }
-const GRID = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['C', '0', 'B']];
 
-/* ---------- הופעה ---------- */
-const P = { active: false, item: null, src: null, input: null, started: false, frozen: null, frozenAt: 0,
-  raf: 0, stage: false, vr: null, dpr: 1, menu: false, rec: null, rc: null, rctx: null, clip: null, endAt: 0, wake: null, minT: 0 };
+const P = { active: false, req: null, item: null, src: null, input: null, started: false, frozen: null, frozenAt: 0, regions: [],
+  raf: 0, stage: false, vr: null, dpr: 1, menu: false, rec: null, rc: null, rctx: null, clip: null, endAt: 0, wake: null, minT: Infinity,
+  chrome: true, lastPlaying: false, phIcon: null };
 const stageCv = $('#stage'), sctx = stageCv.getContext('2d'), pBack = $('#pBack'), phHead = $('#phHead');
+const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.6v14.8c0 .8.9 1.3 1.6.9l12-7.4c.6-.4.6-1.4 0-1.8l-12-7.4C7.9 3.3 7 3.8 7 4.6z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.2"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.2"/></svg>';
+const ICON_SOUND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4.5 4.5 0 010 6M18 6.5a8 8 0 010 11"/></svg>';
+const ICON_MUTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
+const photosMode = () => !P.stage;
 
-function startPerform(item, stage, from) {
-  P.from = from || 'lib'; P.fromItem = item;
-  if (item.method === 'pre' && item.content !== 'drawing') {
-    $('#preIn').value = ''; $('#preIn').inputMode = item.content === 'number' ? 'numeric' : 'text';
-    $('#preForm').onsubmit = e => { e.preventDefault(); const v = $('#preIn').value; $('#preIn').blur(); enterPerform(item, stage, v); };
-    $('#preBack').onclick = () => backTo();
-    show('pre'); setTimeout(() => $('#preIn').focus(), 50);
-    return;
-  }
-  enterPerform(item, stage, '');
+/* פתיחת סרטון מהגלריה או מהעורך */
+function openViewer(id, opts = {}) {
+  const item = byId(id); if (!item) return;
+  P.req = { id, stage: !!opts.stage, from: opts.from || 'photos', preText: '' };
+  if (item.trick !== false && item.method === 'pre' && item.content !== 'drawing') go('pre');
+  else go('perform');
 }
-
-async function enterPerform(item, stage, preText) {
-  // מסך מלא חייב לקרות מיד בתוך הלחיצה
-  const de = document.documentElement;
-  try { (de.requestFullscreen || de.webkitRequestFullscreen || (() => {})).call(de)?.catch?.(() => {}); } catch (e) { /* iOS */ }
-  Object.assign(P, { active: true, item, stage, started: false, frozen: null, frozenAt: 0, menu: false, clip: null, endAt: 0 });
-  P.input = new SecretInput(item); P.input.buf = preText || '';
-  P.minT = Math.min(...item.regions.map(r => r.t), Infinity);
-  $('#pmenu').hidden = true;
-  show('perform');
-  initPhotosUI();
-  P.src = makeSource(item);
-  try { await P.src.ready(); } catch (err) { toast(err.message); exitPerform(); return; }
-  P.src.time = 0;
-  if (stage && screen.orientation && screen.orientation.lock) screen.orientation.lock(P.src.w >= P.src.h ? 'landscape' : 'portrait').catch(() => {});
-  try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ }
-  for (const r of item.regions) { try { await document.fonts.load(`700 40px ${(FONTS[r.font] || FONTS.clean).css}`); } catch (e) { /* ignore */ } }
-  sizeStage();
-  buildStrip();
-  cancelAnimationFrame(P.raf); perfLoop();
-}
-function sizeStage() {
-  P.dpr = Math.min(devicePixelRatio || 1, 2);
-  stageCv.width = Math.round(innerWidth * P.dpr); stageCv.height = Math.round(innerHeight * P.dpr);
-  if (P.src) P.vr = fitRect(P.src.w, P.src.h, stageCv.width, stageCv.height);
-}
-function begin() {
-  P.started = true; P.frozen = null; P.frozenAt = 0; P.endAt = 0; P.clip = null;
-  P.src.time = 0;
-  setupRecorder();
-  const pr = P.src.play(); if (pr && pr.catch) pr.catch(() => toast('הקש שוב כדי להתחיל'));
-}
-function perfLoop() {
-  P.raf = requestAnimationFrame(perfLoop);
-  const src = P.src;
-  // כפתור חזרה גלוי לפני ההתחלה ואחרי הסוף, מוסתר בזמן שהסרטון רץ
-  const playing = !!(src && P.started && !src.ended && !src.paused);
-  const photos = photosMode();
-  const showBack = !photos && !playing;
-  if (pBack.hidden === showBack) pBack.hidden = !showBack;
-  if (photos && src) {
-    // כמו באייפון: הכפתורים נעלמים בזמן ניגון וחוזרים בסוף
-    if (playing && !P.lastPlaying) setChrome(false);
-    if (!playing && P.lastPlaying && !P.menu) setChrome(true);
-    const dur = src.duration || P.item.duration || 1;
-    phHead.style.left = (clamp(src.time / dur) * 100) + '%';
-    if (P.phIcon !== playing) { P.phIcon = playing; $('#phPlay').innerHTML = playing ? ICON_PAUSE : ICON_PLAY; }
-  }
-  P.lastPlaying = playing;
-  if (!src || !P.vr) return;
-  const t = src.time;
-  // נעילת הקלט ברגע שהחשיפה מתחילה (לא באמצע קו בציור)
-  if (P.started && !P.frozen && t >= P.minT && !T.drawing) {
-    const pl = P.input.payload(); if (pl) { P.frozen = pl; P.frozenAt = t; }
-  }
-  sctx.clearRect(0, 0, stageCv.width, stageCv.height);
-  sctx.save(); sctx.translate(P.vr.x, P.vr.y);
-  composeFrame(sctx, src, P.item, P.frozen, P.frozenAt, P.vr.w, P.vr.h, false);
-  sctx.restore();
-  if (S.indicator && !P.stage) { // נקודות זעירות: כמה תווים הוזנו / נעול
-    const n = P.input.count, d = 2.2 * P.dpr;
-    sctx.fillStyle = P.frozen ? 'rgba(120,200,120,.35)' : 'rgba(255,255,255,.22)';
-    for (let i = 0; i < n; i++) sctx.fillRect(stageCv.width - (i + 1) * d * 3, stageCv.height - d * 3, d, d);
-  }
-  if (P.rec && P.rec.state === 'recording') {
-    const rc = P.rc, rx = P.rctx;
-    if (src.ended || (src.duration && t >= src.duration - .02 && src.paused)) {
-      if (!P.endAt) P.endAt = performance.now();
-      drawEndCard(rx, rc.width, rc.height, (performance.now() - P.endAt) / 1000);
-      if (performance.now() - P.endAt > 3200) P.rec.stop();
-    } else composeFrame(rx, src, P.item, P.frozen, P.frozenAt, rc.width, rc.height, false);
-  }
-}
-function drawEndCard(ctx, W, H, t) {
-  ctx.fillStyle = '#0e0e10'; ctx.fillRect(0, 0, W, H);
-  ctx.globalAlpha = clamp(t / .6); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  const u = Math.min(W, H) / 12, name = S.contactName || 'גלריה', link = S.contactLink || '';
-  ctx.direction = isRTL(name) ? 'rtl' : 'ltr'; ctx.fillStyle = '#d8b46a';
-  ctx.font = `400 ${u * 1.3}px "Secular One", sans-serif`; ctx.fillText(name, W / 2, H / 2 - u * .6);
-  ctx.direction = isRTL(link) ? 'rtl' : 'ltr'; ctx.fillStyle = '#ecebe8';
-  ctx.font = `400 ${u * .7}px "Rubik", sans-serif`; ctx.fillText(link, W / 2, H / 2 + u * .8);
-  ctx.globalAlpha = 1;
-}
-
-/* הקלטה לשיתוף */
-function pickMime() {
-  if (!window.MediaRecorder) return null;
-  return ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']
-    .find(m => MediaRecorder.isTypeSupported(m)) || '';
-}
-function discardRec() {
-  if (P.rec && P.rec.state !== 'inactive') { P.rec.ondataavailable = null; P.rec.onstop = null; P.rec.stop(); }
-  P.rec = null; P.clip = null;
-}
-function setupRecorder() {
-  discardRec();
-  const mime = pickMime(); if (!S.record || mime === null) return;
-  const src = P.src, sc = Math.min(1, 1280 / Math.max(src.w, src.h));
-  const rc = P.rc = document.createElement('canvas');
-  rc.width = Math.round(src.w * sc / 2) * 2; rc.height = Math.round(src.h * sc / 2) * 2;
-  P.rctx = rc.getContext('2d');
-  composeFrame(P.rctx, src, P.item, null, 0, rc.width, rc.height, false);
-  const stream = rc.captureStream(30);
-  if (src.el) {
-    try {
-      if (!src.ac) {
-        src.ac = new (window.AudioContext || window.webkitAudioContext)();
-        const node = src.ac.createMediaElementSource(src.el);
-        src.dest = src.ac.createMediaStreamDestination();
-        node.connect(src.dest); node.connect(src.ac.destination);
-      }
-      src.ac.resume();
-      src.dest.stream.getAudioTracks().forEach(tr => stream.addTrack(tr));
-    } catch (e) { /* בלי שמע */ }
-  }
-  try {
-    const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 5e6 } : undefined), chunks = [];
-    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
-    rec.onstop = () => { P.clip = new Blob(chunks, { type: rec.mimeType || mime || 'video/webm' }); };
-    rec.start(500); P.rec = rec;
-  } catch (e) { P.rec = null; }
-}
-async function shareClip() {
-  if (!P.clip) { toast(P.rec && P.rec.state === 'recording' ? 'הסרטון עדיין מוקלט…' : 'אין הקלטה. אפשר להפעיל אותה בהגדרות'); return; }
-  const ext = P.clip.type.includes('mp4') ? 'mp4' : 'webm';
-  const file = new File([P.clip], `gallery-${Date.now()}.${ext}`, { type: P.clip.type });
-  const text = [S.contactName, S.contactLink].filter(Boolean).join(' · ');
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], text }); return; } catch (e) { if (e.name === 'AbortError') return; }
-  }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 60000);
-}
-
-function openMenu() {
-  if (!P.active || P.menu) return;
-  P.menu = true; P.wasPlaying = P.src && !P.src.paused; if (P.wasPlaying) P.src.pause();
-  $('[data-m=share]', $('#pmenu')).hidden = !S.record;
-  $('#pmenu').hidden = false;
-}
-$('#pmenu').addEventListener('click', e => {
-  const m = e.target.dataset.m; if (!m) return;
-  if (m === 'share') { shareClip(); return; }
-  $('#pmenu').hidden = true; P.menu = false;
-  if (m === 'resume') { if (P.wasPlaying) P.src.play(); }
-  else if (m === 'restart') { P.input = new SecretInput(P.item); P.started = false; P.frozen = null; P.src.pause(); P.src.time = 0; discardRec(); }
-  else if (m === 'exit') exitPerform();
+ENTER.pre = () => {
+  const item = byId(P.req.id);
+  $('#preIn').value = ''; $('#preIn').inputMode = item && item.content === 'number' ? 'numeric' : 'text';
+  setTimeout(() => $('#preIn').focus(), 60);
+};
+$('#preForm').addEventListener('submit', e => {
+  e.preventDefault(); P.req.preText = $('#preIn').value; $('#preIn').blur();
+  go('perform', { replace: true });
 });
-function exitPerform() {
+
+ENTER.perform = async () => {
+  const req = P.req, item = byId(req.id); if (!item) { uiBack(); return; }
+  const de = document.documentElement;
+  if (req.stage) { try { const r = (de.requestFullscreen || de.webkitRequestFullscreen || (() => {})).call(de); if (r && r.catch) r.catch(() => {}); } catch (e) { /* ignore */ } }
+  Object.assign(P, { active: true, item, stage: req.stage, started: false, frozen: null, frozenAt: 0, menu: false, clip: null, endAt: 0,
+    lastPlaying: false, phIcon: null, regions: activeRegions(item) });
+  P.input = new SecretInput(item); P.input.buf = req.preText || '';
+  P.minT = P.regions.length ? Math.min(...P.regions.map(r => r.t)) : Infinity;
+  $('#pmenu').hidden = true; closePops();
+  initPhotosUI();
+  try { P.src = makeSource(item); await P.src.ready(); } catch (err) { toast(err.message); uiBack(); return; }
+  if (!P.active) { P.src.destroy(); P.src = null; return; }
+  P.src.time = 0;
+  if (req.stage && screen.orientation && screen.orientation.lock) screen.orientation.lock(P.src.w >= P.src.h ? 'landscape' : 'portrait').catch(() => {});
+  try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ }
+  for (const r of P.regions) { try { await document.fonts.load(`700 40px ${(FONTS[r.font] || FONTS.clean).css}`); } catch (e) { /* ignore */ } }
+  sizeStage(); buildStrip();
+  cancelAnimationFrame(P.raf); perfLoop();
+};
+LEAVE.perform = () => {
   P.active = false; cancelAnimationFrame(P.raf); P.stripRun = (P.stripRun || 0) + 1;
   if (P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; }
   discardRec();
@@ -726,99 +799,74 @@ function exitPerform() {
   try { P.wake && P.wake.release(); } catch (e) { /* ignore */ }
   try { screen.orientation && screen.orientation.unlock && screen.orientation.unlock(); } catch (e) { /* ignore */ }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-  backTo();
-}
-/* חזרה למסך שממנו נכנסו להופעה (עורך או ספרייה) */
-function backTo() {
-  if (P.from === 'edit' && P.fromItem) { const it = ITEMS.find(x => x.id === P.fromItem.id) || P.fromItem; openEditor(it); }
-  else show('lib');
-}
-
-/* מגע בזמן הופעה */
-const touch = $('#touch');
-const T = { pts: new Map(), max: 0, moved: false, t0: 0, sx: 0, sy: 0, lp: 0, lpFired: false, stroke: null, pushed: false, drawing: false };
-const toVideo = e => {
-  const vr = P.vr, x = (e.clientX * P.dpr - vr.x) / vr.w, y = (e.clientY * P.dpr - vr.y) / vr.h;
-  return [x * P.src.w, y * P.src.h];
+  $('#perform').classList.remove('ph-chrome');
 };
-const drawMode = () => P.item && P.item.content === 'drawing';
-
-touch.addEventListener('pointerdown', e => {
-  e.preventDefault(); if (P.menu) return;
-  try { touch.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-  T.pts.set(e.pointerId, true);
-  if (T.pts.size === 1) {
-    Object.assign(T, { max: 1, moved: false, t0: performance.now(), sx: e.clientX, sy: e.clientY, lpFired: false, pushed: false, drawing: false });
-    T.stroke = drawMode() && P.started && !P.frozen ? [toVideo(e)] : null;
-    clearTimeout(T.lp);
-    T.lp = setTimeout(() => { if (!T.moved && T.pts.size === 1) { T.lpFired = true; openMenu(); } }, 800);
-  } else {
-    T.max = Math.max(T.max, T.pts.size); clearTimeout(T.lp);
-    if (T.pushed) P.input.strokes.pop();
-    T.stroke = null; T.pushed = false; T.drawing = false;
-  }
-});
-touch.addEventListener('pointermove', e => {
-  if (!T.pts.has(e.pointerId) || T.pts.size !== 1) return;
-  if (!T.moved && Math.hypot(e.clientX - T.sx, e.clientY - T.sy) > 10) { T.moved = true; clearTimeout(T.lp); }
-  if (T.stroke && T.moved) {
-    if (!T.pushed) { P.input.strokes.push(T.stroke); T.pushed = true; T.drawing = true; }
-    T.stroke.push(toVideo(e));
-  }
-});
-function pointerEnd(e) {
-  if (!T.pts.has(e.pointerId)) return;
-  T.pts.delete(e.pointerId);
-  if (T.pts.size) return;
-  clearTimeout(T.lp); T.drawing = false;
-  const dur = performance.now() - T.t0, stroke = T.stroke; T.stroke = null;
-  if (T.lpFired || P.menu || e.type === 'pointercancel') return;
-  if (T.max >= 2) { if (P.started && !P.frozen) { P.input.undo(); buzz(); } return; }
-  if (T.moved) { if (T.pushed) buzz(); return; }
-  if (dur < 500) secretTap(e, stroke);
+function sizeStage() {
+  P.dpr = Math.min(devicePixelRatio || 1, 2);
+  stageCv.width = Math.round(innerWidth * P.dpr); stageCv.height = Math.round(innerHeight * P.dpr);
+  if (P.src) P.vr = fitRect(P.src.w, P.src.h, stageCv.width, stageCv.height);
 }
-touch.addEventListener('pointerup', pointerEnd);
-touch.addEventListener('pointercancel', pointerEnd);
-touch.addEventListener('contextmenu', e => e.preventDefault());
+addEventListener('resize', () => { if (curScreen() === 'edit') sizeEdCanvas(); if (P.active) { sizeStage(); buildStrip(); } });
 
-function secretTap(e, stroke) {
-  if (!P.started) { begin(); return; }
-  if (photosMode() && P.src.ended) { setChrome(!P.chrome); return; }
-  if (P.frozen) return;
-  const it = P.item;
-  if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
-  if (it.method === 'keyboard' || it.method === 'pre') return;
-  const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 4), 0, 3);
-  if (it.method === 'list') P.input.buf = String(row * 3 + col + 1);
-  else P.input.key(GRID[row][col]);
-  buzz();
+function begin() {
+  P.started = true; P.frozen = null; P.frozenAt = 0; P.endAt = 0; P.clip = null;
+  P.src.time = 0;
+  setupRecorder();
+  const pr = P.src.play(); if (pr && pr.catch) pr.catch(() => toast('הקש שוב כדי לנגן'));
+}
+function resume() { P.endAt = 0; const pr = P.src.play(); if (pr && pr.catch) pr.catch(() => {}); }
+
+function perfLoop() {
+  P.raf = requestAnimationFrame(perfLoop);
+  const src = P.src;
+  const playing = !!(src && P.started && !src.ended && !src.paused);
+  const showBack = P.stage && !playing;
+  if (pBack.hidden === showBack) pBack.hidden = !showBack;
+  if (photosMode() && src) {
+    // כמו בגלריה: הכפתורים נעלמים כשמנגנים וחוזרים כשהסרטון נגמר
+    if (playing && !P.lastPlaying) { setChrome(false); closePops(); }
+    if (!playing && P.lastPlaying && !P.menu && src.ended) setChrome(true);
+    const dur = src.duration || P.item.duration || 1;
+    phHead.style.left = (clamp(src.time / dur) * 100) + '%';
+    if (P.phIcon !== playing) { P.phIcon = playing; $('#phPlay').innerHTML = playing ? ICON_PAUSE : ICON_PLAY; }
+  }
+  P.lastPlaying = playing;
+  if (!src || !P.vr) return;
+  const t = src.time;
+  // הקלט ננעל ברגע שהחשיפה מתחילה (לא באמצע קו בציור)
+  if (P.started && !P.frozen && t >= P.minT && !T.drawing) {
+    const pl = P.input.payload(); if (pl) { P.frozen = pl; P.frozenAt = t; }
+  }
+  sctx.clearRect(0, 0, stageCv.width, stageCv.height);
+  sctx.save(); sctx.translate(P.vr.x, P.vr.y);
+  composeFrame(sctx, src, { regions: P.regions }, P.frozen, P.frozenAt, P.vr.w, P.vr.h, false);
+  sctx.restore();
+  if (S.indicator && !P.stage && P.regions.length) {
+    const n = P.input.count, d = 2.2 * P.dpr;
+    sctx.fillStyle = P.frozen ? 'rgba(120,200,120,.4)' : 'rgba(127,127,127,.35)';
+    for (let i = 0; i < n; i++) sctx.fillRect(stageCv.width - (i + 1) * d * 3, stageCv.height * .5, d, d);
+  }
+  if (P.rec && P.rec.state === 'recording') {
+    const rc = P.rc, rx = P.rctx;
+    if (src.ended || (src.duration && t >= src.duration - .02 && src.paused)) {
+      if (!P.endAt) P.endAt = performance.now();
+      drawEndCard(rx, rc.width, rc.height, (performance.now() - P.endAt) / 1000);
+      if (performance.now() - P.endAt > 3200) P.rec.stop();
+    } else composeFrame(rx, src, { regions: P.regions }, P.frozen, P.frozenAt, rc.width, rc.height, false);
+  }
+}
+function drawEndCard(ctx, W, H, t) {
+  ctx.fillStyle = '#0e0e10'; ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = clamp(t / .6); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const u = Math.min(W, H) / 12, name = S.contactName || '', link = S.contactLink || '';
+  ctx.direction = isRTL(name) ? 'rtl' : 'ltr'; ctx.fillStyle = '#ffffff';
+  ctx.font = `400 ${u * 1.3}px "Secular One", sans-serif`; ctx.fillText(name, W / 2, H / 2 - u * .6);
+  ctx.direction = isRTL(link) ? 'rtl' : 'ltr'; ctx.fillStyle = '#c7c7cc';
+  ctx.font = `400 ${u * .7}px "Rubik", sans-serif`; ctx.fillText(link, W / 2, H / 2 + u * .8);
+  ctx.globalAlpha = 1;
 }
 
-document.addEventListener('keydown', e => {
-  if (!P.active) { if (e.key === 'Escape' && curScreen() !== 'lib') goBack(); return; }
-  if (e.key === 'Escape') { e.preventDefault(); if (P.menu) { $('[data-m=resume]').click(); } else openMenu(); return; }
-  if (P.menu) return;
-  if (!P.started) { if ([' ', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'PageDown', 'PageUp'].includes(e.key)) { e.preventDefault(); begin(); } return; }
-  if (P.frozen || drawMode()) return;
-  if (e.key === 'Backspace') P.input.undo();
-  else if (e.key.length === 1 && e.key !== ' ' && (P.item.content !== 'number' || /\d/.test(e.key))) P.input.buf += e.key;
-  else if (e.key === ' ' && P.item.content === 'word' && P.input.buf) P.input.buf += ' ';
-  else return;
-  e.preventDefault(); buzz();
-});
-document.addEventListener('visibilitychange', async () => {
-  if (P.active && document.visibilityState === 'visible') { try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ } }
-});
-
-
-/* ---------- תצוגה בסגנון גלריית אייפון ---------- */
-const ICON_PLAY = "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M7 4.6v14.8c0 .8.9 1.3 1.6.9l12-7.4c.6-.4.6-1.4 0-1.8l-12-7.4C7.9 3.3 7 3.8 7 4.6z\"/></svg>";
-const ICON_PAUSE = "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><rect x=\"6\" y=\"4.5\" width=\"4.2\" height=\"15\" rx=\"1.2\"/><rect x=\"13.8\" y=\"4.5\" width=\"4.2\" height=\"15\" rx=\"1.2\"/></svg>";
-const ICON_SOUND = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\" fill=\"currentColor\"/><path d=\"M15.5 9a4.5 4.5 0 010 6M18 6.5a8 8 0 010 11\"/></svg>";
-const ICON_MUTE = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\" fill=\"currentColor\"/><path d=\"M16 9.5l5 5M21 9.5l-5 5\"/></svg>";
-const photosMode = () => S.viewStyle !== 'clean' && !P.stage;
-const shotTime = it => it.shotAt || (it.builtin ? Date.now() - 2 * 3600e3 : it.created || Date.now());
-
+/* ---------- ממשק הגלריה בזמן צפייה ---------- */
 function phDate(ts) {
   const d = new Date(ts), now = new Date();
   const day0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
@@ -833,56 +881,72 @@ function setChrome(v) {
   $('#ph').classList.toggle('off', !v);
   $('#perform').classList.toggle('ph-chrome', v && photosMode());
 }
+function closePops() { $('#phMenu').hidden = true; $('#phSheet').hidden = true; $('#phAction').hidden = true; }
+const anyPop = () => !$('#phMenu').hidden || !$('#phSheet').hidden || !$('#phAction').hidden;
+function fakeName(it) {
+  const m = (it.fileName || '').match(/^(IMG_\d+)/i); if (m) return m[1].toUpperCase();
+  let h = 0; for (const ch of it.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return 'IMG_' + String(1000 + h % 8999);
+}
 function initPhotosUI() {
-  const on = photosMode();
+  const on = photosMode(), it = P.item;
   $('#ph').hidden = !on;
-  $('#perform').classList.toggle('ph-light', S.phTheme === 'light');
-  P.lastPlaying = false; P.phIcon = null;
-  $('#phHeart').classList.remove('on');
-  $('#phMute').innerHTML = ICON_SOUND;
-  const [day, time] = phDate(shotTime(P.item));
+  $('#phHeart').classList.toggle('on', !!it.fav);
+  $('#phMute').innerHTML = ICON_SOUND; $('#phPlay').innerHTML = ICON_PLAY;
+  const [day, time] = phDate(shotTime(it));
   $('#phDay').textContent = day; $('#phTime').textContent = time;
   phHead.style.left = '0%';
   const sc = $('#phStrip'); sc.getContext('2d').clearRect(0, 0, sc.width, sc.height);
   setChrome(on);
 }
-/* רצועת פריימים כמו בגלריה */
+function fillInfo() {
+  const it = P.item, d = new Date(shotTime(it));
+  const wd = d.toLocaleDateString('he-IL', { weekday: 'long' });
+  const date = d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' });
+  $('#phiDate').textContent = `${wd} • ${date} • ${d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`;
+  $('#phiName').textContent = fakeName(it);
+  const w = (P.src && P.src.w) || it.w || 1080, h = (P.src && P.src.h) || it.h || 1920, short = Math.min(w, h);
+  const res = short >= 2000 ? '4K' : short >= 1000 ? '1080p' : short >= 700 ? '720p' : `${short}p`;
+  const mb = it.size ? (it.size / 1048576).toFixed(1) : ((it.duration || 20) * 1.1).toFixed(1);
+  $('#phiSpec').textContent = `${res} • ${w} × ${h} • ${mb} MB • ${fmtDur(it.duration)}`;
+}
+/* רצועת פריימים */
 async function buildStrip() {
   if (!photosMode()) return;
   const item = P.item, cv = $('#phStrip'), dpr = P.dpr || 1;
   cv.width = Math.round(cv.clientWidth * dpr); cv.height = Math.round(cv.clientHeight * dpr);
+  if (!cv.width || !cv.height) return;
   const ctx = cv.getContext('2d'), aspect = (P.src.w || 9) / (P.src.h || 16);
   const tw = Math.max(cv.height * aspect, 8 * dpr), n = Math.ceil(cv.width / tw);
   const dur = P.src.duration || item.duration || 1, myRun = P.stripRun = (P.stripRun || 0) + 1;
   let draw;
   if (item.builtin === 'demo') { const d = new DemoSource(); draw = async (t, x) => { d.time = t; ctx.save(); ctx.translate(x, 0); d.draw(ctx, tw, cv.height); ctx.restore(); }; }
   else {
-    const v = document.createElement('video'), u = URL.createObjectURL(item.blob);
+    const src = mediaSrc(item); if (!src) return;
+    const v = document.createElement('video'), owned = src instanceof Blob, u = owned ? URL.createObjectURL(src) : src;
     v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = u;
     $('#vhost').appendChild(v);
+    P.stripCleanup = () => { v.remove(); if (owned) URL.revokeObjectURL(u); };
     try {
       await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = rej; setTimeout(res, 4000); });
       try { await v.play(); v.pause(); } catch (e) { /* ignore */ }
-    } catch (e) { v.remove(); URL.revokeObjectURL(u); return; }
+    } catch (e) { if (P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; } return; }
     draw = (t, x) => new Promise(res => {
-      const go = () => { try { ctx.drawImage(v, x, 0, tw, cv.height); } catch (e) { /* ignore */ } res(); };
-      v.onseeked = go; v.currentTime = Math.min(t, Math.max(0, dur - .05)); setTimeout(res, 1500);
+      v.onseeked = () => { try { ctx.drawImage(v, x, 0, tw, cv.height); } catch (e) { /* ignore */ } res(); };
+      v.currentTime = Math.min(t, Math.max(0, dur - .05)); setTimeout(res, 1500);
     });
-    P.stripCleanup = () => { v.remove(); URL.revokeObjectURL(u); };
   }
   for (let i = 0; i < n; i++) {
     if (P.stripRun !== myRun || !P.active) break;
     await draw((i + .5) / n * dur, i * tw);
   }
-  if (P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; }
+  if (P.stripRun === myRun && P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; }
 }
-/* גרירה על הרצועה = דילוג בסרטון */
 (() => {
   const box = $('#phStripBox'); let drag = false;
   const seek = e => {
     if (!P.src) return; const b = box.getBoundingClientRect();
-    const dur = P.src.duration || P.item.duration || 1;
-    P.src.time = clamp((e.clientX - b.left) / b.width) * dur;
+    P.src.time = clamp((e.clientX - b.left) / b.width) * (P.src.duration || P.item.duration || 1);
   };
   box.addEventListener('pointerdown', e => { drag = true; box.setPointerCapture(e.pointerId); if (P.src && !P.src.paused) P.src.pause(); seek(e); });
   box.addEventListener('pointermove', e => { if (drag) seek(e); });
@@ -890,25 +954,216 @@ async function buildStrip() {
   box.addEventListener('pointercancel', () => { drag = false; });
 })();
 $('#phPlay').onclick = () => {
-  if (!P.src) return;
+  if (!P.src) return; closePops();
   if (!P.started) begin();
-  else if (P.src.paused || P.src.ended) { P.endAt = 0; const pr = P.src.play(); if (pr && pr.catch) pr.catch(() => {}); }
+  else if (P.src.paused || P.src.ended) resume();
   else P.src.pause();
 };
-$('#phBack').onclick = () => exitPerform();
-$('#phMore').onclick = () => openMenu();
-$('#phShare').onclick = () => { if (S.record) shareClip(); };
-$('#phHeart').onclick = e => e.currentTarget.classList.toggle('on');
+$('#phBack').onclick = () => uiBack();
+$('#pBack').onclick = () => uiBack();
+$('#phMore').onclick = () => { const m = $('#phMenu'); const open = m.hidden; closePops(); m.hidden = !open; };
+$('#phMenu').addEventListener('click', e => {
+  const b = e.target.closest('[data-pm]'); if (!b) return;
+  $('#phMenu').hidden = true;
+  const a = b.dataset.pm;
+  if (a === 'hide') hideCurrent();
+  else if (a === 'replay') restartPerformance();
+});
+$('#phInfo').onclick = () => { const s = $('#phSheet'); const open = s.hidden; closePops(); if (open) { fillInfo(); s.hidden = false; } };
+$('#phEdit').onclick = () => {};
+$('#phHeart').onclick = () => {
+  const it = byId(P.item.id); if (!it) return;
+  it.fav = !it.fav; P.item.fav = it.fav; $('#phHeart').classList.toggle('on', it.fav); persist(it);
+};
 $('#phMute').onclick = () => {
   const el = P.src && P.src.el; if (!el) return;
   el.muted = !el.muted; $('#phMute').innerHTML = el.muted ? ICON_MUTE : ICON_SOUND;
 };
+$('#phShare').onclick = async () => {
+  closePops();
+  if (S.record && P.clip) { shareClip(); return; }
+  const it = P.item; let blob = it.blob;
+  try {
+    if (!blob && it.assetUrl) blob = await (await fetch(it.assetUrl)).blob();
+    if (!blob) return;
+    const file = new File([blob], (fakeName(it) + '.' + ((blob.type || '').includes('mp4') ? 'MP4' : 'MOV')), { type: blob.type || 'video/quicktime' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file] });
+  } catch (e) { /* בוטל */ }
+};
+$('#phTrash').onclick = () => { closePops(); $('#phAction').hidden = false; };
+$('#phDelCancel').onclick = () => { $('#phAction').hidden = true; };
+$('#phAction').addEventListener('click', e => { if (e.target.id === 'phAction') $('#phAction').hidden = true; });
+$('#phDelOk').onclick = () => { $('#phAction').hidden = true; hideCurrent(); };
+$('#phSheet').addEventListener('click', e => { if (e.target.classList.contains('grab')) $('#phSheet').hidden = true; });
+function hideCurrent() { // "מחיקה" בגלריה = הסתרה (אפשר להחזיר בניהול)
+  const it = byId(P.item.id); if (it) { it.hidden = true; persist(it); }
+  uiBack();
+}
+function restartPerformance() {
+  P.input = new SecretInput(P.item); P.started = false; P.frozen = null;
+  P.src.pause(); P.src.time = 0; discardRec(); setChrome(photosMode());
+}
 
-/* ---------- הפעלה ---------- */
+/* ---------- הקלטה לשיתוף ---------- */
+function pickMime() {
+  if (!window.MediaRecorder) return null;
+  return ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm']
+    .find(m => MediaRecorder.isTypeSupported(m)) || '';
+}
+function discardRec() {
+  if (P.rec && P.rec.state !== 'inactive') { P.rec.ondataavailable = null; P.rec.onstop = null; try { P.rec.stop(); } catch (e) { /* ignore */ } }
+  P.rec = null; P.clip = null;
+}
+function setupRecorder() {
+  discardRec();
+  const mime = pickMime(); if (!S.record || mime === null) return;
+  try {
+    const src = P.src, sc = Math.min(1, 1280 / Math.max(src.w, src.h));
+    const rc = P.rc = document.createElement('canvas');
+    rc.width = Math.round(src.w * sc / 2) * 2; rc.height = Math.round(src.h * sc / 2) * 2;
+    P.rctx = rc.getContext('2d');
+    composeFrame(P.rctx, src, { regions: P.regions }, null, 0, rc.width, rc.height, false);
+    const stream = rc.captureStream(30);
+    if (src.el) {
+      try {
+        if (!src.ac) {
+          src.ac = new (window.AudioContext || window.webkitAudioContext)();
+          const node = src.ac.createMediaElementSource(src.el);
+          src.dest = src.ac.createMediaStreamDestination();
+          node.connect(src.dest); node.connect(src.ac.destination);
+        }
+        src.ac.resume();
+        src.dest.stream.getAudioTracks().forEach(tr => stream.addTrack(tr));
+      } catch (e) { /* בלי שמע */ }
+    }
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 5e6 } : undefined), chunks = [];
+    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => { P.clip = new Blob(chunks, { type: rec.mimeType || mime || 'video/webm' }); };
+    rec.start(500); P.rec = rec;
+  } catch (e) { P.rec = null; }
+}
+async function shareClip() {
+  if (!P.clip) { toast(P.rec && P.rec.state === 'recording' ? 'ההקלטה עדיין נשמרת…' : 'אין הקלטה. אפשר להפעיל אותה בהגדרות'); return; }
+  const ext = P.clip.type.includes('mp4') ? 'mp4' : 'webm';
+  const file = new File([P.clip], `video-${Date.now()}.${ext}`, { type: P.clip.type });
+  const text = [S.contactName, S.contactLink].filter(Boolean).join(' · ');
+  try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+  toast('השיתוף לא זמין כאן. באפליקציה המותקנת זה עובד');
+}
+
+/* ---------- תפריט סודי (לחיצה ארוכה) ---------- */
+function openMenu() {
+  if (!P.active || P.menu) return;
+  P.menu = true; P.wasPlaying = P.src && !P.src.paused; if (P.wasPlaying) P.src.pause();
+  $('[data-m=share]', $('#pmenu')).hidden = !S.record;
+  $('#pmenu').hidden = false;
+}
+$('#pmenu').addEventListener('click', e => {
+  const m = e.target.dataset.m; if (!m) return;
+  if (m === 'share') { shareClip(); return; }
+  $('#pmenu').hidden = true; P.menu = false;
+  if (m === 'resume') { if (P.wasPlaying) resume(); }
+  else if (m === 'restart') restartPerformance();
+  else if (m === 'exit') uiBack();
+});
+
+/* ---------- מגע על הסרטון ---------- */
+const touch = $('#touch');
+const T = { pts: new Map(), max: 0, moved: false, t0: 0, sx: 0, sy: 0, ex: 0, ey: 0, lp: 0, lpFired: false, stroke: null, pushed: false, drawing: false };
+const toVideo = e => {
+  const vr = P.vr, x = (e.clientX * P.dpr - vr.x) / vr.w, y = (e.clientY * P.dpr - vr.y) / vr.h;
+  return [x * P.src.w, y * P.src.h];
+};
+const isPlaying = () => !!(P.src && P.started && !P.src.ended && !P.src.paused);
+const drawMode = () => P.item && P.item.content === 'drawing' && P.regions.length;
+
+touch.addEventListener('pointerdown', e => {
+  e.preventDefault(); if (P.menu || !P.src) return;
+  if (anyPop()) { closePops(); T.swallow = true; return; }
+  T.swallow = false;
+  try { touch.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  T.pts.set(e.pointerId, true);
+  if (T.pts.size === 1) {
+    Object.assign(T, { max: 1, moved: false, t0: performance.now(), sx: e.clientX, sy: e.clientY, ex: e.clientX, ey: e.clientY, lpFired: false, pushed: false, drawing: false });
+    T.stroke = drawMode() && isPlaying() && !P.frozen ? [toVideo(e)] : null;
+    clearTimeout(T.lp);
+    T.lp = setTimeout(() => { if (!T.moved && T.pts.size === 1) { T.lpFired = true; openMenu(); } }, 800);
+  } else {
+    T.max = Math.max(T.max, T.pts.size); clearTimeout(T.lp);
+    if (T.pushed) P.input.strokes.pop();
+    T.stroke = null; T.pushed = false; T.drawing = false;
+  }
+});
+touch.addEventListener('pointermove', e => {
+  if (!T.pts.has(e.pointerId) || T.pts.size !== 1) return;
+  T.ex = e.clientX; T.ey = e.clientY;
+  if (!T.moved && Math.hypot(e.clientX - T.sx, e.clientY - T.sy) > 10) { T.moved = true; clearTimeout(T.lp); }
+  if (T.stroke && T.moved) {
+    if (!T.pushed) { P.input.strokes.push(T.stroke); T.pushed = true; T.drawing = true; }
+    T.stroke.push(toVideo(e));
+  }
+});
+function pointerEnd(e) {
+  if (!T.pts.has(e.pointerId)) return;
+  T.pts.delete(e.pointerId);
+  if (T.pts.size) return;
+  clearTimeout(T.lp); T.drawing = false;
+  const dur = performance.now() - T.t0, stroke = T.stroke; T.stroke = null;
+  if (T.swallow || T.lpFired || P.menu || e.type === 'pointercancel') return;
+  if (T.max >= 2) { if (P.started && !P.frozen && P.regions.length) { P.input.undo(); buzz(); } return; }
+  if (T.moved) {
+    // החלקה למטה סוגרת את הסרטון, כמו בגלריה (רק כשהוא לא מתנגן)
+    if (!isPlaying() && !T.pushed && T.ey - T.sy > 110 && Math.abs(T.ex - T.sx) < 90) { uiBack(); return; }
+    if (T.pushed) buzz();
+    return;
+  }
+  if (dur < 500) secretTap(e, stroke);
+}
+touch.addEventListener('pointerup', pointerEnd);
+touch.addEventListener('pointercancel', pointerEnd);
+touch.addEventListener('contextmenu', e => e.preventDefault());
+
+function secretTap(e, stroke) {
+  if (!isPlaying()) {
+    // לפני ניגון / בסוף: נגיעה מסתירה ומציגה את הכפתורים כמו בגלריה. במצב במה נגיעה מתחילה.
+    if (photosMode()) setChrome(!P.chrome);
+    else if (!P.started) begin();
+    return;
+  }
+  if (P.frozen || !P.regions.length) return;
+  const it = P.item;
+  if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
+  if (it.method !== 'grid') return;
+  const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
+  if (P.input.digit(String(row * 3 + col + 1))) buzz();
+}
+
+document.addEventListener('keydown', e => {
+  if (!P.active) { if (e.key === 'Escape' && NAV.stack.length > 1 && curScreen() !== 'photos') uiBack(); return; }
+  if (e.key === 'Escape') { e.preventDefault(); if (P.menu) $('[data-m=resume]').click(); else openMenu(); return; }
+  if (P.menu) return;
+  if (!P.started) { if ([' ', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'PageDown', 'PageUp'].includes(e.key)) { e.preventDefault(); begin(); } return; }
+  if (P.frozen || drawMode() || !P.regions.length) return;
+  if (e.key === 'Backspace') P.input.undo();
+  else if (e.key.length === 1 && e.key !== ' ') { if (!P.input.typeKey(e.key)) return; }
+  else if (e.key === ' ' && P.item.content === 'word' && P.input.buf) P.input.buf += ' ';
+  else return;
+  e.preventDefault(); buzz();
+});
+document.addEventListener('visibilitychange', async () => {
+  if (P.active && document.visibilityState === 'visible') { try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ } }
+});
+
+/* ===================== הפעלה ===================== */
 (async function init() {
-  const persistent = await DB.open();
-  try { await loadItems(); } catch (e) { ITEMS = [demoItem()]; renderLib(); }
-  if (!persistent) toast('בתצוגה הזו סרטונים לא נשמרים אחרי סגירה. להתקנה מלאה: GitHub Pages');
+  await Store.init();
+  await Store.loadSettings();
+  applyTheme();
+  try { ITEMS = (await Store.all()).map(normalize); } catch (e) { ITEMS = []; }
+  if (!ITEMS.some(i => i.id === 'demo')) { const d = demoItem(); ITEMS.push(d); persist(d); }
+  try { history.replaceState({ g: 1 }, ''); } catch (e) { /* ignore */ }
+  NAV.stack = ['photos']; paint('photos'); ENTER.photos();
+  if (!S.seenHelp) go('help');
   try { if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {}); }
-  catch (e) { /* מסגרת מוגבלת – בלי עבודה אופליין */ }
+  catch (e) { /* מסגרת מוגבלת */ }
 })();
