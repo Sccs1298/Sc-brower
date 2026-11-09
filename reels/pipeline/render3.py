@@ -164,6 +164,7 @@ if A.get("flag"):
     mw = cv2.GaussianBlur(mw, (0, 0), 2.0)[..., None]
     plate = plate * (1 - mw) + fw * mw
 VIG = (1 - 0.55 * (((xx - W / 2) / (W * 0.75)) ** 2 + ((yy - H / 2) / (H * 0.7)) ** 2)).clip(0.35, 1)[..., None]
+DESK = (1 - 0.94 * np.clip((yy - H * 0.70) / (H * 0.22), 0, 1) ** 1.1)[..., None]  # dark desk edge in the foreground
 RED_RIM = glow(-200, 1100, 900, (0.05, 0.05, 0.9))
 TEAL_TOP = glow(540, -300, 1400, (0.25, 0.18, 0.03))
 
@@ -191,8 +192,8 @@ class Clip:
 def mosaic(img, box, blocks):
     x, y, w, h = box
     cx, cy = x + w / 2, y + h / 2
-    bw, bh = w * 1.3, h * 1.62
-    x0, y0 = int(max(cx - bw / 2, 0)), int(max(cy - bh * 0.6, 0))
+    bw, bh = w * MOS[0], h * MOS[1]
+    x0, y0 = int(max(cx - bw / 2, 0)), int(max(cy - bh * 0.55, 0))
     x1, y1 = int(min(cx + bw / 2, img.shape[1])), int(min(cy + bh * 0.4, img.shape[0]))
     by = max(1, round(blocks * (y1 - y0) / (x1 - x0)))
     sm = cv2.resize(img[y0:y1, x0:x1], (blocks, by), interpolation=cv2.INTER_AREA)
@@ -200,6 +201,7 @@ def mosaic(img, box, blocks):
 
 
 clip = Clip(A["clip"])
+MOS = cfg.get("presenter", {}).get("mosaic", [1.3, 1.62])
 FB = np.nanmedian(clip.box, 0)  # typical face box in source px
 
 
@@ -215,6 +217,14 @@ def presenter_rgba(t, face_w, blocks=7):
     fe = max(int(m.shape[1] * 0.16), 1)   # the source frame cuts the body: fade the side edges into the dark room
     ramp = np.ones(m.shape[1], np.float32); ramp[:fe] = np.linspace(0, 1, fe) ** 1.5; ramp[-fe:] = np.linspace(1, 0, fe) ** 1.5
     m = (m * ramp[None, :])[..., None]
+    ext = int(f.shape[0] * 0.6)  # source frame cuts the chest: extend the body down (hidden by the dark desk)
+    oh = f.shape[0]
+    f = cv2.copyMakeBorder(f, 0, ext, 0, 0, cv2.BORDER_REPLICATE)
+    f[oh - 40:] = cv2.GaussianBlur(f[oh - 40:], (0, 0), sigmaX=18, sigmaY=4)       # kill replicate streaks
+    f[oh - 60:] *= np.clip(np.linspace(1.0, -0.4, ext + 60), 0.04, 1)[:, None, None].astype(np.float32)  # body falls into shadow
+    m = cv2.copyMakeBorder(m, 0, ext, 0, 0, cv2.BORDER_REPLICATE)
+    if m.ndim == 2:
+        m = m[..., None]
     # relight to match the room: darker, cool top, red rim from the LED side
     l_ = f.mean(2, keepdims=True)
     f = np.power(f * 0.85 + l_ * 0.15, 1.25) * 0.78
@@ -241,13 +251,15 @@ def comp(dst, f, m, x0, y0, shadow=False):
 
 
 def head_frame(t, zoom, lt):
-    face_w = 470
+    P = cfg.get("presenter", {})
+    face_w = P.get("face_w", 470)
     f, m, (fx, fy) = presenter_rgba(t, face_w)
     out = plate.copy()
     # handheld micro drift
     dx = 7 * np.sin(t * 1.3) + 4 * np.sin(t * 2.9 + 1)
     dy = 6 * np.sin(t * 1.1 + 2) + 3 * np.sin(t * 3.3)
-    comp(out, f, m, W / 2 - fx + dx, 860 - fy + dy)
+    comp(out, f, m, W / 2 - fx + dx, P.get("face_y", 860) - fy + dy)
+    out = out * DESK
     if zoom != 1.0:  # zoom on the face (jump cut)
         z = zoom * (1 + 0.02 * lt)
         h2, w2 = int(H / z), int(W / z)
@@ -269,7 +281,8 @@ plan = []
 for li, (ln, tm) in enumerate(zip(cfg["lines"], LT)):
     st = 0.0 if li == 0 else tm["start"] - 0.06
     en = LT[li + 1]["start"] - 0.06 if li + 1 < len(LT) else dur
-    plan.append((st, en, ln["shot"], li))
+    sst = plan[-1][4] if (ln["shot"].get("cont") and plan) else st
+    plan.append((st, en, ln["shot"], li, sst))
 _frames = {}
 
 
@@ -282,18 +295,18 @@ def scene_frame(name, lt):
 
 
 def frame(t):
-    st, en, sh, li = next((p for p in plan if p[0] <= t < p[1]), plan[-1])
+    st, en, sh, li, sst = next((p for p in plan if p[0] <= t < p[1]), plan[-1])
     lt = t - st
     ct = li * 2.7 + lt   # different moment of the source clip on every cut
     if sh["type"] == "head":
         out = head_frame(ct, sh.get("zoom", 1.0), lt)
         boxed, cy = False, 1330
     else:
-        out = scene_frame(sh["scene"], lt)
+        out = scene_frame(sh["scene"], t - sst)
         if sh.get("presenter", True):
             corner_presenter(out, ct)
         boxed, cy = True, 1500
-    if lt < 0.13 and st > 0:  # punch-in on every cut
+    if lt < 0.13 and st > 0 and not sh.get("cont"):  # punch-in on every cut
         z = 1.05 - 0.05 * ease(lt / 0.13)
         h2, w2 = int(H / z), int(W / z)
         out = cv2.resize(out[(H - h2) // 2:(H - h2) // 2 + h2, (W - w2) // 2:(W - w2) // 2 + w2], (W, H))
@@ -324,7 +337,7 @@ flt = ["[0]highpass=f=80,acompressor=threshold=-20dB:ratio=3:attack=4:release=60
 lab = ["[v]"]
 k = 1
 prev = "head"
-for st, en, sh, li in plan[1:]:
+for st, en, sh, li, _ in plan[1:]:
     if sh["type"] != prev:
         inp += ["-i", sfx["whoosh"]]
         d = int(max(st - 0.1, 0) * 1000)

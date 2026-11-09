@@ -31,7 +31,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
 .urlbox { position: absolute; left: 60px; right: 60px; top: 520px; background: #f4f5f7; color: #111; border-radius: 40px; padding: 70px 40px; text-align: center; box-shadow: 0 40px 120px rgba(0,0,0,.7); direction: ltr; }
 .url { font: 700 92px/1.1 "DejaVu Sans Mono", monospace; letter-spacing: -2px; white-space: nowrap; }
 .url .one { position: relative; display: inline-block; color: #111; }
-.ring { position: absolute; left: 62%; top: 52%; width: 120px; height: 140px; border: 9px solid #e11d2a; border-radius: 50%; transform: translate(-50%,-50%) scale(1.6); opacity: 0; }
+.ring { position: absolute; left: 78%; top: 52%; width: 120px; height: 140px; border: 9px solid #e11d2a; border-radius: 50%; transform: translate(-50%,-50%) scale(1.6); opacity: 0; }
 .tld { border-radius: 14px; padding: 0 6px; }
 .lbl { margin-top: 40px; font: 800 64px Heebo; color: #e11d2a; direction: rtl; opacity: 0; }
 .cmp { position: absolute; left: 60px; right: 60px; top: 1060px; direction: ltr; }
@@ -61,8 +61,8 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
  </div></div>
 <!-- URL zoom: the 1 -->
 <div class="scene" id="url1"><div class="bgblur"></div>
- <div class="urlbox"><div class="url">israe<span class="one">1<span class="ring" id="ring"></span></span>-post<span class="tld" id="tld1">.top</span></div>
-  <div class="lbl" id="lbl1">הספרה 1, לא האות l</div></div></div>
+ <div class="urlbox"><div class="url"><span id="w1" style="border-radius:12px;padding:0 4px">israe<span class="one">1<span class="ring" id="ring"></span></span></span>-post<span class="tld" id="tld1">.top</span></div>
+  <div class="lbl" id="lbl1">זה לא L. זה 1.</div></div></div>
 <!-- URL zoom: .top + compare -->
 <div class="scene" id="url2"><div class="bgblur"></div>
  <div class="urlbox"><div class="url">israe<span class="one" style="color:#e11d2a">1</span>-post<span class="tld" id="tld2">.top</span></div>
@@ -89,6 +89,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
  <div class="counter" id="ctr">⚠ 9 מנועי אבטחה: פישינג</div>
  <div class="note">תוצאה אמיתית מ-VirusTotal לקישור פישינג לדוגמה של Google</div></div>
 <script>
+const EV = EVENTS_JSON;
 const ease = u => { u = Math.min(Math.max(u, 0), 1); return u * u * (3 - 2 * u); };
 const back = u => { u = Math.min(Math.max(u, 0), 1); const c = 1.7; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
 const $ = id => document.getElementById(id);
@@ -103,30 +104,31 @@ window.setT = (scene, t, dur) => {
     $('ph1').style.transform = `scale(${1 + 0.03 * t / dur})`;
   }
   if (scene === 'url1') {
-    const r = $('ring'); const u = ease((t - 3.0) / 0.3);
+    $('w1').style.background = `rgba(250,204,21,${0.55 * ease((t - EV.word) / 0.25) * (t < EV.ring ? 1 : 0.4)})`;
+    const r = $('ring'); const u = ease((t - EV.ring) / 0.3);
     r.style.opacity = u; r.style.transform = `translate(-50%,-50%) scale(${1.6 - 0.6 * u})`;
-    $('lbl1').style.opacity = ease((t - 3.7) / 0.3);
+    $('lbl1').style.opacity = ease((t - EV.ring - 0.5) / 0.3);
     document.querySelector('#url1 .urlbox').style.transform = `scale(${0.96 + 0.04 * ease(t / 0.3)})`;
   }
   if (scene === 'url2') {
-    const u = ease((t - 0.6) / 0.25);
+    const u = ease((t - EV.tld) / 0.25);
     $('tld2').style.background = `rgba(225,29,42,${0.9 * u})`; $('tld2').style.color = u > 0.5 ? '#fff' : '#111';
-    $('lbl2').style.opacity = ease((t - 0.8) / 0.3);
-    [['rb', 1.35], ['rg', 2.55]].forEach(([id, s]) => { const e = $(id); const v = back((t - s) / 0.4);
+    $('lbl2').style.opacity = ease((t - EV.tld - 0.2) / 0.3);
+    [['rg', EV.good], ['rb', EV.bad]].forEach(([id, s]) => { const e = $(id); const v = back((t - s) / 0.4);
       e.style.opacity = Math.min(1, v); e.style.transform = `translateX(${(1 - Math.min(v, 1)) * 120}px)`; });
   }
   if (scene === 'copy') {
     const l = $('lnk').getBoundingClientRect(), ph = document.querySelector('#copy .phone').getBoundingClientRect();
     const fx = l.left - ph.left + l.width / 2, fy = l.top - ph.top + l.height / 2;
     const f = $('fing'); f.style.left = fx + 'px'; f.style.top = fy + 'px';
-    const press = t > 1.05 && t < 2.0 ? 1 : 0; const pu = ease((t - 1.05) / 0.15);
-    f.style.transform = `translate(-50%,-50%) scale(${press ? 0.7 + 0.3 * pu : (t >= 2.4 && t < 2.8 ? 0.8 : 0)})`;
+    const press = t > EV.press && t < EV.press + 0.9 ? 1 : 0; const pu = ease((t - EV.press) / 0.15);
+    f.style.transform = `translate(-50%,-50%) scale(${press ? 0.7 + 0.3 * pu : (t >= EV.tap && t < EV.tap + 0.4 ? 0.8 : 0)})`;
     $('b2').style.transform = `scale(${press ? 1 - 0.03 * pu : 1})`;
-    const m = $('menu'); const mu = back((t - 1.75) / 0.3);
-    m.style.left = (fx - 460) + 'px'; m.style.top = (fy + 70) + 'px'; m.style.transform = `scale(${Math.max(0, mu)})`; m.style.opacity = t > 1.75 && t < 2.95 ? 1 : 0;
-    if (t >= 2.4 && t < 2.8) { const c = $('mcopy').getBoundingClientRect(); f.style.left = (c.left - ph.left + c.width / 2) + 'px'; f.style.top = (c.top - ph.top + c.height / 2) + 'px'; }
-    $('mcopy').className = t >= 2.4 ? 'hl' : '';
-    const tu = back((t - 2.95) / 0.35); $('toast').style.opacity = t > 2.95 ? 1 : 0; $('toast').style.transform = `translateX(-50%) scale(${Math.max(0, tu)})`;
+    const m = $('menu'); const mu = back((t - EV.press - 0.55) / 0.3);
+    m.style.left = (fx - 460) + 'px'; m.style.top = (fy + 70) + 'px'; m.style.transform = `scale(${Math.max(0, mu)})`; m.style.opacity = t > EV.press + 0.55 && t < EV.tap + 0.5 ? 1 : 0;
+    if (t >= EV.tap && t < EV.tap + 0.4) { const c = $('mcopy').getBoundingClientRect(); f.style.left = (c.left - ph.left + c.width / 2) + 'px'; f.style.top = (c.top - ph.top + c.height / 2) + 'px'; }
+    $('mcopy').className = t >= EV.tap ? 'hl' : '';
+    const tu = back((t - EV.tap - 0.5) / 0.35); $('toast').style.opacity = t > EV.tap + 0.5 ? 1 : 0; $('toast').style.transform = `translateX(-50%) scale(${Math.max(0, tu)})`;
   }
   if (scene === 'vt_type') {
     const box = { x: 230 * S / 1.0, y: 0 };
@@ -145,7 +147,7 @@ window.setT = (scene, t, dur) => {
     const hl = $('hls'); hl.innerHTML = '';
     VT_ROWS.forEach((ry, i) => { const s = 1.0 + i * 0.13; const o = ease((t - s) / 0.15);
       if (o > 0) hl.innerHTML += `<div class="hlrow" style="top:${(ry - 12) * S - scroll}px;height:${24 * S}px;opacity:${o}"></div>`; });
-    const cu = back((t - 2.35) / 0.4); $('ctr').style.transform = `translateX(-50%) scale(${Math.max(0, cu)})`;
+    const cu = back((t - EV.count) / 0.4); $('ctr').style.transform = `translateX(-50%) scale(${Math.max(0, cu)})`;
   }
 };
 </script></body></html>
