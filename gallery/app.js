@@ -275,7 +275,25 @@ const fitRect = (sw, sh, cw, ch) => { const s = Math.min(cw / sw, ch / sh), w = 
 /* ---------- עזרים ---------- */
 let toastT;
 function toast(msg) { const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2600); }
-function show(id) { $$('.screen').forEach(s => s.classList.toggle('active', s.id === id)); window.scrollTo(0, 0); }
+const curScreen = () => ($('.screen.active') || {}).id;
+function show(id) {
+  // כפתור "אחורה" של הטלפון: כל מסך פנימי מקבל רשומה בהיסטוריה
+  if (id !== 'lib' && curScreen() === 'lib') { try { history.pushState({ g: 1 }, ''); } catch (e) { /* ignore */ } }
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id === id)); window.scrollTo(0, 0);
+}
+/* חזרה אחורה מכל מסך */
+function goBack() {
+  const cur = curScreen();
+  if (cur === 'edit') $('#edBack').click();
+  else if (cur === 'perform') exitPerform();
+  else if (cur === 'settings') show('lib');
+  else if (cur === 'pre') backTo();
+}
+addEventListener('popstate', () => {
+  if (curScreen() === 'lib') return;
+  goBack();
+  if (curScreen() !== 'lib') { try { history.pushState({ g: 1 }, ''); } catch (e) { /* ignore */ } }
+});
 const buzz = () => { if (S.vibrate && navigator.vibrate) navigator.vibrate(12); };
 const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 const getPath = (o, p) => p.split('.').reduce((a, k) => a && a[k], o);
@@ -450,8 +468,8 @@ $('#rgDel').onclick = () => { if (!curRegion()) return; E.item.regions.splice(E.
 $('#rgNow').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.t = +E.src.time.toFixed(2); if (r.track.t2 <= r.t) r.track.t2 = r.t + 2; renderRegions(); scheduleSave(); };
 $('#rgNow2').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.track.on = true; r.track.t2 = +E.src.time.toFixed(2); E.target = 'end'; renderRegions(); scheduleSave(); toast('עכשיו גרור את המיקום בזמן הזה'); };
 $('#edBack').onclick = async () => { await flushSave(); closeEditorSrc(); E.item = null; show('lib'); };
-$('#edPerform').onclick = async () => { await flushSave(); const it = E.item; closeEditorSrc(); startPerform(it, false); };
-$('#edStage').onclick = async () => { await flushSave(); const it = E.item; closeEditorSrc(); startPerform(it, true); };
+$('#edPerform').onclick = async () => { await flushSave(); const it = E.item; closeEditorSrc(); startPerform(it, false, 'edit'); };
+$('#edStage').onclick = async () => { await flushSave(); const it = E.item; closeEditorSrc(); startPerform(it, true, 'edit'); };
 $('#edDup').onclick = async () => {
   await flushSave(); const c = structuredClone(E.item);
   c.id = uid(); c.name += ' (עותק)'; c.created = Date.now();
@@ -497,6 +515,7 @@ $('#btnSettings').onclick = () => {
 };
 $('#settings').addEventListener('input', e => { const el = e.target; if (!el.dataset.s) return; S[el.dataset.s] = el.type === 'checkbox' ? el.checked : el.value; saveSettings(); });
 $('#stBack').onclick = () => show('lib');
+$('#pBack').onclick = () => exitPerform();
 
 /* ---------- קלט סודי ---------- */
 class SecretInput {
@@ -517,13 +536,14 @@ const GRID = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['C', '0', 'B']
 /* ---------- הופעה ---------- */
 const P = { active: false, item: null, src: null, input: null, started: false, frozen: null, frozenAt: 0,
   raf: 0, stage: false, vr: null, dpr: 1, menu: false, rec: null, rc: null, rctx: null, clip: null, endAt: 0, wake: null, minT: 0 };
-const stageCv = $('#stage'), sctx = stageCv.getContext('2d');
+const stageCv = $('#stage'), sctx = stageCv.getContext('2d'), pBack = $('#pBack');
 
-function startPerform(item, stage) {
+function startPerform(item, stage, from) {
+  P.from = from || 'lib'; P.fromItem = item;
   if (item.method === 'pre' && item.content !== 'drawing') {
     $('#preIn').value = ''; $('#preIn').inputMode = item.content === 'number' ? 'numeric' : 'text';
     $('#preForm').onsubmit = e => { e.preventDefault(); const v = $('#preIn').value; $('#preIn').blur(); enterPerform(item, stage, v); };
-    $('#preBack').onclick = () => show('lib');
+    $('#preBack').onclick = () => backTo();
     show('pre'); setTimeout(() => $('#preIn').focus(), 50);
     return;
   }
@@ -561,7 +581,11 @@ function begin() {
 }
 function perfLoop() {
   P.raf = requestAnimationFrame(perfLoop);
-  const src = P.src; if (!src || !P.vr) return;
+  const src = P.src;
+  // כפתור חזרה גלוי לפני ההתחלה ואחרי הסוף, מוסתר בזמן שהסרטון רץ
+  const hideBack = !!(src && P.started && !src.ended && !src.paused);
+  if (pBack.hidden !== hideBack) pBack.hidden = hideBack;
+  if (!src || !P.vr) return;
   const t = src.time;
   // נעילת הקלט ברגע שהחשיפה מתחילה (לא באמצע קו בציור)
   if (P.started && !P.frozen && t >= P.minT && !T.drawing) {
@@ -667,7 +691,12 @@ function exitPerform() {
   try { P.wake && P.wake.release(); } catch (e) { /* ignore */ }
   try { screen.orientation && screen.orientation.unlock && screen.orientation.unlock(); } catch (e) { /* ignore */ }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-  show('lib');
+  backTo();
+}
+/* חזרה למסך שממנו נכנסו להופעה (עורך או ספרייה) */
+function backTo() {
+  if (P.from === 'edit' && P.fromItem) { const it = ITEMS.find(x => x.id === P.fromItem.id) || P.fromItem; openEditor(it); }
+  else show('lib');
 }
 
 /* מגע בזמן הופעה */
@@ -730,7 +759,7 @@ function secretTap(e, stroke) {
 }
 
 document.addEventListener('keydown', e => {
-  if (!P.active) return;
+  if (!P.active) { if (e.key === 'Escape' && curScreen() !== 'lib') goBack(); return; }
   if (e.key === 'Escape') { e.preventDefault(); if (P.menu) { $('[data-m=resume]').click(); } else openMenu(); return; }
   if (P.menu) return;
   if (!P.started) { if ([' ', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'PageDown', 'PageUp'].includes(e.key)) { e.preventDefault(); begin(); } return; }

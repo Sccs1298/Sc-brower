@@ -83,3 +83,5 @@ fieldset.track { border: 1px solid var(--line); border-radius: 10px; display: gr
   background: #2b2b31; padding: 10px 16px; border-radius: 10px; font-size: 14px; max-width: 90vw; }
 [hidden] { display: none !important; }
 input[type=range], .transport { direction: ltr; }
+#pBack { position: absolute; z-index: 3; top: calc(env(safe-area-inset-top) + 12px); right: max(12px, env(safe-area-inset-right)); background: rgba(24,24,28,.85); }
+.back { white-space: nowrap; }
