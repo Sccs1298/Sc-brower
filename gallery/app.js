@@ -44,13 +44,22 @@ const saveSettings = () => { try { localStorage.setItem(SKEY, JSON.stringify(S))
 /* ---------- אחסון (IndexedDB) ---------- */
 const DB = {
   db: null,
-  open() {
-    return new Promise((res, rej) => {
-      const r = indexedDB.open('gallery', 1);
-      r.onupgradeneeded = () => r.result.createObjectStore('videos', { keyPath: 'id' });
-      r.onsuccess = () => { this.db = r.result; res(); };
-      r.onerror = () => rej(r.error);
-    });
+  mem: null, // גיבוי בזיכרון כשהדפדפן חוסם אחסון (מסגרת מוגבלת, גלישה פרטית)
+  async open() {
+    try {
+      await new Promise((res, rej) => {
+        const r = indexedDB.open('gallery', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('videos', { keyPath: 'id' });
+        r.onsuccess = () => { this.db = r.result; res(); };
+        r.onerror = () => rej(r.error);
+        r.onblocked = () => rej(new Error('blocked'));
+        setTimeout(() => rej(new Error('timeout')), 4000);
+      });
+      return true;
+    } catch (e) {
+      this.db = null; this.mem = new Map();
+      return false;
+    }
   },
   run(mode, fn) {
     return new Promise((res, rej) => {
@@ -60,9 +69,9 @@ const DB = {
       tx.onerror = tx.onabort = () => rej(tx.error);
     });
   },
-  all() { return this.run('readonly', s => s.getAll()); },
-  put(v) { return this.run('readwrite', s => s.put(v)); },
-  del(id) { return this.run('readwrite', s => s.delete(id)); },
+  all() { return this.mem ? Promise.resolve([...this.mem.values()]) : this.run('readonly', s => s.getAll()); },
+  put(v) { if (this.mem) { this.mem.set(v.id, v); return Promise.resolve(); } return this.run('readwrite', s => s.put(v)); },
+  del(id) { if (this.mem) { this.mem.delete(id); return Promise.resolve(); } return this.run('readwrite', s => s.delete(id)); },
 };
 
 function newRegion(t, extra) {
@@ -897,7 +906,9 @@ $('#phMute').onclick = () => {
 
 /* ---------- הפעלה ---------- */
 (async function init() {
-  try { await DB.open(); await loadItems(); }
-  catch (e) { toast('אחסון לא זמין: ' + (e.message || e)); ITEMS = [demoItem()]; renderLib(); }
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  const persistent = await DB.open();
+  try { await loadItems(); } catch (e) { ITEMS = [demoItem()]; renderLib(); }
+  if (!persistent) toast('בתצוגה הזו סרטונים לא נשמרים אחרי סגירה. להתקנה מלאה: GitHub Pages');
+  try { if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {}); }
+  catch (e) { /* מסגרת מוגבלת – בלי עבודה אופליין */ }
 })();
