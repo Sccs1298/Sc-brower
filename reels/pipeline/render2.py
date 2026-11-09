@@ -207,6 +207,17 @@ def presenter_frame(clip, t):
     return f, m, clip.box[i]
 
 
+SET = None
+if A.get("set"):
+    _s = cv2.imread(A["set"]).astype(np.float32) / 255
+    _s = np.clip(cv2.resize(_s, (W, H), interpolation=cv2.INTER_CUBIC), 0, 1)
+    _l = _s.mean(2, keepdims=True)
+    _s = np.power(_s * 0.6 + _l * 0.4, 1.9) * 0.42          # night: crush to darkness, desaturate
+    _s[..., 0] *= 1.25                                         # cold teal ceiling
+    _s[..., 2] *= 0.7
+    SET = cv2.GaussianBlur(_s, (0, 0), 7)                      # shallow depth of field
+
+
 def head_shot(clip, t, zoom):
     f, m, box = presenter_frame(clip, t)
     sh, sw = f.shape[:2]
@@ -221,8 +232,8 @@ def head_shot(clip, t, zoom):
     mm = cv2.resize(m[sl], (W, H))[..., None]
     lum = img.mean(2, keepdims=True)
     img = np.power(img * 0.82 + lum * 0.18, 1.2)
-    # subject stays lit, the room falls into darkness -> consistent "hacker room" look
-    bg = cv2.GaussianBlur(img, (0, 0), 6) * 0.22
+    # subject stays lit; background = our own generated "attic" set (or the darkened source room)
+    bg = SET if SET is not None else cv2.GaussianBlur(img, (0, 0), 6) * 0.22
     bg = 1 - (1 - bg) * (1 - LED * 0.9) * (1 - CEIL)
     subj = 1 - (1 - img * 0.92) * (1 - LED * 0.35)
     return subj * mm + bg * (1 - mm)
@@ -469,7 +480,7 @@ def frame(t):
         h2, w2 = int(H / sc), int(W / sc)
         out = cv2.resize(out[(H - h2) // 2:(H - h2) // 2 + h2, (W - w2) // 2:(W - w2) // 2 + w2], (W, H))
     out = out * (VIG if typ in ("head", "strip") else (1 - (1 - VIG) * 0.4))
-    out = grain(out, 0.018)
+    out = grain(out, 0.012)
     o8 = (np.clip(out, 0, 1) * 255).astype(np.uint8)
     if t < 0.3:
         s = int(26 * (1 - t / 0.3))
@@ -489,7 +500,7 @@ if preview:
         cv2.imwrite(OUT.replace(".mp4", f"_p{t:05.1f}.jpg"), frame(t))
     sys.exit(0)
 ff = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24", "-s", f"{W}x{H}", "-r", str(FPS),
-                       "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "22", "-pix_fmt", "yuv420p", OUT + ".v.mp4"],
+                       "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "24", "-maxrate", "9M", "-bufsize", "18M", "-pix_fmt", "yuv420p", OUT + ".v.mp4"],
                       stdin=subprocess.PIPE)
 N = int(dur * FPS)
 for fi in range(N):
