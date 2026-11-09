@@ -31,6 +31,8 @@ const METHODS = {
               help: 'מקלידים במקלדת או בשלט Bluetooth מחוברים. נגיעות במסך לא עושות כלום, אז הצופה יכול להחזיק את הטלפון. רווח או חץ מתחיל את הסרטון.' },
   pre:      { name: 'לפני ההופעה (מסך חיפוש)', for: ['number', 'word'],
               help: 'כשנוגעים בסרטון בגלריה, נפתח קודם מסך חיפוש של הגלריה. מקלידים שם את הבחירה ולוחצים "חפש" במקלדת, והסרטון נפתח.' },
+  scrub:    { name: 'גרירה ברצועת הפריימים (חדש)', for: ['number', 'word'], video: true,
+              help: 'לפני הניגון גוררים את הסמן ברצועת הפריימים, כאילו מחפשים קטע. כל עזיבה של הרצועה = ספרה לפי המקום: קצה שמאל 0, קצה ימין 9 (10 אזורים). מאפשר גם 0. אחר כך לוחצים ▶.' },
   draw:     { name: 'ציור נסתר', for: ['drawing'],
               help: 'בזמן שהסרטון מתנגן מציירים באצבע על המסך. הקווים לא נראים, והציור מופיע באזור החשיפה. שתי אצבעות מבטלות את הקו האחרון.' },
 };
@@ -152,6 +154,9 @@ function normalize(it) {
   if (it.trick === undefined) it.trick = true;
   if (!it.words) it.words = DEFAULT_WORDS.slice();
   if (!it.regions) it.regions = [];
+  if (!it.meta) it.meta = 'none';
+  if (!it.kind) it.kind = 'video';
+  if (it.kind === 'photo' && it.method === 'scrub') it.method = 'grid';
   return it;
 }
 const shotTime = it => it.shotAt || (it.builtin ? Date.now() - 2 * 3600e3 : it.created || Date.now());
@@ -352,8 +357,31 @@ class VideoSource {
     if (this.owned) URL.revokeObjectURL(this.url);
   }
 }
+/* תמונה: "זמן" הוא שעון שמתחיל כשמתחילים להזין */
+class ImageSource {
+  constructor(src) {
+    this.owned = src instanceof Blob; this.url = this.owned ? URL.createObjectURL(src) : src;
+    this.img = new Image(); this.img.src = this.url;
+    this._t = 0; this._t0 = 0; this.paused = true; this.ended = false; this.duration = 0;
+  }
+  ready() {
+    return new Promise((res, rej) => {
+      if (this.img.complete && this.img.naturalWidth) return res();
+      this.img.onload = () => res(); this.img.onerror = () => rej(new Error('לא ניתן לטעון את התמונה'));
+    });
+  }
+  get w() { return this.img.naturalWidth || 1080; }
+  get h() { return this.img.naturalHeight || 1440; }
+  get time() { return this.paused ? this._t : (performance.now() - this._t0) / 1000; }
+  set time(v) { this._t = v; this._t0 = performance.now() - v * 1000; }
+  play() { this._t0 = performance.now() - this._t * 1000; this.paused = false; return Promise.resolve(); }
+  pause() { this._t = this.time; this.paused = true; }
+  draw(ctx, w, h) { if (this.img.naturalWidth) ctx.drawImage(this.img, 0, 0, w, h); }
+  destroy() { if (this.owned) URL.revokeObjectURL(this.url); }
+}
 const makeSource = item => {
   if (item.builtin === 'demo') return new DemoSource();
+  if (item.kind === 'photo') { const src = mediaSrc(item); if (!src) throw new Error('קובץ התמונה חסר'); return new ImageSource(src); }
   const src = mediaSrc(item);
   if (!src) throw new Error('קובץ הווידאו חסר');
   return new VideoSource(src);
@@ -361,6 +389,14 @@ const makeSource = item => {
 
 /* בדיקת קובץ חדש: מידות, אורך ותמונה ממוזערת */
 async function inspect(file) {
+  if ((file.type || '').startsWith('image/')) {
+    const u = URL.createObjectURL(file), img = new Image();
+    try {
+      await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('לא ניתן לפתוח את התמונה')); img.src = u; });
+      const w = img.naturalWidth, h = img.naturalHeight;
+      return { kind: 'photo', w, h, duration: 0, thumb: thumbOf(c => c.drawImage(img, 0, 0, w, h), w, h) };
+    } finally { URL.revokeObjectURL(u); }
+  }
   const v = document.createElement('video'), u = URL.createObjectURL(file);
   v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = u;
   $('#vhost').appendChild(v);
@@ -441,14 +477,15 @@ let ITEMS = [];
 const byId = id => ITEMS.find(x => x.id === id);
 function renderGrid() {
   const grid = $('#pgGrid'), list = ITEMS.filter(x => !x.hidden).sort((a, b) => shotTime(a) - shotTime(b));
-  $('#pgCount').textContent = list.length === 1 ? 'סרטון 1' : `${list.length} סרטונים`;
+  const nv = list.filter(x => x.kind !== 'photo').length, np = list.length - nv;
+  $('#pgCount').textContent = [np ? (np === 1 ? 'תמונה 1' : `${np} תמונות`) : '', nv ? (nv === 1 ? 'סרטון 1' : `${nv} סרטונים`) : ''].filter(Boolean).join(', ');
   grid.innerHTML = '';
   for (const it of list) {
     const b = document.createElement('button'); b.className = 'pg-cell'; b.type = 'button';
     const th = thumbFor(it);
     b.innerHTML = `${th ? '<img alt="">' : ''}<span class="dur"></span>${it.fav ? '<svg class="fav" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></svg>' : ''}`;
     if (th) $('img', b).src = th;
-    $('.dur', b).textContent = fmtDur(it.duration);
+    $('.dur', b).textContent = it.kind === 'photo' ? '' : fmtDur(it.duration);
     b.addEventListener('click', () => openViewer(it.id, { from: 'photos' }));
     grid.appendChild(b);
   }
@@ -480,11 +517,11 @@ function renderManage() {
   for (const it of list) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'mg-item';
     const kind = { number: `מספר, ${it.digits} ספרות`, word: 'מילה מרשימה', drawing: 'ציור' }[it.content];
-    const isTrick = it.trick !== false && it.regions.length;
+    const isTrick = it.trick !== false && (it.regions.length || (it.meta && it.meta !== 'none'));
     b.innerHTML = '<img alt=""><div class="txt"><b></b><span></span></div><span class="tag"></span>';
     const th = thumbFor(it); if (th) $('img', b).src = th;
     $('b', b).textContent = it.name;
-    $('.txt span', b).textContent = `${fmtDur(it.duration)} · ` + (isTrick ? `${kind} · ${METHODS[it.method].name}` : 'סרטון רגיל');
+    $('.txt span', b).textContent = (it.kind === 'photo' ? 'תמונה · ' : `${fmtDur(it.duration)} · `) + (isTrick ? `${kind} · ${METHODS[it.method].name}` : (it.kind === 'photo' ? 'רגילה' : 'סרטון רגיל'));
     const tag = $('.tag', b);
     tag.textContent = it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
     if (isTrick && !it.hidden) tag.classList.add('trick');
@@ -499,31 +536,32 @@ $('#mgSettings').onclick = () => go('settings');
 $('#helpDone').onclick = () => { if (!S.seenHelp) { S.seenHelp = true; saveSettings(); } uiBack(); };
 
 $('#fileIn').addEventListener('change', async e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  toast('טוען את הסרטון…', 10000);
-  let info;
-  try { info = await inspect(f); } catch (err) { toast(err.message || 'לא ניתן לפתוח את הסרטון'); return; }
-  const t = info.duration ? +(info.duration * .75).toFixed(2) : 3;
-  const it = normalize({
-    id: uid(), name: f.name.replace(/\.[^.]+$/, ''), fileName: f.name, size: f.size, blob: f,
-    w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, created: Date.now(), shotAt: f.lastModified || Date.now(),
-    content: 'number', method: 'grid', digits: 2, trick: true, words: DEFAULT_WORDS.slice(), regions: [newRegion(t)],
-  });
-  if (Store.mode === 'cloud') {
-    if (!Store.assets) { toast('אין הרשאה לשמור קבצים בקישור הזה. הסרטון יישמר רק עד הסגירה'); }
-    else {
-      toast('שומר את הסרטון בחשבון…', 60000);
-      try { const r = await Store.assets.upload(f); it.assetId = r.id; it.assetUrl = r.url; it.size = r.sizeBytes; }
-      catch (err) {
-        toast(err && err.code === 'too_large' ? 'הסרטון גדול מ-20MB. קצר אותו או השתמש באפליקציה המותקנת' : 'שמירת הסרטון נכשלה. נסה שוב', 6000);
-        return;
+  const files = [...e.target.files]; e.target.value = ''; if (!files.length) return;
+  let last = null, n = 0;
+  for (const f of files) {
+    toast(files.length > 1 ? `טוען ${n + 1} מתוך ${files.length}…` : 'טוען…', 60000);
+    let info;
+    try { info = await inspect(f); } catch (err) { toast(`${f.name}: ${err.message || 'לא ניתן לפתוח'}`, 4000); continue; }
+    const photo = info.kind === 'photo';
+    const t = photo ? 1.5 : info.duration ? +(info.duration * .75).toFixed(2) : 3;
+    const it = normalize({
+      id: uid(), kind: photo ? 'photo' : 'video', name: f.name.replace(/\.[^.]+$/, ''), fileName: f.name, size: f.size, blob: f,
+      w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, created: Date.now(), shotAt: f.lastModified || Date.now(),
+      content: 'number', method: 'grid', digits: 2, trick: !photo, meta: 'none', words: DEFAULT_WORDS.slice(), regions: [newRegion(t, photo ? { fade: 3, effect: 'develop' } : {})],
+    });
+    if (Store.mode === 'cloud') {
+      if (!Store.assets) toast('אין הרשאה לשמור קבצים בקישור הזה. הפריט יישמר רק עד הסגירה', 4000);
+      else {
+        toast('שומר בחשבון…', 60000);
+        try { const r = await Store.assets.upload(f); it.assetId = r.id; it.assetUrl = r.url; it.size = r.sizeBytes; }
+        catch (err) { toast(err && err.code === 'too_large' ? `${f.name} גדול מ-20MB. קצר אותו או השתמש באפליקציה המותקנת` : 'השמירה נכשלה. נסה שוב', 6000); continue; }
       }
     }
+    ITEMS.push(it); await persist(it); last = it; n++;
   }
-  ITEMS.push(it);
-  await persist(it);
-  toast('נוסף. עכשיו סמן איפה ומתי הבחירה תופיע');
-  E.id = it.id; go('edit');
+  if (!last) return;
+  if (n === 1) { toast(last.kind === 'photo' ? 'נוספה תמונה רגילה. אפשר להפוך אותה לטריק כאן' : 'נוסף. עכשיו סמן איפה ומתי הבחירה תופיע'); E.id = last.id; go('edit'); }
+  else { toast(`נוספו ${n} פריטים לגלריה`); renderManage(); }
 });
 
 /* ===================== עורך ===================== */
@@ -538,7 +576,7 @@ const curRegion = () => E.item && E.item.regions[E.sel];
 
 function syncEditorForm() {
   const it = E.item;
-  const ok = Object.entries(METHODS).filter(([, m]) => m.for.includes(it.content));
+  const ok = Object.entries(METHODS).filter(([, m]) => m.for.includes(it.content) && !(m.video && it.kind === 'photo'));
   if (!ok.some(([k]) => k === it.method)) it.method = ok[0][0];
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
@@ -552,6 +590,11 @@ function syncEditorForm() {
   $('#edTrick').checked = it.trick !== false;
   $('#edHideLabel').textContent = it.hidden ? 'הצג בגלריה' : 'הסתר מהגלריה';
   $('#edDelete').hidden = it.id === 'demo';
+  $('#edMeta').value = it.meta || 'none';
+  const photo = it.kind === 'photo';
+  $('#edTransport').hidden = photo;
+  $('#rgTLabel').textContent = photo ? 'שניות אחרי שההזנה הושלמה' : 'שנייה בסרטון שבה זה מופיע';
+  $('#rgNow').hidden = photo;
   $('#edTitle').textContent = it.name || 'עריכה';
 }
 function renderRegions() {
@@ -735,6 +778,7 @@ class SecretInput {
     this.buf += k; return true;
   }
   undo() { if (this.item.content === 'drawing') this.strokes.pop(); else this.buf = this.buf.slice(0, -1); }
+  complete(it) { if (it.content === 'drawing') return false; if (it.method === 'pre') return !!this.buf.trim(); return /^\d+$/.test(this.buf) && this.buf.length >= this.cap; }
   get count() { return this.item.content === 'drawing' ? this.strokes.length : this.buf.length; }
   payload() {
     const it = this.item;
@@ -777,7 +821,10 @@ ENTER.perform = async () => {
   const de = document.documentElement;
   if (req.stage) { try { const r = (de.requestFullscreen || de.webkitRequestFullscreen || (() => {})).call(de); if (r && r.catch) r.catch(() => {}); } catch (e) { /* ignore */ } }
   Object.assign(P, { active: true, item, stage: req.stage, started: false, frozen: null, frozenAt: 0, menu: false, clip: null, endAt: 0,
-    lastPlaying: false, phIcon: null, regions: activeRegions(item) });
+    lastPlaying: false, phIcon: null, regions: activeRegions(item), isPhoto: item.kind === 'photo', forceFreeze: false, lastStrokeAt: 0,
+    meta: item.trick === false ? 'none' : (item.meta || 'none') });
+  P.hasTrick = item.trick !== false && (P.regions.length > 0 || P.meta !== 'none');
+  P.drawRegions = P.regions;
   P.input = new SecretInput(item); P.input.buf = req.preText || '';
   P.minT = P.regions.length ? Math.min(...P.regions.map(r => r.t)) : Infinity;
   $('#pmenu').hidden = true; closePops();
@@ -788,7 +835,7 @@ ENTER.perform = async () => {
   if (req.stage && screen.orientation && screen.orientation.lock) screen.orientation.lock(P.src.w >= P.src.h ? 'landscape' : 'portrait').catch(() => {});
   try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ }
   for (const r of P.regions) { try { await document.fonts.load(`700 40px ${(FONTS[r.font] || FONTS.clean).css}`); } catch (e) { /* ignore */ } }
-  sizeStage(); buildStrip();
+  sizeStage(); if (!P.isPhoto) buildStrip();
   cancelAnimationFrame(P.raf); perfLoop();
 };
 LEAVE.perform = () => {
@@ -806,10 +853,10 @@ function sizeStage() {
   stageCv.width = Math.round(innerWidth * P.dpr); stageCv.height = Math.round(innerHeight * P.dpr);
   if (P.src) P.vr = fitRect(P.src.w, P.src.h, stageCv.width, stageCv.height);
 }
-addEventListener('resize', () => { if (curScreen() === 'edit') sizeEdCanvas(); if (P.active) { sizeStage(); buildStrip(); } });
+addEventListener('resize', () => { if (curScreen() === 'edit') sizeEdCanvas(); if (P.active) { sizeStage(); if (!P.isPhoto) buildStrip(); } });
 
 function begin() {
-  P.started = true; P.frozen = null; P.frozenAt = 0; P.endAt = 0; P.clip = null;
+  P.started = true; P.frozen = null; P.frozenAt = 0; P.endAt = 0; P.clip = null; P.drawRegions = P.regions; updateHeader();
   P.src.time = 0;
   setupRecorder();
   const pr = P.src.play(); if (pr && pr.catch) pr.catch(() => toast('הקש שוב כדי לנגן'));
@@ -819,7 +866,7 @@ function resume() { P.endAt = 0; const pr = P.src.play(); if (pr && pr.catch) pr
 function perfLoop() {
   P.raf = requestAnimationFrame(perfLoop);
   const src = P.src;
-  const playing = !!(src && P.started && !src.ended && !src.paused);
+  const playing = !P.isPhoto && !!(src && P.started && !src.ended && !src.paused);
   const showBack = P.stage && !playing;
   if (pBack.hidden === showBack) pBack.hidden = !showBack;
   if (photosMode() && src) {
@@ -834,14 +881,17 @@ function perfLoop() {
   if (!src || !P.vr) return;
   const t = src.time;
   // הקלט ננעל ברגע שהחשיפה מתחילה (לא באמצע קו בציור)
-  if (P.started && !P.frozen && t >= P.minT && !T.drawing) {
-    const pl = P.input.payload(); if (pl) { P.frozen = pl; P.frozenAt = t; }
+  if (P.started && !P.frozen && !T.drawing && P.hasTrick) {
+    let due;
+    if (P.isPhoto) due = P.forceFreeze || P.input.complete(P.item) || (P.item.content === 'drawing' && P.input.strokes.length && performance.now() - P.lastStrokeAt > 2500);
+    else due = t >= P.minT || src.ended || (P.forceFreeze && P.minT === Infinity);
+    if (due) { const pl = P.input.payload(); if (pl) { P.frozen = pl; P.frozenAt = t; onFrozen(); } }
   }
   sctx.clearRect(0, 0, stageCv.width, stageCv.height);
   sctx.save(); sctx.translate(P.vr.x, P.vr.y);
-  composeFrame(sctx, src, { regions: P.regions }, P.frozen, P.frozenAt, P.vr.w, P.vr.h, false);
+  composeFrame(sctx, src, { regions: P.drawRegions }, P.frozen, P.frozenAt, P.vr.w, P.vr.h, false);
   sctx.restore();
-  if (S.indicator && !P.stage && P.regions.length) {
+  if (S.indicator && !P.stage && P.hasTrick) {
     const n = P.input.count, d = 2.2 * P.dpr;
     sctx.fillStyle = P.frozen ? 'rgba(120,200,120,.4)' : 'rgba(127,127,127,.35)';
     for (let i = 0; i < n; i++) sctx.fillRect(stageCv.width - (i + 1) * d * 3, stageCv.height * .5, d, d);
@@ -852,7 +902,7 @@ function perfLoop() {
       if (!P.endAt) P.endAt = performance.now();
       drawEndCard(rx, rc.width, rc.height, (performance.now() - P.endAt) / 1000);
       if (performance.now() - P.endAt > 3200) P.rec.stop();
-    } else composeFrame(rx, src, { regions: P.regions }, P.frozen, P.frozenAt, rc.width, rc.height, false);
+    } else composeFrame(rx, src, { regions: P.drawRegions }, P.frozen, P.frozenAt, rc.width, rc.height, false);
   }
 }
 function drawEndCard(ctx, W, H, t) {
@@ -876,6 +926,33 @@ function phDate(ts) {
     : d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', ...(d.getFullYear() !== now.getFullYear() ? { year: 'numeric' } : {}) });
   return [day, d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })];
 }
+/* ---------- חשיפה בפרטי הסרטון ---------- */
+function shownDate() {
+  const d = new Date(shotTime(P.item)), pl = P.frozen;
+  if (!pl || pl.type !== 'text' || !/^\d+$/.test(pl.text)) return d;
+  const s = pl.text, n = parseInt(s, 10);
+  if (P.meta === 'time') {
+    if (s.length <= 2) { if (n < 60) d.setMinutes(n); }
+    else { const hh = parseInt(s.slice(0, -2), 10), mm = parseInt(s.slice(-2), 10); if (hh < 24 && mm < 60) d.setHours(hh, mm); }
+  } else if (P.meta === 'date') {
+    if (s.length <= 2) { if (n >= 1 && n <= 31) d.setDate(n); }
+    else { const dd = parseInt(s.slice(0, -2), 10), mm = parseInt(s.slice(-2), 10); if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12) d.setMonth(mm - 1, dd); }
+  }
+  return d;
+}
+function updateHeader() {
+  const d = shownDate(), [day, time] = phDate(d.getTime()), pl = P.frozen;
+  if (P.meta === 'place' && pl && pl.type === 'text') { $('#phDay').textContent = pl.text; $('#phTime').textContent = `${day} · ${time}`; }
+  else { $('#phDay').textContent = day; $('#phTime').textContent = time; }
+}
+function onFrozen() {
+  updateHeader();
+  if (P.meta === 'caption' && P.frozen.type === 'text') $('.ph-caption').value = P.frozen.text;
+  if (P.isPhoto && P.regions.length) {
+    const t0 = P.frozenAt;
+    P.drawRegions = P.regions.map(r => ({ ...r, t: t0 + r.t, track: { ...r.track, t2: t0 + r.track.t2 } }));
+  }
+}
 function setChrome(v) {
   P.chrome = v;
   $('#ph').classList.toggle('off', !v);
@@ -893,14 +970,14 @@ function initPhotosUI() {
   $('#ph').hidden = !on;
   $('#phHeart').classList.toggle('on', !!it.fav);
   $('#phMute').innerHTML = ICON_SOUND; $('#phPlay').innerHTML = ICON_PLAY;
-  const [day, time] = phDate(shotTime(it));
-  $('#phDay').textContent = day; $('#phTime').textContent = time;
+  updateHeader(); $('.ph-caption').value = '';
+  $('#ph').classList.toggle('is-photo', !!P.isPhoto);
   phHead.style.left = '0%';
   const sc = $('#phStrip'); sc.getContext('2d').clearRect(0, 0, sc.width, sc.height);
   setChrome(on);
 }
 function fillInfo() {
-  const it = P.item, d = new Date(shotTime(it));
+  const it = P.item, d = shownDate();
   const wd = d.toLocaleDateString('he-IL', { weekday: 'long' });
   const date = d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' });
   $('#phiDate').textContent = `${wd} • ${date} • ${d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`;
@@ -908,7 +985,11 @@ function fillInfo() {
   const w = (P.src && P.src.w) || it.w || 1080, h = (P.src && P.src.h) || it.h || 1920, short = Math.min(w, h);
   const res = short >= 2000 ? '4K' : short >= 1000 ? '1080p' : short >= 700 ? '720p' : `${short}p`;
   const mb = it.size ? (it.size / 1048576).toFixed(1) : ((it.duration || 20) * 1.1).toFixed(1);
-  $('#phiSpec').textContent = `${res} • ${w} × ${h} • ${mb} MB • ${fmtDur(it.duration)}`;
+  $('#phiSpec').textContent = `${res} • ${w} × ${h} • ${mb} MB` + (it.kind === 'photo' ? '' : ` • ${fmtDur(it.duration)}`);
+  const place = $('#phiPlace'), pl = P.frozen;
+  place.hidden = !(P.meta === 'place' && pl && pl.type === 'text');
+  if (!place.hidden) place.textContent = '📍 ' + pl.text;
+  $('#phiDevice').textContent = it.kind === 'photo' ? 'מצלמה ראשית' : 'מצלמה ראשית · וידאו';
 }
 /* רצועת פריימים */
 async function buildStrip() {
@@ -950,7 +1031,14 @@ async function buildStrip() {
   };
   box.addEventListener('pointerdown', e => { drag = true; box.setPointerCapture(e.pointerId); if (P.src && !P.src.paused) P.src.pause(); seek(e); });
   box.addEventListener('pointermove', e => { if (drag) seek(e); });
-  box.addEventListener('pointerup', () => { drag = false; });
+  box.addEventListener('pointerup', e => {
+    if (!drag) return; drag = false;
+    // שיטת "גרירה ברצועה": המקום שבו עוזבים = ספרה 0–9
+    if (P.item && P.item.method === 'scrub' && P.hasTrick && !P.frozen) {
+      const b = box.getBoundingClientRect();
+      if (P.input.digit(String(clamp(Math.floor((e.clientX - b.left) / b.width * 10), 0, 9)))) buzz();
+    }
+  });
   box.addEventListener('pointercancel', () => { drag = false; });
 })();
 $('#phPlay').onclick = () => {
@@ -995,13 +1083,23 @@ $('#phDelCancel').onclick = () => { $('#phAction').hidden = true; };
 $('#phAction').addEventListener('click', e => { if (e.target.id === 'phAction') $('#phAction').hidden = true; });
 $('#phDelOk').onclick = () => { $('#phAction').hidden = true; hideCurrent(); };
 $('#phSheet').addEventListener('click', e => { if (e.target.classList.contains('grab')) $('#phSheet').hidden = true; });
+/* החלקה בין פריטים כמו בגלריה (בעברית: ימינה = הפריט הבא) */
+async function swipeItem(dir) {
+  const list = ITEMS.filter(x => !x.hidden).sort((a, b) => shotTime(a) - shotTime(b));
+  const i = list.findIndex(x => x.id === P.item.id), next = list[i + dir];
+  if (!next) return;
+  LEAVE.perform();
+  P.req = { ...P.req, id: next.id, preText: '', stage: false };
+  $('#perform').classList.remove('swap'); void $('#perform').offsetWidth; $('#perform').classList.add('swap');
+  await ENTER.perform();
+}
 function hideCurrent() { // "מחיקה" בגלריה = הסתרה (אפשר להחזיר בניהול)
   const it = byId(P.item.id); if (it) { it.hidden = true; persist(it); }
   uiBack();
 }
 function restartPerformance() {
-  P.input = new SecretInput(P.item); P.started = false; P.frozen = null;
-  P.src.pause(); P.src.time = 0; discardRec(); setChrome(photosMode());
+  P.input = new SecretInput(P.item); P.started = false; P.frozen = null; P.forceFreeze = false; P.drawRegions = P.regions;
+  P.src.pause(); P.src.time = 0; discardRec(); setChrome(photosMode()); updateHeader(); $('.ph-caption').value = '';
 }
 
 /* ---------- הקלטה לשיתוף ---------- */
@@ -1074,7 +1172,9 @@ const toVideo = e => {
   const vr = P.vr, x = (e.clientX * P.dpr - vr.x) / vr.w, y = (e.clientY * P.dpr - vr.y) / vr.h;
   return [x * P.src.w, y * P.src.h];
 };
-const isPlaying = () => !!(P.src && P.started && !P.src.ended && !P.src.paused);
+const isPlaying = () => !P.isPhoto && !!(P.src && P.started && !P.src.ended && !P.src.paused);
+/* שלב ההזנה: בסרטון – בזמן ניגון; בתמונה – אחרי שהסתירו את הכפתורים ועד שהחשיפה ננעלה */
+const inputPhase = () => P.isPhoto ? (P.hasTrick && P.started && !P.chrome && !P.frozen) : isPlaying();
 const drawMode = () => P.item && P.item.content === 'drawing' && P.regions.length;
 
 touch.addEventListener('pointerdown', e => {
@@ -1085,7 +1185,7 @@ touch.addEventListener('pointerdown', e => {
   T.pts.set(e.pointerId, true);
   if (T.pts.size === 1) {
     Object.assign(T, { max: 1, moved: false, t0: performance.now(), sx: e.clientX, sy: e.clientY, ex: e.clientX, ey: e.clientY, lpFired: false, pushed: false, drawing: false });
-    T.stroke = drawMode() && isPlaying() && !P.frozen ? [toVideo(e)] : null;
+    T.stroke = drawMode() && inputPhase() && !P.frozen ? [toVideo(e)] : null;
     clearTimeout(T.lp);
     T.lp = setTimeout(() => { if (!T.moved && T.pts.size === 1) { T.lpFired = true; openMenu(); } }, 800);
   } else {
@@ -1110,11 +1210,13 @@ function pointerEnd(e) {
   clearTimeout(T.lp); T.drawing = false;
   const dur = performance.now() - T.t0, stroke = T.stroke; T.stroke = null;
   if (T.swallow || T.lpFired || P.menu || e.type === 'pointercancel') return;
-  if (T.max >= 2) { if (P.started && !P.frozen && P.regions.length) { P.input.undo(); buzz(); } return; }
+  if (T.max >= 2) { if (P.started && !P.frozen && P.hasTrick) { P.input.undo(); buzz(); } return; }
   if (T.moved) {
     // החלקה למטה סוגרת את הסרטון, כמו בגלריה (רק כשהוא לא מתנגן)
-    if (!isPlaying() && !T.pushed && T.ey - T.sy > 110 && Math.abs(T.ex - T.sx) < 90) { uiBack(); return; }
-    if (T.pushed) buzz();
+    const dx = T.ex - T.sx, dy = T.ey - T.sy;
+    if (!inputPhase() && !T.pushed && dy > 110 && Math.abs(dx) < 90) { uiBack(); return; }
+    if (!inputPhase() && !T.pushed && photosMode() && Math.abs(dx) > 70 && Math.abs(dy) < 70) { swipeItem(dx > 0 ? 1 : -1); return; }
+    if (T.pushed) { buzz(); P.lastStrokeAt = performance.now(); }
     return;
   }
   if (dur < 500) secretTap(e, stroke);
@@ -1124,13 +1226,24 @@ touch.addEventListener('pointercancel', pointerEnd);
 touch.addEventListener('contextmenu', e => e.preventDefault());
 
 function secretTap(e, stroke) {
+  if (P.isPhoto) {
+    if (!P.hasTrick || P.frozen) { setChrome(!P.chrome); return; }
+    if (!P.started) { P.started = true; P.src.play(); setChrome(false); return; } // נגיעה ראשונה מסתירה כפתורים ומתחילה
+    if (P.chrome) { setChrome(false); return; }
+    const it = P.item;
+    if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); P.lastStrokeAt = performance.now(); buzz(); } return; }
+    if (it.method !== 'grid') return;
+    const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
+    if (P.input.digit(String(row * 3 + col + 1))) buzz();
+    return;
+  }
   if (!isPlaying()) {
     // לפני ניגון / בסוף: נגיעה מסתירה ומציגה את הכפתורים כמו בגלריה. במצב במה נגיעה מתחילה.
     if (photosMode()) setChrome(!P.chrome);
     else if (!P.started) begin();
     return;
   }
-  if (P.frozen || !P.regions.length) return;
+  if (P.frozen || !P.hasTrick) return;
   const it = P.item;
   if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
   if (it.method !== 'grid') return;
@@ -1142,8 +1255,9 @@ document.addEventListener('keydown', e => {
   if (!P.active) { if (e.key === 'Escape' && NAV.stack.length > 1 && curScreen() !== 'photos') uiBack(); return; }
   if (e.key === 'Escape') { e.preventDefault(); if (P.menu) $('[data-m=resume]').click(); else openMenu(); return; }
   if (P.menu) return;
-  if (!P.started) { if ([' ', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'PageDown', 'PageUp'].includes(e.key)) { e.preventDefault(); begin(); } return; }
-  if (P.frozen || drawMode() || !P.regions.length) return;
+  if (!P.started) { if ([' ', 'Enter', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'PageDown', 'PageUp'].includes(e.key)) { e.preventDefault(); if (P.isPhoto) { P.started = true; P.src.play(); setChrome(false); } else begin(); } return; }
+  if (P.frozen || drawMode() || !P.hasTrick) return;
+  if (e.key === 'Enter') { P.forceFreeze = true; e.preventDefault(); return; }
   if (e.key === 'Backspace') P.input.undo();
   else if (e.key.length === 1 && e.key !== ' ') { if (!P.input.typeKey(e.key)) return; }
   else if (e.key === ' ' && P.item.content === 'word' && P.input.buf) P.input.buf += ' ';
@@ -1160,7 +1274,7 @@ document.addEventListener('visibilitychange', async () => {
   await Store.loadSettings();
   applyTheme();
   try { ITEMS = (await Store.all()).map(normalize); } catch (e) { ITEMS = []; }
-  if (!ITEMS.some(i => i.id === 'demo')) { const d = demoItem(); ITEMS.push(d); persist(d); }
+  if (!ITEMS.some(i => i.id === 'demo')) { const d = normalize(demoItem()); ITEMS.push(d); persist(d); }
   try { history.replaceState({ g: 1 }, ''); } catch (e) { /* ignore */ }
   NAV.stack = ['photos']; paint('photos'); ENTER.photos();
   if (!S.seenHelp) go('help');

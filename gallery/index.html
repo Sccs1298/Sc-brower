@@ -48,9 +48,9 @@
     <div class="group-title">הסרטונים שלך</div>
     <div id="mgList" class="group"></div>
 
-    <label class="btn-big primary" for="fileIn">הוסף סרטון מהגלריה</label>
-    <input id="fileIn" type="file" accept="video/*" hidden>
-    <p class="foot">כל סרטון שתוסיף יופיע בגלריה. סרטון עם "חשיפה" הוא סרטון טריק, וסרטון בלי חשיפה הוא סרטון רגיל שמוסיף אמינות.</p>
+    <label class="btn-big primary" for="fileIn">הוסף סרטונים או תמונות</label>
+    <input id="fileIn" type="file" accept="video/*,image/*" multiple hidden>
+    <p class="foot">כל מה שתוסיף יופיע בגלריה. אפשר לבחור כמה קבצים יחד. פריט עם "חשיפה" הוא טריק. תמונות וסרטונים רגילים מוסיפים אמינות לגלריה.</p>
 
     <div class="group">
       <button class="row-link" id="mgSettings" type="button"><span>הגדרות</span><span class="chev">‹</span></button>
@@ -70,7 +70,7 @@
     <div class="preview">
       <canvas id="edCanvas"></canvas>
     </div>
-    <div class="transport">
+    <div class="transport" id="edTransport">
       <button id="edPlay" type="button" class="round" aria-label="נגן">▶</button>
       <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="זמן בסרטון">
       <span id="edTime" class="mono">0.00</span>
@@ -119,12 +119,26 @@
           <button id="rgAdd" class="btn" type="button">+ אזור נוסף</button>
           <button id="rgDel" class="btn danger" type="button">מחק אזור</button>
         </div>
-        <label class="row"><span>שנייה בסרטון שבה זה מופיע</span>
+        <label class="row"><span id="rgTLabel">שנייה בסרטון שבה זה מופיע</span>
           <span class="inline"><input data-r="t" type="number" step="0.05" min="0"><button id="rgNow" class="btn" type="button">הזמן הנוכחי</button></span>
         </label>
         <label class="row"><span>הצג חשיפה תמיד בתצוגה</span><input id="edShowAll" type="checkbox" class="switch" checked></label>
         <label class="row"><span>טקסט לדוגמה</span><input id="edSample" placeholder="47"></label>
       </div>
+
+      <div class="group-title">חשיפה בפרטי הסרטון (חדש)</div>
+      <div class="group">
+        <label class="row"><span>הבחירה תופיע גם ב…</span>
+          <select data-i="meta" id="edMeta">
+            <option value="none">לא בשימוש</option>
+            <option value="time">שעת הצילום</option>
+            <option value="date">תאריך הצילום</option>
+            <option value="place">שם המקום בכותרת</option>
+            <option value="caption">הכיתוב בחלון המידע</option>
+          </select>
+        </label>
+      </div>
+      <p class="foot">שעה: 47 ← 17:47, ‏1447 ← 14:47. תאריך: 15 ← ה-15 בחודש, ‏1503 ← 15 במרץ. מקום: המילה מופיעה ככותרת. בסוף הסרטון הכותרת למעלה מראה את הבחירה, כאילו הסרטון צולם בשעה, בתאריך או במקום שהצופה בחר. אפשר להשתמש בזה גם בלי אזור חשיפה על התמונה.</p>
 
       <details class="group-details">
         <summary>5. מראה החשיפה</summary>
@@ -269,9 +283,23 @@
     <div class="group pad">
       <h2>שיטות הזנה נוספות</h2>
       <ul>
+        <li><b>גרירה ברצועת הפריימים (חדש):</b> לפני הניגון "מחפשים" בסרטון. כל פעם שעוזבים את הרצועה נרשמת ספרה לפי המקום: קצה שמאל = 0, קצה ימין = 9. זה מאפשר גם 0.</li>
         <li><b>מקלדת Bluetooth או שלט:</b> מקלידים בכיס, והצופה יכול להחזיק את הטלפון.</li>
         <li><b>לפני ההופעה:</b> לפני שהסרטון נפתח מופיע מסך חיפוש, ושם מקלידים את הבחירה.</li>
         <li><b>ציור נסתר:</b> מציירים באצבע על המסך בזמן הסרטון, והציור מופיע באזור החשיפה.</li>
+      </ul>
+    </div>
+
+    <div class="group pad">
+      <h2>חשיפה בפרטי הסרטון (חדש)</h2>
+      <p>במקום (או בנוסף) לחשיפה על התמונה, הבחירה מופיעה בכותרת שבראש המסך: שעת הצילום, תאריך הצילום או שם המקום. בסוף הסרטון אומרים לצופה: "תסתכל מתי הסרטון הזה צולם".</p>
+    </div>
+
+    <div class="group pad">
+      <h2>תמונות</h2>
+      <ul>
+        <li>מוסיפים תמונות רגילות כדי שהגלריה תיראה אמיתית. מחליקים ימינה ושמאלה בין פריטים, כמו בגלריה.</li>
+        <li><b>תמונת טריק:</b> פותחים את התמונה ונוגעים פעם אחת כדי להסתיר את הכפתורים. מזינים בסתר, והבחירה "מתפתחת" על התמונה כמה שניות אחרי שההזנה הושלמה.</li>
       </ul>
     </div>
 
@@ -344,6 +372,7 @@
         <div class="ph-sheet-row"><b id="phiDevice">מצלמה ראשית</b><span class="ph-tag">HEVC</span></div>
         <div class="ph-sheet-row dim" id="phiName"></div>
         <div class="ph-sheet-row dim" id="phiSpec"></div>
+        <div class="ph-sheet-row" id="phiPlace" hidden></div>
       </div>
     </div>
 

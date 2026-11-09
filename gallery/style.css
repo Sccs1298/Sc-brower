@@ -49,7 +49,7 @@ input[type=range] { direction: ltr; }
 .pg-circle { width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--pg-btn); color: var(--pg-fg); display: grid; place-items: center; padding: 0;
   -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
 .pg-circle svg { width: 17px; height: 17px; }
-.pg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding-bottom: calc(env(safe-area-inset-bottom) + 20px); }
+.pg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(31vw, 132px), 1fr)); gap: 2px; padding-bottom: calc(env(safe-area-inset-bottom) + 20px); }
 .pg-cell { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--pg-btn); border: 0; padding: 0; cursor: pointer; }
 .pg-cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pg-cell .dur { position: absolute; right: 5px; bottom: 4px; font-size: 12px; font-weight: 600; color: #fff; text-shadow: 0 0 3px rgba(0,0,0,.6); direction: ltr; }
@@ -216,3 +216,17 @@ input[type=range] { direction: ltr; }
 #toast { position: fixed; z-index: 50; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 40px); transform: translateX(-50%);
   background: rgba(30,30,32,.92); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 15px; max-width: calc(100vw - 32px); text-align: center; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+#ph.is-photo .ph-scrub-row { display: none; }
+#perform.swap #stage { animation: swapIn .22s ease; }
+@keyframes swapIn { from { opacity: .2; } }
+@media (max-width: 360px) { .row { flex-wrap: wrap; } .row input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]), .row select { max-width: 100%; } }
+/* אף פעם לא רחב מהמסך: רשימות בחירה ארוכות לא מותחות את העמוד */
+.page { grid-template-columns: minmax(0, 1fr); }
+.page > *, #edTrickWrap > * { min-width: 0; }
+#edTrickWrap { display: grid; gap: 8px; min-width: 0; }
+.row select { width: 58%; text-overflow: ellipsis; }
+.row > span:first-child { flex: 1 1 auto; }
+.row input[type=range] { flex: 0 1 50%; min-width: 90px; }
+/* קריאות הכותרת כשהסרטון ממלא את המסך (מסכים קצרים) */
+.ph-title b, .ph-title span { text-shadow: 0 0 6px var(--pg-bg), 0 0 12px var(--pg-bg); }
