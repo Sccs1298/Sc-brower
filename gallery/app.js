@@ -458,7 +458,13 @@ $('#edDup').onclick = async () => {
   await DB.put(c); ITEMS.unshift(c); renderLib(); openEditor(c); toast('נוצר עותק');
 };
 $('#edDelete').onclick = async () => {
-  if (!confirm('למחוק את הסרטון וההגדרות שלו?')) return;
+  const b = $('#edDelete');
+  if (!b.dataset.armed) { // אישור בלחיצה שנייה (confirm חסום בחלק מהדפדפנים)
+    b.dataset.armed = '1'; b.textContent = 'לחץ שוב למחיקה';
+    setTimeout(() => { delete b.dataset.armed; b.textContent = 'מחק סרטון'; }, 3000);
+    return;
+  }
+  delete b.dataset.armed; b.textContent = 'מחק סרטון';
   await DB.del(E.item.id); ITEMS = ITEMS.filter(x => x.id !== E.item.id); closeEditorSrc(); E.item = null; renderLib(); show('lib');
 };
 
