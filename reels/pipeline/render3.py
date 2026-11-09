@@ -132,6 +132,37 @@ def glow(cx, cy, r, col):
 
 plate = 1 - (1 - plate) * (1 - glow(80, 1250, 700, (0.0, 0.0, 0.55)))    # red LED pool, left
 plate = 1 - (1 - plate) * (1 - glow(540, -150, 1100, (0.22, 0.17, 0.02)))  # teal ceiling wash (BGR)
+
+
+def israel_flag(Wf=1100, Hf=800):
+    """Israeli flag (official 160:220 proportions) with soft cloth folds"""
+    k = Hf / 160
+    f = np.full((Hf, Wf, 3), 1.0, np.float32)
+    blue = (184 / 255, 56 / 255, 0.0)
+    for y0 in (15, 120):
+        f[int(y0 * k):int((y0 + 25) * k)] = blue
+    cx, cy, R = Wf / 2, Hf / 2, 27.5 * k
+    for rot in (np.pi / 2, -np.pi / 2):
+        pts = np.array([[cx + R * np.cos(rot + j * 2 * np.pi / 3), cy - R * np.sin(rot + j * 2 * np.pi / 3)] for j in range(3)], np.int32)
+        cv2.polylines(f, [pts], True, blue, int(5.5 * k), cv2.LINE_AA)
+    fy, fx = np.mgrid[0:Hf, 0:Wf].astype(np.float32)
+    wv = np.sin(fx / Wf * np.pi * 3.2 + 0.6) * 0.5 + np.sin(fx / Wf * np.pi * 7.3) * 0.2
+    f = f * (0.8 + 0.2 * wv)[..., None]
+    my = fy + 10 * np.sin(fx / Wf * np.pi * 3.2 + 0.6)
+    return cv2.remap(f, fx, my, cv2.INTER_LINEAR, borderValue=0), cv2.remap(np.ones((Hf, Wf), np.float32), fx, my, cv2.INTER_LINEAR, borderValue=0)
+
+
+if A.get("flag"):
+    fl, fm = israel_flag()
+    q = np.float32(A["flag"]["quad"])
+    M = cv2.getPerspectiveTransform(np.float32([[0, 0], [fl.shape[1], 0], [fl.shape[1], fl.shape[0]], [0, fl.shape[0]]]), q)
+    fw = cv2.warpPerspective(fl, M, (W, H))
+    mw = cv2.warpPerspective(fm, M, (W, H))[..., None]
+    lit = A["flag"].get("brightness", 0.6) * (1.0 - 0.35 * (yy / H))[..., None] * np.array([1.08, 1.0, 0.9], np.float32)
+    fw = fw * lit + glow(80, 1250, 900, (0.0, 0.0, 0.18))            # red spill from the LED
+    fw = cv2.GaussianBlur(fw, (0, 0), 2.0)
+    mw = cv2.GaussianBlur(mw, (0, 0), 2.0)[..., None]
+    plate = plate * (1 - mw) + fw * mw
 VIG = (1 - 0.55 * (((xx - W / 2) / (W * 0.75)) ** 2 + ((yy - H / 2) / (H * 0.7)) ** 2)).clip(0.35, 1)[..., None]
 RED_RIM = glow(-200, 1100, 900, (0.05, 0.05, 0.9))
 TEAL_TOP = glow(540, -300, 1400, (0.25, 0.18, 0.03))
@@ -180,7 +211,10 @@ def presenter_rgba(t, face_w, blocks=7):
     sc = face_w / FB[2]
     f = cv2.resize(f, None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA).astype(np.float32) / 255
     m = cv2.resize(clip.mask[i], (f.shape[1], f.shape[0])).astype(np.float32) / 255
-    m = cv2.GaussianBlur(np.clip((m - 0.3) * 2.6, 0, 1), (0, 0), 1.6)[..., None]
+    m = np.clip((m - 0.55) * 5.0, 0, 1); m[m < 0.04] = 0; m = cv2.GaussianBlur(m, (0, 0), 1.4)
+    fe = max(int(m.shape[1] * 0.16), 1)   # the source frame cuts the body: fade the side edges into the dark room
+    ramp = np.ones(m.shape[1], np.float32); ramp[:fe] = np.linspace(0, 1, fe) ** 1.5; ramp[-fe:] = np.linspace(1, 0, fe) ** 1.5
+    m = (m * ramp[None, :])[..., None]
     # relight to match the room: darker, cool top, red rim from the LED side
     l_ = f.mean(2, keepdims=True)
     f = np.power(f * 0.85 + l_ * 0.15, 1.25) * 0.78
@@ -207,7 +241,7 @@ def comp(dst, f, m, x0, y0, shadow=False):
 
 
 def head_frame(t, zoom, lt):
-    face_w = 400
+    face_w = 470
     f, m, (fx, fy) = presenter_rgba(t, face_w)
     out = plate.copy()
     # handheld micro drift

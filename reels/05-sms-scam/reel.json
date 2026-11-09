@@ -154,6 +154,27 @@
   "clip": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4",
   "sfx": {
    "whoosh": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/whoosh.mp3"
+  },
+  "flag": {
+   "quad": [
+    [
+     640,
+     230
+    ],
+    [
+     1110,
+     170
+    ],
+    [
+     1110,
+     760
+    ],
+    [
+     640,
+     720
+    ]
+   ],
+   "brightness": 0.46
   }
  }
 }
