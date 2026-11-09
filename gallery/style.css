@@ -85,3 +85,37 @@ fieldset.track { border: 1px solid var(--line); border-radius: 10px; display: gr
 input[type=range], .transport { direction: ltr; }
 #pBack { position: absolute; z-index: 3; top: calc(env(safe-area-inset-top) + 12px); right: max(12px, env(safe-area-inset-right)); background: rgba(24,24,28,.85); }
 .back { white-space: nowrap; }
+
+/* ===== תצוגה בסגנון גלריית אייפון ===== */
+#perform { --ph-bg: #000; --ph-fg: #fff; --ph-dim: rgba(235,235,245,.6); --ph-btn: rgba(118,118,128,.36);
+  transition: background-color .25s ease; }
+#perform.ph-light { --ph-fg: #000; --ph-dim: rgba(60,60,67,.6); --ph-btn: rgba(118,118,128,.16); }
+#perform.ph-light.ph-chrome { --ph-bg: #fff; }
+#perform.ph-chrome { background: var(--ph-bg); }
+#pmenu { z-index: 4; }
+#ph { position: absolute; inset: 0; z-index: 2; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
+  font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; color: var(--ph-fg); transition: opacity .25s ease; }
+#ph.off { opacity: 0; }
+#ph:not(.off) button, #ph:not(.off) .ph-strip { pointer-events: auto; }
+#ph button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ph-top { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: calc(env(safe-area-inset-top) + 6px) max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left)); }
+.ph-title { display: grid; text-align: center; line-height: 1.25; min-width: 0; }
+.ph-title b { font-size: 16px; font-weight: 600; }
+.ph-title span { font-size: 12.5px; color: var(--ph-dim); }
+.ph-round { width: 40px; height: 40px; flex: none; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center;
+  background: var(--ph-btn); color: var(--ph-fg); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
+.ph-round svg { width: 21px; height: 21px; }
+.ph-round.sm { width: 34px; height: 34px; }
+.ph-round.sm svg { width: 17px; height: 17px; }
+.ph-bottom { display: grid; gap: 12px;
+  padding: 8px max(14px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 8px) max(14px, env(safe-area-inset-left)); }
+.ph-scrub-row { display: flex; align-items: center; gap: 10px; }
+.ph-strip { position: relative; flex: 1; height: 36px; direction: ltr; touch-action: none; }
+#phStrip { width: 100%; height: 100%; display: block; border-radius: 7px; background: var(--ph-btn); }
+#phHead { position: absolute; top: -3px; bottom: -3px; left: 0; width: 4px; margin-left: -2px; border-radius: 2px;
+  background: #fff; box-shadow: 0 0 0 .5px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.3); }
+.ph-tools { display: flex; justify-content: space-between; align-items: center; padding: 0 6px; }
+.ph-tools button { width: 46px; height: 42px; border: 0; padding: 0; background: none; color: var(--ph-fg); display: grid; place-items: center; }
+.ph-tools svg { width: 25px; height: 25px; }
+#phHeart.on svg path { fill: currentColor; }

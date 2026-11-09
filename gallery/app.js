@@ -36,7 +36,7 @@ const METHODS = {
 /* ---------- הגדרות ---------- */
 const SKEY = 'gallery.settings';
 const S = Object.assign(
-  { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47' },
+  { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', viewStyle: 'photos', phTheme: 'dark' },
   (() => { try { return JSON.parse(localStorage.getItem(SKEY)) || {}; } catch (e) { return {}; } })()
 );
 const saveSettings = () => { try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) { /* ignore */ } };
@@ -96,10 +96,18 @@ class VideoSource {
   }
   ready() {
     return new Promise((res, rej) => {
-      if (this.el.readyState >= 2) return res();
-      this.el.addEventListener('loadeddata', () => res(), { once: true });
-      this.el.addEventListener('error', () => rej(new Error('לא ניתן לטעון את הסרטון')), { once: true });
-      this.el.load();
+      const v = this.el; let done = false;
+      const ok = () => { if (!done) { done = true; res(); } };
+      if (v.readyState >= 2) return ok();
+      v.addEventListener('loadeddata', ok, { once: true });
+      v.addEventListener('loadedmetadata', () => setTimeout(ok, 900), { once: true });
+      v.addEventListener('error', () => { if (!done) { done = true; rej(new Error('לא ניתן לטעון את הסרטון')); } }, { once: true });
+      // אייפון לא טוען פריים לפני ניגון: מנגנים שנייה בשקט ועוצרים
+      v.muted = true;
+      const p = v.play();
+      if (p && p.then) p.then(() => { v.pause(); v.currentTime = 0; v.muted = false; ok(); }).catch(() => { v.muted = false; });
+      else v.muted = false;
+      setTimeout(ok, 4000);
     });
   }
   get w() { return this.el.videoWidth || 720; }
@@ -306,6 +314,7 @@ function probe(blob) {
     v.onloadedmetadata = () => { res({ w: v.videoWidth, h: v.videoHeight, duration: isFinite(v.duration) ? v.duration : 0 }); URL.revokeObjectURL(u); };
     v.onerror = () => { URL.revokeObjectURL(u); rej(new Error('פורמט הווידאו לא נתמך בדפדפן הזה')); };
     v.src = u;
+    setTimeout(() => res({ w: v.videoWidth, h: v.videoHeight, duration: isFinite(v.duration) ? v.duration : 0 }), 6000);
   });
 }
 
@@ -340,7 +349,7 @@ $('#fileIn').addEventListener('change', async e => {
   try {
     const m = await probe(f);
     const t = m.duration ? +(m.duration * .75).toFixed(2) : 3;
-    const it = { id: uid(), name: f.name.replace(/\.[^.]+$/, ''), blob: f, ...m, created: Date.now(),
+    const it = { id: uid(), name: f.name.replace(/\.[^.]+$/, ''), blob: f, ...m, created: Date.now(), shotAt: f.lastModified || Date.now(),
       content: 'number', method: 'grid', words: DEFAULT_WORDS.slice(), regions: [newRegion(t)] };
     await DB.put(it); ITEMS.unshift(it); renderLib(); openEditor(it);
     toast('גרור על התמונה כדי לסמן איפה תופיע החשיפה');
@@ -376,6 +385,8 @@ async function openEditor(item) {
   $('#edContent').value = E.item.content;
   $('#edWords').value = (E.item.words || []).join('\n');
   $('#edSample').value = S.sample;
+  const ts = shotTime(E.item);
+  $('#edShot').value = new Date(ts - new Date(ts).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   $('#edDelete').hidden = E.item.id === 'demo';
   fillSelect($('#rgFont'), Object.entries(FONTS).map(([k, f]) => [k, f.name]), 'hand');
   syncMethodOptions(); renderRegions();
@@ -457,6 +468,7 @@ $('#edit').addEventListener('input', e => {
   } else if (el.id === 'edWords') it.words = el.value.split('\n').map(s => s.trim()).filter(Boolean);
   else if (el.id === 'edSample') { S.sample = el.value; saveSettings(); return; }
   else if (el.name === 'edTarget') { E.target = el.value; return; }
+  else if (el.id === 'edShot') it.shotAt = new Date(el.value).getTime() || undefined;
   else return;
   scheduleSave();
 });
@@ -506,7 +518,7 @@ edCanvas.addEventListener('pointermove', e => {
 });
 const endDrag = () => { if (E.drag) { E.drag = null; scheduleSave(); } };
 edCanvas.addEventListener('pointerup', endDrag); edCanvas.addEventListener('pointercancel', endDrag);
-addEventListener('resize', () => { sizeEdCanvas(); if (P.active) sizeStage(); });
+addEventListener('resize', () => { sizeEdCanvas(); if (P.active) { sizeStage(); buildStrip(); } });
 
 /* ---------- הגדרות ---------- */
 $('#btnSettings').onclick = () => {
@@ -536,7 +548,7 @@ const GRID = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['C', '0', 'B']
 /* ---------- הופעה ---------- */
 const P = { active: false, item: null, src: null, input: null, started: false, frozen: null, frozenAt: 0,
   raf: 0, stage: false, vr: null, dpr: 1, menu: false, rec: null, rc: null, rctx: null, clip: null, endAt: 0, wake: null, minT: 0 };
-const stageCv = $('#stage'), sctx = stageCv.getContext('2d'), pBack = $('#pBack');
+const stageCv = $('#stage'), sctx = stageCv.getContext('2d'), pBack = $('#pBack'), phHead = $('#phHead');
 
 function startPerform(item, stage, from) {
   P.from = from || 'lib'; P.fromItem = item;
@@ -559,6 +571,7 @@ async function enterPerform(item, stage, preText) {
   P.minT = Math.min(...item.regions.map(r => r.t), Infinity);
   $('#pmenu').hidden = true;
   show('perform');
+  initPhotosUI();
   P.src = makeSource(item);
   try { await P.src.ready(); } catch (err) { toast(err.message); exitPerform(); return; }
   P.src.time = 0;
@@ -566,6 +579,7 @@ async function enterPerform(item, stage, preText) {
   try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ }
   for (const r of item.regions) { try { await document.fonts.load(`700 40px ${(FONTS[r.font] || FONTS.clean).css}`); } catch (e) { /* ignore */ } }
   sizeStage();
+  buildStrip();
   cancelAnimationFrame(P.raf); perfLoop();
 }
 function sizeStage() {
@@ -583,15 +597,26 @@ function perfLoop() {
   P.raf = requestAnimationFrame(perfLoop);
   const src = P.src;
   // כפתור חזרה גלוי לפני ההתחלה ואחרי הסוף, מוסתר בזמן שהסרטון רץ
-  const hideBack = !!(src && P.started && !src.ended && !src.paused);
-  if (pBack.hidden !== hideBack) pBack.hidden = hideBack;
+  const playing = !!(src && P.started && !src.ended && !src.paused);
+  const photos = photosMode();
+  const showBack = !photos && !playing;
+  if (pBack.hidden === showBack) pBack.hidden = !showBack;
+  if (photos && src) {
+    // כמו באייפון: הכפתורים נעלמים בזמן ניגון וחוזרים בסוף
+    if (playing && !P.lastPlaying) setChrome(false);
+    if (!playing && P.lastPlaying && !P.menu) setChrome(true);
+    const dur = src.duration || P.item.duration || 1;
+    phHead.style.left = (clamp(src.time / dur) * 100) + '%';
+    if (P.phIcon !== playing) { P.phIcon = playing; $('#phPlay').innerHTML = playing ? ICON_PAUSE : ICON_PLAY; }
+  }
+  P.lastPlaying = playing;
   if (!src || !P.vr) return;
   const t = src.time;
   // נעילת הקלט ברגע שהחשיפה מתחילה (לא באמצע קו בציור)
   if (P.started && !P.frozen && t >= P.minT && !T.drawing) {
     const pl = P.input.payload(); if (pl) { P.frozen = pl; P.frozenAt = t; }
   }
-  sctx.fillStyle = '#000'; sctx.fillRect(0, 0, stageCv.width, stageCv.height);
+  sctx.clearRect(0, 0, stageCv.width, stageCv.height);
   sctx.save(); sctx.translate(P.vr.x, P.vr.y);
   composeFrame(sctx, src, P.item, P.frozen, P.frozenAt, P.vr.w, P.vr.h, false);
   sctx.restore();
@@ -685,7 +710,8 @@ $('#pmenu').addEventListener('click', e => {
   else if (m === 'exit') exitPerform();
 });
 function exitPerform() {
-  P.active = false; cancelAnimationFrame(P.raf);
+  P.active = false; cancelAnimationFrame(P.raf); P.stripRun = (P.stripRun || 0) + 1;
+  if (P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; }
   discardRec();
   if (P.src) { P.src.destroy(); P.src = null; }
   try { P.wake && P.wake.release(); } catch (e) { /* ignore */ }
@@ -748,6 +774,7 @@ touch.addEventListener('contextmenu', e => e.preventDefault());
 
 function secretTap(e, stroke) {
   if (!P.started) { begin(); return; }
+  if (photosMode() && P.src.ended) { setChrome(!P.chrome); return; }
   if (P.frozen) return;
   const it = P.item;
   if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
@@ -773,6 +800,100 @@ document.addEventListener('keydown', e => {
 document.addEventListener('visibilitychange', async () => {
   if (P.active && document.visibilityState === 'visible') { try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ } }
 });
+
+
+/* ---------- תצוגה בסגנון גלריית אייפון ---------- */
+const ICON_PLAY = "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M7 4.6v14.8c0 .8.9 1.3 1.6.9l12-7.4c.6-.4.6-1.4 0-1.8l-12-7.4C7.9 3.3 7 3.8 7 4.6z\"/></svg>";
+const ICON_PAUSE = "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><rect x=\"6\" y=\"4.5\" width=\"4.2\" height=\"15\" rx=\"1.2\"/><rect x=\"13.8\" y=\"4.5\" width=\"4.2\" height=\"15\" rx=\"1.2\"/></svg>";
+const ICON_SOUND = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\" fill=\"currentColor\"/><path d=\"M15.5 9a4.5 4.5 0 010 6M18 6.5a8 8 0 010 11\"/></svg>";
+const ICON_MUTE = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\" fill=\"currentColor\"/><path d=\"M16 9.5l5 5M21 9.5l-5 5\"/></svg>";
+const photosMode = () => S.viewStyle !== 'clean' && !P.stage;
+const shotTime = it => it.shotAt || (it.builtin ? Date.now() - 2 * 3600e3 : it.created || Date.now());
+
+function phDate(ts) {
+  const d = new Date(ts), now = new Date();
+  const day0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day0(now) - day0(d)) / 864e5);
+  const day = diff === 0 ? 'היום' : diff === 1 ? 'אתמול' : diff > 1 && diff < 7
+    ? d.toLocaleDateString('he-IL', { weekday: 'long' })
+    : d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', ...(d.getFullYear() !== now.getFullYear() ? { year: 'numeric' } : {}) });
+  return [day, d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })];
+}
+function setChrome(v) {
+  P.chrome = v;
+  $('#ph').classList.toggle('off', !v);
+  $('#perform').classList.toggle('ph-chrome', v && photosMode());
+}
+function initPhotosUI() {
+  const on = photosMode();
+  $('#ph').hidden = !on;
+  $('#perform').classList.toggle('ph-light', S.phTheme === 'light');
+  P.lastPlaying = false; P.phIcon = null;
+  $('#phHeart').classList.remove('on');
+  $('#phMute').innerHTML = ICON_SOUND;
+  const [day, time] = phDate(shotTime(P.item));
+  $('#phDay').textContent = day; $('#phTime').textContent = time;
+  phHead.style.left = '0%';
+  const sc = $('#phStrip'); sc.getContext('2d').clearRect(0, 0, sc.width, sc.height);
+  setChrome(on);
+}
+/* רצועת פריימים כמו בגלריה */
+async function buildStrip() {
+  if (!photosMode()) return;
+  const item = P.item, cv = $('#phStrip'), dpr = P.dpr || 1;
+  cv.width = Math.round(cv.clientWidth * dpr); cv.height = Math.round(cv.clientHeight * dpr);
+  const ctx = cv.getContext('2d'), aspect = (P.src.w || 9) / (P.src.h || 16);
+  const tw = Math.max(cv.height * aspect, 8 * dpr), n = Math.ceil(cv.width / tw);
+  const dur = P.src.duration || item.duration || 1, myRun = P.stripRun = (P.stripRun || 0) + 1;
+  let draw;
+  if (item.builtin === 'demo') { const d = new DemoSource(); draw = async (t, x) => { d.time = t; ctx.save(); ctx.translate(x, 0); d.draw(ctx, tw, cv.height); ctx.restore(); }; }
+  else {
+    const v = document.createElement('video'), u = URL.createObjectURL(item.blob);
+    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = u;
+    $('#vhost').appendChild(v);
+    try {
+      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = rej; setTimeout(res, 4000); });
+      try { await v.play(); v.pause(); } catch (e) { /* ignore */ }
+    } catch (e) { v.remove(); URL.revokeObjectURL(u); return; }
+    draw = (t, x) => new Promise(res => {
+      const go = () => { try { ctx.drawImage(v, x, 0, tw, cv.height); } catch (e) { /* ignore */ } res(); };
+      v.onseeked = go; v.currentTime = Math.min(t, Math.max(0, dur - .05)); setTimeout(res, 1500);
+    });
+    P.stripCleanup = () => { v.remove(); URL.revokeObjectURL(u); };
+  }
+  for (let i = 0; i < n; i++) {
+    if (P.stripRun !== myRun || !P.active) break;
+    await draw((i + .5) / n * dur, i * tw);
+  }
+  if (P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; }
+}
+/* גרירה על הרצועה = דילוג בסרטון */
+(() => {
+  const box = $('#phStripBox'); let drag = false;
+  const seek = e => {
+    if (!P.src) return; const b = box.getBoundingClientRect();
+    const dur = P.src.duration || P.item.duration || 1;
+    P.src.time = clamp((e.clientX - b.left) / b.width) * dur;
+  };
+  box.addEventListener('pointerdown', e => { drag = true; box.setPointerCapture(e.pointerId); if (P.src && !P.src.paused) P.src.pause(); seek(e); });
+  box.addEventListener('pointermove', e => { if (drag) seek(e); });
+  box.addEventListener('pointerup', () => { drag = false; });
+  box.addEventListener('pointercancel', () => { drag = false; });
+})();
+$('#phPlay').onclick = () => {
+  if (!P.src) return;
+  if (!P.started) begin();
+  else if (P.src.paused || P.src.ended) { P.endAt = 0; const pr = P.src.play(); if (pr && pr.catch) pr.catch(() => {}); }
+  else P.src.pause();
+};
+$('#phBack').onclick = () => exitPerform();
+$('#phMore').onclick = () => openMenu();
+$('#phShare').onclick = () => { if (S.record) shareClip(); };
+$('#phHeart').onclick = e => e.currentTarget.classList.toggle('on');
+$('#phMute').onclick = () => {
+  const el = P.src && P.src.el; if (!el) return;
+  el.muted = !el.muted; $('#phMute').innerHTML = el.muted ? ICON_MUTE : ICON_SOUND;
+};
 
 /* ---------- הפעלה ---------- */
 (async function init() {
