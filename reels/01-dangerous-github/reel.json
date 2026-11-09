@@ -1,0 +1,27 @@
+{
+  "duration": 56.6,
+  "out_video": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/out/reel01_video.mp4",
+  "caption_y": 1330,
+  "assets": {
+    "stt": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/voice/stt.json",
+    "font": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/fonts/Heebo-800.ttf",
+    "clips": {"A": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4", "B": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2955.mp4"},
+    "screens": {"pdf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/pdf.png", "immich": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/immich.png", "upscayl": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/upscayl.png", "localsend": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/localsend.png", "ollama": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ollama.png"}
+  },
+  "caption_replace": {"sterling": "Stirling", "img": "Immich", "upscale": "Upscayl", "lookalikesend": "LocalSend", "Apple": "אפל", "ulama": "Ollama", "photos": "פוטוס"},
+  "caption_suffix": {"גרוע": "?", "מטורף": "?"},
+  "caption_merge": [
+    {"from": ["ב", "Github"], "to": "ב-GitHub"},
+    {"from": ["sterling", "PDF"], "to": "Stirling-PDF"},
+    {"from": ["air", "drop"], "to": "AirDrop"}
+  ],
+  "sections": [
+    {"kind": "head", "clip": "A", "start": 0, "end": 13.42, "zoom_from": 1.0, "zoom_to": 1.08, "punch": [[11.08, 13.42, 1.15]]},
+    {"kind": "screen", "screen": "pdf", "clip": "A", "start": 13.42, "end": 20.08, "stars": "96.1K", "chip": "1/5", "scroll_px": 1900},
+    {"kind": "screen", "screen": "immich", "clip": "A", "start": 20.08, "end": 26.54, "stars": "118.6K", "chip": "2/5", "scroll_px": 2300},
+    {"kind": "screen", "screen": "upscayl", "clip": "A", "start": 26.54, "end": 32.48, "stars": "52K", "chip": "3/5", "scroll_px": 2300},
+    {"kind": "screen", "screen": "localsend", "clip": "A", "start": 32.48, "end": 39.0, "stars": "88K", "chip": "4/5", "scroll_px": 2300},
+    {"kind": "screen", "screen": "ollama", "clip": "A", "start": 39.0, "end": 48.86, "stars": "166K", "chip": "5/5", "scroll_px": 2600},
+    {"kind": "head", "clip": "B", "start": 48.86, "end": 56.6, "center_face": true, "zoom_from": 1.0, "zoom_to": 1.06, "punch": [[55.5, 56.6, 1.2]]}
+  ]
+}
