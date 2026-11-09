@@ -7,7 +7,7 @@ seg.json: רשימת משפטים (סצנה לכל משפט).
 --bed music (ברירת מחדל, 08.11 – הבעלים: "הביט לא מסתדר עם הקול") = אקורדים+בס+תופים רכים עם הנמכה מתחת לקול; --bed drums = הישן.
 פלט: OUT_DIR/mix.wav (קול+ביט+אפקטים), OUT_DIR/vo_sfx.wav (בלי ביט – אם הבעלים מוסיף מוזיקה), timing.js.
 כל משפט מתחיל בדיוק על ביט → החיתוכים מסונכרנים לביט.
-⚠️ קול: edge-tts (אברי) – ערוץ לא רשמי.
+⚠️ קול: edge-tts (אברי) – ערוץ לא רשמי, לטיוטות. לפרסום: --eleven l7Q9rbdCC6j3J5dNlOOg (איתמר) [--tempo 1.1].
 """
 import asyncio
 import json
@@ -32,6 +32,36 @@ async def tts(text, rate):
             words.append([ch["text"], ch["offset"] / 1e7])
     pcm = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "-", "-f", "f32le", "-ac", "1", "-ar", str(SR), "-"],
                          input=bytes(audio), capture_output=True).stdout
+    return np.frombuffer(pcm, np.float32).copy(), words
+
+
+def tts_eleven(text, voice, prev="", nxt="", tempo=1.0):
+    """ElevenLabs (eleven_v3, עברית) עם תזמון תווים → תזמון מילים. המפתח מוזרק ע"י ה-proxy.
+    tempo>1 מאיץ בלי לשנות גובה (atempo) ומכווץ את התזמונים בהתאם."""
+    import base64
+    import urllib.request
+    body = {"text": text, "model_id": "eleven_v3", "language_code": "he",
+            "voice_settings": {"stability": 0.5, "similarity_boost": 0.75, "style": 0}}
+    # previous_text/next_text – לא נתמך ב-eleven_v3 (נבדק 09.11)
+    req = urllib.request.Request(f"https://api.elevenlabs.io/v1/text-to-speech/{voice}/with-timestamps?output_format=mp3_44100_128",
+                                 data=json.dumps(body).encode(), headers={"xi-api-key": "proxy-injected", "Content-Type": "application/json"})
+    d = json.loads(urllib.request.urlopen(req, timeout=180).read())
+    af = ["-af", f"atempo={tempo}"] if tempo != 1.0 else []
+    pcm = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "-", *af, "-f", "f32le", "-ac", "1", "-ar", str(SR), "-"],
+                         input=base64.b64decode(d["audio_base64"]), capture_output=True).stdout
+    al = d.get("alignment") or d.get("normalized_alignment")
+    words, cur, t0 = [], "", None
+    for ch, st in zip(al["characters"], al["character_start_times_seconds"]):
+        if ch.isspace():
+            if cur:
+                words.append([cur, t0 / tempo]); cur = ""
+        else:
+            if not cur:
+                t0 = st
+            cur += ch
+    if cur:
+        words.append([cur, t0 / tempo])
+    words = [[w.strip(",.?!:"), o] for w, o in words if w.strip(",.?!:")]
     return np.frombuffer(pcm, np.float32).copy(), words
 
 
@@ -145,8 +175,12 @@ def main():
     os.makedirs(out, exist_ok=True)
 
     clips = []
-    for s in seg:  # חיתוך שקט בהתחלה ובסוף כל משפט (edge-tts מוסיף ~0.3–0.8ש')
-        pcm, ws = asyncio.run(tts(s, rate))
+    el_voice, tempo = opt("--eleven", ""), float(opt("--tempo", 1.0))
+    for si, s in enumerate(seg):  # חיתוך שקט בהתחלה ובסוף כל משפט
+        if el_voice:  # ElevenLabs (קול העמוד) – רק אחרי אישור הבעלים לתסריט!
+            pcm, ws = tts_eleven(s, el_voice, " ".join(seg[max(0, si - 2):si]), " ".join(seg[si + 1:si + 2]), tempo)
+        else:
+            pcm, ws = asyncio.run(tts(s, rate))
         loud = np.where(np.abs(pcm) > 0.012)[0]
         a0 = max(0, loud[0] - int(.03 * SR)) if len(loud) else 0
         a1 = min(len(pcm), loud[-1] + int(.08 * SR)) if len(loud) else len(pcm)
