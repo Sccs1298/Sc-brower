@@ -167,22 +167,29 @@
               <option value="soft-light">אור רך</option>
             </select>
           </label>
+          <label class="row"><span>גרעיניות מצלמה</span><input data-r="grain" type="range" min="0" max="1" step="0.01"></label>
+          <label class="row"><span>רכות (כמו פוקוס של מצלמה)</span><input data-r="soft" type="range" min="0" max="1" step="0.01"></label>
+          <label class="row"><span>התאמת תאורה אוטומטית</span><input data-r="light" type="checkbox" class="switch"></label>
           <label class="row"><span>מודגש</span><input data-r="bold" type="checkbox" class="switch"></label>
           <label class="row"><span>צל</span><input data-r="shadow" type="checkbox" class="switch"></label>
         </div>
       </details>
 
       <details class="group-details">
-        <summary>6. מעקב תנועה (אם המשטח זז)</summary>
+        <summary>6. מעקב תנועה (מצלמה ביד / משטח שזז)</summary>
         <div class="group">
-          <label class="row"><span>הפעל מעקב</span><input data-r="track.on" type="checkbox" class="switch"></label>
-          <div class="row">
-            <label class="inline"><input type="radio" name="edTarget" value="start" checked> עריכת מיקום התחלה</label>
-            <label class="inline"><input type="radio" name="edTarget" value="end"> מיקום סיום</label>
-          </div>
-          <label class="row"><span>שנייה של מיקום הסיום</span>
-            <span class="inline"><input data-r="track.t2" type="number" step="0.05" min="0"><button id="rgNow2" class="btn" type="button">הזמן הנוכחי</button></span>
-          </label>
+          <label class="row"><span>הפעל מעקב</span><input data-r="trackOn" type="checkbox" class="switch"></label>
+          <div class="row col"><span class="help-inline">מזיזים את הסרגל לרגע אחר וגוררים את המסגרת למקום שבו המשטח נמצא באותו רגע. כל גרירה יוצרת נקודת מעקב, והחשיפה "נצמדת" לתנועה. כדאי לשים נקודה כל חצי שנייה עד שנייה.</span></div>
+          <div class="row"><span>נקודות</span><div id="rgKeys" class="chips"></div></div>
+          <div class="row"><button id="rgKeysClear" class="btn danger" type="button">נקה את כל הנקודות</button></div>
+        </div>
+      </details>
+
+      <details class="group-details">
+        <summary>7. פרספקטיבה (משטח בזווית)</summary>
+        <div class="group">
+          <label class="row"><span>הפעל פרספקטיבה</span><input data-r="persp.on" type="checkbox" class="switch"></label>
+          <div class="row"><span class="help-inline">גרור את 4 הנקודות הכחולות לפינות המשטח בתמונה (לוח, דף, שלט).</span><button id="rgQuadReset" class="btn" type="button">אפס</button></div>
         </div>
       </details>
     </div>
@@ -235,6 +242,21 @@
     <div class="group pad">
       <h2>מה האפליקציה עושה</h2>
       <p>האפליקציה נראית בדיוק כמו גלריית התמונות של הטלפון. אתה מראה לצופה סרטון "רגיל" מהגלריה, הצופה חושב על מספר, מילה או ציור, והבחירה שלו מופיעה בתוך הסרטון.</p>
+    </div>
+
+    <div class="group pad">
+      <h2>איך לצלם סרטון שנראה אמיתי</h2>
+      <ol>
+        <li><b>משטח ברור:</b> לוח מחיק, דף לבן, שלט, מסך כבוי או חולצה. משטח מט (לא מבריק), ישר ובגודל טוב בפריים.</li>
+        <li><b>אור אחיד</b> בלי השתקפויות על המשטח. אם האור משתנה, "התאמת תאורה" תשנה את החשיפה איתו.</li>
+        <li><b>חצובה או יד יציבה.</b> אם המצלמה זזה, משתמשים ב<b>מעקב תנועה</b> עם נקודה כל חצי שנייה.</li>
+        <li><b>הטריק החזק ביותר:</b> המצלמה זזה הצידה מהמשטח וחוזרת אליו. שמים את רגע החשיפה כשהמשטח מחוץ לפריים, עם אפקט "מיידי". הצופה רואה שהכתובה "כבר הייתה שם".</li>
+        <li><b>תנו סיבה לחשיפה:</b> צלמו את עצמכם "כותבים" עם טוש סגור ותזמנו את אפקט "נכתב" לתנועת היד, או הפכו דף, או הדליקו אור.</li>
+        <li><b>שום דבר לא עובר מעל האזור</b> אחרי החשיפה (יד, ראש). זה שובר את האשליה.</li>
+        <li><b>אורך:</b> 15–30 שניות. החשיפה בערך ב-70% מהסרטון. דברו אל הצופה ("תחשוב על מספר בין 10 ל-99").</li>
+        <li><b>צלמו באותו טלפון</b> שאיתו מופיעים, ב-1080p וב-30fps, ושמרו בגלריה גם תמונות וסרטונים רגילים מסביב.</li>
+        <li><b>מראה החשיפה:</b> טוש כהה (לא שחור טהור) עם "דיו על נייר", גרעיניות 10–20%, רכות קלה, ופרספקטיבה אם המשטח בזווית.</li>
+      </ol>
     </div>
 
     <div class="group pad">

@@ -130,11 +130,13 @@ function persist(item) {
 }
 
 /* ---------- מודל ---------- */
+const defQuad = () => [[0, 0], [1, 0], [1, 1], [0, 1]];
 function newRegion(t, extra) {
   const base = { x: .2, y: .4, w: .6, h: .15 };
   return Object.assign({
     id: uid(), ...base, t, fade: 1.5, effect: 'fade', font: 'hand', color: '#ffffff', opacity: .95,
-    rot: 0, skew: 0, blend: 'source-over', shadow: true, bold: true, track: { on: false, t2: t + 2, ...base },
+    rot: 0, skew: 0, blend: 'source-over', shadow: true, bold: true,
+    trackOn: false, keys: [], persp: { on: false, q: defQuad() }, grain: .12, soft: .15, light: true,
   }, extra || {});
 }
 function demoItem() {
@@ -155,6 +157,14 @@ function normalize(it) {
   if (!it.words) it.words = DEFAULT_WORDS.slice();
   if (!it.regions) it.regions = [];
   if (!it.meta) it.meta = 'none';
+  for (const r of it.regions) { // שדרוג אזורים ישנים
+    if (!r.keys) { r.keys = []; if (r.track && r.track.on) { r.keys = [{ t: r.track.t2, x: r.track.x, y: r.track.y, w: r.track.w, h: r.track.h }]; r.trackOn = true; } }
+    if (r.trackOn === undefined) r.trackOn = false;
+    if (!r.persp) r.persp = { on: false, q: defQuad() };
+    if (r.grain === undefined) r.grain = .1;
+    if (r.soft === undefined) r.soft = .1;
+    if (r.light === undefined) r.light = true;
+  }
   if (!it.kind) it.kind = 'video';
   if (it.kind === 'photo' && it.method === 'scrub') it.method = 'grid';
   return it;
@@ -234,13 +244,18 @@ function drawDemo(ctx, t) {
 
 
 /* ---------- רינדור החשיפה ---------- */
+/* מיקום האזור בזמן t: נקודת ההתחלה + נקודות מעקב, עם מעבר חלק ביניהן */
 function regionRect(r, t) {
-  const tr = r.track;
-  if (tr && tr.on && tr.t2 > r.t && t > r.t) {
-    const k = clamp((t - r.t) / (tr.t2 - r.t));
-    return { x: lerp(r.x, tr.x, k), y: lerp(r.y, tr.y, k), w: lerp(r.w, tr.w, k), h: lerp(r.h, tr.h, k) };
+  if (!r.trackOn || !r.keys || !r.keys.length) return r;
+  const pts = [{ t: r.t, x: r.x, y: r.y, w: r.w, h: r.h }, ...r.keys].sort((a, b) => a.t - b.t);
+  if (t <= pts[0].t) return pts[0];
+  for (let i = 1; i < pts.length; i++) {
+    if (t <= pts[i].t) {
+      const a = pts[i - 1], b = pts[i], k = (t - a.t) / Math.max(1e-6, b.t - a.t);
+      return { x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), w: lerp(a.w, b.w, k), h: lerp(a.h, b.h, k) };
+    }
   }
-  return r;
+  return pts[pts.length - 1];
 }
 function revealProgress(r, t, t0) {
   if (t < t0) return -1;
@@ -280,25 +295,134 @@ function drawStrokes(ctx, strokes, w, h, r) {
     const L = st[st.length - 1]; ctx.lineTo(L[0], L[1]); ctx.stroke();
   }
 }
+/* ---------- ריאליזם: שכבה, גרעיניות, רכות, תאורה ופרספקטיבה ---------- */
+const LAYER = document.createElement('canvas'), LCTX = LAYER.getContext('2d');
+let NOISE = null;
+function noiseCanvas() {
+  if (!NOISE) {
+    NOISE = document.createElement('canvas'); NOISE.width = NOISE.height = 128;
+    const x = NOISE.getContext('2d'), d = x.createImageData(128, 128);
+    for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+    x.putImageData(d, 0, 0);
+  }
+  return NOISE;
+}
+const SAMPLE = document.createElement('canvas'); SAMPLE.width = SAMPLE.height = 6;
+const SCTX = SAMPLE.getContext('2d', { willReadFrequently: true });
+const LIGHT = new Map();
+const resetLight = () => LIGHT.clear();
+function sampleLum(ctx, x, y, w, h) {
+  try {
+    const m = ctx.getTransform();
+    SCTX.clearRect(0, 0, 6, 6);
+    SCTX.drawImage(ctx.canvas, m.a * x + m.e, m.d * y + m.f, Math.max(1, m.a * w), Math.max(1, m.d * h), 0, 0, 6, 6);
+    const d = SCTX.getImageData(0, 0, 6, 6).data; let sum = 0;
+    for (let i = 0; i < d.length; i += 4) sum += .2126 * d[i] + .7152 * d[i + 1] + .0722 * d[i + 2];
+    return sum / 36 / 255;
+  } catch (e) { return null; } // וידאו ממקור חיצוני – בלי דגימה
+}
+/* התאמת תאורה: כמה בהיר המשטח עכשיו לעומת רגע החשיפה */
+function lightFactor(r, ctx, x, y, w, h) {
+  if (!r.light) return 1;
+  if (!ctx.canvas.__lid) ctx.canvas.__lid = uid();
+  const key = r.id + ctx.canvas.__lid;
+  let st = LIGHT.get(key); if (!st) { st = { ref: null, val: 1, n: 0 }; LIGHT.set(key, st); }
+  if (st.n++ % 3 === 0) {
+    const l = sampleLum(ctx, x, y, w, h);
+    if (l != null) { if (st.ref == null) st.ref = Math.max(.04, l); st.val = lerp(st.val, clamp(l / st.ref, .25, 1.6), .5); }
+  }
+  return st.val;
+}
+/* מיפוי ריבוע היחידה למרובע (פרספקטיבה אמיתית) */
+function homography(q) {
+  const [x0, y0] = q[0], [x1, y1] = q[1], [x2, y2] = q[2], [x3, y3] = q[3];
+  const dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+  let a13 = 0, a23 = 0; const den = dx1 * dy2 - dx2 * dy1;
+  if (Math.abs(den) > 1e-9) { a13 = (dx3 * dy2 - dx2 * dy3) / den; a23 = (dx1 * dy3 - dx3 * dy1) / den; }
+  const a11 = x1 - x0 + a13 * x1, a21 = x3 - x0 + a23 * x3, a12 = y1 - y0 + a13 * y1, a22 = y3 - y0 + a23 * y3;
+  return (u, v) => { const z = a13 * u + a23 * v + 1; return [(a11 * u + a21 * v + x0) / z, (a12 * u + a22 * v + y0) / z]; };
+}
+function drawTri(ctx, img, s0, s1, s2, d0, d1, d2) {
+  const det = (s1[0] - s0[0]) * (s2[1] - s0[1]) - (s2[0] - s0[0]) * (s1[1] - s0[1]);
+  if (Math.abs(det) < 1e-9) return;
+  const cx = (d0[0] + d1[0] + d2[0]) / 3, cy = (d0[1] + d1[1] + d2[1]) / 3;
+  const ex = p => { const dx = p[0] - cx, dy = p[1] - cy, l = Math.hypot(dx, dy) || 1; return [p[0] + dx / l * .7, p[1] + dy / l * .7]; };
+  ctx.save(); ctx.beginPath();
+  const e0 = ex(d0), e1 = ex(d1), e2 = ex(d2);
+  ctx.moveTo(e0[0], e0[1]); ctx.lineTo(e1[0], e1[1]); ctx.lineTo(e2[0], e2[1]); ctx.closePath(); ctx.clip();
+  const ax = s1[0] - s0[0], ay = s1[1] - s0[1], bx = s2[0] - s0[0], by = s2[1] - s0[1];
+  const ux = d1[0] - d0[0], uy = d1[1] - d0[1], vx = d2[0] - d0[0], vy = d2[1] - d0[1];
+  const a = (ux * by - vx * ay) / det, c = (vx * ax - ux * bx) / det;
+  const b = (uy * by - vy * ay) / det, d = (vy * ax - uy * bx) / det;
+  ctx.transform(a, b, c, d, d0[0] - a * s0[0] - c * s0[1], d0[1] - b * s0[0] - d * s0[1]);
+  ctx.drawImage(img, 0, 0); ctx.restore();
+}
+function drawWarped(ctx, img, quad, pad) {
+  const H = homography(quad), N = 6, LW = img.width, LH = img.height, span = 1 + 2 * pad;
+  const P = [];
+  for (let j = 0; j <= N; j++) for (let i = 0; i <= N; i++) {
+    const u = -pad + span * i / N, v = -pad + span * j / N;
+    P.push({ s: [LW * i / N, LH * j / N], d: H(u, v) });
+  }
+  const at = (i, j) => P[j * (N + 1) + i];
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const p00 = at(i, j), p10 = at(i + 1, j), p11 = at(i + 1, j + 1), p01 = at(i, j + 1);
+    drawTri(ctx, img, p00.s, p10.s, p11.s, p00.d, p10.d, p11.d);
+    drawTri(ctx, img, p00.s, p11.s, p01.s, p00.d, p11.d, p01.d);
+  }
+}
 function drawReveal(ctx, r, payload, p, t, W, H) {
   if (!payload || p < 0) return;
-  const R = regionRect(r, t), w = R.w * W, h = R.h * H;
-  ctx.save();
-  ctx.translate(R.x * W + w / 2, R.y * H + h / 2);
-  ctx.rotate(r.rot * Math.PI / 180);
-  if (r.skew) ctx.transform(1, 0, Math.tan(r.skew * Math.PI / 180), 1, 0, 0);
-  ctx.globalCompositeOperation = r.blend || 'source-over';
-  let a = r.opacity; const e = easeOut(p);
-  if (r.effect === 'fade') a *= e;
-  else if (r.effect === 'develop') { a *= clamp(p * 1.2); const s = 1.06 - .06 * e; ctx.scale(s, s); }
-  else if (r.effect === 'pop') { const s = Math.max(.001, backOut(p)); ctx.scale(s, s); a *= clamp(p * 3); }
-  else if (r.effect === 'wipe') {
-    const rtl = payload.type === 'text' && isRTL(payload.text), ww = w * 1.1 * clamp(p);
-    ctx.beginPath(); ctx.rect(rtl ? w * .55 - ww : -w * .55, -h, ww, h * 2); ctx.clip();
+  const R = regionRect(r, t), w = R.w * W, h = R.h * H, x0 = R.x * W, y0 = R.y * H;
+  if (w < 2 || h < 2) return;
+  const lf = lightFactor(r, ctx, x0, y0, w, h);
+  // 1. מציירים את הכתב על שכבה נפרדת (קטנה יותר = רכה יותר)
+  const m = ctx.getTransform(), dens = Math.abs(m.a) || 1, sc = 1 / (1 + clamp(r.soft || 0) * 3), pad = .25;
+  const lw = Math.max(2, w * dens * sc), lh = Math.max(2, h * dens * sc);
+  LAYER.width = Math.ceil(lw * (1 + 2 * pad)); LAYER.height = Math.ceil(lh * (1 + 2 * pad));
+  const LW = LAYER.width, LH = LAYER.height;
+  LCTX.save(); LCTX.translate(LW / 2, LH / 2); LCTX.scale(dens * sc, dens * sc);
+  if (payload.type === 'text') drawTextFit(LCTX, payload.text, w, h, r); else drawStrokes(LCTX, payload.strokes, w, h, r);
+  LCTX.restore();
+  // 2. תאורה: המשטח התכהה או התבהר מאז רגע החשיפה
+  if (Math.abs(lf - 1) > .02) {
+    LCTX.save(); LCTX.globalCompositeOperation = 'source-atop';
+    LCTX.fillStyle = lf < 1 ? `rgba(0,0,0,${clamp(1 - lf, 0, .8)})` : `rgba(255,255,255,${clamp((lf - 1) * .6, 0, .5)})`;
+    LCTX.fillRect(0, 0, LW, LH); LCTX.restore();
   }
+  // 3. גרעיניות מצלמה, מתחלפת בכל פריים
+  if (r.grain > 0) {
+    LCTX.save(); LCTX.globalCompositeOperation = 'source-atop'; LCTX.globalAlpha = clamp(r.grain) * .45;
+    LCTX.fillStyle = LCTX.createPattern(noiseCanvas(), 'repeat');
+    LCTX.translate(-(Math.random() * 128 | 0), -(Math.random() * 128 | 0));
+    LCTX.fillRect(0, 0, LW + 128, LH + 128); LCTX.restore();
+  }
+  // 4. אפקט "נכתב": חושפים חלק מהשכבה
+  const e = easeOut(p);
+  if (r.effect === 'wipe') {
+    const rtl = payload.type === 'text' && isRTL(payload.text), ww = lw * 1.1 * clamp(p);
+    LCTX.save(); LCTX.globalCompositeOperation = 'destination-in'; LCTX.fillStyle = '#000';
+    LCTX.fillRect(rtl ? LW / 2 + lw * .55 - ww : LW / 2 - lw * .55, 0, ww, LH); LCTX.restore();
+  }
+  // 5. הדבקה על הסרטון
+  ctx.save();
+  ctx.globalCompositeOperation = r.blend || 'source-over';
+  let a = r.opacity, s = 1;
+  if (r.effect === 'fade') a *= e;
+  else if (r.effect === 'develop') { a *= clamp(p * 1.2); s = 1.06 - .06 * e; }
+  else if (r.effect === 'pop') { s = Math.max(.001, backOut(p)); a *= clamp(p * 3); }
   ctx.globalAlpha = a;
-  if (payload.type === 'text') drawTextFit(ctx, payload.text, w, h, r);
-  else drawStrokes(ctx, payload.strokes, w, h, r);
+  if (r.persp && r.persp.on) {
+    const cx = x0 + w / 2, cy = y0 + h / 2;
+    const quad = r.persp.q.map(([u, v]) => [cx + (x0 + u * w - cx) * s, cy + (y0 + v * h - cy) * s]);
+    drawWarped(ctx, LAYER, quad, pad);
+  } else {
+    ctx.translate(x0 + w / 2, y0 + h / 2);
+    ctx.rotate(r.rot * Math.PI / 180);
+    if (r.skew) ctx.transform(1, 0, Math.tan(r.skew * Math.PI / 180), 1, 0, 0);
+    ctx.scale(s, s);
+    ctx.drawImage(LAYER, -w / 2 * (1 + 2 * pad), -h / 2 * (1 + 2 * pad), w * (1 + 2 * pad), h * (1 + 2 * pad));
+  }
   ctx.restore();
 }
 /* מצייר פריים מלא: וידאו + כל אזורי החשיפה */
@@ -611,7 +735,15 @@ function renderRegions() {
     const v = getPath(r, el.dataset.r);
     if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
   });
-  $$('input[name=edTarget]').forEach(el => el.checked = el.value === E.target);
+  const kb = $('#rgKeys'); kb.innerHTML = '';
+  if (r) {
+    if (!r.keys.length) kb.innerHTML = '<span class="help-inline">אין עדיין</span>';
+    r.keys.forEach((k, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = `${(+k.t).toFixed(1)} ✕`;
+      b.title = 'מחק נקודה'; b.onclick = () => { r.keys.splice(i, 1); renderRegions(); scheduleSave(); };
+      kb.appendChild(b);
+    });
+  }
 }
 ENTER.edit = async () => {
   const src = byId(E.id); if (!src) { uiBack(); return; }
@@ -674,7 +806,20 @@ function edLoop() {
     ctx.strokeStyle = on ? '#ffcc00' : 'rgba(255,255,255,.55)';
     ctx.strokeRect(R.x * W, R.y * H, R.w * W, R.h * H);
     if (on) { ctx.setLineDash([]); ctx.fillStyle = '#ffcc00'; ctx.fillRect((R.x + R.w) * W - 10, (R.y + R.h) * H - 10, 16, 16); }
-    if (on && r.track.on) { ctx.strokeStyle = '#5ac8fa'; ctx.setLineDash([3, 4]); ctx.strokeRect(r.track.x * W, r.track.y * H, r.track.w * W, r.track.h * H); }
+    if (on && r.trackOn && r.keys.length) { // מסלול המעקב
+      ctx.setLineDash([]); ctx.strokeStyle = '#5ac8fa'; ctx.fillStyle = '#5ac8fa'; ctx.lineWidth = 1.5; ctx.beginPath();
+      [{ t: r.t, x: r.x, y: r.y, w: r.w, h: r.h }, ...r.keys].sort((a, b) => a.t - b.t).forEach((k, n) => {
+        const kx = (k.x + k.w / 2) * W, ky = (k.y + k.h / 2) * H; if (n) ctx.lineTo(kx, ky); else ctx.moveTo(kx, ky);
+      });
+      ctx.stroke();
+      r.keys.forEach(k => { ctx.beginPath(); ctx.arc((k.x + k.w / 2) * W, (k.y + k.h / 2) * H, Math.abs(k.t - t) < .15 ? 6 : 3.5, 0, 7); ctx.fill(); });
+    }
+    if (on && r.persp && r.persp.on) { // פינות הפרספקטיבה
+      ctx.setLineDash([]); ctx.strokeStyle = '#0a84ff'; ctx.lineWidth = 2; ctx.beginPath();
+      const pts = r.persp.q.map(([u, v]) => [(R.x + u * R.w) * W, (R.y + v * R.h) * H]);
+      pts.forEach(([px, py], n) => n ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.stroke();
+      ctx.fillStyle = '#0a84ff'; pts.forEach(([px, py]) => { ctx.beginPath(); ctx.arc(px, py, 9, 0, 7); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.stroke(); });
+    }
     ctx.restore();
   });
   if (!E.scrubbing) $('#edScrub').value = t;
@@ -691,7 +836,9 @@ $('#edit').addEventListener('input', e => {
   } else if (el.dataset.r && curRegion()) {
     const v = el.type === 'checkbox' ? el.checked : (el.type === 'number' || el.type === 'range') ? parseFloat(el.value) || 0 : el.value;
     setPath(curRegion(), el.dataset.r, v);
-    if (el.dataset.r === 'track.on' && v) { const r = curRegion(); Object.assign(r.track, { x: r.x, y: r.y, w: r.w, h: r.h }); if (r.track.t2 <= r.t) r.track.t2 = r.t + 2; renderRegions(); }
+    if (el.dataset.r === 'trackOn' && v) toast('הזז את הסרגל לרגע אחר וגרור את המסגרת למקום החדש');
+    if (el.dataset.r === 'persp.on' && v) toast('גרור את 4 הנקודות הכחולות לפינות המשטח');
+    resetLight();
     if (el.dataset.r === 't') renderRegions();
   } else if (el.id === 'edWords') it.words = el.value.split('\n').map(s => s.trim()).filter(Boolean);
   else if (el.id === 'edDigits') { it.digits = parseInt(el.value, 10) || 2; syncEditorForm(); }
@@ -702,13 +849,14 @@ $('#edit').addEventListener('input', e => {
   else return;
   scheduleSave();
 });
-$('#edScrub').addEventListener('input', e => { E.scrubbing = true; if (E.src) { E.src.pause(); E.src.time = parseFloat(e.target.value); } });
+$('#edScrub').addEventListener('input', e => { E.scrubbing = true; resetLight(); if (E.src) { E.src.pause(); E.src.time = parseFloat(e.target.value); } });
 $('#edScrub').addEventListener('change', () => { E.scrubbing = false; });
 $('#edPlay').onclick = () => { if (!E.src) return; if (E.src.paused) { if (E.src.ended || E.src.time >= E.src.duration - .05) E.src.time = 0; E.src.play(); } else E.src.pause(); };
 $('#rgAdd').onclick = () => { E.item.regions.push(newRegion(+(E.src ? E.src.time : 0).toFixed(2))); E.sel = E.item.regions.length - 1; E.target = 'start'; renderRegions(); scheduleSave(); toast('גרור על התמונה כדי לסמן את האזור החדש'); };
 $('#rgDel').onclick = () => { if (!curRegion()) return; E.item.regions.splice(E.sel, 1); E.sel = Math.max(0, E.sel - 1); renderRegions(); scheduleSave(); };
-$('#rgNow').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.t = +E.src.time.toFixed(2); if (r.track.t2 <= r.t) r.track.t2 = r.t + 2; renderRegions(); scheduleSave(); };
-$('#rgNow2').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.track.on = true; r.track.t2 = +E.src.time.toFixed(2); E.target = 'end'; renderRegions(); scheduleSave(); toast('עכשיו גרור את המיקום בזמן הזה'); };
+$('#rgNow').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.t = +E.src.time.toFixed(2); r.keys = r.keys.filter(k => k.t > r.t); renderRegions(); scheduleSave(); };
+$('#rgKeysClear').onclick = () => { const r = curRegion(); if (!r) return; r.keys = []; renderRegions(); scheduleSave(); };
+$('#rgQuadReset').onclick = () => { const r = curRegion(); if (!r) return; r.persp.q = defQuad(); scheduleSave(); };
 $('#edTry').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit' }); };
 $('#edStage').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit', stage: true }); };
 $('#edHide').onclick = () => { E.item.hidden = !E.item.hidden; syncEditorForm(); scheduleSave(); toast(E.item.hidden ? 'הסרטון הוסתר מהגלריה' : 'הסרטון מוצג בגלריה'); };
@@ -739,7 +887,20 @@ const edCanvas = $('#edCanvas');
 const normPt = e => { const b = edCanvas.getBoundingClientRect(); return { x: clamp((e.clientX - b.left) / b.width), y: clamp((e.clientY - b.top) / b.height) }; };
 edCanvas.addEventListener('pointerdown', e => {
   const r = curRegion(); if (!r || E.item.trick === false) return;
-  const tgt = E.target === 'end' && r.track.on ? r.track : r, p = normPt(e), b = edCanvas.getBoundingClientRect();
+  const t = E.src ? E.src.time : 0, p = normPt(e), b = edCanvas.getBoundingClientRect();
+  // פינות פרספקטיבה
+  if (r.persp && r.persp.on) {
+    const R = regionRect(r, t);
+    const i = r.persp.q.findIndex(([u, v]) => Math.hypot((R.x + u * R.w - p.x) * b.width, (R.y + v * R.h - p.y) * b.height) < 24);
+    if (i >= 0) { E.drag = { mode: 'corner', i, R }; edCanvas.setPointerCapture(e.pointerId); return; }
+  }
+  // במעקב: גרירה ברגע אחר יוצרת/עורכת נקודת מעקב
+  let tgt = r;
+  if (r.trackOn && t > r.t + .05) {
+    let k = r.keys.find(k => Math.abs(k.t - t) < .15);
+    if (!k) { const cur = regionRect(r, t); k = { t: +t.toFixed(2), x: cur.x, y: cur.y, w: cur.w, h: cur.h }; r.keys.push(k); r.keys.sort((a, c) => a.t - c.t); renderRegions(); }
+    tgt = k;
+  }
   const nearCorner = Math.abs(p.x - (tgt.x + tgt.w)) * b.width < 24 && Math.abs(p.y - (tgt.y + tgt.h)) * b.height < 24;
   const inside = p.x > tgt.x && p.x < tgt.x + tgt.w && p.y > tgt.y && p.y < tgt.y + tgt.h;
   E.drag = { tgt, mode: nearCorner ? 'size' : inside ? 'move' : 'new', sx: p.x, sy: p.y, o: { ...tgt } };
@@ -747,7 +908,9 @@ edCanvas.addEventListener('pointerdown', e => {
   edCanvas.setPointerCapture(e.pointerId);
 });
 edCanvas.addEventListener('pointermove', e => {
-  const d = E.drag; if (!d) return; const p = normPt(e), t = d.tgt;
+  const d = E.drag; if (!d) return; const p = normPt(e);
+  if (d.mode === 'corner') { const R = d.R; curRegion().persp.q[d.i] = [(p.x - R.x) / R.w, (p.y - R.y) / R.h]; return; }
+  const t = d.tgt;
   if (d.mode === 'move') { t.x = clamp(d.o.x + p.x - d.sx, 0, 1 - t.w); t.y = clamp(d.o.y + p.y - d.sy, 0, 1 - t.h); }
   else if (d.mode === 'size') { t.w = clamp(d.o.w + p.x - d.sx, .02, 1 - t.x); t.h = clamp(d.o.h + p.y - d.sy, .02, 1 - t.y); }
   else { t.x = Math.min(p.x, d.sx); t.y = Math.min(p.y, d.sy); t.w = Math.max(.02, Math.abs(p.x - d.sx)); t.h = Math.max(.02, Math.abs(p.y - d.sy)); }
@@ -856,6 +1019,7 @@ function sizeStage() {
 addEventListener('resize', () => { if (curScreen() === 'edit') sizeEdCanvas(); if (P.active) { sizeStage(); if (!P.isPhoto) buildStrip(); } });
 
 function begin() {
+  resetLight();
   P.started = true; P.frozen = null; P.frozenAt = 0; P.endAt = 0; P.clip = null; P.drawRegions = P.regions; updateHeader();
   P.src.time = 0;
   setupRecorder();
@@ -950,7 +1114,7 @@ function onFrozen() {
   if (P.meta === 'caption' && P.frozen.type === 'text') $('.ph-caption').value = P.frozen.text;
   if (P.isPhoto && P.regions.length) {
     const t0 = P.frozenAt;
-    P.drawRegions = P.regions.map(r => ({ ...r, t: t0 + r.t, track: { ...r.track, t2: t0 + r.track.t2 } }));
+    P.drawRegions = P.regions.map(r => ({ ...r, t: t0 + r.t, keys: (r.keys || []).map(k => ({ ...k, t: t0 + k.t })) }));
   }
 }
 function setChrome(v) {
@@ -1098,6 +1262,7 @@ function hideCurrent() { // "מחיקה" בגלריה = הסתרה (אפשר ל�
   uiBack();
 }
 function restartPerformance() {
+  resetLight();
   P.input = new SecretInput(P.item); P.started = false; P.frozen = null; P.forceFreeze = false; P.drawRegions = P.regions;
   P.src.pause(); P.src.time = 0; discardRec(); setChrome(photosMode()); updateHeader(); $('.ph-caption').value = '';
 }

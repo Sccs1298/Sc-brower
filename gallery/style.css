@@ -230,3 +230,5 @@ input[type=range] { direction: ltr; }
 .row input[type=range] { flex: 0 1 50%; min-width: 90px; }
 /* קריאות הכותרת כשהסרטון ממלא את המסך (מסכים קצרים) */
 .ph-title b, .ph-title span { text-shadow: 0 0 6px var(--pg-bg), 0 0 12px var(--pg-bg); }
+
+.help-inline { font-size: 13px; color: var(--dim); }
