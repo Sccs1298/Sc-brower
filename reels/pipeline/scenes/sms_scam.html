@@ -142,10 +142,10 @@ window.setT = (scene, t, dur) => {
   if (scene === 'vt_result') {
     const img = $('vtres'); const top0 = 300 * S, top1 = 300 * S - 140;
     const y = -(top0 + (top1 - top0) * 0) + 0;
-    const scroll = 300 * S * ease((t - 0.15) / 0.8);
+    const scroll = 300 * S * ease((t - 0.05) / 0.5);
     img.style.top = (-scroll) + 'px';
     const hl = $('hls'); hl.innerHTML = '';
-    VT_ROWS.forEach((ry, i) => { const s = 1.0 + i * 0.13; const o = ease((t - s) / 0.15);
+    VT_ROWS.forEach((ry, i) => { const s = EV.rows + i * 0.1; const o = ease((t - s) / 0.15);
       if (o > 0) hl.innerHTML += `<div class="hlrow" style="top:${(ry - 12) * S - scroll}px;height:${24 * S}px;opacity:${o}"></div>`; });
     const cu = back((t - EV.count) / 0.4); $('ctr').style.transform = `translateX(-50%) scale(${Math.max(0, cu)})`;
   }
