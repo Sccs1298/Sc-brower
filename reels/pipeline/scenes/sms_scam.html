@@ -101,7 +101,12 @@ window.setT = (scene, t, dur) => {
     const n = $('n1'); const u = back((t - 0.1) / 0.45);
     n.style.transform = `translateY(${(1 - u) * -260}px)`; n.style.opacity = t < 1.7 ? 1 : 1 - ease((t - 1.7) / 0.3);
     const b = $('b1'); const v = back((t - 1.75) / 0.4); b.style.transform = `scale(${v})`; b.style.opacity = t > 1.7 ? 1 : 0;
-    $('ph1').style.transform = `scale(${1 + 0.03 * t / dur})`;
+    const z = 1 + 0.03 * t / dur + 0.2 * ease((t - EV.zoom) / 1.2); $("ph1").style.transformOrigin = "50% 32%";
+    $('ph1').style.transform = `scale(${z}) translateY(${-30 * ease((t - EV.zoom) / 1.2)}px)`;
+    const nm = document.querySelector('#ph1 .name'); const a1 = ease((t - EV.sender) / 0.25) * (t < EV.link ? 1 : 0.35);
+    nm.style.background = `rgba(250,204,21,${0.85 * a1})`; nm.style.color = a1 > 0.5 ? '#111' : '#fff'; nm.style.borderRadius = '10px'; nm.style.padding = '2px 12px';
+    const lk = document.querySelector('#b1 a'); const a2 = ease((t - EV.link) / 0.25);
+    lk.style.background = `rgba(225,29,42,${0.9 * a2})`; lk.style.color = a2 > 0.5 ? '#fff' : '#3d9bff'; lk.style.borderRadius = '8px'; lk.style.padding = '0 8px';
   }
   if (scene === 'url1') {
     $('w1').style.background = `rgba(250,204,21,${0.55 * ease((t - EV.word) / 0.25) * (t < EV.ring ? 1 : 0.4)})`;
