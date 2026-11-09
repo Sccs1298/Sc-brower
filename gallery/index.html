@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0e0e10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="גלריה">
+<title>גלריה</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;700&family=Secular+One&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== ספרייה ===== -->
+<section id="lib" class="screen active">
+  <header class="bar">
+    <h1>גלריה</h1>
+    <button id="btnSettings" class="icon" aria-label="הגדרות">⚙︎</button>
+  </header>
+  <div id="items" class="list"></div>
+  <footer class="dock">
+    <label class="btn primary">
+      + סרטון חדש
+      <input id="fileIn" type="file" accept="video/*" hidden>
+    </label>
+  </footer>
+</section>
+
+<!-- ===== עורך ===== -->
+<section id="edit" class="screen">
+  <header class="bar">
+    <button id="edBack" class="icon" aria-label="חזרה">→</button>
+    <input id="edName" data-i="name" class="title-in" placeholder="שם הסרטון">
+    <button id="edPerform" class="btn small primary">הופעה</button>
+  </header>
+
+  <div class="ed-body">
+    <div class="preview-wrap"><canvas id="edCanvas"></canvas></div>
+    <div class="transport">
+      <button id="edPlay" class="icon">▶</button>
+      <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0">
+      <span id="edTime" class="mono">0.00</span>
+    </div>
+    <label class="row tight"><input id="edShowAll" type="checkbox" checked> הצג חשיפה תמיד (תצוגה מקדימה)</label>
+
+    <details open class="card">
+      <summary>1 · מה חושפים ואיך מזינים</summary>
+      <label class="row">סוג
+        <select data-i="content" id="edContent">
+          <option value="number">מספר</option>
+          <option value="word">מילה / שם / מדינה</option>
+          <option value="drawing">ציור</option>
+        </select>
+      </label>
+      <label class="row">שיטת קלט סודית
+        <select data-i="method" id="edMethod"></select>
+      </label>
+      <p id="edMethodHelp" class="help"></p>
+      <label class="col" id="edWordsWrap">רשימת מילים (שורה לכל מילה – המיקום ברשימה = מספר)
+        <textarea id="edWords" rows="5"></textarea>
+      </label>
+      <label class="row">טקסט לדוגמה בתצוגה
+        <input id="edSample" placeholder="47">
+      </label>
+    </details>
+
+    <details open class="card">
+      <summary>2 · אזורי חשיפה <span class="help">(גרור על התמונה כדי לסמן)</span></summary>
+      <div id="edRegions" class="chips"></div>
+      <div class="row gap">
+        <button id="rgAdd" class="btn small">+ אזור</button>
+        <button id="rgDel" class="btn small danger">מחק אזור</button>
+      </div>
+
+      <div id="rgForm">
+        <label class="row">זמן חשיפה (שנ׳)
+          <span class="inline"><input data-r="t" type="number" step="0.05" min="0"><button id="rgNow" class="btn small">עכשיו</button></span>
+        </label>
+        <label class="row">אפקט
+          <select data-r="effect">
+            <option value="fade">הופעה הדרגתית</option>
+            <option value="wipe">כתיבה / מחיקה</option>
+            <option value="develop">פיתוח (כמו פולרויד)</option>
+            <option value="pop">קפיצה</option>
+            <option value="cut">מיידי</option>
+          </select>
+        </label>
+        <label class="row">משך אפקט (שנ׳) <input data-r="fade" type="number" step="0.1" min="0"></label>
+        <label class="row">גופן
+          <select data-r="font" id="rgFont"></select>
+        </label>
+        <label class="row">צבע <input data-r="color" type="color"></label>
+        <label class="row">אטימות <input data-r="opacity" type="range" min="0.05" max="1" step="0.01"></label>
+        <label class="row">סיבוב° <input data-r="rot" type="range" min="-45" max="45" step="0.5"></label>
+        <label class="row">הטיה° <input data-r="skew" type="range" min="-30" max="30" step="0.5"></label>
+        <label class="row">מיזוג
+          <select data-r="blend">
+            <option value="source-over">רגיל</option>
+            <option value="multiply">דיו על נייר (Multiply)</option>
+            <option value="screen">אור / מסך (Screen)</option>
+            <option value="overlay">שכבה (Overlay)</option>
+            <option value="soft-light">אור רך</option>
+          </select>
+        </label>
+        <label class="row tight"><input data-r="bold" type="checkbox"> מודגש</label>
+        <label class="row tight"><input data-r="shadow" type="checkbox"> צל</label>
+        <fieldset class="track">
+          <legend><label><input data-r="track.on" type="checkbox"> מעקב תנועה (האזור זז)</label></legend>
+          <div class="row gap">
+            <label><input type="radio" name="edTarget" value="start" checked> מיקום התחלה</label>
+            <label><input type="radio" name="edTarget" value="end"> מיקום סיום</label>
+          </div>
+          <label class="row">זמן סיום (שנ׳)
+            <span class="inline"><input data-r="track.t2" type="number" step="0.05" min="0"><button id="rgNow2" class="btn small">עכשיו</button></span>
+          </label>
+        </fieldset>
+      </div>
+    </details>
+
+    <div class="row gap end">
+      <button id="edStage" class="btn">מצב במה</button>
+      <button id="edDup" class="btn">שכפל</button>
+      <button id="edDelete" class="btn danger">מחק סרטון</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== הגדרות ===== -->
+<section id="settings" class="screen">
+  <header class="bar">
+    <button id="stBack" class="icon" aria-label="חזרה">→</button>
+    <h1>הגדרות</h1>
+    <span></span>
+  </header>
+  <div class="ed-body">
+    <div class="card">
+      <label class="row tight"><input data-s="vibrate" type="checkbox"> רטט קצר על כל הקשה סודית (אנדרואיד)</label>
+      <label class="row tight"><input data-s="indicator" type="checkbox"> אינדיקטור דיסקרטי (נקודות זעירות בפינה)</label>
+      <label class="row tight"><input data-s="record" type="checkbox"> הקלט את ההופעה לשיתוף עם הצופה</label>
+    </div>
+    <div class="card">
+      <p class="help">יופיע בכרטיס הסיום של הסרטון המשותף</p>
+      <label class="row">שם <input data-s="contactName" placeholder="הקוסם ..."></label>
+      <label class="row">קישור / אינסטגרם <input data-s="contactLink" placeholder="@my.magic" dir="ltr"></label>
+    </div>
+    <div class="card help">
+      <b>מחוות בזמן הופעה</b><br>
+      הקשה ראשונה – מתחיל את הסרטון · לחיצה ארוכה – תפריט נסתר · הקשה בשתי אצבעות – ביטול אחרון · מקלדת Bluetooth: רווח/חץ מתחיל, Esc תפריט.
+    </div>
+  </div>
+</section>
+
+<!-- ===== קלט מראש (מוסווה כחיפוש) ===== -->
+<section id="pre" class="screen">
+  <header class="bar">
+    <button id="preBack" class="icon" aria-label="חזרה">→</button>
+    <h1>חיפוש</h1><span></span>
+  </header>
+  <form id="preForm" class="ed-body">
+    <input id="preIn" class="search" placeholder="🔍 חיפוש בגלריה" autocomplete="off">
+    <button class="btn primary" type="submit">חפש</button>
+  </form>
+</section>
+
+<!-- ===== הופעה ===== -->
+<section id="perform" class="screen">
+  <canvas id="stage"></canvas>
+  <div id="touch"></div>
+  <div id="pmenu" hidden>
+    <button data-m="resume" class="btn">המשך</button>
+    <button data-m="restart" class="btn">התחל מחדש</button>
+    <button data-m="share" class="btn primary">שתף סרטון</button>
+    <button data-m="exit" class="btn danger">יציאה</button>
+  </div>
+</section>
+
+<div id="vhost" aria-hidden="true"></div>
+<div id="toast" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
