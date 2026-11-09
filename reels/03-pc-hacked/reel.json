@@ -1,0 +1,141 @@
+{
+ "lines": [
+  {
+   "say": "שלושה סימנים שהמחשב שלכם כבר נפרץ, בלי שאתם יודעים.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "כי פריצות אמיתיות לא נראות כמו בסרטים. הן שקטות.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "סימן ראשון: חיבורים מוזרים. פותחים שורת פקודה, וכותבים נטסטט מינוס איי אן או.",
+   "shot": {
+    "type": "strip",
+    "text": "netstat -ano",
+    "sub": "שורת הפקודה (CMD)",
+    "chip": "1/3"
+   }
+  },
+  {
+   "say": "תראו את כל החיבורים הפעילים. ובסוף כל שורה, מספר תהליך. תזכרו אותו.",
+   "shot": {
+    "type": "term",
+    "title": "Command Prompt",
+    "prompt": "C:\\> ",
+    "lines": [
+     "netstat -ano",
+     "Proto Local Address     Foreign Address      PID",
+     "TCP   192.168.1.12:50412  142.250.75.14:443   11240",
+     "TCP   192.168.1.12:50433  20.42.65.92:443     3884",
+     "TCP   192.168.1.12:50519  185.220.101.7:4444  4821",
+     "TCP   192.168.1.12:50602  52.112.95.3:443     9032"
+    ],
+    "highlight": [
+     4
+    ],
+    "font": 27,
+    "chip": "1/3"
+   }
+  },
+  {
+   "say": "סימן שני: תוכנה שאתם לא מכירים. מחפשים בדיוק את המספר הזה.",
+   "shot": {
+    "type": "strip",
+    "text": "tasklist /fi \"PID eq 4821\"",
+    "chip": "2/3"
+   }
+  },
+  {
+   "say": "ואם מופיעה תוכנה שאתם לא מכירים, שמדברת עם האינטרנט, זה כבר חשוד מאוד.",
+   "shot": {
+    "type": "term",
+    "title": "Command Prompt",
+    "prompt": "C:\\> ",
+    "lines": [
+     "tasklist /fi \"PID eq 4821\"",
+     "Image Name     PID   Mem Usage",
+     "=============  ====  =========",
+     "svch0st.exe    4821  18,204 K"
+    ],
+    "highlight": [
+     3
+    ],
+    "font": 36,
+    "chip": "2/3"
+   }
+  },
+  {
+   "say": "שימו לב לאפס במקום או. ככה הן מתחפשות לתוכנות של המערכת.",
+   "shot": {
+    "type": "strip",
+    "text": "svch0st.exe  ≠  svchost.exe",
+    "chip": "2/3"
+   }
+  },
+  {
+   "say": "סימן שלישי: האנטי וירוס כבוי, ואתם לא כיביתם אותו.",
+   "shot": {
+    "type": "head",
+    "chip": "3/3"
+   }
+  },
+  {
+   "say": "נוזקות אוהבות לכבות את ההגנה, או להוסיף לעצמן החרגה. אז תבדקו שההגנה פעילה, ושאין החרגות שלא אתם הוספתם.",
+   "shot": {
+    "type": "head",
+    "chip": "3/3"
+   }
+  },
+  {
+   "say": "רוצים מדריך מלא לבדיקה וניקוי? כתבו האקר בתגובות.",
+   "shot": {
+    "type": "head"
+   }
+  }
+ ],
+ "caption_merge": [
+  {
+   "from": [
+    "נטסטט",
+    "מינוס",
+    "איי",
+    "אן",
+    "או."
+   ],
+   "to": "netstat -ano"
+  }
+ ],
+ "caption_replace": {},
+ "assets": {
+  "font": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/fonts/Heebo-800.ttf",
+  "clips": {
+   "A": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4",
+   "B": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2955.mp4"
+  },
+  "shots": {
+   "pdf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/pdf.png",
+   "immich": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/immich.png",
+   "upscayl": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/upscayl.png",
+   "localsend": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/localsend.png",
+   "ollama": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ollama.png",
+   "hibp": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/hibp.png",
+   "ipinfo": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ipinfo.png",
+   "gandalf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/gandalf.png",
+   "urlscan": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/urlscan.png",
+   "vt": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/vt.png"
+  },
+  "sfx": {
+   "glitch": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/glitch.mp3",
+   "whoosh": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/whoosh.mp3",
+   "tick": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/tick.mp3"
+  }
+ },
+ "rate": "+14%",
+ "pitch": "-3Hz",
+ "gap": 0.1
+}

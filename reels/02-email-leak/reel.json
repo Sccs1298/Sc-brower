@@ -1,0 +1,118 @@
+{
+ "lines": [
+  {
+   "say": "יש סיכוי גבוה שהסיסמה שלכם כבר מסתובבת באינטרנט. ואתם אפילו לא יודעים.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "תסתכלו על המספר הזה. כמעט שמונה עשרה מיליארד חשבונות שדלפו.",
+   "shot": {
+    "type": "card",
+    "img": "hibp",
+    "crop": [
+     0,
+     800
+    ],
+    "cy": 600
+   }
+  },
+  {
+   "say": "מאתרים שאתם בכלל לא זוכרים שנרשמתם אליהם.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "באתר הזה, האב איי בין פוונד, מכניסים את המייל, ותוך שנייה רואים באילו דליפות הוא הופיע.",
+   "shot": {
+    "type": "card",
+    "img": "hibp",
+    "crop": [
+     0,
+     700
+    ],
+    "cy": 600
+   }
+  },
+  {
+   "say": "אם המייל שלכם שם, אל תיבהלו. אבל תעשו שלושה דברים, עכשיו.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "אחד: סיסמה חדשה לכל אתר שבו השתמשתם בסיסמה הזאת.",
+   "shot": {
+    "type": "strip",
+    "text": "1. סיסמה חדשה לכל אתר"
+   }
+  },
+  {
+   "say": "שתיים: אימות דו שלבי. במיוחד במייל ובוואטסאפ.",
+   "shot": {
+    "type": "strip",
+    "text": "2. אימות דו-שלבי"
+   }
+  },
+  {
+   "say": "ושלוש: מנהל סיסמאות. כדי שדליפה אחת לא תפיל לכם את כל החשבונות.",
+   "shot": {
+    "type": "strip",
+    "text": "3. מנהל סיסמאות"
+   }
+  },
+  {
+   "say": "שלחו את זה למישהו שמשתמש באותה סיסמה בכל מקום. כולנו מכירים אחד כזה.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "רוצים עוד דברים כאלה? כתבו האקר בתגובות.",
+   "shot": {
+    "type": "head"
+   }
+  }
+ ],
+ "caption_merge": [
+  {
+   "from": [
+    "האב",
+    "איי",
+    "בין",
+    "פוונד,"
+   ],
+   "to": "HaveIBeenPwned"
+  }
+ ],
+ "caption_replace": {},
+ "assets": {
+  "font": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/fonts/Heebo-800.ttf",
+  "clips": {
+   "A": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4",
+   "B": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2955.mp4"
+  },
+  "shots": {
+   "pdf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/pdf.png",
+   "immich": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/immich.png",
+   "upscayl": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/upscayl.png",
+   "localsend": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/localsend.png",
+   "ollama": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ollama.png",
+   "hibp": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/hibp.png",
+   "ipinfo": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ipinfo.png",
+   "gandalf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/gandalf.png",
+   "urlscan": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/urlscan.png",
+   "vt": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/vt.png"
+  },
+  "sfx": {
+   "glitch": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/glitch.mp3",
+   "whoosh": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/whoosh.mp3",
+   "tick": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/tick.mp3"
+  }
+ },
+ "rate": "+14%",
+ "pitch": "-3Hz",
+ "gap": 0.1
+}

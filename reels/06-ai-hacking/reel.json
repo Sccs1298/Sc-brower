@@ -1,0 +1,112 @@
+{
+ "lines": [
+  {
+   "say": "אפשר לפרוץ לבינה מלאכותית, בלי לכתוב שורת קוד אחת.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "קוראים לזה פרומפט אינג'קשן. ומשכנעים את הבוט לעשות משהו שהוא לא אמור לעשות.",
+   "shot": {
+    "type": "strip",
+    "text": "Prompt Injection",
+    "sub": "הזרקת הוראות לבינה מלאכותית"
+   }
+  },
+  {
+   "say": "ויש משחק חינמי, ולגמרי חוקי, שבו מתאמנים בדיוק על זה. אייג'נט בריקר.",
+   "shot": {
+    "type": "card",
+    "img": "gandalf",
+    "crop": [
+     0,
+     640
+    ],
+    "cy": 600
+   }
+  },
+  {
+   "say": "מקבלים אפליקציות בינה מלאכותית אמיתיות, והמשימה היא לגרום להן לחשוף מידע או לעקוף את ההגנות.",
+   "shot": {
+    "type": "card",
+    "img": "gandalf",
+    "crop": [
+     480,
+     1500
+    ],
+    "scroll": 300,
+    "cy": 620
+   }
+  },
+  {
+   "say": "וזה לא רק משחק. חברות מחברות היום בוטים למיילים, ללקוחות ולמערכות פנימיות.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "ואם הבוט ניתן לשכנוע, תוקף יכול לגרום לו לדלוף מידע רגיש.",
+   "shot": {
+    "type": "head",
+    "zoom": 1.2
+   }
+  },
+  {
+   "say": "מי שיודע לבדוק את זה, הוא בדיוק האדם שחברות מחפשות עכשיו.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "רוצים ללמוד האקינג מאפס, בעברית? כתבו האקר בתגובות.",
+   "shot": {
+    "type": "head"
+   }
+  }
+ ],
+ "caption_merge": [
+  {
+   "from": [
+    "פרומפט",
+    "אינג'קשן."
+   ],
+   "to": "Prompt Injection"
+  },
+  {
+   "from": [
+    "אייג'נט",
+    "בריקר."
+   ],
+   "to": "Agent Breaker"
+  }
+ ],
+ "caption_replace": {},
+ "assets": {
+  "font": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/fonts/Heebo-800.ttf",
+  "clips": {
+   "A": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4",
+   "B": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2955.mp4"
+  },
+  "shots": {
+   "pdf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/pdf.png",
+   "immich": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/immich.png",
+   "upscayl": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/upscayl.png",
+   "localsend": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/localsend.png",
+   "ollama": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ollama.png",
+   "hibp": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/hibp.png",
+   "ipinfo": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ipinfo.png",
+   "gandalf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/gandalf.png",
+   "urlscan": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/urlscan.png",
+   "vt": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/vt.png"
+  },
+  "sfx": {
+   "glitch": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/glitch.mp3",
+   "whoosh": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/whoosh.mp3",
+   "tick": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/tick.mp3"
+  }
+ },
+ "rate": "+14%",
+ "pitch": "-3Hz",
+ "gap": 0.1
+}

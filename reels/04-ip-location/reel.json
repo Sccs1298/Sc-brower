@@ -1,0 +1,118 @@
+{
+ "lines": [
+  {
+   "say": "האם האקר יכול לדעת איפה אתם גרים, רק מכתובת האייפי שלכם?",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "בואו נבדוק. כתובת אחת, ופקודה אחת בטרמינל.",
+   "shot": {
+    "type": "strip",
+    "text": "curl ipinfo.io/8.8.8.8"
+   }
+  },
+  {
+   "say": "ותוך שנייה: עיר, מדינה, ספק אינטרנט, ואפילו קואורדינטות.",
+   "shot": {
+    "type": "term",
+    "title": "Terminal",
+    "lines": [
+     "curl ipinfo.io/8.8.8.8",
+     "{",
+     "  \"ip\": \"8.8.8.8\",",
+     "  \"hostname\": \"dns.google\",",
+     "  \"city\": \"Mountain View\",",
+     "  \"region\": \"California\",",
+     "  \"country\": \"US\",",
+     "  \"loc\": \"37.4056,-122.0775\",",
+     "  \"org\": \"AS15169 Google LLC\",",
+     "}"
+    ],
+    "highlight": [
+     4,
+     7
+    ],
+    "font": 32
+   }
+  },
+  {
+   "say": "הכתובת הזאת שייכת לגוגל. אבל זה עובד על כל כתובת.",
+   "shot": {
+    "type": "card",
+    "img": "ipinfo",
+    "crop": [
+     0,
+     780
+    ],
+    "cy": 620
+   }
+  },
+  {
+   "say": "החדשות הטובות? זה מיקום משוער. בדרך כלל העיר, או האזור של הספק. לא הבית שלכם.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "החדשות הרעות? מספיקה לחיצה אחת על קישור, כדי שמישהו יקבל את הכתובת שלכם.",
+   "shot": {
+    "type": "head",
+    "zoom": 1.2
+   }
+  },
+  {
+   "say": "אז לא לוחצים על קישורים מאנשים שאתם לא מכירים. ואם הפרטיות חשובה לכם, משתמשים בוי פי אן.",
+   "shot": {
+    "type": "head"
+   }
+  },
+  {
+   "say": "רוצים עוד דברים כאלה? כתבו האקר בתגובות.",
+   "shot": {
+    "type": "head"
+   }
+  }
+ ],
+ "caption_merge": [
+  {
+   "from": [
+    "וי",
+    "פי",
+    "אן."
+   ],
+   "to": "VPN"
+  }
+ ],
+ "caption_replace": {
+  "האייפי": "ה-IP"
+ },
+ "assets": {
+  "font": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/fonts/Heebo-800.ttf",
+  "clips": {
+   "A": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4",
+   "B": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2955.mp4"
+  },
+  "shots": {
+   "pdf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/pdf.png",
+   "immich": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/immich.png",
+   "upscayl": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/upscayl.png",
+   "localsend": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/localsend.png",
+   "ollama": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ollama.png",
+   "hibp": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/hibp.png",
+   "ipinfo": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ipinfo.png",
+   "gandalf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/gandalf.png",
+   "urlscan": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/urlscan.png",
+   "vt": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/vt.png"
+  },
+  "sfx": {
+   "glitch": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/glitch.mp3",
+   "whoosh": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/whoosh.mp3",
+   "tick": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/tick.mp3"
+  }
+ },
+ "rate": "+14%",
+ "pitch": "-3Hz",
+ "gap": 0.1
+}
