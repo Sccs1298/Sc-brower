@@ -12,10 +12,11 @@ import sys
 import edge_tts
 
 VOICE = "he-IL-AvriNeural"
+VOICE_OVERRIDE = None
 
 
 async def synth(text, path, rate, pitch):
-    c = edge_tts.Communicate(text, VOICE, rate=rate, pitch=pitch, boundary="WordBoundary")
+    c = edge_tts.Communicate(text, VOICE_OVERRIDE or VOICE, rate=rate, pitch=pitch, boundary="WordBoundary")
     words = []
     with open(path, "wb") as f:
         async for ch in c.stream():
@@ -25,6 +26,40 @@ async def synth(text, path, rate, pitch):
                 s = ch["offset"] / 1e7
                 words.append({"t": ch["text"], "s": s, "e": s + ch["duration"] / 1e7})
     return words
+
+
+MAX_GAP = 0.16  # longest silence kept between words inside a line (tight, punchy delivery)
+
+
+def squeeze(src, dst, ws, max_gap):
+    """cut every inner silence longer than max_gap down to max_gap; remap word timings"""
+    import numpy as np
+    sr = 24000
+    pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-f", "s16le", "-ac", "1", "-ar", str(sr), "-"],
+                         capture_output=True, check=True).stdout
+    a = np.frombuffer(pcm, np.int16)
+    keep, out_ws, t_out = [], [], 0.0
+    lead = 0.03
+    prev_end = max(ws[0]["s"] - lead, 0)
+    for i, w in enumerate(ws):
+        gap = w["s"] - prev_end
+        g = min(gap, max_gap) if i else 0.0
+        if g > 0:
+            keep.append(a[int((w["s"] - g) * sr):int(w["s"] * sr)])
+            t_out += g
+        seg = a[int(w["s"] * sr):int(w["e"] * sr)]
+        out_ws.append({"t": w["t"], "s": t_out, "e": t_out + len(seg) / sr})
+        keep.append(seg)
+        t_out += len(seg) / sr
+        prev_end = w["e"]
+    tail = a[int(ws[-1]["e"] * sr):int((ws[-1]["e"] + 0.06) * sr)]
+    keep.append(tail)
+    t_out += len(tail) / sr
+    y = np.concatenate(keep)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "s16le", "-ar", str(sr), "-ac", "1", "-i", "-",
+                    "-af", "afade=t=in:d=0.01,areverse,afade=t=in:d=0.03,areverse", dst],
+                   input=y.tobytes(), check=True)
+    return out_ws, t_out
 
 
 def dur(path):
@@ -40,10 +75,8 @@ async def main():
     for i, ln in enumerate(cfg["lines"]):
         p = f"{out}_l{i:02d}.mp3"
         raw = p.replace(".mp3", "_raw.mp3")
-        ws = await synth(ln["say"], raw, rate, pitch)
-        d = min(dur(raw), ws[-1]["e"] + 0.07)  # cut the built-in trailing silence (tight, remy-style pacing)
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", raw, "-t", f"{d:.3f}", "-af",
-                        f"afade=t=out:st={max(d - 0.04, 0):.3f}:d=0.04", p], check=True)
+        ws = await synth(ln["say"], raw, ln.get("rate", rate), ln.get("pitch", pitch))
+        ws, d = squeeze(raw, p, ws, ln.get("max_gap", MAX_GAP))
         for w in ws:
             allw.append({"t": w["t"], "s": round(t + w["s"], 3), "e": round(t + w["e"], 3), "line": i})
         lines.append({"start": round(t, 3), "end": round(t + d, 3)})

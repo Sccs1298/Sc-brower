@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Heebo; src: url("HEEBO_URL"); font-weight: 800; }
+@font-face { font-family: HeeboR; src: url("HEEBO_URL"); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; font-family: -apple-system, Heebo, sans-serif; color: #fff; }
+.scene { position: absolute; inset: 0; display: none; }
+.bgblur { position: absolute; inset: -40px; background: url("PLATE_URL") center/cover; filter: blur(28px) brightness(0.35) saturate(0.8); }
+/* ---------- phone messages ---------- */
+.phone { position: absolute; left: 90px; top: 150px; width: 900px; height: 1320px; border-radius: 70px; background: #000;
+         border: 10px solid #222; box-shadow: 0 40px 120px rgba(0,0,0,.8), 0 0 0 2px #444; overflow: hidden; }
+.status { height: 90px; display: flex; justify-content: space-between; align-items: center; padding: 0 70px; font: 600 34px HeeboR; direction: ltr; }
+.hdr { height: 190px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid #1c1c1e; background: #0d0d0f; }
+.avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(#8e8e93, #636366); display: flex; align-items: center; justify-content: center; font: 800 44px Heebo; }
+.hdr .name { font: 600 30px HeeboR; margin-top: 10px; direction: ltr; }
+.thread { padding: 40px 34px; }
+.ts { text-align: center; color: #8e8e93; font: 500 26px HeeboR; margin-bottom: 26px; }
+.bubble { max-width: 640px; background: #262629; border-radius: 40px; padding: 28px 34px; font: 400 38px/1.42 HeeboR; transform-origin: right bottom; position: relative; }
+.bubble a { color: #3d9bff; text-decoration: underline; direction: ltr; unicode-bidi: embed; display: inline-block; font-size: 38px; }
+.notif { position: absolute; left: 30px; right: 30px; top: 30px; background: rgba(40,40,44,.92); border-radius: 36px; padding: 26px 30px; display: flex; gap: 24px; align-items: center; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+.notif .ic { width: 80px; height: 80px; border-radius: 20px; background: #34c759; display: flex; align-items: center; justify-content: center; font: 800 44px Heebo; flex: none; }
+.notif .t1 { font: 700 30px HeeboR; display: flex; justify-content: space-between; } .notif .t1 span { color: #aaa; font-weight: 400; }
+.notif .t2 { font: 400 30px/1.35 HeeboR; color: #ddd; }
+.finger { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.35); border: 4px solid rgba(255,255,255,.8); transform: translate(-50%,-50%) scale(0); }
+.menu { position: absolute; width: 520px; background: rgba(44,44,48,.97); border-radius: 30px; overflow: hidden; box-shadow: 0 30px 90px rgba(0,0,0,.7); transform-origin: top right; }
+.menu div { padding: 30px 36px; font: 400 38px HeeboR; border-bottom: 1px solid #3a3a3c; display: flex; justify-content: space-between; }
+.menu div.hl { background: #3a3a3e; }
+.toast { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); background: rgba(52,199,89,.95); color: #00210a; font: 800 40px Heebo; padding: 22px 44px; border-radius: 60px; white-space: nowrap; }
+/* ---------- url callouts ---------- */
+.urlbox { position: absolute; left: 60px; right: 60px; top: 520px; background: #f4f5f7; color: #111; border-radius: 40px; padding: 70px 40px; text-align: center; box-shadow: 0 40px 120px rgba(0,0,0,.7); direction: ltr; }
+.url { font: 700 92px/1.1 "DejaVu Sans Mono", monospace; letter-spacing: -2px; white-space: nowrap; }
+.url .one { position: relative; display: inline-block; color: #111; }
+.ring { position: absolute; left: 62%; top: 52%; width: 120px; height: 140px; border: 9px solid #e11d2a; border-radius: 50%; transform: translate(-50%,-50%) scale(1.6); opacity: 0; }
+.tld { border-radius: 14px; padding: 0 6px; }
+.lbl { margin-top: 40px; font: 800 64px Heebo; color: #e11d2a; direction: rtl; opacity: 0; }
+.cmp { position: absolute; left: 60px; right: 60px; top: 1060px; direction: ltr; }
+.row { display: flex; align-items: center; gap: 30px; background: #121316; border-radius: 30px; padding: 34px 40px; margin-bottom: 26px; font: 700 62px "DejaVu Sans Mono", monospace; opacity: 0; }
+.row .m { font: 800 70px Heebo; width: 80px; text-align: center; }
+.bad { border: 4px solid #e11d2a; } .bad .m { color: #e11d2a; }
+.good { border: 4px solid #22c55e; } .good .m { color: #22c55e; }
+.row .d { font: 800 40px Heebo; margin-left: auto; direction: rtl; }
+/* ---------- VirusTotal ---------- */
+.vtwrap { position: absolute; left: 0; right: 0; top: 0; height: 1920px; overflow: hidden; background: #1d1f2b; }
+.vtimg { position: absolute; left: 0; top: 0; width: 1080px; }
+.typed { position: absolute; background: #161625; height: 52px; line-height: 52px; padding-left: 8px; direction: ltr; font: 500 38px HeeboR; color: #fff; white-space: nowrap; overflow: hidden; }
+.caret { display: inline-block; width: 4px; height: 44px; background: #4d8dff; vertical-align: middle; margin-left: 3px; }
+.hlrow { position: absolute; left: 30px; right: 30px; border: 6px solid #ff3b47; border-radius: 14px; background: rgba(255,59,71,.12); opacity: 0; }
+.counter { position: absolute; left: 50%; top: 120px; transform: translateX(-50%) scale(0); background: #e11d2a; color: #fff; border-radius: 40px; padding: 26px 50px; font: 800 64px Heebo; white-space: nowrap; box-shadow: 0 20px 60px rgba(225,29,42,.5); direction: rtl; }
+.note { position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%); font: 400 30px HeeboR; color: #c9c9d1; background: rgba(0,0,0,.55); padding: 10px 26px; border-radius: 20px; white-space: nowrap; }
+</style></head>
+<body>
+<!-- SMS arrives -->
+<div class="scene" id="sms"><div class="bgblur"></div>
+ <div class="phone" id="ph1">
+  <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+  <div class="hdr"><div class="avatar">IP</div><div class="name">IsraelPost ›</div></div>
+  <div class="thread"><div class="ts">הודעת טקסט · היום 09:41</div>
+   <div class="bubble" id="b1">החבילה שלך מעוכבת במרכז המיון. לשחרור יש להסדיר תשלום של 4.90 ש"ח עד היום:<br><a>israe1-post.top/pay</a></div></div>
+  <div class="notif" id="n1"><div class="ic">✉</div><div style="flex:1"><div class="t1">IsraelPost <span>עכשיו</span></div><div class="t2">החבילה שלך מעוכבת במרכז המיון. לשחרור יש להסדיר תשלום של 4.90 ש"ח…</div></div></div>
+ </div></div>
+<!-- URL zoom: the 1 -->
+<div class="scene" id="url1"><div class="bgblur"></div>
+ <div class="urlbox"><div class="url">israe<span class="one">1<span class="ring" id="ring"></span></span>-post<span class="tld" id="tld1">.top</span></div>
+  <div class="lbl" id="lbl1">הספרה 1, לא האות l</div></div></div>
+<!-- URL zoom: .top + compare -->
+<div class="scene" id="url2"><div class="bgblur"></div>
+ <div class="urlbox"><div class="url">israe<span class="one" style="color:#e11d2a">1</span>-post<span class="tld" id="tld2">.top</span></div>
+  <div class="lbl" id="lbl2">סיומת חשודה</div></div>
+ <div class="cmp"><div class="row bad" id="rb"><span class="m">✗</span>israe1-post.top<span class="d">מזויף</span></div>
+  <div class="row good" id="rg"><span class="m">✓</span>israelpost.co.il<span class="d">אמיתי</span></div></div></div>
+<!-- long-press & copy -->
+<div class="scene" id="copy"><div class="bgblur"></div>
+ <div class="phone">
+  <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+  <div class="hdr"><div class="avatar">IP</div><div class="name">IsraelPost ›</div></div>
+  <div class="thread"><div class="ts">הודעת טקסט · היום 09:41</div>
+   <div class="bubble" id="b2">החבילה שלך מעוכבת במרכז המיון. לשחרור יש להסדיר תשלום של 4.90 ש"ח עד היום:<br><a id="lnk">israe1-post.top/pay</a></div></div>
+  <div class="menu" id="menu"><div>פתיחה בדפדפן <span>🧭</span></div><div id="mcopy">העתקת קישור <span>⧉</span></div><div>שיתוף <span>⇪</span></div></div>
+  <div class="finger" id="fing"></div>
+  <div class="toast" id="toast">✓ הקישור הועתק</div>
+ </div></div>
+<!-- VirusTotal: paste -->
+<div class="scene" id="vt_type"><div class="vtwrap"><img class="vtimg" id="vthome" src="VT_HOME"></div>
+ <div class="typed" id="typed"></div><div class="finger" id="fing2"></div></div>
+<!-- VirusTotal: real result -->
+<div class="scene" id="vt_result"><div class="vtwrap"><img class="vtimg" id="vtres" src="VT_RES"></div>
+ <div id="hls"></div>
+ <div class="counter" id="ctr">⚠ 9 מנועי אבטחה: פישינג</div>
+ <div class="note">תוצאה אמיתית מ-VirusTotal לקישור פישינג לדוגמה של Google</div></div>
+<script>
+const ease = u => { u = Math.min(Math.max(u, 0), 1); return u * u * (3 - 2 * u); };
+const back = u => { u = Math.min(Math.max(u, 0), 1); const c = 1.7; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
+const $ = id => document.getElementById(id);
+const S = 1080 / 430;               // screenshot scale (captured at 430px wide)
+const VT_ROWS = [491, 516, 541, 566, 591, 616, 641, 666, 691];   // y (px @430w) of the 9 flagged vendor rows
+window.setT = (scene, t, dur) => {
+  document.querySelectorAll('.scene').forEach(s => s.style.display = s.id === scene ? 'block' : 'none');
+  if (scene === 'sms') {
+    const n = $('n1'); const u = back((t - 0.1) / 0.45);
+    n.style.transform = `translateY(${(1 - u) * -260}px)`; n.style.opacity = t < 1.7 ? 1 : 1 - ease((t - 1.7) / 0.3);
+    const b = $('b1'); const v = back((t - 1.75) / 0.4); b.style.transform = `scale(${v})`; b.style.opacity = t > 1.7 ? 1 : 0;
+    $('ph1').style.transform = `scale(${1 + 0.03 * t / dur})`;
+  }
+  if (scene === 'url1') {
+    const r = $('ring'); const u = ease((t - 3.0) / 0.3);
+    r.style.opacity = u; r.style.transform = `translate(-50%,-50%) scale(${1.6 - 0.6 * u})`;
+    $('lbl1').style.opacity = ease((t - 3.7) / 0.3);
+    document.querySelector('#url1 .urlbox').style.transform = `scale(${0.96 + 0.04 * ease(t / 0.3)})`;
+  }
+  if (scene === 'url2') {
+    const u = ease((t - 0.6) / 0.25);
+    $('tld2').style.background = `rgba(225,29,42,${0.9 * u})`; $('tld2').style.color = u > 0.5 ? '#fff' : '#111';
+    $('lbl2').style.opacity = ease((t - 0.8) / 0.3);
+    [['rb', 1.35], ['rg', 2.55]].forEach(([id, s]) => { const e = $(id); const v = back((t - s) / 0.4);
+      e.style.opacity = Math.min(1, v); e.style.transform = `translateX(${(1 - Math.min(v, 1)) * 120}px)`; });
+  }
+  if (scene === 'copy') {
+    const l = $('lnk').getBoundingClientRect(), ph = document.querySelector('#copy .phone').getBoundingClientRect();
+    const fx = l.left - ph.left + l.width / 2, fy = l.top - ph.top + l.height / 2;
+    const f = $('fing'); f.style.left = fx + 'px'; f.style.top = fy + 'px';
+    const press = t > 1.05 && t < 2.0 ? 1 : 0; const pu = ease((t - 1.05) / 0.15);
+    f.style.transform = `translate(-50%,-50%) scale(${press ? 0.7 + 0.3 * pu : (t >= 2.4 && t < 2.8 ? 0.8 : 0)})`;
+    $('b2').style.transform = `scale(${press ? 1 - 0.03 * pu : 1})`;
+    const m = $('menu'); const mu = back((t - 1.75) / 0.3);
+    m.style.left = (fx - 460) + 'px'; m.style.top = (fy + 70) + 'px'; m.style.transform = `scale(${Math.max(0, mu)})`; m.style.opacity = t > 1.75 && t < 2.95 ? 1 : 0;
+    if (t >= 2.4 && t < 2.8) { const c = $('mcopy').getBoundingClientRect(); f.style.left = (c.left - ph.left + c.width / 2) + 'px'; f.style.top = (c.top - ph.top + c.height / 2) + 'px'; }
+    $('mcopy').className = t >= 2.4 ? 'hl' : '';
+    const tu = back((t - 2.95) / 0.35); $('toast').style.opacity = t > 2.95 ? 1 : 0; $('toast').style.transform = `translateX(-50%) scale(${Math.max(0, tu)})`;
+  }
+  if (scene === 'vt_type') {
+    const box = { x: 230 * S / 1.0, y: 0 };
+    const txt = 'israe1-post.top/pay'; const n = Math.floor(txt.length * ease((t - 0.25) / 0.6));
+    const ty = $('typed'); ty.style.left = (88 * S) + 'px'; ty.style.top = (240 * S + 22) + 'px'; ty.style.width = (290 * S) + 'px';
+    ty.innerHTML = txt.slice(0, n) + (t < 1.2 ? '<span class="caret"></span>' : '');
+    const f = $('fing2'); f.style.left = (215 * S) + 'px'; f.style.top = (317 * S) + 'px';
+    f.style.transform = `translate(-50%,-50%) scale(${t > 1.15 && t < 1.45 ? 0.75 : 0})`;
+    $('vthome').style.transform = `scale(${1.0 + 0.04 * ease(t / dur)})`; $('vthome').style.transformOrigin = '50% 10%';
+  }
+  if (scene === 'vt_result') {
+    const img = $('vtres'); const top0 = 300 * S, top1 = 300 * S - 140;
+    const y = -(top0 + (top1 - top0) * 0) + 0;
+    const scroll = 300 * S * ease((t - 0.15) / 0.8);
+    img.style.top = (-scroll) + 'px';
+    const hl = $('hls'); hl.innerHTML = '';
+    VT_ROWS.forEach((ry, i) => { const s = 1.0 + i * 0.13; const o = ease((t - s) / 0.15);
+      if (o > 0) hl.innerHTML += `<div class="hlrow" style="top:${(ry - 12) * S - scroll}px;height:${24 * S}px;opacity:${o}"></div>`; });
+    const cu = back((t - 2.35) / 0.4); $('ctr').style.transform = `translateX(-50%) scale(${Math.max(0, cu)})`;
+  }
+};
+</script></body></html>

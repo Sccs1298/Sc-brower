@@ -1,111 +1,159 @@
 {
+ "voice": "he-IL-AvriNeural",
  "lines": [
   {
-   "say": "אם קיבלתם הודעה כזאת, אל תלחצו על הקישור.",
+   "say": "קיבלתם אס אם אס כזה, מדואר ישראל?",
+   "rate": "+6%",
+   "pitch": "+2Hz",
+   "pause": 0.08,
    "shot": {
-    "type": "sms",
-    "sender": "IsraelPost",
-    "text": "החבילה שלך מעוכבת במרכז המיון. לשחרור יש להסדיר תשלום של 4.90 ש\"ח עד היום:",
-    "link": "israe1-post.top/pay"
+    "type": "screen",
+    "scene": "sms"
    }
   },
   {
-   "say": "זו אחת ההונאות הכי נפוצות בישראל עכשיו.",
+   "say": "רגע. אל תלחצו.",
+   "rate": "-4%",
+   "pitch": "-4Hz",
+   "pause": 0.22,
    "shot": {
-    "type": "head"
+    "type": "head",
+    "zoom": 1.18
    }
   },
   {
-   "say": "הקישור מוביל לאתר שנראה בדיוק כמו של דואר ישראל, ומבקש פרטי אשראי, בשביל כמה שקלים.",
+   "say": "זה העוקץ הכי נפוץ בארץ עכשיו. ונופלים בו גם אנשים ממש חכמים.",
+   "rate": "+14%",
    "shot": {
-    "type": "head"
+    "type": "head",
+    "zoom": 1.0
    }
   },
   {
-   "say": "אבל המטרה היא לא ארבעה תשעים. המטרה היא הכרטיס שלכם.",
+   "say": "כי זה נראה אמיתי לגמרי. הלוגו, הניסוח, אפילו הסכום. ארבע תשעים.",
+   "rate": "+12%",
+   "shot": {
+    "type": "head",
+    "zoom": 1.1
+   }
+  },
+  {
+   "say": "אבל הם לא רוצים את הארבע תשעים. הם רוצים את הכרטיס שלכם.",
+   "rate": "+8%",
+   "pitch": "-3Hz",
+   "pause": 0.2,
    "shot": {
     "type": "head",
     "zoom": 1.22
    }
   },
   {
-   "say": "איך מזהים? מסתכלים על הכתובת. הספרה אחת במקום האות אל, וסיומת מוזרה.",
+   "say": "תסתכלו על הכתובת. איזראל, עם הספרה אחת, במקום האות אל.",
+   "rate": "+10%",
    "shot": {
-    "type": "strip",
-    "text": "israe1-post.top",
-    "sub": "1 במקום l  ·  סיומת ‎.top"
+    "type": "screen",
+    "scene": "url1"
    }
   },
   {
-   "say": "לא בטוחים? מעתיקים את הקישור, בלי ללחוץ, ובודקים אותו באתר כמו וירוס טוטאל.",
+   "say": "וסיומת טופ. דואר ישראל זה רק ישראל פוסט נקודה קו נקודה איל. נקודה.",
+   "rate": "+12%",
    "shot": {
-    "type": "card",
-    "img": "vt",
-    "crop": [
-     0,
-     700
-    ],
-    "cy": 600
+    "type": "screen",
+    "scene": "url2"
    }
   },
   {
-   "say": "ותזכרו: גוף רשמי לא יבקש מכם פרטי אשראי בהודעת אס אם אס.",
+   "say": "לא בטוחים? לחיצה ארוכה, מעתיקים. בלי לפתוח.",
+   "rate": "+10%",
    "shot": {
-    "type": "head"
+    "type": "screen",
+    "scene": "copy"
    }
   },
   {
-   "say": "עכשיו שלחו את הסרטון הזה להורים שלכם. ברצינות.",
+   "say": "מדביקים בוירוס טוטאל.",
+   "rate": "+8%",
+   "pause": 0.05,
+   "shot": {
+    "type": "screen",
+    "scene": "vt_type"
+   }
+  },
+  {
+   "say": "וככה זה נראה כשהקישור מסוכן. תשעה מנועי אבטחה, וכולם צועקים: פישינג.",
+   "rate": "+10%",
+   "shot": {
+    "type": "screen",
+    "scene": "vt_result"
+   }
+  },
+  {
+   "say": "וכלל אחד לזכור. אף גוף רשמי לא מבקש פרטי אשראי באס אם אס. אף אחד.",
+   "rate": "+10%",
+   "pause": 0.18,
    "shot": {
     "type": "head",
-    "zoom": 1.2
+    "zoom": 1.0
+   }
+  },
+  {
+   "say": "עכשיו תשלחו את זה לאמא שלכם. היא תודה לכם.",
+   "rate": "+8%",
+   "shot": {
+    "type": "head",
+    "zoom": 1.15
    }
   }
  ],
  "caption_merge": [
   {
    "from": [
-    "וירוס",
-    "טוטאל."
+    "אס",
+    "אם",
+    "אס"
    ],
-   "to": "VirusTotal"
+   "to": "SMS"
   },
   {
    "from": [
-    "אס",
+    "באס",
     "אם",
-    "אס."
+    "אס"
    ],
-   "to": "SMS"
+   "to": "ב-SMS"
+  },
+  {
+   "from": [
+    "ישראל",
+    "פוסט",
+    "נקודה",
+    "קו",
+    "נקודה",
+    "איל"
+   ],
+   "to": "israelpost.co.il"
+  },
+  {
+   "from": [
+    "בוירוס",
+    "טוטאל"
+   ],
+   "to": "ב-VirusTotal"
   }
  ],
- "caption_replace": {},
+ "caption_replace": {
+  "איזראל": "israe1",
+  "טופ": ".top",
+  "ארבע": "4.90",
+  "תשעים": ""
+ },
  "assets": {
   "font": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/fonts/Heebo-800.ttf",
-  "clips": {
-   "A": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4",
-   "B": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2955.mp4"
-  },
-  "shots": {
-   "pdf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/pdf.png",
-   "immich": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/immich.png",
-   "upscayl": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/upscayl.png",
-   "localsend": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/localsend.png",
-   "ollama": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ollama.png",
-   "hibp": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/hibp.png",
-   "ipinfo": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/ipinfo.png",
-   "gandalf": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/gandalf.png",
-   "urlscan": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/urlscan.png",
-   "vt": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/gh/vt.png"
-  },
+  "plate": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/set/r_22.png",
+  "clip": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/mk/v_2963.mp4",
   "sfx": {
-   "glitch": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/glitch.mp3",
-   "whoosh": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/whoosh.mp3",
-   "tick": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/tick.mp3"
-  },
-  "set": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/set/set_4.png"
- },
- "rate": "+14%",
- "pitch": "-3Hz",
- "gap": 0.1
+   "whoosh": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/sfx/whoosh.mp3"
+  }
+ }
 }
