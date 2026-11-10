@@ -302,3 +302,18 @@ input[type=range] { direction: ltr; }
 .f-share { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 @keyframes figPulse { from { transform: scale(.6); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
 @keyframes figDevelop { 0%, 15% { opacity: 0; } 60%, 100% { opacity: 1; } }
+
+/* ===================== חיפוש בגלריה ===================== */
+.sr-field { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; height: 38px; border-radius: 10px; background: var(--pg-btn); padding: 0 10px; color: var(--pg-dim); }
+.sr-field svg { width: 17px; height: 17px; flex: none; }
+.sr-field input { flex: 1; min-width: 0; border: 0; background: none; color: var(--pg-fg); font-size: 17px; outline: none; -webkit-appearance: none; appearance: none; }
+.sr-field input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.sr-body { padding: 8px 0 calc(env(safe-area-inset-bottom) + 20px); }
+.sr-h { margin: 14px max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left)); font-size: 20px; font-weight: 700; }
+.sr-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
+.sr-chip { border: 0; border-radius: 99px; padding: 7px 14px; background: var(--pg-btn); color: var(--pg-fg); font-size: 15px; }
+.sr-dim { color: var(--pg-dim); font-size: 15px; margin: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
+.sr-empty { text-align: center; padding: 70px 24px; color: var(--pg-dim); }
+.sr-empty b { display: block; color: var(--pg-fg); font-size: 22px; margin-bottom: 6px; }
+.sr-empty p { margin: 0; font-size: 15px; }
+.peek-val { font-weight: 700; color: var(--accent); max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

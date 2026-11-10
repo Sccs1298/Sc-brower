@@ -29,7 +29,7 @@
     </div>
     <div class="pg-actions">
       <button class="pg-pill" type="button" id="pgSelect">בחר</button>
-      <button class="pg-circle" type="button" aria-label="חיפוש"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></button>
+      <button class="pg-circle" id="pgSearch" type="button" aria-label="חיפוש"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></button>
     </div>
   </header>
   <div id="pgGrid" class="pg-grid"></div>
@@ -216,6 +216,10 @@
       <label class="row"><span>מראה</span>
         <select data-s="phTheme"><option value="auto">לפי הטלפון</option><option value="light">בהיר</option><option value="dark">כהה</option></select>
       </label>
+      <label class="row"><span>כשהצופה מחפש בגלריה</span>
+        <select data-s="searchMode"><option value="result">מוצא את סרטון הטריק</option><option value="none">"אין תוצאות" (רק הצצה)</option></select>
+      </label>
+      <div class="row"><span>החיפוש האחרון של הצופה</span><b id="stPeek" class="peek-val">—</b></div>
     </div>
     <div class="group-title">בזמן הופעה</div>
     <div class="group">
@@ -244,7 +248,7 @@
       <p>האפליקציה נראית כמו גלריית התמונות של הטלפון. אתה מראה לצופה סרטון "רגיל", הצופה חושב על מספר, מילה או ציור, והבחירה שלו מופיעה בתוך הסרטון.</p>
       <nav class="toc" aria-label="תוכן המדריך">
         <a href="#h-entry">כניסה נסתרת</a><a href="#h-setup">הכנת סרטון</a><a href="#h-keys">מקשים 3×3</a>
-        <a href="#h-scrub">גרירה ברצועה</a><a href="#h-bt">מקלדת / שלט</a><a href="#h-pre">מסך חיפוש</a>
+        <a href="#h-scrub">גרירה ברצועה</a><a href="#h-bt">מקלדת / שלט</a><a href="#h-peek">הצופה מחפש (חדש)</a><a href="#h-pre">מסך חיפוש</a>
         <a href="#h-draw">ציור נסתר</a><a href="#h-meta">חשיפה בפרטים</a><a href="#h-photo">תמונות</a>
         <a href="#h-track">מעקב תנועה</a><a href="#h-persp">פרספקטיבה</a><a href="#h-real">מראה אמיתי</a>
         <a href="#h-gest">מחוות בהופעה</a><a href="#h-film">איך לצלם</a><a href="#h-install">התקנה</a>
@@ -365,6 +369,33 @@
     </div>
 
     <!-- מסך חיפוש -->
+    <div class="group pad howto" id="h-peek">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <rect class="f-search" x="12" y="18" width="52" height="14" rx="5"/>
+          <text class="f-typed" x="58" y="28">יפן</text>
+          <text class="f-cancel" x="80" y="28">ביטול</text>
+          <text class="f-title" x="78" y="48">סרטון 1</text>
+          <rect class="f-video" x="12" y="54" width="30" height="30"/>
+          <text class="f-note" x="27" y="72" style="fill:#fff">0:20</text>
+          <circle class="f-ring" cx="27" cy="69" r="9"/>
+          <text class="f-note" x="45" y="120">הצופה מקליד</text><text class="f-note" x="45" y="132">ופותח בעצמו</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>הצופה מחפש בעצמו (חדש)</h2>
+        <p>אתה לא נוגע בטלפון. אומרים: "תחשוב על מדינה ותחפש אותה בגלריה שלי."</p>
+        <ol>
+          <li>בעורך בוחרים שיטה: <b>הצופה מחפש בעצמו</b>.</li>
+          <li>בגלריה נותנים לצופה את הטלפון, והוא לוחץ על <b>🔍 החיפוש</b> ומקליד.</li>
+          <li>נמצא <b>סרטון אחד</b>. הצופה פותח אותו, והבחירה שלו מופיעה בתוכו.</li>
+        </ol>
+        <p class="dim">אפשרות בהגדרות: "אין תוצאות". אז זו רק הצצה: אתה פותח את הסרטון בעצמך אחר כך, והבחירה כבר בפנים. החיפוש האחרון מוצג גם בהגדרות.</p>
+      </div>
+    </div>
+
     <div class="group pad howto" id="h-pre">
       <div class="fig">
         <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
@@ -587,6 +618,36 @@
 
     <button class="btn-big primary" id="helpDone" type="button">הבנתי</button>
   </main>
+</section>
+
+<!-- ===================== חיפוש בגלריה (הצופה מקליד בעצמו) ===================== -->
+<section id="search" class="screen pg">
+  <form id="srForm" class="pre">
+    <div class="pre-bar">
+      <label class="sr-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+        <input id="srIn" type="search" enterkeyhint="search" placeholder="תמונות, אנשים, מקומות…" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="חיפוש">
+      </label>
+      <button type="button" class="pre-cancel" data-back>ביטול</button>
+    </div>
+    <button type="submit" hidden></button>
+  </form>
+  <div class="sr-body">
+    <div id="srSuggest">
+      <h3 class="sr-h">הצעות</h3>
+      <div class="sr-chips"><button type="button" class="sr-chip" data-q="סרטונים">סרטונים</button><button type="button" class="sr-chip" data-q="מועדפים">מועדפים</button><button type="button" class="sr-chip" data-q="סלפי">סלפי</button><button type="button" class="sr-chip" data-q="צילומי מסך">צילומי מסך</button></div>
+      <h3 class="sr-h">חיפושים אחרונים</h3>
+      <p class="sr-dim">אין חיפושים אחרונים</p>
+    </div>
+    <div id="srResults" hidden>
+      <h3 class="sr-h" id="srCount"></h3>
+      <div class="pg-grid" id="srGrid"></div>
+    </div>
+    <div id="srEmpty" class="sr-empty" hidden>
+      <b>אין תוצאות</b>
+      <p>לא נמצאו תוצאות עבור "<span id="srEmptyQ"></span>". נסו חיפוש חדש.</p>
+    </div>
+  </div>
 </section>
 
 <!-- ===================== הזנה לפני ההופעה (מוסווה כחיפוש) ===================== -->

@@ -29,6 +29,8 @@ const METHODS = {
               help: 'בזמן שהסרטון מתנגן, המסך מחולק ל-9 מקשים בלתי נראים: 1 בפינה השמאלית העליונה ו-9 בימנית התחתונה. אחרי מספר הספרות שהגדרת, שאר הנגיעות לא נחשבות. שתי אצבעות מוחקות ספרה.' },
   keyboard: { name: 'מקלדת Bluetooth / שלט', for: ['number', 'word'],
               help: 'מקלידים במקלדת או בשלט Bluetooth מחוברים. נגיעות במסך לא עושות כלום, אז הצופה יכול להחזיק את הטלפון. רווח או חץ מתחיל את הסרטון.' },
+  peek:     { name: 'הצופה מחפש בעצמו (חדש)', for: ['number', 'word'],
+              help: 'הצופה לוחץ על חיפוש בגלריה ומקליד בעצמו את המילה או המספר. הוא מוצא את הסרטון, פותח אותו, והבחירה שלו מופיעה בתוכו. אתה לא נוגע בטלפון. (בהגדרות: אפשר "אין תוצאות" לשימוש כהצצה בלבד.)' },
   pre:      { name: 'לפני ההופעה (מסך חיפוש)', for: ['number', 'word'],
               help: 'כשנוגעים בסרטון בגלריה, נפתח קודם מסך חיפוש של הגלריה. מקלידים שם את הבחירה ולוחצים "חפש" במקלדת, והסרטון נפתח.' },
   scrub:    { name: 'גרירה ברצועת הפריימים (חדש)', for: ['number', 'word'], video: true,
@@ -38,7 +40,8 @@ const METHODS = {
 };
 
 /* ---------- הגדרות ---------- */
-const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false };
+const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result' };
+const PEEK = { text: '', at: 0 }; // החיפוש האחרון של הצופה (בזיכרון בלבד)
 
 /* ===================== אחסון =====================
    local  – IndexedDB באפליקציה המותקנת (קבוע במכשיר)
@@ -617,6 +620,54 @@ function renderGrid() {
 }
 ENTER.photos = () => { applyTheme(); renderGrid(); };
 
+/* ===================== חיפוש בגלריה: הצופה מקליד בעצמו ===================== */
+$('#pgSearch').onclick = () => go('search');
+ENTER.search = () => {
+  $('#srIn').value = ''; $('#srSuggest').hidden = false; $('#srResults').hidden = true; $('#srEmpty').hidden = true;
+  setTimeout(() => $('#srIn').focus(), 80);
+};
+function runSearch(q) {
+  q = (q || '').trim(); if (!q) return;
+  PEEK.text = q; PEEK.at = Date.now();
+  $('#srIn').blur(); $('#srSuggest').hidden = true;
+  const tricks = ITEMS.filter(x => !x.hidden && x.trick !== false && x.method === 'peek').sort((a, b) => shotTime(b) - shotTime(a));
+  if (S.searchMode !== 'none' && tricks.length) {
+    const it = tricks[0], grid = $('#srGrid');
+    $('#srCount').textContent = it.kind === 'photo' ? 'תמונה 1' : 'סרטון 1';
+    grid.innerHTML = '';
+    const b = document.createElement('button'); b.className = 'pg-cell'; b.type = 'button';
+    const th = thumbFor(it);
+    b.innerHTML = `${th ? '<img alt="">' : ''}<span class="dur"></span>`;
+    if (th) $('img', b).src = th;
+    $('.dur', b).textContent = it.kind === 'photo' ? '' : fmtDur(it.duration);
+    b.addEventListener('click', () => openViewer(it.id, { from: 'search' }));
+    grid.appendChild(b);
+    $('#srResults').hidden = false; $('#srEmpty').hidden = true;
+  } else {
+    $('#srEmptyQ').textContent = q; $('#srEmpty').hidden = false; $('#srResults').hidden = true;
+  }
+}
+$('#srForm').addEventListener('submit', e => { e.preventDefault(); runSearch($('#srIn').value); });
+/* הצעות: מציגות פריטים רגילים מהגלריה, בלי לגעת בהצצה */
+$('#srSuggest').addEventListener('click', e => {
+  const c = e.target.closest('[data-q]'); if (!c) return;
+  $('#srIn').value = c.dataset.q; $('#srSuggest').hidden = true; $('#srEmpty').hidden = true;
+  let list = ITEMS.filter(x => !x.hidden);
+  if (c.dataset.q === 'סרטונים') list = list.filter(x => x.kind !== 'photo');
+  else if (c.dataset.q === 'מועדפים') list = list.filter(x => x.fav);
+  else list = [];
+  if (!list.length) { $('#srEmptyQ').textContent = c.dataset.q; $('#srEmpty').hidden = false; $('#srResults').hidden = true; return; }
+  const grid = $('#srGrid'); grid.innerHTML = '';
+  $('#srCount').textContent = `${list.length} פריטים`;
+  for (const it of list) {
+    const b = document.createElement('button'); b.className = 'pg-cell'; b.type = 'button';
+    const th = thumbFor(it); b.innerHTML = `${th ? '<img alt="">' : ''}<span class="dur"></span>`;
+    if (th) $('img', b).src = th; $('.dur', b).textContent = it.kind === 'photo' ? '' : fmtDur(it.duration);
+    b.addEventListener('click', () => openViewer(it.id, { from: 'search' })); grid.appendChild(b);
+  }
+  $('#srResults').hidden = false;
+});
+
 /* לחיצה ארוכה על "ספרייה" = כניסה נסתרת לניהול */
 (() => {
   const t = $('#pgTitle').parentElement; let timer = 0;
@@ -925,6 +976,7 @@ edCanvas.addEventListener('pointerup', endDrag); edCanvas.addEventListener('poin
 
 /* ===================== הגדרות ===================== */
 ENTER.settings = () => {
+  $('#stPeek').textContent = PEEK.text || '—';
   $$('[data-s]').forEach(el => { if (el.type === 'checkbox') el.checked = !!S[el.dataset.s]; else el.value = S[el.dataset.s] || ''; });
 };
 $('#settings').addEventListener('input', e => {
@@ -946,7 +998,7 @@ class SecretInput {
     this.buf += k; return true;
   }
   undo() { if (this.item.content === 'drawing') this.strokes.pop(); else this.buf = this.buf.slice(0, -1); }
-  complete(it) { if (it.content === 'drawing') return false; if (it.method === 'pre') return !!this.buf.trim(); return /^\d+$/.test(this.buf) && this.buf.length >= this.cap; }
+  complete(it) { if (it.content === 'drawing') return false; if (it.method === 'pre' || it.method === 'peek') return !!this.buf.trim(); return /^\d+$/.test(this.buf) && this.buf.length >= this.cap; }
   get count() { return this.item.content === 'drawing' ? this.strokes.length : this.buf.length; }
   payload() {
     const it = this.item;
@@ -993,7 +1045,7 @@ ENTER.perform = async () => {
     meta: item.trick === false ? 'none' : (item.meta || 'none') });
   P.hasTrick = item.trick !== false && (P.regions.length > 0 || P.meta !== 'none');
   P.drawRegions = P.regions;
-  P.input = new SecretInput(item); P.input.buf = req.preText || '';
+  P.input = new SecretInput(item); P.input.buf = item.method === 'peek' ? PEEK.text : (req.preText || '');
   P.minT = P.regions.length ? Math.min(...P.regions.map(r => r.t)) : Infinity;
   $('#pmenu').hidden = true; closePops();
   initPhotosUI();
