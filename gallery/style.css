@@ -232,3 +232,73 @@ input[type=range] { direction: ltr; }
 .ph-title b, .ph-title span { text-shadow: 0 0 6px var(--pg-bg), 0 0 12px var(--pg-bg); }
 
 .help-inline { font-size: 13px; color: var(--dim); }
+
+/* ===================== מדריך ויזואלי ===================== */
+.toc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.toc a { font-size: 14px; padding: 5px 11px; border-radius: 99px; background: var(--fill); color: var(--accent); text-decoration: none; }
+.help .dim { color: var(--dim); font-size: 14px; }
+.howto { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; align-items: start; scroll-margin-top: 64px; }
+.howto .txt { min-width: 0; }
+.howto .txt h2 { margin-top: 2px; }
+@media (max-width: 560px) { .howto { grid-template-columns: minmax(0, 1fr); } }
+.fig { display: flex; justify-content: center; align-items: center; background: var(--bg); border-radius: 12px; padding: 12px; min-width: 0; }
+.fig svg { display: block; max-width: 100%; height: auto; direction: ltr; }
+.fig svg.phone { width: 100px; }
+.fig.wide svg { width: 300px; }
+.howto .keypad-demo { padding: 0; }
+.howto .keypad-demo .phone { width: 104px; border-width: 4px; border-radius: 18px; }
+.howto .keypad-demo .phone span { font-size: 18px; }
+.f-body { fill: var(--fill); stroke: var(--fg); stroke-width: 2; }
+.f-screen-l { fill: var(--card); }
+.f-screen-d { fill: #2a2622; }
+.f-title { font: 700 12px var(--font); fill: var(--fg); text-anchor: end; }
+.f-cells rect { fill: var(--fill); }
+.f-ring { fill: none; stroke: var(--accent); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: figPulse 1.6s ease-out infinite; }
+.f-touch { fill: var(--accent); opacity: .85; }
+.f-note { font: 600 9px var(--font); fill: var(--dim); text-anchor: middle; }
+.f-note-l { font: 600 9px var(--font); fill: #e6e1d8; text-anchor: middle; }
+.f-note-w { font: 600 8px var(--font); fill: #e6e1d8; text-anchor: middle; }
+.f-video { fill: #3a342e; }
+.f-board, .f-paper { fill: #efe8dc; }
+.f-sel { fill: none; stroke: #ffcc00; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.f-handle { fill: #ffcc00; }
+.f-num { font: 700 22px "Amatic SC", "Caveat", cursive; fill: #2a1d12; text-anchor: middle; }
+.f-num.sm { font-size: 15px; }
+.f-num.dev { animation: figDevelop 3.2s ease-in-out infinite; }
+.f-track { stroke: var(--fill); stroke-width: 4; stroke-linecap: round; }
+.f-fill { stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+.f-thumb { fill: #fff; stroke: var(--sep); }
+.f-arrow { fill: none; stroke: var(--accent); stroke-width: 2; }
+.f-ahead { fill: var(--accent); }
+.f-strip { fill: #5a524a; }
+.f-seg line { stroke: rgba(255,255,255,.35); }
+.f-digits text { font: 600 10px var(--font); fill: var(--dim); text-anchor: middle; }
+.f-digits .on { fill: var(--accent); font-weight: 800; }
+.f-head { fill: #fff; stroke: rgba(0,0,0,.25); }
+.f-kb { fill: var(--fill); stroke: var(--fg); stroke-width: 1.5; }
+.f-keys rect, .f-keys-s rect { fill: var(--card); stroke: var(--sep); }
+.f-keys .on { fill: var(--accent); }
+.f-wave { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+.f-search, .f-kbd, .f-sheet { fill: var(--fill); }
+.f-typed { font: 600 9px var(--font); fill: var(--fg); text-anchor: end; }
+.f-cancel { font: 600 7px var(--font); fill: var(--accent); text-anchor: end; }
+.f-ghost { fill: none; stroke: rgba(255,255,255,.4); stroke-width: 2; stroke-dasharray: 3 3; }
+.f-frame { fill: #c79a45; }
+.f-ink { fill: none; stroke: #2a1d12; stroke-width: 3; stroke-linejoin: round; }
+.f-glass { fill: rgba(255,255,255,.25); }
+.f-hdr { font: 700 10px var(--font); fill: #fff; text-anchor: middle; }
+.f-hdr-sub { font: 600 9px var(--font); fill: #fff; text-anchor: middle; }
+.f-hl { fill: none; stroke: #ffcc00; stroke-width: 1.5; }
+.f-sky { fill: #cfe3f0; }
+.f-ghostcard { fill: #efe8dc; opacity: .3; }
+.f-path { fill: none; stroke: #5ac8fa; stroke-width: 1.5; }
+.f-key { fill: #0a84ff; stroke: #fff; stroke-width: 1.5; }
+.f-quad { fill: none; stroke: #0a84ff; stroke-width: 1.5; }
+.f-crisp { font: 700 30px "Rubik", sans-serif; fill: #000; text-anchor: middle; }
+.f-real { font: 700 32px "Amatic SC", cursive; fill: #2a2420; text-anchor: middle; }
+.f-row { fill: var(--card); }
+.f-row.on { fill: var(--accent); opacity: .3; }
+.f-rowt { font: 700 8px var(--font); fill: var(--fg); text-anchor: end; }
+.f-share { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes figPulse { from { transform: scale(.6); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+@keyframes figDevelop { 0%, 15% { opacity: 0; } 60%, 100% { opacity: 1; } }

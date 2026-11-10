@@ -657,6 +657,11 @@ ENTER.manage = renderManage;
 $('#mgHelp').onclick = () => go('help');
 $('#mgHelp2').onclick = () => go('help');
 $('#mgSettings').onclick = () => go('settings');
+/* תוכן המדריך: גלילה לסעיף בלי לשנות את כתובת הדף */
+$('#help .toc').addEventListener('click', e => {
+  const a = e.target.closest('a'); if (!a) return; e.preventDefault();
+  const el = document.getElementById(a.getAttribute('href').slice(1)); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 $('#helpDone').onclick = () => { if (!S.seenHelp) { S.seenHelp = true; saveSettings(); } uiBack(); };
 
 $('#fileIn').addEventListener('change', async e => {

@@ -241,98 +241,348 @@
   <main class="page help">
     <div class="group pad">
       <h2>מה האפליקציה עושה</h2>
-      <p>האפליקציה נראית בדיוק כמו גלריית התמונות של הטלפון. אתה מראה לצופה סרטון "רגיל" מהגלריה, הצופה חושב על מספר, מילה או ציור, והבחירה שלו מופיעה בתוך הסרטון.</p>
+      <p>האפליקציה נראית כמו גלריית התמונות של הטלפון. אתה מראה לצופה סרטון "רגיל", הצופה חושב על מספר, מילה או ציור, והבחירה שלו מופיעה בתוך הסרטון.</p>
+      <nav class="toc" aria-label="תוכן המדריך">
+        <a href="#h-entry">כניסה נסתרת</a><a href="#h-setup">הכנת סרטון</a><a href="#h-keys">מקשים 3×3</a>
+        <a href="#h-scrub">גרירה ברצועה</a><a href="#h-bt">מקלדת / שלט</a><a href="#h-pre">מסך חיפוש</a>
+        <a href="#h-draw">ציור נסתר</a><a href="#h-meta">חשיפה בפרטים</a><a href="#h-photo">תמונות</a>
+        <a href="#h-track">מעקב תנועה</a><a href="#h-persp">פרספקטיבה</a><a href="#h-real">מראה אמיתי</a>
+        <a href="#h-gest">מחוות בהופעה</a><a href="#h-film">איך לצלם</a><a href="#h-install">התקנה</a>
+      </nav>
     </div>
 
-    <div class="group pad">
-      <h2>איך לצלם סרטון שנראה אמיתי</h2>
-      <ol>
-        <li><b>משטח ברור:</b> לוח מחיק, דף לבן, שלט, מסך כבוי או חולצה. משטח מט (לא מבריק), ישר ובגודל טוב בפריים.</li>
-        <li><b>אור אחיד</b> בלי השתקפויות על המשטח. אם האור משתנה, "התאמת תאורה" תשנה את החשיפה איתו.</li>
-        <li><b>חצובה או יד יציבה.</b> אם המצלמה זזה, משתמשים ב<b>מעקב תנועה</b> עם נקודה כל חצי שנייה.</li>
-        <li><b>הטריק החזק ביותר:</b> המצלמה זזה הצידה מהמשטח וחוזרת אליו. שמים את רגע החשיפה כשהמשטח מחוץ לפריים, עם אפקט "מיידי". הצופה רואה שהכתובה "כבר הייתה שם".</li>
-        <li><b>תנו סיבה לחשיפה:</b> צלמו את עצמכם "כותבים" עם טוש סגור ותזמנו את אפקט "נכתב" לתנועת היד, או הפכו דף, או הדליקו אור.</li>
-        <li><b>שום דבר לא עובר מעל האזור</b> אחרי החשיפה (יד, ראש). זה שובר את האשליה.</li>
-        <li><b>אורך:</b> 15–30 שניות. החשיפה בערך ב-70% מהסרטון. דברו אל הצופה ("תחשוב על מספר בין 10 ל-99").</li>
-        <li><b>צלמו באותו טלפון</b> שאיתו מופיעים, ב-1080p וב-30fps, ושמרו בגלריה גם תמונות וסרטונים רגילים מסביב.</li>
-        <li><b>מראה החשיפה:</b> טוש כהה (לא שחור טהור) עם "דיו על נייר", גרעיניות 10–20%, רכות קלה, ופרספקטיבה אם המשטח בזווית.</li>
-      </ol>
-    </div>
-
-    <div class="group pad">
-      <h2>הכניסה הנסתרת</h2>
-      <p><b>לחיצה ארוכה (שנייה) על המילה "ספרייה"</b> בראש הגלריה פותחת את מסך הניהול. שם מוסיפים סרטונים, עורכים ומגדירים.</p>
-    </div>
-
-    <div class="group pad">
-      <h2>הכנה, פעם אחת לכל סרטון</h2>
-      <ol>
-        <li>בניהול לוחצים <b>הוסף סרטון מהגלריה</b> ובוחרים סרטון.</li>
-        <li>בוחרים <b>מה הצופה בוחר</b>: מספר, מילה או ציור. במספר בוחרים כמה ספרות.</li>
-        <li>בוחרים <b>שיטת הזנה סודית</b>.</li>
-        <li>מזיזים את הסרגל לרגע שבו הבחירה צריכה להופיע ולוחצים <b>הזמן הנוכחי</b>.</li>
-        <li><b>גוררים מלבן</b> על התמונה במקום שבו היא תופיע.</li>
-        <li>לוחצים <b>נסה</b> כדי לראות את התוצאה.</li>
-      </ol>
-    </div>
-
-    <div class="group pad">
-      <h2>המקשים הנסתרים</h2>
-      <p>בזמן שהסרטון מתנגן, המסך מחולק ל-9 מקשים בלתי נראים. הצופה רואה רק את הסרטון.</p>
-      <div class="keypad-demo" aria-hidden="true">
-        <div class="phone"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+    <!-- כניסה נסתרת -->
+    <div class="group pad howto" id="h-entry">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <text class="f-title" x="76" y="30">ספרייה</text>
+          <g class="f-cells"><rect x="10" y="44" width="23" height="23"/><rect x="34" y="44" width="23" height="23"/><rect x="58" y="44" width="23" height="23"/>
+          <rect x="10" y="68" width="23" height="23"/><rect x="34" y="68" width="23" height="23"/><rect x="58" y="68" width="23" height="23"/>
+          <rect x="10" y="92" width="23" height="23"/><rect x="34" y="92" width="23" height="23"/><rect x="58" y="92" width="23" height="23"/></g>
+          <circle class="f-ring" cx="52" cy="26" r="9"/><circle class="f-touch" cx="52" cy="26" r="5" opacity=".45"/>
+          <text class="f-note" x="45" y="140">לחיצה ארוכה</text><text class="f-note" x="45" y="152">שנייה אחת</text>
+        </svg>
       </div>
-      <ul>
-        <li>1 בפינה <b>השמאלית העליונה</b>, 9 בפינה <b>הימנית התחתונה</b>, כמו מקלדת טלפון.</li>
-        <li>אחרי מספר הספרות שהגדרת (למשל 2), <b>שאר הנגיעות לא נחשבות</b>, אז אפשר לגעת במסך בחופשיות.</li>
-        <li>אין 0. אם בחרו מספר עם 0, כדאי לבקש מספר בטווח 11–99 בלי 0, או להשתמש במילים.</li>
-        <li>במילים: הספרה היא מספר המילה ברשימה (1 = המילה הראשונה).</li>
-        <li><b>טעית?</b> הקשה עם שתי אצבעות מוחקת את הספרה האחרונה.</li>
-      </ul>
+      <div class="txt">
+        <h2>הכניסה הנסתרת</h2>
+        <p>במסך הגלריה <b>לוחצים לחיצה ארוכה (שנייה) על המילה "ספרייה"</b>. נפתח מסך הניהול, ושם מוסיפים, עורכים ומגדירים.</p>
+      </div>
     </div>
 
-    <div class="group pad">
-      <h2>הופעה</h2>
-      <ol>
-        <li>פותחים את הגלריה ונוגעים בסרטון.</li>
-        <li>לוחצים ▶ כדי לנגן. כל הכפתורים נעלמים כמו בגלריה אמיתית.</li>
-        <li>מזינים את הבחירה בסתר לפני רגע החשיפה. אפשר גם קצת אחרי, והחשיפה תתחיל ברגע שהזנת.</li>
-        <li>בסוף הכפתורים חוזרים, ואפשר לנגן שוב. החשיפה תופיע שוב.</li>
-      </ol>
-      <p>תפריט סודי: <b>לחיצה ארוכה על הסרטון</b> (התחל מחדש / יציאה).</p>
+    <!-- הכנת סרטון -->
+    <div class="group pad howto" id="h-setup">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 124" aria-hidden="true">
+          <rect class="f-video" x="40" y="4" width="120" height="84" rx="6"/>
+          <rect class="f-board" x="78" y="22" width="44" height="40" rx="2"/>
+          <rect class="f-sel" x="74" y="18" width="52" height="48"/>
+          <rect class="f-handle" x="121" y="61" width="8" height="8"/>
+          <text class="f-num" x="100" y="51">47</text>
+          <line class="f-track" x1="40" y1="104" x2="160" y2="104"/>
+          <line class="f-fill" x1="40" y1="104" x2="124" y2="104"/>
+          <circle class="f-thumb" cx="124" cy="104" r="5"/>
+          <text class="f-note" x="124" y="120">רגע החשיפה</text>
+          <text class="f-note" x="22" y="44">גרור</text><text class="f-note" x="22" y="54">מלבן</text>
+          <path class="f-arrow" d="M34 48 L70 40" marker-end="url(#ah)"/>
+          <defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>הכנה, פעם אחת לכל סרטון</h2>
+        <ol>
+          <li>בניהול: <b>הוסף סרטונים או תמונות</b>.</li>
+          <li><b>מה הצופה בוחר</b>: מספר (וכמה ספרות), מילה מרשימה או ציור.</li>
+          <li><b>שיטה סודית</b> להזנה (בהמשך המדריך).</li>
+          <li>מזיזים את הסרגל לרגע החשיפה ולוחצים <b>הזמן הנוכחי</b>.</li>
+          <li><b>גוררים מלבן</b> על המשטח. פינה צהובה = שינוי גודל.</li>
+          <li>לוחצים <b>נסה</b>.</li>
+        </ol>
+      </div>
     </div>
 
-    <div class="group pad">
-      <h2>שיטות הזנה נוספות</h2>
-      <ul>
-        <li><b>גרירה ברצועת הפריימים (חדש):</b> לפני הניגון "מחפשים" בסרטון. כל פעם שעוזבים את הרצועה נרשמת ספרה לפי המקום: קצה שמאל = 0, קצה ימין = 9. זה מאפשר גם 0.</li>
-        <li><b>מקלדת Bluetooth או שלט:</b> מקלידים בכיס, והצופה יכול להחזיק את הטלפון.</li>
-        <li><b>לפני ההופעה:</b> לפני שהסרטון נפתח מופיע מסך חיפוש, ושם מקלידים את הבחירה.</li>
-        <li><b>ציור נסתר:</b> מציירים באצבע על המסך בזמן הסרטון, והציור מופיע באזור החשיפה.</li>
-      </ul>
+    <!-- מקשים 3x3 -->
+    <div class="group pad howto" id="h-keys">
+      <div class="fig">
+        <div class="keypad-demo" aria-hidden="true">
+          <div class="phone"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+        </div>
+      </div>
+      <div class="txt">
+        <h2>מקשים נסתרים 3×3</h2>
+        <p>בזמן שהסרטון מתנגן, המסך הוא 9 מקשים בלתי נראים, כמו מקלדת טלפון.</p>
+        <ul>
+          <li>1 בפינה <b>השמאלית העליונה</b>, 9 בפינה <b>הימנית התחתונה</b>.</li>
+          <li>אחרי מספר הספרות שהגדרת, <b>שאר הנגיעות לא נחשבות</b>.</li>
+          <li>אין 0. כשצריך 0, משתמשים בגרירה ברצועה.</li>
+          <li>במילים: הספרה היא מספר המילה ברשימה.</li>
+          <li><b>טעות:</b> הקשה בשתי אצבעות מוחקת ספרה.</li>
+        </ul>
+      </div>
     </div>
 
-    <div class="group pad">
-      <h2>חשיפה בפרטי הסרטון (חדש)</h2>
-      <p>במקום (או בנוסף) לחשיפה על התמונה, הבחירה מופיעה בכותרת שבראש המסך: שעת הצילום, תאריך הצילום או שם המקום. בסוף הסרטון אומרים לצופה: "תסתכל מתי הסרטון הזה צולם".</p>
+    <!-- גרירה ברצועה -->
+    <div class="group pad howto" id="h-scrub">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-strip" x="10" y="30" width="180" height="26" rx="5"/>
+          <g class="f-seg"><line x1="28" y1="30" x2="28" y2="56"/><line x1="46" y1="30" x2="46" y2="56"/><line x1="64" y1="30" x2="64" y2="56"/><line x1="82" y1="30" x2="82" y2="56"/><line x1="100" y1="30" x2="100" y2="56"/><line x1="118" y1="30" x2="118" y2="56"/><line x1="136" y1="30" x2="136" y2="56"/><line x1="154" y1="30" x2="154" y2="56"/><line x1="172" y1="30" x2="172" y2="56"/></g>
+          <g class="f-digits"><text x="19" y="72">0</text><text x="37" y="72">1</text><text x="55" y="72">2</text><text x="73" y="72">3</text><text x="91" y="72">4</text><text x="109" y="72">5</text><text x="127" y="72">6</text><text x="145" y="72" class="on">7</text><text x="163" y="72">8</text><text x="181" y="72">9</text></g>
+          <rect class="f-head" x="143" y="25" width="4" height="36" rx="2"/>
+          <circle class="f-touch" cx="145" cy="14" r="5"/>
+          <path class="f-arrow" d="M60 14 H136" marker-end="url(#ah2)"/>
+          <defs><marker id="ah2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <text class="f-note" x="100" y="92">עוזבים כאן = ספרה 7</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>גרירה ברצועת הפריימים</h2>
+        <p>לפני שמנגנים, "מחפשים קטע" בסרטון. <b>כל פעם שעוזבים את הרצועה נרשמת ספרה</b> לפי המקום: קצה שמאל 0, קצה ימין 9. אחר כך לוחצים ▶.</p>
+        <p class="dim">תנועה טבעית לגמרי, ומאפשרת גם 0.</p>
+      </div>
     </div>
 
-    <div class="group pad">
-      <h2>תמונות</h2>
-      <ul>
-        <li>מוסיפים תמונות רגילות כדי שהגלריה תיראה אמיתית. מחליקים ימינה ושמאלה בין פריטים, כמו בגלריה.</li>
-        <li><b>תמונת טריק:</b> פותחים את התמונה ונוגעים פעם אחת כדי להסתיר את הכפתורים. מזינים בסתר, והבחירה "מתפתחת" על התמונה כמה שניות אחרי שההזנה הושלמה.</li>
-      </ul>
+    <!-- מקלדת BT -->
+    <div class="group pad howto" id="h-bt">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-body" x="14" y="6" width="46" height="88" rx="9"/>
+          <rect class="f-screen-d" x="18" y="11" width="38" height="78" rx="5"/>
+          <rect class="f-kb" x="96" y="44" width="96" height="46" rx="6"/>
+          <g class="f-keys"><rect x="102" y="50" width="12" height="10" rx="2"/><rect x="117" y="50" width="12" height="10" rx="2"/><rect x="132" y="50" width="12" height="10" rx="2" class="on"/><rect x="147" y="50" width="12" height="10" rx="2"/><rect x="162" y="50" width="12" height="10" rx="2"/><rect x="177" y="50" width="10" height="10" rx="2"/>
+          <rect x="102" y="64" width="12" height="10" rx="2"/><rect x="117" y="64" width="12" height="10" rx="2" class="on"/><rect x="132" y="64" width="12" height="10" rx="2"/><rect x="147" y="64" width="12" height="10" rx="2"/><rect x="162" y="64" width="25" height="10" rx="2"/>
+          <rect x="117" y="78" width="55" height="8" rx="2"/></g>
+          <path class="f-wave" d="M70 50 q6 -8 0 -16 M78 54 q10 -12 0 -24 M86 58 q14 -16 0 -32"/>
+          <text class="f-note" x="144" y="34">בכיס / ביד</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>מקלדת Bluetooth או שלט</h2>
+        <p>מחברים מקלדת קטנה או שלט מצגות. מקלידים בסתר, והצופה יכול <b>להחזיק את הטלפון בעצמו</b>, כי נגיעות במסך לא עושות כלום.</p>
+        <ul><li>רווח או חץ מתחיל את הסרטון.</li><li>Enter נועל את הבחירה מיד.</li><li>Esc פותח את התפריט הסודי.</li></ul>
+      </div>
     </div>
 
-    <div class="group pad">
-      <h2>התקנה באייפון ושמירה לתמיד</h2>
-      <ol>
-        <li>פותחים ב-<b>Safari</b> את כתובת האפליקציה.</li>
-        <li>כפתור השיתוף ← <b>הוסף למסך הבית</b>.</li>
-        <li>האייקון נראה כמו אייקון הגלריה, והאפליקציה נפתחת במסך מלא.</li>
-      </ol>
-      <p>באפליקציה המותקנת הסרטונים נשמרים במכשיר לתמיד. בקישור של Claude הם נשמרים בחשבון שלך (עד 20MB לסרטון).</p>
+    <!-- מסך חיפוש -->
+    <div class="group pad howto" id="h-pre">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <rect class="f-search" x="12" y="18" width="52" height="14" rx="5"/>
+          <text class="f-typed" x="58" y="28">47</text>
+          <text class="f-cancel" x="80" y="28">ביטול</text>
+          <rect class="f-kbd" x="7" y="104" width="76" height="62" rx="0"/>
+          <g class="f-keys-s"><rect x="12" y="110" width="12" height="11" rx="2"/><rect x="26" y="110" width="12" height="11" rx="2"/><rect x="40" y="110" width="12" height="11" rx="2"/><rect x="54" y="110" width="12" height="11" rx="2"/><rect x="68" y="110" width="12" height="11" rx="2"/>
+          <rect x="12" y="125" width="12" height="11" rx="2"/><rect x="26" y="125" width="12" height="11" rx="2"/><rect x="40" y="125" width="12" height="11" rx="2"/><rect x="54" y="125" width="12" height="11" rx="2"/><rect x="68" y="125" width="12" height="11" rx="2"/>
+          <rect x="22" y="142" width="46" height="11" rx="2"/></g>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>לפני ההופעה (מסך חיפוש)</h2>
+        <p>נוגעים בסרטון בגלריה, ונפתח קודם <b>מסך חיפוש</b> רגיל של הגלריה. מקלידים את הבחירה ("כדי למצוא סרטון") ולוחצים חפש במקלדת, והסרטון נפתח.</p>
+        <p class="dim">מתאים כשהצופה אמר את הבחירה, או כשהצצת אליה בדרך אחרת.</p>
+      </div>
+    </div>
+
+    <!-- ציור נסתר -->
+    <div class="group pad howto" id="h-draw">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 110" aria-hidden="true">
+          <rect class="f-body" x="8" y="4" width="56" height="102" rx="10"/>
+          <rect class="f-screen-d" x="12" y="9" width="48" height="92" rx="6"/>
+          <path class="f-ghost" d="M36 30 L52 72 L20 72 Z"/>
+          <circle class="f-touch" cx="52" cy="72" r="4"/>
+          <path class="f-arrow" d="M72 55 H112" marker-end="url(#ah3)"/>
+          <defs><marker id="ah3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <rect class="f-frame" x="122" y="14" width="68" height="82" rx="3"/>
+          <rect class="f-paper" x="128" y="20" width="56" height="70"/>
+          <path class="f-ink" d="M156 32 L174 76 L138 76 Z"/>
+          <text class="f-note" x="36" y="22">בלתי נראה</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>ציור נסתר</h2>
+        <p>בזמן שהסרטון מתנגן <b>מציירים באצבע</b> את מה שהצופה צייר. הקווים לא נראים על המסך, והציור מופיע באזור החשיפה.</p>
+        <p class="dim">שתי אצבעות מבטלות את הקו האחרון.</p>
+      </div>
+    </div>
+
+    <!-- חשיפה בפרטים -->
+    <div class="group pad howto" id="h-meta">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 104" aria-hidden="true">
+          <rect class="f-video" x="10" y="4" width="180" height="96" rx="8"/>
+          <circle class="f-glass" cx="26" cy="20" r="9"/><circle class="f-glass" cx="174" cy="20" r="9"/>
+          <text class="f-hdr" x="100" y="19">היום</text>
+          <rect class="f-hl" x="80" y="23" width="40" height="13" rx="4"/>
+          <text class="f-hdr-sub" x="100" y="33">17:47</text>
+          <text class="f-note-l" x="100" y="62">שעה: 47 ← 17:47</text>
+          <text class="f-note-l" x="100" y="76">תאריך: 1503 ← 15 במרץ</text>
+          <text class="f-note-l" x="100" y="90">מקום: "יפן" ← כותרת</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>חשיפה בפרטי הסרטון</h2>
+        <p>בעורך: <b>"הבחירה תופיע גם ב…"</b>. בסוף הסרטון הכותרת שבראש המסך מראה את הבחירה כשעת הצילום, כתאריך הצילום או כשם המקום. אפשר גם בכיתוב שבחלון המידע ⓘ.</p>
+        <p class="dim">"תסתכל מתי הסרטון הזה צולם." אין שום דבר מודבק על התמונה.</p>
+      </div>
+    </div>
+
+    <!-- תמונות -->
+    <div class="group pad howto" id="h-photo">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-sky" x="8" y="10" width="76" height="80" rx="4"/><rect class="f-paper" x="28" y="34" width="36" height="36"/>
+          <path class="f-arrow" d="M90 50 H110" marker-end="url(#ah4)"/>
+          <defs><marker id="ah4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <rect class="f-sky" x="116" y="10" width="76" height="80" rx="4"/><rect class="f-paper" x="136" y="34" width="36" height="36"/>
+          <text class="f-num dev" x="154" y="60">37</text>
+          <text class="f-note" x="46" y="98">נגיעה + 2 ספרות</text><text class="f-note" x="154" y="98">"מתפתח"</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>תמונות</h2>
+        <ul>
+          <li><b>תמונות רגילות</b> גורמות לגלריה להיראות אמיתית. אפשר לבחור כמה קבצים יחד.</li>
+          <li><b>תמונת טריק:</b> פותחים את התמונה, נוגעים פעם אחת (הכפתורים נעלמים), ומזינים במקשים הנסתרים. אחרי רגע הבחירה "מתפתחת" על התמונה.</li>
+          <li>בעורך מסמנים אזור, וקובעים כמה שניות אחרי ההזנה זה יופיע.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- מעקב תנועה -->
+    <div class="group pad howto" id="h-track">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-video" x="6" y="6" width="188" height="88" rx="6"/>
+          <rect class="f-ghostcard" x="16" y="18" width="44" height="30"/><rect class="f-ghostcard" x="74" y="32" width="44" height="30"/>
+          <rect class="f-board" x="134" y="48" width="44" height="30"/><text class="f-num sm" x="156" y="69">47</text>
+          <polyline class="f-path" points="38,33 96,47 156,63"/>
+          <circle class="f-key" cx="38" cy="33" r="4"/><circle class="f-key" cx="96" cy="47" r="4"/><circle class="f-key" cx="156" cy="63" r="5"/>
+          <text class="f-note-w" x="38" y="60">0.5 שנ׳</text><text class="f-note-w" x="96" y="74">1.0 שנ׳</text><text class="f-note-w" x="156" y="90">1.5 שנ׳</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>מעקב תנועה</h2>
+        <p>כשהמצלמה ביד או שהמשטח זז: מפעילים <b>מעקב</b>, מזיזים את הסרגל לרגע אחר <b>וגוררים את המסגרת למקום של המשטח</b> באותו רגע. כל גרירה = נקודה כחולה. הכתב נצמד לתנועה.</p>
+        <p class="dim">נקודה כל חצי שנייה עד שנייה מספיקה.</p>
+      </div>
+    </div>
+
+    <!-- פרספקטיבה -->
+    <div class="group pad howto" id="h-persp">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-video" x="6" y="6" width="188" height="88" rx="6"/>
+          <polygon class="f-board" points="58,22 150,14 140,84 64,78"/>
+          <text class="f-num" x="0" y="0" transform="matrix(0.95,-0.08,0.03,1,104,60)">47</text>
+          <polygon class="f-quad" points="58,22 150,14 140,84 64,78"/>
+          <circle class="f-key" cx="58" cy="22" r="5"/><circle class="f-key" cx="150" cy="14" r="5"/><circle class="f-key" cx="140" cy="84" r="5"/><circle class="f-key" cx="64" cy="78" r="5"/>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>פרספקטיבה</h2>
+        <p>כשהמשטח בזווית (לוח על קיר, דף על שולחן): מפעילים <b>פרספקטיבה</b> וגוררים את <b>4 הנקודות הכחולות</b> לפינות המשטח. הכתב נמתח עליו כמו במציאות.</p>
+      </div>
+    </div>
+
+    <!-- מראה אמיתי -->
+    <div class="group pad howto" id="h-real">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 92" aria-hidden="true">
+          <defs><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" result="n"/><feColorMatrix type="saturate" values="0"/><feComposite in2="SourceGraphic" operator="in" result="g"/><feBlend in="SourceGraphic" in2="g" mode="multiply"/><feGaussianBlur stdDeviation=".6"/></filter></defs>
+          <rect class="f-paper" x="10" y="10" width="84" height="62" rx="3"/>
+          <text class="f-crisp" x="52" y="54">47</text>
+          <rect class="f-paper" x="106" y="10" width="84" height="62" rx="3"/>
+          <text class="f-real" x="148" y="54" filter="url(#grain)">47</text>
+          <text class="f-note" x="52" y="86">מודבק</text><text class="f-note" x="148" y="86">מצולם</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>שיראה מצולם, לא מודבק</h2>
+        <ul>
+          <li><b>גרעיניות מצלמה</b> 10–20%.</li>
+          <li><b>רכות</b> קלה, כמו הפוקוס של המצלמה.</li>
+          <li><b>התאמת תאורה</b> פועלת לבד: כשהמשטח מתכהה, הכתב מתכהה איתו.</li>
+          <li>"דיו על נייר" על משטח בהיר, וצבע כהה (לא שחור מלא).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- מחוות -->
+    <div class="group pad howto" id="h-gest">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 84" aria-hidden="true">
+          <g transform="translate(25 30)"><circle class="f-ring" r="11"/><circle class="f-touch" r="5"/></g>
+          <g transform="translate(75 30)"><circle class="f-touch" cx="-6" r="5"/><circle class="f-touch" cx="6" r="5"/></g>
+          <g transform="translate(125 22)"><circle class="f-touch" r="5"/><path class="f-arrow" d="M0 8 V26" marker-end="url(#ah5)"/></g>
+          <g transform="translate(175 30)"><circle class="f-touch" r="5"/><path class="f-arrow" d="M-8 0 H-20 M8 0 H20" marker-end="url(#ah5)"/></g>
+          <defs><marker id="ah5" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <text class="f-note" x="25" y="66">ארוכה</text><text class="f-note" x="25" y="77">תפריט סודי</text>
+          <text class="f-note" x="75" y="66">2 אצבעות</text><text class="f-note" x="75" y="77">מחק ספרה</text>
+          <text class="f-note" x="125" y="66">למטה</text><text class="f-note" x="125" y="77">סגור סרטון</text>
+          <text class="f-note" x="175" y="66">לצדדים</text><text class="f-note" x="175" y="77">הפריט הבא</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>בזמן ההופעה</h2>
+        <ol>
+          <li>נוגעים בסרטון בגלריה ולוחצים ▶. הכפתורים נעלמים כמו בגלריה אמיתית.</li>
+          <li>מזינים בסתר <b>לפני רגע החשיפה</b>. גם קצת אחרי זה עובד, והחשיפה תתחיל ברגע שהזנת.</li>
+          <li>בסוף הכפתורים חוזרים, ואפשר לנגן שוב.</li>
+        </ol>
+        <p class="dim">בתפריט ⋯ יש "הצג מההתחלה", שמאפס את מה שהוזן.</p>
+      </div>
+    </div>
+
+    <!-- איך לצלם -->
+    <div class="group pad howto" id="h-film">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 86" aria-hidden="true">
+          <rect class="f-video" x="4" y="8" width="58" height="56" rx="4"/><rect class="f-paper" x="18" y="20" width="30" height="32"/>
+          <rect class="f-video" x="71" y="8" width="58" height="56" rx="4"/><rect class="f-paper" x="113" y="20" width="16" height="32"/><text class="f-note-w" x="92" y="40">⚡</text>
+          <rect class="f-video" x="138" y="8" width="58" height="56" rx="4"/><rect class="f-paper" x="152" y="20" width="30" height="32"/><text class="f-num sm" x="167" y="42">47</text>
+          <text class="f-note" x="33" y="78">1. ריק</text><text class="f-note" x="100" y="78">2. חשיפה בחוץ</text><text class="f-note" x="167" y="78">3. "כבר היה"</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>איך לצלם סרטון שנראה אמיתי</h2>
+        <ol>
+          <li><b>משטח ברור</b>: לוח, דף, שלט או חולצה. מט, ישר וגדול בפריים.</li>
+          <li><b>אור אחיד</b> בלי השתקפויות על המשטח.</li>
+          <li><b>הטריק החזק ביותר:</b> המצלמה זזה מהמשטח וחוזרת. החשיפה ("מיידי") קורית כשהמשטח מחוץ לפריים.</li>
+          <li><b>סיבה לחשיפה:</b> "כותבים" עם טוש סגור ומתזמנים את "נכתב" ליד, הופכים דף, או מדליקים אור.</li>
+          <li><b>שום דבר לא עובר מעל הכתב</b> אחרי החשיפה.</li>
+          <li>15–30 שניות, חשיפה בערך ב-70% מהסרטון. מדברים אל הצופה.</li>
+          <li>מצלמים <b>באותו טלפון</b>, ומשאירים בגלריה תמונות רגילות מסביב.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- התקנה -->
+    <div class="group pad howto" id="h-install">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <rect class="f-sheet" x="7" y="96" width="76" height="70" rx="9"/>
+          <rect class="f-row" x="13" y="108" width="64" height="14" rx="4"/>
+          <rect class="f-row on" x="13" y="126" width="64" height="14" rx="4"/>
+          <text class="f-rowt" x="74" y="136">הוסף למסך הבית</text>
+          <path class="f-share" d="M45 66 v-16 M40 55 l5 -5 l5 5 M39 60 h-3 v12 h18 v-12 h-3"/>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>התקנה באייפון ושמירה לתמיד</h2>
+        <ol>
+          <li>פותחים ב-<b>Safari</b> את כתובת האפליקציה.</li>
+          <li>כפתור השיתוף ← <b>הוסף למסך הבית</b>.</li>
+          <li>האפליקציה נפתחת במסך מלא, ושומרת הכל במכשיר.</li>
+        </ol>
+        <p class="dim">בקישור של Claude הסרטונים נשמרים בחשבון שלך (עד 20MB לסרטון).</p>
+      </div>
     </div>
 
     <button class="btn-big primary" id="helpDone" type="button">הבנתי</button>
