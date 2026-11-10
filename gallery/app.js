@@ -40,7 +40,9 @@ const METHODS = {
 };
 
 /* ---------- הגדרות ---------- */
-const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '' };
+const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
+  startIn: 'hub', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
+  notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6' };
 const PEEK = { text: '', at: 0 };
 const LAST = { text: '' }; // הבחירה האחרונה (מחיפוש או מחשיפה) – לפסיפס ולמצגת
 let LASTVIEW = null;       // הפריט האחרון שנפתח מהגלריה – לגלריה המתנפצת // החיפוש האחרון של הצופה (בזיכרון בלבד)
@@ -1188,16 +1190,16 @@ const endDrag = () => { if (E.drag) { E.drag = null; scheduleSave(); } };
 edCanvas.addEventListener('pointerup', endDrag); edCanvas.addEventListener('pointercancel', endDrag);
 
 /* ===================== הגדרות ===================== */
-ENTER.settings = () => {
-  $('#stPeek').textContent = PEEK.text || '—';
-  $$('[data-s]').forEach(el => { if (el.type === 'checkbox') el.checked = !!S[el.dataset.s]; else el.value = S[el.dataset.s] || ''; });
-};
-$('#settings').addEventListener('input', e => {
+const fillS = root => $$('[data-s]', root).forEach(el => { if (el.type === 'checkbox') el.checked = !!S[el.dataset.s]; else el.value = S[el.dataset.s] ?? ''; });
+ENTER.settings = () => { $('#stPeek').textContent = PEEK.text || '—'; fillS($('#settings')); };
+const onSetting = e => {
   const el = e.target; if (!el.dataset.s) return;
   S[el.dataset.s] = el.type === 'checkbox' ? el.checked : el.value;
   if (el.dataset.s === 'phTheme') applyTheme();
   saveSettings();
-});
+};
+$('#settings').addEventListener('input', onSetting);
+$('#hub').addEventListener('input', onSetting);
 
 /* ===================== צפייה / הופעה ===================== */
 class SecretInput {
@@ -1710,6 +1712,140 @@ document.addEventListener('visibilitychange', async () => {
   if (P.active && document.visibilityState === 'visible') { try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ } }
 });
 
+
+/* ===================== מרכז הקסמים ===================== */
+function longPress(el, ms, fn) {
+  let t = 0;
+  el.addEventListener('pointerdown', () => { clearTimeout(t); t = setTimeout(() => { buzz(); fn(); }, ms); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => el.addEventListener(ev, () => clearTimeout(t)));
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+async function goHome() {
+  const cur = curScreen(); if (cur === 'hub') return;
+  if (LEAVE[cur]) await LEAVE[cur]();
+  NAV.stack = ['hub']; try { history.pushState({ g: 1 }, ''); } catch (e) { /* ignore */ }
+  paint('hub'); ENTER.hub();
+}
+ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); };
+$('#hub').addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) go(b.dataset.open); });
+$('#mgHub').onclick = () => goHome();
+$$('.exit-band').forEach(el => longPress(el, 900, goHome));
+const setChoice = t => { PEEK.text = t; PEEK.at = Date.now(); LAST.text = t; };
+
+/* ---------- מחשבון עם הכרחה ---------- */
+const C = { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null, fi: 0 };
+function calcTarget() {
+  const d = new Date(), p2 = n => String(n).padStart(2, '0');
+  if (S.calcMode === 'time') return +(p2(d.getHours()) + p2(d.getMinutes()));
+  if (S.calcMode === 'date') return +(p2(d.getDate()) + p2(d.getMonth() + 1) + d.getFullYear());
+  if (S.calcMode === 'last') { const n = parseInt(String(LAST.text || '').replace(/\D/g, ''), 10); if (n) return n; }
+  return parseFloat(S.calcNumber) || 1089;
+}
+const calcFmt = v => {
+  if (!isFinite(v)) return 'שגיאה';
+  if (Math.abs(v) >= 1e12) return v.toExponential(5);
+  const [i, f] = String(+v.toPrecision(10)).split('.');
+  return Number(i).toLocaleString('en-US') + (f ? '.' + f : '');
+};
+const curFmt = () => {
+  const neg = C.cur.startsWith('-'), [i, f] = C.cur.replace('-', '').split('.');
+  return (neg ? '-' : '') + Number(i || '0').toLocaleString('en-US') + (C.cur.includes('.') ? '.' + (f || '') : '');
+};
+function calcShow(txt) {
+  const el = $('#cDisp'); el.textContent = txt;
+  const n = txt.replace(/[^\d]/g, '').length; el.style.fontSize = n > 9 ? '52px' : n > 7 ? '66px' : '86px';
+}
+const calcApply = (a, op, b) => op === '+' ? a + b : op === '-' ? a - b : op === '×' ? a * b : op === '÷' ? (b === 0 ? NaN : a / b) : b;
+function calcKey(k) {
+  $$('.ck.op').forEach(b => b.classList.remove('on'));
+  if (/^[\d.]$/.test(k)) {
+    if (C.armed && C.op === '+') { // הכרחה: כל מקש מקליד את הספרה הבאה של המספר הדרוש
+      if (C.force === null) { C.force = String(Math.round((calcTarget() - C.acc) * 1e6) / 1e6); C.fi = 0; C.cur = ''; }
+      if (C.fi >= C.force.length) return;
+      C.cur += C.force[C.fi++]; if (C.cur === '-') C.cur += C.force[C.fi++] || '';
+      C.fresh = false; calcShow(curFmt()); return;
+    }
+    if (C.fresh) { C.cur = k === '.' ? '0.' : k; C.fresh = false; }
+    else { if (k === '.' && C.cur.includes('.')) return; if (C.cur.replace(/[-.]/g, '').length >= 9) return; C.cur = C.cur === '0' && k !== '.' ? k : C.cur + k; }
+    calcShow(curFmt()); return;
+  }
+  if (k === 'ac') { Object.assign(C, { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null }); calcShow('0'); return; }
+  if (k === 'neg') { C.cur = C.cur.startsWith('-') ? C.cur.slice(1) : (C.cur === '0' ? '0' : '-' + C.cur); calcShow(curFmt()); return; }
+  if (k === 'pct') { C.cur = String(parseFloat(C.cur) / 100); calcShow(calcFmt(+C.cur)); return; }
+  if (k === '=') {
+    if (C.op) { C.acc = calcApply(C.acc, C.op, parseFloat(C.cur)); C.op = null; }
+    else C.acc = parseFloat(C.cur);
+    C.cur = String(C.acc); C.fresh = true; if (C.force !== null) { C.armed = false; C.force = null; }
+    calcShow(calcFmt(C.acc)); return;
+  }
+  // + − × ÷
+  if (C.op && !C.fresh) C.acc = calcApply(C.acc, C.op, parseFloat(C.cur));
+  else if (!C.op) C.acc = parseFloat(C.cur);
+  C.op = k; C.fresh = true; if (C.force !== null) { C.force = null; }
+  $(`.ck.op[data-k="${k}"]`).classList.add('on');
+  calcShow(calcFmt(C.acc));
+}
+$('#calc .c-keys').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) calcKey(b.dataset.k); });
+longPress($('#cDisp'), 800, () => { C.armed = true; const d = $('#cDisp'); d.style.opacity = '.55'; setTimeout(() => d.style.opacity = '', 160); });
+ENTER.calc = () => { calcKey('ac'); };
+
+/* ---------- חיפוש באינטרנט (הצצה) ---------- */
+ENTER.web = () => { $('#wIn').value = ''; $('#wHome').hidden = false; $('#wOff').hidden = true; $('#wPeek').hidden = true; setTimeout(() => $('#wIn').focus(), 80); };
+$('#wForm').addEventListener('submit', e => {
+  e.preventDefault(); const q = $('#wIn').value.trim(); if (!q) return;
+  setChoice(q); $('#wIn').blur(); $('#wHome').hidden = true; $('#wOff').hidden = false;
+});
+$('#wRetry').onclick = () => { const b = $('#wRetry'); b.textContent = 'טוען…'; setTimeout(() => { b.textContent = 'נסה שוב'; }, 1400); };
+longPress($('#wOffIco'), 600, () => { const p = $('#wPeek'); p.textContent = PEEK.text; p.hidden = false; setTimeout(() => p.hidden = true, 1600); });
+
+/* ---------- חפיסת קלפים ---------- */
+function buildDeck() {
+  const fan = $('#dFan'); fan.innerHTML = '';
+  for (let i = 0; i < 52; i++) { const b = document.createElement('button'); b.type = 'button'; b.className = 'dcard'; b.setAttribute('aria-label', 'קלף'); fan.appendChild(b); }
+  requestAnimationFrame(() => { fan.scrollLeft = (fan.scrollWidth - fan.clientWidth) / 2; });
+  $('#dPick').hidden = true;
+}
+ENTER.deck = buildDeck;
+$('#dShuffle').onclick = () => { const fan = $('#dFan'); fan.scrollTo({ left: Math.random() * (fan.scrollWidth - fan.clientWidth), behavior: 'smooth' }); };
+$('#dFan').addEventListener('click', e => {
+  if (!e.target.closest('.dcard')) return;
+  const c = S.deckMode === 'free' ? { s: Math.floor(Math.random() * 4), v: 1 + Math.floor(Math.random() * 13) } : (parseCard(S.deckForce) || { s: 1, v: 7 });
+  const red = c.s === 1 || c.s === 3, col = red ? '#c8102e' : '#141414', face = $('#dFace');
+  face.innerHTML = `<div class="c1"><span></span><i></i></div><div class="mid"></div><div class="c2"><span></span><i></i></div>`;
+  $$('span', face).forEach(x => x.textContent = VAL(c.v)); $$('i', face).forEach(x => x.textContent = SUITS[c.s]);
+  $('.mid', face).textContent = c.v >= 11 ? VAL(c.v) + SUITS[c.s] : SUITS[c.s]; face.style.color = col;
+  face.style.animation = 'none'; void face.offsetWidth; face.style.animation = '';
+  $('#dPick').hidden = false; setChoice(cardText(c)); buzz();
+});
+$('#dPick').onclick = () => { $('#dPick').hidden = true; };
+
+/* ---------- מסך נעול + התראה ---------- */
+const L = { t: 0, tick: 0, buf: '', fired: false };
+function lockClock() {
+  const d = new Date();
+  $('#lTime').textContent = d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+  $('#lDate').textContent = d.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+function fireNote(x) {
+  if (L.fired) return; L.fired = true;
+  $('#lFrom').textContent = S.notifyFrom || 'הודעה';
+  $('#lText').textContent = (S.notifyBody || '{x}').split('{x}').join(x);
+  const n = $('#lNote'); n.hidden = true; void n.offsetWidth; n.hidden = false; buzz();
+}
+ENTER.lock = () => {
+  lockClock(); clearInterval(L.tick); L.tick = setInterval(lockClock, 15000);
+  clearTimeout(L.t); L.buf = ''; L.fired = false; $('#lNote').hidden = true;
+  if (LAST.text) L.t = setTimeout(() => fireNote(LAST.text), (parseFloat(S.notifyDelay) || 6) * 1000);
+};
+LEAVE.lock = () => { clearTimeout(L.t); clearInterval(L.tick); };
+$('#lTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כשאין בחירה שנקלטה
+  if (L.fired || L.buf.length >= 2) return;
+  if (!L.buf) clearTimeout(L.t); // הזנה ידנית גוברת על ההודעה האוטומטית
+  const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
+  L.buf += String(row * 3 + col + 1); buzz();
+  if (L.buf.length >= 2) { clearTimeout(L.t); const v = L.buf; L.t = setTimeout(() => { setChoice(v); fireNote(v); }, 2000); }
+});
+
 /* ===================== הפעלה ===================== */
 (async function init() {
   await Store.init();
@@ -1718,8 +1854,8 @@ document.addEventListener('visibilitychange', async () => {
   try { ITEMS = (await Store.all()).map(normalize); } catch (e) { ITEMS = []; }
   if (!ITEMS.some(i => i.id === 'demo')) { const d = normalize(demoItem()); ITEMS.push(d); persist(d); }
   try { history.replaceState({ g: 1 }, ''); } catch (e) { /* ignore */ }
-  NAV.stack = ['photos']; paint('photos'); ENTER.photos();
-  if (!S.seenHelp) go('help');
+  const root = S.startIn === 'photos' ? 'photos' : 'hub';
+  NAV.stack = [root]; paint(root); ENTER[root]();
   try { if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {}); }
   catch (e) { /* מסגרת מוגבלת */ }
 })();

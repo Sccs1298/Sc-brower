@@ -20,6 +20,179 @@
 </head>
 <body>
 
+<!-- ===================== מרכז הקסמים (מסך הכניסה + מדריך) ===================== -->
+<section id="hub" class="screen ui">
+  <header class="nav">
+    <span class="nav-back"></span>
+    <h1>מרכז הקסמים</h1>
+    <button class="nav-act" data-open="settings" type="button">הגדרות</button>
+  </header>
+  <main class="page hub">
+    <div class="hub-hero">
+      <h2>בחר קסם</h2>
+      <p>כל כרטיס מסביר מה הצופה רואה ואיך עושים את זה. מה שהצופה בוחר בקסם אחד עובר לכל השאר.</p>
+      <div class="hub-peek"><span>הבחירה האחרונה שנקלטה:</span><b id="hubPeek">—</b></div>
+    </div>
+
+    <!-- גלריה -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#fff"><svg viewBox="0 0 40 40"><g opacity=".85"><ellipse cx="20" cy="11" rx="5" ry="8" fill="#ff9500"/><ellipse cx="29" cy="20" rx="8" ry="5" fill="#34c759"/><ellipse cx="20" cy="29" rx="5" ry="8" fill="#007aff"/><ellipse cx="11" cy="20" rx="8" ry="5" fill="#ff2d55"/></g></svg></span>
+        <div><h2>קסמי גלריה</h2><p class="dim">הצופה רואה: סרטון או תמונה "רגילים" בגלריה, ובתוכם מה שהוא חשב.</p></div>
+      </div>
+      <ul class="tc-list">
+        <li><b>מספר, מילה, ציור או קלף</b> בתוך סרטון או תמונה</li>
+        <li><b>שעה, תאריך או מקום</b> בפרטי הסרטון</li>
+        <li><b>הצופה מחפש בעצמו</b> ומוצא את הסרטון</li>
+        <li><b>גלריה מתנפצת, פסיפס, מצגת שעוצרת</b></li>
+      </ul>
+      <div class="tc-acts"><button class="btn-big primary" data-open="photos" type="button">פתח את הגלריה</button>
+        <div class="tc-sub"><button class="btn" data-open="manage" type="button">ניהול הסרטונים</button><button class="btn" data-open="help" type="button">מדריך מלא עם ציורים</button></div></div>
+    </div>
+
+    <!-- מחשבון -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40"><rect x="9" y="7" width="22" height="7" rx="2" fill="#a5a5a5"/><g fill="#505050"><circle cx="12" cy="20" r="3"/><circle cx="20" cy="20" r="3"/><circle cx="12" cy="28" r="3"/><circle cx="20" cy="28" r="3"/></g><circle cx="28" cy="20" r="3" fill="#ff9f0a"/><circle cx="28" cy="28" r="3" fill="#ff9f0a"/></svg></span>
+        <div><h2>מחשבון</h2><p class="dim">הצופה רואה: מחבר מספרים אקראיים, והתוצאה היא בדיוק החיזוי שלך.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>הצופה (או כמה צופים) מקליד מספרים אקראיים עם <b>+</b> ביניהם.</li>
+        <li>אתה לוקח את הטלפון ו<b>לוחץ לחיצה ארוכה על המסך של המספרים</b> (שנייה). זה מפעיל את הקסם בסתר.</li>
+        <li>אומרים "ועכשיו אני מוסיף מספר", לוחצים <b>+</b> ומקלידים מקשים אקראיים. המחשבון מקליד בעצמו את המספר הנכון.</li>
+        <li>לוחצים <b>=</b>, והתוצאה היא השעה עכשיו, התאריך של היום, או המספר שבחרת.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>התוצאה תהיה</span>
+            <select data-s="calcMode"><option value="time">השעה עכשיו (1447)</option><option value="date">התאריך של היום</option><option value="number">מספר שאני בוחר</option><option value="last">הבחירה האחרונה שנקלטה</option></select></label>
+          <label class="row"><span>המספר שלי</span><input data-s="calcNumber" inputmode="numeric" placeholder="1089"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="calc" type="button">פתח מחשבון</button></div>
+    </div>
+
+    <!-- חיפוש באינטרנט -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#0a84ff"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><circle cx="18" cy="18" r="8"/><path d="M24 24l7 7"/></svg></span>
+        <div><h2>חיפוש באינטרנט (הצצה)</h2><p class="dim">הצופה רואה: מחפש מילה, ו"אין אינטרנט". אתה כבר יודע מה הוא חיפש.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>"תחשוב על מדינה ותחפש אותה, שנראה תמונות."</li>
+        <li>הצופה מקליד ומחפש, ומופיע <b>"אין חיבור לאינטרנט"</b>. נראה כמו תקלה.</li>
+        <li>להצצה: <b>לחיצה ארוכה על סמל הענן</b> מראה לך את המילה לשנייה.</li>
+        <li>המילה עוברת אוטומטית לכל הקסמים: סרטון בגלריה, התראה, פסיפס.</li>
+      </ol>
+      <div class="tc-acts"><button class="btn-big primary" data-open="web" type="button">פתח חיפוש</button></div>
+    </div>
+
+    <!-- קלפים -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#1f6b45"><svg viewBox="0 0 40 40"><rect x="8" y="10" width="15" height="21" rx="2" fill="#fff" transform="rotate(-12 15 20)"/><rect x="17" y="9" width="15" height="21" rx="2" fill="#fff" stroke="#ccc"/><text x="24.5" y="24" font-size="11" text-anchor="middle" fill="#c8102e">♥</text></svg></span>
+        <div><h2>חפיסת קלפים</h2><p class="dim">הצופה רואה: בוחר קלף בחופשיות מתוך חפיסה, והוא בדיוק הקלף שחזית.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>הצופה מגלגל את החפיסה ונוגע בקלף.</li>
+        <li><b>מצב הכרחה:</b> לא משנה באיזה קלף נגע, יוצא הקלף שקבעת.</li>
+        <li><b>מצב חופשי:</b> יוצא קלף אקראי, והקלף עובר לשאר הקסמים (למשל סרטון קלף בגלריה).</li>
+        <li>נגיעה בקלף שנבחר מחזירה לחפיסה.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>מצב</span><select data-s="deckMode"><option value="force">הכרחה (תמיד אותו קלף)</option><option value="free">חופשי (אני מקבל את הקלף)</option></select></label>
+          <label class="row"><span>קלף ההכרחה</span><input data-s="deckForce" placeholder="7 לב"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="deck" type="button">פתח חפיסה</button></div>
+    </div>
+
+    <!-- התראה -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>
+        <div><h2>התראה</h2><p class="dim">הצופה רואה: הטלפון שלך נעול, ופתאום מגיעה הודעה עם מה שהוא חשב.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>פותחים, והמסך נראה כמו <b>מסך נעול</b>. מניחים את הטלפון על השולחן.</li>
+        <li><b>אם יש בחירה שנקלטה</b> (מחיפוש, מקלף וכו'), ההודעה מגיעה לבד אחרי כמה שניות.</li>
+        <li><b>אחרת:</b> נוגעים בסתר במקשים 3×3 (2 ספרות), וההודעה מגיעה אחרי 2 שניות.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>שולח</span><input data-s="notifyFrom" placeholder="אמא"></label>
+          <label class="row col"><span>טקסט ההודעה ({x} = הבחירה)</span><input data-s="notifyBody" placeholder="חלמתי הלילה על {x} 😮"></label>
+          <label class="row"><span>שניות עד ההודעה</span><input data-s="notifyDelay" type="number" min="1" step="1" placeholder="6"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="lock" type="button">פתח מסך נעול</button></div>
+    </div>
+
+    <div class="group pad">
+      <h2>יציאה מקסם</h2>
+      <p><b>לחיצה ארוכה (שנייה) על החלק העליון של המסך</b> בכל קסם מחזירה לכאן. בגלריה: לחיצה ארוכה על "ספרייה" ← ניהול ← "מרכז הקסמים".</p>
+      <label class="row"><span>כשפותחים את האפליקציה</span><select data-s="startIn"><option value="hub">מרכז הקסמים</option><option value="photos">ישר לגלריה</option></select></label>
+    </div>
+  </main>
+</section>
+
+<!-- ===================== מחשבון ===================== -->
+<section id="calc" class="screen trick">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="calc">
+    <div class="c-disp" id="cDisp">0</div>
+    <div class="c-keys">
+      <button class="ck fn" data-k="ac" type="button">AC</button><button class="ck fn" data-k="neg" type="button">+/−</button><button class="ck fn" data-k="pct" type="button">%</button><button class="ck op" data-k="÷" type="button">÷</button>
+      <button class="ck" data-k="7" type="button">7</button><button class="ck" data-k="8" type="button">8</button><button class="ck" data-k="9" type="button">9</button><button class="ck op" data-k="×" type="button">×</button>
+      <button class="ck" data-k="4" type="button">4</button><button class="ck" data-k="5" type="button">5</button><button class="ck" data-k="6" type="button">6</button><button class="ck op" data-k="-" type="button">−</button>
+      <button class="ck" data-k="1" type="button">1</button><button class="ck" data-k="2" type="button">2</button><button class="ck" data-k="3" type="button">3</button><button class="ck op" data-k="+" type="button">+</button>
+      <button class="ck zero" data-k="0" type="button">0</button><button class="ck" data-k="." type="button">.</button><button class="ck op" data-k="=" type="button">=</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== חיפוש באינטרנט ===================== -->
+<section id="web" class="screen trick web">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div id="wHome" class="w-home">
+    <div class="w-logo">חיפוש</div>
+    <form id="wForm" class="w-form">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+      <input id="wIn" type="search" enterkeyhint="search" placeholder="חפש באינטרנט" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="חיפוש">
+    </form>
+    <div class="w-chips"><span>חדשות</span><span>מזג אוויר</span><span>תמונות</span><span>מפות</span></div>
+  </div>
+  <div id="wOff" class="w-off" hidden>
+    <svg id="wOffIco" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 46h26a10 10 0 001-20 14 14 0 00-27-3 11 11 0 000 23z"/><path d="M10 10l44 44"/></svg>
+    <b>אין חיבור לאינטרנט</b>
+    <p>בדקו את החיבור לרשת ונסו שוב.</p>
+    <button id="wRetry" type="button">נסה שוב</button>
+    <span id="wPeek" class="w-peek" hidden></span>
+  </div>
+</section>
+
+<!-- ===================== חפיסת קלפים ===================== -->
+<section id="deck" class="screen trick deck">
+  <div class="exit-band" aria-hidden="true"></div>
+  <p class="d-hint">בחר קלף</p>
+  <div id="dFan" class="d-fan"></div>
+  <button id="dShuffle" class="d-shuffle" type="button">ערבב</button>
+  <div id="dPick" class="d-pick" hidden><div class="d-face" id="dFace"></div></div>
+</section>
+
+<!-- ===================== מסך נעול + התראה ===================== -->
+<section id="lock" class="screen trick lock">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="l-top"><div id="lDate" class="l-date"></div><div id="lTime" class="l-time"></div></div>
+  <div id="lNote" class="l-note" hidden>
+    <span class="l-ico"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4c5 0 9 3.1 9 7s-4 7-9 7c-1 0-2-.1-2.9-.4L5 19l1.2-3.2C4.2 14.5 3 12.9 3 11c0-3.9 4-7 9-7z"/></svg></span>
+    <div class="l-body"><div class="l-row"><b id="lFrom"></b><span>עכשיו</span></div><div id="lText"></div></div>
+  </div>
+  <div class="l-bottom"><span class="l-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M9 3h6l-1 6h-4z"/><rect x="9" y="9" width="6" height="12" rx="2"/></svg></span><span class="l-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M9 7l1.5-3h3L15 7"/></svg></span></div>
+  <div id="lTouch" class="l-touch"></div>
+</section>
+
 <!-- ===================== הגלריה (מסך הבית המוסווה) ===================== -->
 <section id="photos" class="screen">
   <header class="pg-head">
@@ -61,6 +234,7 @@
     <p class="foot">כל מה שתוסיף יופיע בגלריה. אפשר לבחור כמה קבצים יחד. פריט עם "חשיפה" הוא טריק. תמונות וסרטונים רגילים מוסיפים אמינות לגלריה.</p>
 
     <div class="group">
+      <button class="row-link" id="mgHub" type="button"><span>מרכז הקסמים (כל הקסמים)</span><span class="chev">‹</span></button>
       <button class="row-link" id="mgSettings" type="button"><span>הגדרות</span><span class="chev">‹</span></button>
       <button class="row-link" id="mgHelp2" type="button"><span>מדריך שימוש והמקשים הנסתרים</span><span class="chev">‹</span></button>
     </div>
