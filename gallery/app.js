@@ -25,23 +25,25 @@ const FONTS = {
 const DEFAULT_WORDS = ['ישראל', 'צרפת', 'יפן', 'ברזיל', 'מצרים', 'קנדה', 'איטליה', 'הודו', 'מקסיקו', 'יוון', 'תאילנד', 'ספרד'];
 
 const METHODS = {
-  grid:     { name: 'מקשים נסתרים 3×3', for: ['number', 'word'],
+  grid:     { name: 'מקשים נסתרים 3×3', for: ['number', 'word', 'card'],
               help: 'בזמן שהסרטון מתנגן, המסך מחולק ל-9 מקשים בלתי נראים: 1 בפינה השמאלית העליונה ו-9 בימנית התחתונה. אחרי מספר הספרות שהגדרת, שאר הנגיעות לא נחשבות. שתי אצבעות מוחקות ספרה.' },
-  keyboard: { name: 'מקלדת Bluetooth / שלט', for: ['number', 'word'],
+  keyboard: { name: 'מקלדת Bluetooth / שלט', for: ['number', 'word', 'card'],
               help: 'מקלידים במקלדת או בשלט Bluetooth מחוברים. נגיעות במסך לא עושות כלום, אז הצופה יכול להחזיק את הטלפון. רווח או חץ מתחיל את הסרטון.' },
-  peek:     { name: 'הצופה מחפש בעצמו (חדש)', for: ['number', 'word'],
+  peek:     { name: 'הצופה מחפש בעצמו (חדש)', for: ['number', 'word', 'card'],
               help: 'הצופה לוחץ על חיפוש בגלריה ומקליד בעצמו את המילה או המספר. הוא מוצא את הסרטון, פותח אותו, והבחירה שלו מופיעה בתוכו. אתה לא נוגע בטלפון. (בהגדרות: אפשר "אין תוצאות" לשימוש כהצצה בלבד.)' },
-  pre:      { name: 'לפני ההופעה (מסך חיפוש)', for: ['number', 'word'],
+  pre:      { name: 'לפני ההופעה (מסך חיפוש)', for: ['number', 'word', 'card'],
               help: 'כשנוגעים בסרטון בגלריה, נפתח קודם מסך חיפוש של הגלריה. מקלידים שם את הבחירה ולוחצים "חפש" במקלדת, והסרטון נפתח.' },
-  scrub:    { name: 'גרירה ברצועת הפריימים (חדש)', for: ['number', 'word'], video: true,
+  scrub:    { name: 'גרירה ברצועת הפריימים (חדש)', for: ['number', 'word', 'card'], video: true,
               help: 'לפני הניגון גוררים את הסמן ברצועת הפריימים, כאילו מחפשים קטע. כל עזיבה של הרצועה = ספרה לפי המקום: קצה שמאל 0, קצה ימין 9 (10 אזורים). מאפשר גם 0. אחר כך לוחצים ▶.' },
   draw:     { name: 'ציור נסתר', for: ['drawing'],
               help: 'בזמן שהסרטון מתנגן מציירים באצבע על המסך. הקווים לא נראים, והציור מופיע באזור החשיפה. שתי אצבעות מבטלות את הקו האחרון.' },
 };
 
 /* ---------- הגדרות ---------- */
-const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result' };
-const PEEK = { text: '', at: 0 }; // החיפוש האחרון של הצופה (בזיכרון בלבד)
+const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '' };
+const PEEK = { text: '', at: 0 };
+const LAST = { text: '' }; // הבחירה האחרונה (מחיפוש או מחשיפה) – לפסיפס ולמצגת
+let LASTVIEW = null;       // הפריט האחרון שנפתח מהגלריה – לגלריה המתנפצת // החיפוש האחרון של הצופה (בזיכרון בלבד)
 
 /* ===================== אחסון =====================
    local  – IndexedDB באפליקציה המותקנת (קבוע במכשיר)
@@ -298,6 +300,46 @@ function drawStrokes(ctx, strokes, w, h, r) {
     const L = st[st.length - 1]; ctx.lineTo(L[0], L[1]); ctx.stroke();
   }
 }
+/* ---------- קלפים ---------- */
+const SUITS = ['♠', '♥', '♣', '♦'], SUIT_NAMES = ['עלה', 'לב', 'תלתן', 'יהלום'];
+const VAL = v => ({ 1: 'A', 11: 'J', 12: 'Q', 13: 'K' }[v] || String(v));
+function parseCard(str) {
+  const s = String(str || '').trim(); if (!s) return null;
+  if (/^\d+$/.test(s)) { // קוד: צורה (1–4) ואז ערך (1–13)
+    const su = +s[0] - 1, v = +s.slice(1);
+    return su >= 0 && su < 4 && v >= 1 && v <= 13 ? { s: su, v } : null;
+  }
+  const t = s.toLowerCase().replace(/\s+/g, ' ');
+  let su = -1;
+  [['♠', 'עלה', 'ספייד', 'spade', 'פיק'], ['♥', 'לב', 'heart'], ['♣', 'תלתן', 'club'], ['♦', 'יהלום', 'מעוין', 'diamond']]
+    .forEach((ws, i) => { if (ws.some(w => t.includes(w))) su = i; });
+  let v = 0;
+  if (/(^|\s)(a|אס|אסים|ace)(\s|$|♠|♥|♣|♦)/.test(t) || /^a/.test(t)) v = 1;
+  else if (/(k|מלך|king)/.test(t)) v = 13; else if (/(q|מלכה|queen)/.test(t)) v = 12; else if (/(j|נסיך|ג'ק|jack)/.test(t)) v = 11;
+  else { const m = t.match(/\d+/); if (m) v = +m[0]; }
+  return su >= 0 && v >= 1 && v <= 13 ? { s: su, v } : null;
+}
+const cardText = c => `${VAL(c.v)}${SUITS[c.s]}`;
+function drawCard(ctx, c, w, h, r) {
+  const ar = 2.5 / 3.5; let cw = w * .9, ch = cw / ar; if (ch > h * .9) { ch = h * .9; cw = ch * ar; }
+  const red = c.s === 1 || c.s === 3, ink = red ? '#c8102e' : '#141414', rad = cw * .07;
+  ctx.save();
+  if (r.shadow) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = cw * .06; ctx.shadowOffsetY = cw * .02; }
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-cw / 2, -ch / 2, cw, ch, rad) : ctx.rect(-cw / 2, -ch / 2, cw, ch);
+  ctx.fillStyle = '#fbfaf7'; ctx.fill(); ctx.shadowColor = 'transparent';
+  ctx.lineWidth = Math.max(1, cw * .01); ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.stroke();
+  ctx.fillStyle = ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = 'ltr';
+  const corner = (sx, sy, rot) => {
+    ctx.save(); ctx.translate(sx, sy); ctx.rotate(rot);
+    ctx.font = `700 ${cw * .17}px Georgia, "Times New Roman", serif`; ctx.fillText(VAL(c.v), 0, 0);
+    ctx.font = `${cw * .14}px Georgia, serif`; ctx.fillText(SUITS[c.s], 0, cw * .16); ctx.restore();
+  };
+  corner(-cw / 2 + cw * .13, -ch / 2 + ch * .1, 0); corner(cw / 2 - cw * .13, ch / 2 - ch * .1, Math.PI);
+  ctx.font = `${c.v >= 11 ? cw * .5 : cw * .45}px Georgia, serif`;
+  ctx.fillText(c.v >= 11 ? VAL(c.v) + SUITS[c.s] : SUITS[c.s], 0, ch * .02);
+  ctx.restore();
+}
+
 /* ---------- ריאליזם: שכבה, גרעיניות, רכות, תאורה ופרספקטיבה ---------- */
 const LAYER = document.createElement('canvas'), LCTX = LAYER.getContext('2d');
 let NOISE = null;
@@ -385,7 +427,9 @@ function drawReveal(ctx, r, payload, p, t, W, H) {
   LAYER.width = Math.ceil(lw * (1 + 2 * pad)); LAYER.height = Math.ceil(lh * (1 + 2 * pad));
   const LW = LAYER.width, LH = LAYER.height;
   LCTX.save(); LCTX.translate(LW / 2, LH / 2); LCTX.scale(dens * sc, dens * sc);
-  if (payload.type === 'text') drawTextFit(LCTX, payload.text, w, h, r); else drawStrokes(LCTX, payload.strokes, w, h, r);
+  if (payload.type === 'text') drawTextFit(LCTX, payload.text, w, h, r);
+  else if (payload.type === 'card') drawCard(LCTX, payload.card, w, h, r);
+  else drawStrokes(LCTX, payload.strokes, w, h, r);
   LCTX.restore();
   // 2. תאורה: המשטח התכהה או התבהר מאז רגע החשיפה
   if (Math.abs(lf - 1) > .02) {
@@ -619,6 +663,171 @@ function renderGrid() {
   requestAnimationFrame(() => window.scrollTo(0, document.body.scrollHeight)); // כמו בגלריה: החדש למטה
 }
 ENTER.photos = () => { applyTheme(); renderGrid(); };
+LEAVE.photos = () => { $('#shatter').hidden = true; $('#shatter').innerHTML = ''; $('#mosaic').hidden = true; $('#pgGrid').style.visibility = ''; };
+
+
+/* ===================== אפקטים בגלריה ===================== */
+const visibleItems = () => ITEMS.filter(x => !x.hidden).sort((a, b) => shotTime(a) - shotTime(b));
+/* מחוות על הגלריה: הקשה בשתי אצבעות = התנפצות · צביטה פנימה = פסיפס */
+(() => {
+  const grid = $('#pgGrid'), pts = new Map(); let d0 = 0, t0 = 0, maxN = 0, moved = false, pinched = false;
+  const dist = () => { const [a, b] = [...pts.values()]; return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0; };
+  grid.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse') return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY });
+    if (pts.size === 1) { t0 = performance.now(); maxN = 1; moved = false; pinched = false; }
+    if (pts.size === 2) { d0 = dist(); maxN = 2; }
+  });
+  grid.addEventListener('pointermove', e => {
+    const p = pts.get(e.pointerId); if (!p) return; p.x = e.clientX; p.y = e.clientY;
+    if (Math.hypot(p.x - p.sx, p.y - p.sy) > 12) moved = true;
+    if (pts.size === 2 && !pinched && d0 && dist() < d0 * .6) { pinched = true; showMosaic(); }
+  });
+  const up = e => {
+    if (!pts.has(e.pointerId)) return; pts.delete(e.pointerId);
+    if (pts.size === 0 && maxN === 2 && !moved && !pinched && performance.now() - t0 < 450) shatter();
+  };
+  grid.addEventListener('pointerup', up); grid.addEventListener('pointercancel', up);
+  grid.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  addEventListener('wheel', e => { if (curScreen() === 'photos' && e.ctrlKey && e.deltaY > 0) { e.preventDefault(); showMosaic(); } }, { passive: false });
+})();
+
+/* התנפצות: כל הפריטים נופלים, נשאר רק מה שהצופה פתח */
+function shatter() {
+  const target = LASTVIEW && byId(LASTVIEW); if (!target) return;
+  const layer = $('#shatter'); layer.innerHTML = ''; layer.hidden = false;
+  $('#pgGrid').style.visibility = 'hidden'; // רק השברים נראים
+  const cells = [...$('#pgGrid').children], list = visibleItems();
+  let keep = null, n = 0;
+  cells.forEach((cell, i) => {
+    const r = cell.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    const sh = document.createElement('div'); sh.className = 'shard';
+    Object.assign(sh.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    const img = $('img', cell); if (img) { const im = document.createElement('img'); im.src = img.src; sh.appendChild(im); }
+    layer.appendChild(sh);
+    if (list[i] && list[i].id === target.id) { keep = { sh, r }; return; }
+    const delay = 120 + (n++) * 55 + Math.random() * 60;
+    sh.animate([{ transform: 'none', opacity: 1 },
+      { transform: `translate(${(Math.random() - .5) * 160}px, ${innerHeight + 200}px) rotate(${(Math.random() - .5) * 120}deg)`, opacity: .9 }],
+      { duration: 900 + Math.random() * 400, delay, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' });
+  });
+  buzz();
+  if (keep) {
+    const size = Math.min(innerWidth, innerHeight) * .78, { r } = keep;
+    const dx = innerWidth / 2 - (r.left + r.width / 2), dy = innerHeight / 2 - (r.top + r.height / 2), sc = size / r.width;
+    keep.sh.animate([{ transform: 'none' }, { transform: `translate(${dx}px, ${dy}px) scale(${sc})` }],
+      { duration: 700, delay: 200 + n * 55 + 500, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' });
+    keep.sh.style.zIndex = 2; keep.sh.style.borderRadius = '4px';
+  }
+  layer.onclick = () => { layer.hidden = true; layer.innerHTML = ''; $('#pgGrid').style.visibility = ''; };
+}
+
+/* פסיפס: הגלריה "מתרחקת" והתמונות יוצרות את הבחירה */
+const THUMB_IMGS = new Map();
+function thumbImg(it) {
+  const src = thumbFor(it); if (!src) return null;
+  if (!THUMB_IMGS.has(src)) { const im = new Image(); im.src = src; THUMB_IMGS.set(src, im); }
+  return THUMB_IMGS.get(src);
+}
+function showMosaic() {
+  const text = (LAST.text || '').trim(); if (!text) return;
+  const cv = $('#mosaic'), dpr = Math.min(devicePixelRatio || 1, 2), W = innerWidth, H = innerHeight;
+  cv.width = W * dpr; cv.height = H * dpr; cv.hidden = false;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  const cols = Math.max(14, Math.round(W / 18)), cell = W / cols, rows = Math.ceil(H / cell);
+  // מסכה של הטקסט ברזולוציית התאים
+  const m = document.createElement('canvas'); m.width = cols; m.height = rows;
+  const mx = m.getContext('2d'); mx.fillStyle = '#000'; mx.textAlign = 'center'; mx.textBaseline = 'middle'; mx.direction = isRTL(text) ? 'rtl' : 'ltr';
+  let fs = rows * .5; mx.font = `900 ${fs}px "Rubik", "Secular One", sans-serif`;
+  const tw = mx.measureText(text).width; if (tw > cols * .9) fs *= cols * .9 / tw;
+  mx.font = `900 ${fs}px "Rubik", "Secular One", sans-serif`; mx.fillText(text, cols / 2, rows / 2);
+  const mask = mx.getImageData(0, 0, cols, rows).data;
+  const imgs = visibleItems().map(thumbImg).filter(Boolean);
+  const bg = getComputedStyle($('#photos')).getPropertyValue('--pg-bg').trim() || '#000';
+  const t0 = performance.now();
+  const frame = now => {
+    if (cv.hidden) return;
+    const k = Math.min(1, (now - t0) / 1400), e = 1 - Math.pow(1 - k, 3), zoom = 4 - 3 * e;
+    ctx.save(); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    ctx.translate(W / 2, H / 2); ctx.scale(zoom, zoom); ctx.translate(-W / 2, -H / 2);
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+      const on = mask[(y * cols + x) * 4 + 3] > 110, im = imgs.length ? imgs[(x * 7 + y * 13) % imgs.length] : null;
+      ctx.globalAlpha = on ? 1 : lerp(1, .13, e);
+      if (im && im.complete && im.naturalWidth) ctx.drawImage(im, x * cell + .5, y * cell + .5, cell - 1, cell - 1);
+      else { ctx.fillStyle = on ? '#ffcc00' : '#888'; ctx.fillRect(x * cell + .5, y * cell + .5, cell - 1, cell - 1); }
+    }
+    ctx.restore();
+    if (k < 1) requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame); buzz();
+  cv.onclick = () => { cv.hidden = true; };
+}
+
+/* ===================== מצגת "זכרונות" עם כותרת והכרחה ===================== */
+const M = { raf: 0, items: [], imgs: [], i: 0, t0: 0, stopAt: -1, stopped: false, title: '' };
+function memImage(it) {
+  const im = new Image();
+  if (it.kind === 'photo' && mediaSrc(it)) { const s = mediaSrc(it); im.src = s instanceof Blob ? (it._url || (it._url = URL.createObjectURL(s))) : s; }
+  else im.src = thumbFor(it) || '';
+  return im;
+}
+ENTER.memories = () => {
+  const list = visibleItems(); if (!list.length) { uiBack(); return; }
+  // מערבבים, אבל פריט ההכרחה תמיד נמצא ברשימה
+  M.items = list.slice().sort(() => Math.random() - .5);
+  M.imgs = M.items.map(memImage);
+  M.title = (LAST.text || '').trim() || phDate(Date.now())[0];
+  M.i = 0; M.t0 = performance.now(); M.stopAt = -1; M.stopped = false;
+  const cv = $('#memCv'), dpr = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+  cancelAnimationFrame(M.raf); M.raf = requestAnimationFrame(memLoop);
+};
+LEAVE.memories = () => { cancelAnimationFrame(M.raf); };
+const MEM_TITLE = 3.2, MEM_SLIDE = 2.2;
+function memLoop(now) {
+  M.raf = requestAnimationFrame(memLoop);
+  const cv = $('#memCv'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height, t = (now - M.t0) / 1000;
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  const drawImg = (im, alpha, zoom) => {
+    if (!im || !im.complete || !im.naturalWidth) return;
+    const s = Math.max(W / im.naturalWidth, H / im.naturalHeight) * zoom, w = im.naturalWidth * s, h = im.naturalHeight * s;
+    ctx.globalAlpha = alpha; ctx.drawImage(im, (W - w) / 2, (H - h) / 2, w, h); ctx.globalAlpha = 1;
+  };
+  if (t < MEM_TITLE && !M.stopped) { // כרטיס פתיחה: הכותרת היא הבחירה של הצופה
+    drawImg(M.imgs[0], .45, 1.08 + t * .02);
+    const a = Math.min(1, t / .8) * Math.min(1, (MEM_TITLE - t) / .5);
+    ctx.globalAlpha = a; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.direction = isRTL(M.title) ? 'rtl' : 'ltr';
+    let fs = W * .14; ctx.font = `800 ${fs}px -apple-system, "SF Pro Display", "Rubik", sans-serif`;
+    const tw = ctx.measureText(M.title).width; if (tw > W * .84) { fs *= W * .84 / tw; ctx.font = `800 ${fs}px -apple-system, "SF Pro Display", "Rubik", sans-serif`; }
+    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = fs * .3; ctx.fillText(M.title, W / 2, H * .46);
+    ctx.font = `600 ${W * .045}px -apple-system, "Rubik", sans-serif`; ctx.direction = 'rtl';
+    ctx.fillText(new Date().toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }), W / 2, H * .46 + fs * .85);
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    return;
+  }
+  if (M.stopped) { drawImg(M.imgs[M.i], 1, 1.02); return; }
+  const st = t - MEM_TITLE, idx = Math.floor(st / MEM_SLIDE), k = (st % MEM_SLIDE) / MEM_SLIDE;
+  const cur = idx % M.items.length, nxt = (idx + 1) % M.items.length;
+  if (M.stopAt >= 0 && idx >= M.stopAt) { M.i = M.stopAt % M.items.length; M.stopped = true; buzz(); return; }
+  drawImg(M.imgs[cur], 1, 1.05 + k * .08);
+  if (k > .82) drawImg(M.imgs[nxt], (k - .82) / .18, 1.05);
+}
+/* נגיעה = "עצור": המצגת ממשיכה עוד קצת ועוצרת על פריט ההכרחה */
+$('#memCv').addEventListener('click', () => {
+  if (M.stopped) { uiBack(); return; }
+  const now = (performance.now() - M.t0) / 1000;
+  const idx = Math.max(0, Math.floor((now - MEM_TITLE) / MEM_SLIDE));
+  const fi = M.items.findIndex(x => x.id === S.forceId);
+  if (fi < 0) { M.stopAt = idx; return; }
+  // מציבים את פריט ההכרחה שתי שקופיות קדימה (עוד לא נראה), ועוצרים עליו
+  const target = idx + 2, ti = target % M.items.length, ci = idx % M.items.length, ni = (idx + 1) % M.items.length;
+  if (fi === ci) { M.stopAt = idx; return; }      // כבר על המסך – עוצרים מיד
+  if (fi === ni) { M.stopAt = idx + 1; return; }  // השקופית הבאה
+  [M.items[fi], M.items[ti]] = [M.items[ti], M.items[fi]];
+  [M.imgs[fi], M.imgs[ti]] = [M.imgs[ti], M.imgs[fi]];
+  M.stopAt = target;
+});
+$('#memClose').onclick = () => uiBack();
 
 /* ===================== חיפוש בגלריה: הצופה מקליד בעצמו ===================== */
 $('#pgSearch').onclick = () => go('search');
@@ -628,7 +837,7 @@ ENTER.search = () => {
 };
 function runSearch(q) {
   q = (q || '').trim(); if (!q) return;
-  PEEK.text = q; PEEK.at = Date.now();
+  PEEK.text = q; PEEK.at = Date.now(); LAST.text = q;
   $('#srIn').blur(); $('#srSuggest').hidden = true;
   const tricks = ITEMS.filter(x => !x.hidden && x.trick !== false && x.method === 'peek').sort((a, b) => shotTime(b) - shotTime(a));
   if (S.searchMode !== 'none' && tricks.length) {
@@ -691,7 +900,7 @@ function renderManage() {
   const list = ITEMS.slice().sort((a, b) => shotTime(b) - shotTime(a));
   for (const it of list) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'mg-item';
-    const kind = { number: `מספר, ${it.digits} ספרות`, word: 'מילה מרשימה', drawing: 'ציור' }[it.content];
+    const kind = { number: `מספר, ${it.digits} ספרות`, word: 'מילה מרשימה', drawing: 'ציור', card: 'קלף' }[it.content];
     const isTrick = it.trick !== false && (it.regions.length || (it.meta && it.meta !== 'none'));
     b.innerHTML = '<img alt=""><div class="txt"><b></b><span></span></div><span class="tag"></span>';
     const th = thumbFor(it); if (th) $('img', b).src = th;
@@ -761,11 +970,13 @@ function syncEditorForm() {
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
   $('#edWordsWrap').hidden = it.content !== 'word';
-  $('#edDigitsRow').hidden = it.content === 'drawing';
+  $('#edDigitsRow').hidden = it.content === 'drawing' || it.content === 'card';
+  $('#edForce').checked = S.forceId === it.id;
   $('#edDigits').value = String(it.digits);
   $('#edDigitsHelp').textContent = it.content === 'number'
     ? `מזינים ${it.digits} ספרות. אחרי ${it.digits} נגיעות, שאר הנגיעות לא נחשבות.`
-    : it.content === 'word' ? 'הספרות הן מספר המילה ברשימה. עם ספרה אחת בוחרים מבין 9 המילים הראשונות.' : '';
+    : it.content === 'word' ? 'הספרות הן מספר המילה ברשימה. עם ספרה אחת בוחרים מבין 9 המילים הראשונות.'
+    : it.content === 'card' ? 'קוד הקלף: צורה (1♠ 2♥ 3♣ 4♦) ואז ערך (1 אס … 11 נסיך, 12 מלכה, 13 מלך). למשל 27 = 7♥. בחיפוש אפשר לכתוב גם "7 לב".' : '';
   $('#edTrickWrap').hidden = it.trick === false;
   $('#edTrick').checked = it.trick !== false;
   $('#edHideLabel').textContent = it.hidden ? 'הצג בגלריה' : 'הסתר מהגלריה';
@@ -848,6 +1059,7 @@ function sizeEdCanvas() {
 function edPayload() {
   const it = E.item;
   if (it.content === 'drawing') return SAMPLE_DRAW;
+  if (it.content === 'card') return { type: 'card', card: parseCard(S.sample) || { s: 1, v: 7 }, text: '' };
   return { type: 'text', text: S.sample || (it.content === 'word' ? it.words[0] : '47') || '47' };
 }
 function edLoop() {
@@ -899,6 +1111,7 @@ $('#edit').addEventListener('input', e => {
   } else if (el.id === 'edWords') it.words = el.value.split('\n').map(s => s.trim()).filter(Boolean);
   else if (el.id === 'edDigits') { it.digits = parseInt(el.value, 10) || 2; syncEditorForm(); }
   else if (el.id === 'edTrick') { it.trick = el.checked; syncEditorForm(); }
+  else if (el.id === 'edForce') { S.forceId = el.checked ? it.id : (S.forceId === it.id ? '' : S.forceId); saveSettings(); return; }
   else if (el.id === 'edShot') it.shotAt = new Date(el.value).getTime() || undefined;
   else if (el.id === 'edSample') { S.sample = el.value; saveSettings(); return; }
   else if (el.name === 'edTarget') { E.target = el.value; return; }
@@ -989,21 +1202,24 @@ $('#settings').addEventListener('input', e => {
 /* ===================== צפייה / הופעה ===================== */
 class SecretInput {
   constructor(item) { this.item = item; this.buf = ''; this.strokes = []; }
-  get cap() { return this.item.content === 'drawing' ? Infinity : (this.item.digits || 2); }
-  digit(d) { if (this.buf.length >= this.cap) return false; this.buf += d; return true; } // שאר הנגיעות לא נחשבות
+  get cap() { return this.item.content === 'drawing' ? Infinity : this.item.content === 'card' ? 3 : (this.item.digits || 2); }
+  digit(d) { if (this.buf.length >= this.cap) return false; this.buf += d; this.at = performance.now(); return true; } // שאר הנגיעות לא נחשבות
   typeKey(k) {
     const it = this.item;
     if (it.content === 'number' && (!/\d/.test(k) || this.buf.length >= this.cap)) return false;
+    if (it.content === 'card') { this.buf += k; return true; }
     if (it.content === 'word' && /\d/.test(k) && /^\d*$/.test(this.buf) && this.buf.length >= this.cap) return false;
     this.buf += k; return true;
   }
   undo() { if (this.item.content === 'drawing') this.strokes.pop(); else this.buf = this.buf.slice(0, -1); }
-  complete(it) { if (it.content === 'drawing') return false; if (it.method === 'pre' || it.method === 'peek') return !!this.buf.trim(); return /^\d+$/.test(this.buf) && this.buf.length >= this.cap; }
+  complete(it) { if (it.content === 'drawing') return false;
+    if (it.content === 'card' && /^\d+$/.test(this.buf) && it.method !== 'peek' && it.method !== 'pre') return this.buf.length >= 3 || (this.buf.length === 2 && (this.buf[1] !== '1' || performance.now() - (this.at || 0) > 1300)); if (it.method === 'pre' || it.method === 'peek') return !!this.buf.trim(); return /^\d+$/.test(this.buf) && this.buf.length >= this.cap; }
   get count() { return this.item.content === 'drawing' ? this.strokes.length : this.buf.length; }
   payload() {
     const it = this.item;
     if (it.content === 'drawing') return this.strokes.length ? { type: 'draw', strokes: this.strokes.map(s => s.slice()) } : null;
     const b = this.buf.trim(); if (!b) return null;
+    if (it.content === 'card') { const c = parseCard(b); return c ? { type: 'card', card: c, text: cardText(c) } : null; }
     if (it.content === 'word' && /^\d+$/.test(b)) { const w = (it.words || [])[parseInt(b, 10) - 1]; return w ? { type: 'text', text: w } : null; }
     return { type: 'text', text: b };
   }
@@ -1023,6 +1239,7 @@ const photosMode = () => !P.stage;
 function openViewer(id, opts = {}) {
   const item = byId(id); if (!item) return;
   P.req = { id, stage: !!opts.stage, from: opts.from || 'photos', preText: '' };
+  if (P.req.from === 'photos') LASTVIEW = id;
   if (item.trick !== false && item.method === 'pre' && item.content !== 'drawing') go('pre');
   else go('perform');
 }
@@ -1167,6 +1384,7 @@ function updateHeader() {
   else { $('#phDay').textContent = day; $('#phTime').textContent = time; }
 }
 function onFrozen() {
+  if (P.frozen.text) LAST.text = P.frozen.text;
   updateHeader();
   if (P.meta === 'caption' && P.frozen.type === 'text') $('.ph-caption').value = P.frozen.text;
   if (P.isPhoto && P.regions.length) {
@@ -1276,6 +1494,7 @@ $('#phMenu').addEventListener('click', e => {
   $('#phMenu').hidden = true;
   const a = b.dataset.pm;
   if (a === 'hide') hideCurrent();
+  else if (a === 'memories') go('memories');
   else if (a === 'replay') restartPerformance();
 });
 $('#phInfo').onclick = () => { const s = $('#phSheet'); const open = s.hidden; closePops(); if (open) { fillInfo(); s.hidden = false; } };
@@ -1311,6 +1530,7 @@ async function swipeItem(dir) {
   if (!next) return;
   LEAVE.perform();
   P.req = { ...P.req, id: next.id, preText: '', stage: false };
+  if (P.req.from === 'photos') LASTVIEW = next.id;
   $('#perform').classList.remove('swap'); void $('#perform').offsetWidth; $('#perform').classList.add('swap');
   await ENTER.perform();
 }

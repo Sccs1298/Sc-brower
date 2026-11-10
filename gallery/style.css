@@ -317,3 +317,14 @@ input[type=range] { direction: ltr; }
 .sr-empty b { display: block; color: var(--pg-fg); font-size: 22px; margin-bottom: 6px; }
 .sr-empty p { margin: 0; font-size: 15px; }
 .peek-val { font-weight: 700; color: var(--accent); max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===================== אפקטים בגלריה ===================== */
+.fx-layer { position: fixed; inset: 0; z-index: 20; width: 100%; height: 100%; }
+#shatter { pointer-events: auto; }
+#shatter .shard { position: fixed; overflow: hidden; background: var(--pg-btn); will-change: transform, opacity; }
+#shatter .shard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#mosaic { background: var(--pg-bg); }
+#memories { position: fixed; inset: 0; z-index: 12; background: #000; }
+#memCv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.mem-top { position: absolute; z-index: 2; top: calc(env(safe-area-inset-top) + 8px); right: max(16px, env(safe-area-inset-right)); --pg-fg: #fff; --pg-glass: rgba(40,40,40,.55); }
+.mem-top .ph-round { color: #fff; }
