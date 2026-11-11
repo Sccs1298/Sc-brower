@@ -31,7 +31,14 @@
     <div class="hub-hero">
       <h2>בחר קסם</h2>
       <p>כל כרטיס מסביר מה הצופה רואה ואיך עושים את זה. מה שהצופה בוחר בקסם אחד עובר לכל השאר.</p>
-      <div class="hub-peek"><span>הבחירה האחרונה שנקלטה:</span><b id="hubPeek">—</b></div>
+      <div class="hub-peek"><span>הבחירה האחרונה שנקלטה:</span><b id="hubPeek">—</b><button id="hubClear" class="btn" type="button">נקה</button></div>
+      <div class="hub-quick" aria-label="פתיחה מהירה">
+        <button type="button" data-open="photos"><span class="tc-ico" style="background:#fff"><svg viewBox="0 0 40 40"><g opacity=".85"><ellipse cx="20" cy="11" rx="5" ry="8" fill="#ff9500"/><ellipse cx="29" cy="20" rx="8" ry="5" fill="#34c759"/><ellipse cx="20" cy="29" rx="5" ry="8" fill="#007aff"/><ellipse cx="11" cy="20" rx="8" ry="5" fill="#ff2d55"/></g></svg></span>גלריה</button>
+        <button type="button" data-open="calc"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40"><rect x="9" y="7" width="22" height="7" rx="2" fill="#a5a5a5"/><g fill="#505050"><circle cx="12" cy="20" r="3"/><circle cx="20" cy="20" r="3"/><circle cx="12" cy="28" r="3"/><circle cx="20" cy="28" r="3"/></g><circle cx="28" cy="20" r="3" fill="#ff9f0a"/><circle cx="28" cy="28" r="3" fill="#ff9f0a"/></svg></span>מחשבון</button>
+        <button type="button" data-open="web"><span class="tc-ico" style="background:#0a84ff"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><circle cx="18" cy="18" r="8"/><path d="M24 24l7 7"/></svg></span>חיפוש</button>
+        <button type="button" data-open="deck"><span class="tc-ico" style="background:#1f6b45"><svg viewBox="0 0 40 40"><rect x="8" y="10" width="15" height="21" rx="2" fill="#fff" transform="rotate(-12 15 20)"/><rect x="17" y="9" width="15" height="21" rx="2" fill="#fff" stroke="#ccc"/><text x="24.5" y="24" font-size="11" text-anchor="middle" fill="#c8102e">♥</text></svg></span>קלפים</button>
+        <button type="button" data-open="lock"><span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>התראה</button>
+      </div>
     </div>
 
     <!-- גלריה -->
@@ -61,6 +68,7 @@
         <li>אתה לוקח את הטלפון ו<b>לוחץ לחיצה ארוכה על המסך של המספרים</b> (שנייה). זה מפעיל את הקסם בסתר.</li>
         <li>אומרים "ועכשיו אני מוסיף מספר", לוחצים <b>+</b> ומקלידים מקשים אקראיים. המחשבון מקליד בעצמו את המספר הנכון.</li>
         <li>לוחצים <b>=</b>, והתוצאה היא השעה עכשיו, התאריך של היום, או המספר שבחרת.</li>
+        <li>חשוב: הסכום של הצופים צריך להיות <b>קטן מהתוצאה</b>. לכן מבקשים מספרים של 2–3 ספרות, או בוחרים בתאריך (מספר גדול).</li>
       </ol>
       <details class="tc-set"><summary>הגדרות</summary>
         <div class="group">
@@ -116,8 +124,8 @@
       </div>
       <ol class="tc-list">
         <li>פותחים, והמסך נראה כמו <b>מסך נעול</b>. מניחים את הטלפון על השולחן.</li>
-        <li><b>אם יש בחירה שנקלטה</b> (מחיפוש, מקלף וכו'), ההודעה מגיעה לבד אחרי כמה שניות.</li>
-        <li><b>אחרת:</b> נוגעים בסתר במקשים 3×3 (2 ספרות), וההודעה מגיעה אחרי 2 שניות.</li>
+        <li><b>אם יש בחירה שנקלטה</b> (מחיפוש, מקלף וכו'), ההודעה מגיעה לבד אחרי כמה שניות, ונגיעות במסך לא משפיעות.</li>
+        <li><b>אחרת</b> (אחרי "נקה" למעלה): נוגעים בסתר במקשים 3×3 (2 ספרות), וההודעה מגיעה אחרי 2 שניות.</li>
       </ol>
       <details class="tc-set"><summary>הגדרות</summary>
         <div class="group">
@@ -947,6 +955,19 @@
         <button id="phInfo" type="button" aria-label="מידע"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg></button>
         <button id="phEdit" type="button" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M18 7h2M4 17h3M12 17h8"/><circle cx="15.5" cy="7" r="2.3"/><circle cx="9.5" cy="17" r="2.3"/></svg></button>
         <button id="phTrash" type="button" aria-label="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13a1.5 1.5 0 001.5 1.4h6a1.5 1.5 0 001.5-1.4l1-13M10 10.5v6.5M14 10.5v6.5"/></svg></button>
+      </div>
+    </div>
+
+    <!-- מסך עריכה (כמו בגלריה) -->
+    <div id="phEditor" class="ph-editor" hidden>
+      <div class="pe-top"><button id="peCancel" type="button" class="pe-pill">ביטול</button><button id="peDone" type="button" class="pe-pill done">סיום</button></div>
+      <div class="pe-bottom">
+        <div class="pe-val" id="peVal">0</div>
+        <input id="peRange" type="range" min="-100" max="100" step="1" value="0" aria-label="עוצמה">
+        <div class="pe-tools" id="peTools">
+          <button type="button" data-t="bright" class="on">בהירות</button><button type="button" data-t="contrast">ניגודיות</button><button type="button" data-t="sat">רוויה</button>
+        </div>
+        <div class="pe-tabs"><span class="on">התאמה</span><span>מסננים</span><span>חיתוך</span></div>
       </div>
     </div>
 

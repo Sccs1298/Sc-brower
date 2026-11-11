@@ -87,7 +87,7 @@ const Store = {
     if (this.mode === 'local') return (await this._idb('readonly', s => s.getAll())).filter(x => x.id !== '__settings');
     if (this.mode === 'cloud') {
       const snap = await this._col().get();
-      return snap.docs.map(d => d.data()).filter(d => d && d.kind === 'video').map(d => ({ ...d }));
+      return snap.docs.filter(d => d.id.startsWith('v_')).map(d => ({ ...d.data() }));
     }
     return [...this.mem.values()];
   },
@@ -95,7 +95,7 @@ const Store = {
     if (this.mode === 'local') return this._idb('readwrite', s => s.put(item));
     if (this.mode === 'cloud') {
       const { blob, ...rest } = item; void blob;
-      return this._col().doc('v_' + item.id).set(JSON.parse(JSON.stringify({ ...rest, kind: 'video' })));
+      return this._col().doc('v_' + item.id).set(JSON.parse(JSON.stringify(rest)));
     }
     this.mem.set(item.id, item);
   },
@@ -158,6 +158,9 @@ function demoItem() {
 /* התאמת סרטונים שנשמרו בגרסאות קודמות */
 function normalize(it) {
   if (it.method === 'list') { it.method = 'grid'; it.digits = 1; }
+  delete it._url;
+  // תיקון לפריטים שנשמרו בטעות כסרטון
+  if (!it.builtin && !it.duration && /\.(jpe?g|png|heic|heif|webp|gif|avif)$/i.test(it.fileName || '')) it.kind = 'photo';
   if (!METHODS[it.method]) it.method = it.content === 'drawing' ? 'draw' : 'grid';
   if (!it.digits) it.digits = 2;
   if (it.trick === undefined) it.trick = true;
@@ -316,8 +319,10 @@ function parseCard(str) {
   [['♠', 'עלה', 'ספייד', 'spade', 'פיק'], ['♥', 'לב', 'heart'], ['♣', 'תלתן', 'club'], ['♦', 'יהלום', 'מעוין', 'diamond']]
     .forEach((ws, i) => { if (ws.some(w => t.includes(w))) su = i; });
   let v = 0;
-  if (/(^|\s)(a|אס|אסים|ace)(\s|$|♠|♥|♣|♦)/.test(t) || /^a/.test(t)) v = 1;
-  else if (/(k|מלך|king)/.test(t)) v = 13; else if (/(q|מלכה|queen)/.test(t)) v = 12; else if (/(j|נסיך|ג'ק|jack)/.test(t)) v = 11;
+  if (/ace|אס|^a(?![a-z])/.test(t)) v = 1;
+  else if (/jack|נסיך|ג'ק|^j(?![a-z])/.test(t)) v = 11;
+  else if (/queen|מלכה|^q(?![a-z])/.test(t)) v = 12;
+  else if (/king|מלך|^k(?![a-z])/.test(t)) v = 13;
   else { const m = t.match(/\d+/); if (m) v = +m[0]; }
   return su >= 0 && v >= 1 && v <= 13 ? { s: su, v } : null;
 }
@@ -612,12 +617,17 @@ function applyTheme() {
    כפתור "אחורה" של הטלפון/הדפדפן מחזיר מסך אחד. */
 const NAV = { stack: [], skipPop: 0 };
 const ENTER = {}, LEAVE = {};
-function paint(id) {
+const SCREEN_NAMES = { hub: 'מרכז הקסמים', photos: 'גלריה', manage: 'ניהול', edit: 'עריכה', settings: 'הגדרות', help: 'מדריך' };
+const SCROLL = {};
+function paint(id, restore) {
   $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
-  if (id !== 'photos') window.scrollTo(0, 0);
+  const prev = NAV.stack[NAV.stack.length - 2], back = $(`#${id} .nav-back[data-back]`);
+  if (back) back.textContent = '‹ ' + (SCREEN_NAMES[prev] || 'חזרה');
+  if (id !== 'photos') window.scrollTo(0, restore ? (SCROLL[id] || 0) : 0);
 }
 async function go(id, opts = {}) {
   const cur = NAV.stack[NAV.stack.length - 1];
+  if (cur) SCROLL[cur] = window.scrollY;
   if (cur && LEAVE[cur]) await LEAVE[cur]();
   if (opts.replace) NAV.stack.pop();
   else { try { history.pushState({ g: NAV.stack.length + 1 }, ''); } catch (e) { /* ignore */ } }
@@ -629,7 +639,7 @@ async function popScreen() {
   const cur = NAV.stack.pop();
   if (LEAVE[cur]) await LEAVE[cur]();
   const prev = NAV.stack[NAV.stack.length - 1];
-  paint(prev);
+  paint(prev, true);
   if (ENTER[prev]) await ENTER[prev]();
 }
 function uiBack() {
@@ -659,12 +669,24 @@ function renderGrid() {
     b.innerHTML = `${th ? '<img alt="">' : ''}<span class="dur"></span>${it.fav ? '<svg class="fav" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></svg>' : ''}`;
     if (th) $('img', b).src = th;
     $('.dur', b).textContent = it.kind === 'photo' ? '' : fmtDur(it.duration);
-    b.addEventListener('click', () => openViewer(it.id, { from: 'photos' }));
+    b.addEventListener('click', () => {
+      if (performance.now() - GRID.multiAt < 600) return;        // זה היה חלק ממחווה בשתי אצבעות
+      if (GRID.select) { b.classList.toggle('sel'); updateSelect(); return; }
+      openViewer(it.id, { from: 'photos' });
+    });
     grid.appendChild(b);
   }
   requestAnimationFrame(() => window.scrollTo(0, document.body.scrollHeight)); // כמו בגלריה: החדש למטה
 }
-ENTER.photos = () => { applyTheme(); renderGrid(); };
+const GRID = { multiAt: 0, select: false };
+function updateSelect() {
+  const n = $$('#pgGrid .sel').length;
+  $('#pgSelect').textContent = GRID.select ? 'ביטול' : 'בחר';
+  $('#photos').classList.toggle('selecting', GRID.select);
+  $('#pgTitle').textContent = !GRID.select ? 'ספרייה' : n ? (n === 1 ? 'נבחר פריט 1' : `נבחרו ${n} פריטים`) : 'בחר פריטים';
+}
+$('#pgSelect').onclick = () => { GRID.select = !GRID.select; if (!GRID.select) $$('#pgGrid .sel').forEach(c => c.classList.remove('sel')); updateSelect(); };
+ENTER.photos = () => { applyTheme(); GRID.select = false; renderGrid(); updateSelect(); };
 LEAVE.photos = () => { $('#shatter').hidden = true; $('#shatter').innerHTML = ''; $('#mosaic').hidden = true; $('#pgGrid').style.visibility = ''; };
 
 
@@ -678,7 +700,7 @@ const visibleItems = () => ITEMS.filter(x => !x.hidden).sort((a, b) => shotTime(
     if (e.pointerType === 'mouse') return;
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY });
     if (pts.size === 1) { t0 = performance.now(); maxN = 1; moved = false; pinched = false; }
-    if (pts.size === 2) { d0 = dist(); maxN = 2; }
+    if (pts.size === 2) { d0 = dist(); maxN = 2; GRID.multiAt = performance.now(); }
   });
   grid.addEventListener('pointermove', e => {
     const p = pts.get(e.pointerId); if (!p) return; p.x = e.clientX; p.y = e.clientY;
@@ -687,7 +709,8 @@ const visibleItems = () => ITEMS.filter(x => !x.hidden).sort((a, b) => shotTime(
   });
   const up = e => {
     if (!pts.has(e.pointerId)) return; pts.delete(e.pointerId);
-    if (pts.size === 0 && maxN === 2 && !moved && !pinched && performance.now() - t0 < 450) shatter();
+    if (maxN === 2) GRID.multiAt = performance.now();
+    if (pts.size === 0 && maxN === 2 && !moved && !pinched && performance.now() - t0 < 450 && !GRID.select) shatter();
   };
   grid.addEventListener('pointerup', up); grid.addEventListener('pointercancel', up);
   grid.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
@@ -714,6 +737,13 @@ function shatter() {
       { duration: 900 + Math.random() * 400, delay, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' });
   });
   buzz();
+  if (!keep) {
+    const size = Math.min(innerWidth, innerHeight) * .78, sh = document.createElement('div'); sh.className = 'shard';
+    Object.assign(sh.style, { left: (innerWidth - size) / 2 + 'px', top: (innerHeight - size) / 2 + 'px', width: size + 'px', height: size + 'px', zIndex: 2, borderRadius: '4px' });
+    const th = thumbFor(target); if (th) { const im = document.createElement('img'); im.src = th; sh.appendChild(im); }
+    layer.appendChild(sh);
+    sh.animate([{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'none' }], { duration: 600, delay: 300 + n * 55 + 500, easing: 'ease-out', fill: 'both' });
+  }
   if (keep) {
     const size = Math.min(innerWidth, innerHeight) * .78, { r } = keep;
     const dx = innerWidth / 2 - (r.left + r.width / 2), dy = innerHeight / 2 - (r.top + r.height / 2), sc = size / r.width;
@@ -767,9 +797,13 @@ function showMosaic() {
 
 /* ===================== מצגת "זכרונות" עם כותרת והכרחה ===================== */
 const M = { raf: 0, items: [], imgs: [], i: 0, t0: 0, stopAt: -1, stopped: false, title: '' };
+const MEM_URLS = new Map();
 function memImage(it) {
   const im = new Image();
-  if (it.kind === 'photo' && mediaSrc(it)) { const s = mediaSrc(it); im.src = s instanceof Blob ? (it._url || (it._url = URL.createObjectURL(s))) : s; }
+  if (it.kind === 'photo' && mediaSrc(it)) {
+    const s = mediaSrc(it);
+    if (s instanceof Blob) { if (!MEM_URLS.has(it.id)) MEM_URLS.set(it.id, URL.createObjectURL(s)); im.src = MEM_URLS.get(it.id); } else im.src = s;
+  }
   else im.src = thumbFor(it) || '';
   return im;
 }
@@ -1399,7 +1433,7 @@ function setChrome(v) {
   $('#ph').classList.toggle('off', !v);
   $('#perform').classList.toggle('ph-chrome', v && photosMode());
 }
-function closePops() { $('#phMenu').hidden = true; $('#phSheet').hidden = true; $('#phAction').hidden = true; }
+function closePops() { $('#phMenu').hidden = true; $('#phSheet').hidden = true; $('#phAction').hidden = true; if (!$('#phEditor').hidden) closeEditor(); }
 const anyPop = () => !$('#phMenu').hidden || !$('#phSheet').hidden || !$('#phAction').hidden;
 function fakeName(it) {
   const m = (it.fileName || '').match(/^(IMG_\d+)/i); if (m) return m[1].toUpperCase();
@@ -1500,7 +1534,21 @@ $('#phMenu').addEventListener('click', e => {
   else if (a === 'replay') restartPerformance();
 });
 $('#phInfo').onclick = () => { const s = $('#phSheet'); const open = s.hidden; closePops(); if (open) { fillInfo(); s.hidden = false; } };
-$('#phEdit').onclick = () => {};
+$('#phEdit').onclick = () => {
+  closePops(); if (P.src && !P.src.paused) P.src.pause();
+  $('#phEditor').hidden = false; $('#ph').classList.add('editing'); $('#peRange').value = 0; stageCv.style.filter = '';
+};
+const closeEditor = () => { $('#phEditor').hidden = true; $('#ph').classList.remove('editing'); stageCv.style.filter = ''; };
+$('#peCancel').onclick = closeEditor; $('#peDone').onclick = closeEditor;
+$('#peRange').addEventListener('input', e => {
+  const v = +e.target.value, tool = $('#peTools .on').dataset.t;
+  stageCv.style.filter = tool === 'bright' ? `brightness(${1 + v / 200})` : tool === 'contrast' ? `contrast(${1 + v / 200})` : `saturate(${1 + v / 100})`;
+  $('#peVal').textContent = v;
+});
+$('#peTools').addEventListener('click', e => {
+  const b = e.target.closest('[data-t]'); if (!b) return;
+  $$('#peTools [data-t]').forEach(x => x.classList.toggle('on', x === b)); $('#peRange').value = 0; $('#peVal').textContent = '0'; stageCv.style.filter = '';
+});
 $('#phHeart').onclick = () => {
   const it = byId(P.item.id); if (!it) return;
   it.fav = !it.fav; P.item.fav = it.fav; $('#phHeart').classList.toggle('on', it.fav); persist(it);
@@ -1730,6 +1778,11 @@ ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hu
 $('#hub').addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) go(b.dataset.open); });
 $('#mgHub').onclick = () => goHome();
 $$('.exit-band').forEach(el => longPress(el, 900, goHome));
+let AWAKE = null;
+async function keepAwake(on) {
+  try { if (on) AWAKE = await navigator.wakeLock?.request('screen'); else { AWAKE && AWAKE.release(); AWAKE = null; } } catch (e) { /* ignore */ }
+}
+$('#hubClear').onclick = () => { PEEK.text = ''; LAST.text = ''; LASTVIEW = null; ENTER.hub(); toast('הבחירה נוקתה'); };
 const setChoice = t => { PEEK.text = t; PEEK.at = Date.now(); LAST.text = t; };
 
 /* ---------- מחשבון עם הכרחה ---------- */
@@ -1760,7 +1813,11 @@ function calcKey(k) {
   $$('.ck.op').forEach(b => b.classList.remove('on'));
   if (/^[\d.]$/.test(k)) {
     if (C.armed && C.op === '+') { // הכרחה: כל מקש מקליד את הספרה הבאה של המספר הדרוש
-      if (C.force === null) { C.force = String(Math.round((calcTarget() - C.acc) * 1e6) / 1e6); C.fi = 0; C.cur = ''; }
+      if (C.force === null) {
+        let need = Math.round((calcTarget() - C.acc) * 1e6) / 1e6;
+        if (need <= 0) { C.armed = false; toast('הסכום כבר גדול מהתוצאה שנקבעה'); return calcKey(k); }
+        C.force = String(need); C.fi = 0; C.cur = '';
+      }
       if (C.fi >= C.force.length) return;
       C.cur += C.force[C.fi++]; if (C.cur === '-') C.cur += C.force[C.fi++] || '';
       C.fresh = false; calcShow(curFmt()); return;
@@ -1787,7 +1844,17 @@ function calcKey(k) {
 }
 $('#calc .c-keys').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) calcKey(b.dataset.k); });
 longPress($('#cDisp'), 800, () => { C.armed = true; const d = $('#cDisp'); d.style.opacity = '.55'; setTimeout(() => d.style.opacity = '', 160); });
-ENTER.calc = () => { calcKey('ac'); };
+ENTER.calc = () => { calcKey('ac'); keepAwake(true); };
+LEAVE.calc = () => keepAwake(false);
+/* החלקה על המספר מוחקת ספרה, כמו במחשבון אמיתי */
+(() => {
+  const d = $('#cDisp'); let sx = null;
+  d.addEventListener('pointerdown', e => { sx = e.clientX; });
+  d.addEventListener('pointerup', e => {
+    if (sx !== null && Math.abs(e.clientX - sx) > 30 && !C.fresh && C.force === null) { C.cur = C.cur.length > 1 ? C.cur.slice(0, -1) : '0'; if (C.cur === '-') C.cur = '0'; calcShow(curFmt()); }
+    sx = null;
+  });
+})();
 
 /* ---------- חיפוש באינטרנט (הצצה) ---------- */
 ENTER.web = () => { $('#wIn').value = ''; $('#wHome').hidden = false; $('#wOff').hidden = true; $('#wPeek').hidden = true; setTimeout(() => $('#wIn').focus(), 80); };
@@ -1835,12 +1902,13 @@ function fireNote(x) {
 ENTER.lock = () => {
   lockClock(); clearInterval(L.tick); L.tick = setInterval(lockClock, 15000);
   clearTimeout(L.t); L.buf = ''; L.fired = false; $('#lNote').hidden = true;
-  if (LAST.text) L.t = setTimeout(() => fireNote(LAST.text), (parseFloat(S.notifyDelay) || 6) * 1000);
+  L.auto = !!LAST.text;
+  if (L.auto) L.t = setTimeout(() => fireNote(LAST.text), (parseFloat(S.notifyDelay) || 6) * 1000);
+  keepAwake(true);
 };
-LEAVE.lock = () => { clearTimeout(L.t); clearInterval(L.tick); };
+LEAVE.lock = () => { clearTimeout(L.t); clearInterval(L.tick); keepAwake(false); };
 $('#lTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כשאין בחירה שנקלטה
-  if (L.fired || L.buf.length >= 2) return;
-  if (!L.buf) clearTimeout(L.t); // הזנה ידנית גוברת על ההודעה האוטומטית
+  if (L.fired || L.auto || L.buf.length >= 2) return;
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
   L.buf += String(row * 3 + col + 1); buzz();
   if (L.buf.length >= 2) { clearTimeout(L.t); const v = L.buf; L.t = setTimeout(() => { setChoice(v); fireNote(v); }, 2000); }

@@ -432,3 +432,44 @@ input[type=range] { direction: ltr; }
   .ck { font-size: 22px; } .ck.fn { font-size: 18px; } .ck.op { font-size: 26px; }
   .c-disp { font-size: 46px !important; padding-bottom: 4px; }
 }
+
+/* ===================== תיקוני מכשיר אמיתי ===================== */
+* { touch-action: manipulation; }                 /* בלי זום בהקשה כפולה (מקשים מהירים) */
+html, body { overscroll-behavior: none; }         /* בלי "משיכה לרענון" באמצע קסם */
+.trick, #perform, #memories { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.w-form input, .sr-field input, .pre-in, .ph-caption { -webkit-user-select: text; user-select: text; }
+
+/* מרכז הקסמים: פתיחה מהירה */
+.hub-peek { align-items: center; }
+.hub-peek .btn { margin-inline-start: auto; padding: 4px 10px; font-size: 13px; }
+.hub-quick { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
+.hub-quick button { display: grid; justify-items: center; gap: 6px; border: 0; background: none; color: var(--fg); font-size: 12px; padding: 4px 0; cursor: pointer; min-width: 0; }
+.hub-quick .tc-ico { width: 54px; height: 54px; border-radius: 13px; max-width: 100%; }
+.hub-quick button:active .tc-ico { filter: brightness(.85); }
+
+/* גלריה: מצב "בחר" */
+.pg-cell::after { content: ""; position: absolute; right: 5px; bottom: 5px; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #fff;
+  background: rgba(0,0,0,.15); box-shadow: 0 0 2px rgba(0,0,0,.4); display: none; }
+.selecting .pg-cell::after { display: block; }
+.selecting .pg-cell .dur { display: none; }
+.pg-cell.sel::after { background: #0a84ff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/70% no-repeat; }
+.pg-cell.sel img { opacity: .65; }
+
+/* צפייה: מסך עריכה */
+#ph.editing .ph-top, #ph.editing .ph-bottom { visibility: hidden; }
+.ph-editor { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; color: #fff; }
+.ph-editor > * { pointer-events: auto; }
+.pe-top { display: flex; justify-content: space-between; padding: calc(env(safe-area-inset-top) + 8px) max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left)); }
+.pe-pill { border: 0; border-radius: 99px; padding: 8px 16px; font-size: 16px; font-weight: 600; background: rgba(60,60,60,.75); color: #fff; }
+.pe-pill.done { background: #ffd60a; color: #000; }
+.pe-bottom { display: grid; gap: 10px; justify-items: center; background: linear-gradient(transparent, rgba(0,0,0,.75) 35%);
+  padding: 30px max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 12px) max(16px, env(safe-area-inset-left)); }
+.pe-val { font-size: 13px; font-weight: 600; color: #ffd60a; font-variant-numeric: tabular-nums; }
+#peRange { width: min(100%, 420px); accent-color: #ffd60a; }
+.pe-tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pe-tools button { border: 1.5px solid rgba(255,255,255,.4); background: none; color: #fff; border-radius: 99px; padding: 6px 14px; font-size: 14px; }
+.pe-tools button.on { border-color: #ffd60a; color: #ffd60a; }
+.pe-tabs { display: flex; gap: 26px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.55); letter-spacing: .3px; }
+.pe-tabs .on { color: #fff; }
+
+#perform:has(#ph.editing) { background: #000; }
