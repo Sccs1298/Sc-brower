@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../cine.css">
+<style>
+  .job .logo { width: 110px; height: 110px; border-radius: 30px; background: linear-gradient(135deg,#2b2b30,#0d0d0f); }
+  .job .title { font: 700 58px Heebo; margin: 30px 0 8px; direction: ltr; text-align: right; }
+  .job .meta { font: 400 42px Heebo; opacity: .6; }
+  .tag { display: inline-block; margin: 26px 0 32px; padding: 14px 30px; border-radius: 999px; background: rgba(48,164,108,.16); color: #1f8a57; font: 700 40px Heebo; }
+  .step { text-align: center; padding: 70px 40px !important; }
+  .step .n { font: 900 64px Heebo; color: var(--accent); direction: ltr; }
+  .step .ic { font: 900 170px/1.1 Heebo; }
+  .step .lb { font: 900 110px Heebo; }
+  .bar { height: 22px; border-radius: 11px; background: rgba(255,255,255,.15); overflow: hidden; margin-top: 40px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+  .wallet .lab { font: 700 42px Heebo; opacity: .65; }
+  .wallet .bal { font: 900 118px Heebo; direction: ltr; text-align: right; margin: 22px 0 36px; letter-spacing: -2px; }
+  .live { display: inline-block; width: 24px; height: 24px; border-radius: 50%; background: var(--green); margin-left: 14px; }
+  .sw { display: inline-block; width: 260px; height: 146px; border-radius: 73px; background: var(--green); position: relative; vertical-align: middle; }
+  .sw i { position: absolute; top: 13px; width: 120px; height: 120px; border-radius: 50%; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  .coins { position: absolute; top: 600px; left: 80px; right: 80px; display: flex; gap: 40px; transform-style: preserve-3d; }
+  .coin { flex: 1; height: 520px; border-radius: 50px; text-align: center; padding-top: 150px; position: relative; overflow: hidden;
+    background: linear-gradient(160deg, rgba(255,255,255,.13), rgba(255,255,255,.03)); border: 1.5px solid rgba(255,255,255,.15); }
+  .coin b { font: 900 100px Heebo; display: block; direction: ltr; }
+  .coin span { font: 400 46px Heebo; opacity: .6; }
+  .ice { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(170,215,255,.75), rgba(120,170,255,.2)); }
+  .ice:after { content: '❄'; position: absolute; top: 30px; left: 30px; font-size: 70px; }
+  .ownes .k { font: 700 46px Heebo; opacity: .6; }
+  .ownes .v { font: 900 170px Heebo; direction: ltr; text-align: right; margin: 16px 0 6px; }
+  .follow { text-align: center; }
+  .follow .lg { width: 230px; height: 230px; border-radius: 50%; margin: 0 auto 30px; background: radial-gradient(circle at 35% 30%, #c4a1ff, #9D5CFF 55%, #5b21b6);
+    font: 900 110px/230px Heebo; color: #fff; box-shadow: 0 30px 60px rgba(157,92,255,.35); }
+  .follow .nm { font: 900 76px Heebo; direction: ltr; }
+  .follow .hd { font: 400 44px Heebo; opacity: .55; margin: 4px 0 40px; direction: ltr; }
+  .cursor { position: absolute; width: 84px; height: 84px; }
+  .stamp { display: inline-block; padding: 26px 60px; border: 10px solid var(--red); color: var(--red); border-radius: 26px; font: 900 130px Heebo; }
+  .redtint .bgfill { background: radial-gradient(ellipse 70% 45% at 50% 45%, rgba(229,72,77,.35), transparent 70%), linear-gradient(#1a0c0d, #050303) !important; }
+  .icetint .bgfill { background: radial-gradient(ellipse 70% 45% at 50% 45%, rgba(120,180,255,.30), transparent 70%), linear-gradient(#0c1220, #03050a) !important; }
+</style></head>
+<body><div id="stage"></div>
+<script src="daily_2026-11-08_v3_timing.js"></script>
+<script src="../cine2.js"></script>
+<script>
+const G = (t, cls, top, st = '') => KT(t, cls, `top:${top}px;${st}`);
+function auto(lt, el) {
+  $$(el, '.kt').forEach((r, i) => kin(r, lt, .02 + i * .12, .06));
+  $$(el, '.card').forEach((c, i) => card3d(c, lt, i * .1));
+  $$(el, '.icon').forEach(c => icon3d(c, lt, 0));
+}
+const AV = (x, y, evil) => `<div class="avatar ${evil ? 'evil' : ''}" style="left:${x - 140}px;top:${y - 140}px;transform-origin:center"><span class="eye" style="right:76px"></span><span class="eye" style="left:76px"></span></div>`;
+function avatar(el, lt) { const a = $(el, '.avatar'); if (!a) return; const p = P(lt, 0, .5, back);
+  a.style.opacity = clamp(p); a.style.transform = `translate3d(0,${Math.sin(lt * 2) * 12}px,${-300 * (1 - p)}px) scale(${1.6 * (.7 + .3 * p)}) rotateY(${Math.sin(lt * 1.3) * 22}deg)`; }
+
+window.SCENES = [
+ { at: [0, 'סקירת'], theme: 'black', ring: [540, 760, 260], noTop: true,
+   bp: [{ c: [540, 760, 300], at: .1 }, { t: [540, 1120, 'DAILY // 08.11.2026'], anchor: 'middle', at: .2 }],
+   mid: G('סקירת הקריפטו', 'h1', 640, 'font-size:120px') + G('היומית', 'giga acc', 800, 'font-size:210px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [1, 'ביטקוין'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 640, 230],
+   bp: [{ d: [160, 1060, 920, 1060], label: 'BTC · $75,856', at: .2 }],
+   mid: ICON('3d-coin', 540, 640, 480) + G('ביטקוין מתחת ל', 'h2', 930, 'font-size:70px') + `<div class="row giga num" style="top:1000px;font-size:220px">$76K</div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [2, 'באירופה'], theme: 'light', tr: 'whipR', ring: [540, 820, 0],
+   mid: `<div class="card" style="top:520px;text-align:center"><div style="font:900 60px Heebo;color:#7B3FF2">01 · אירופה</div>
+     <div style="font:900 96px/1.15 Heebo;margin-top:24px">בינאנס סוגרת חשבונות</div><div style="font:400 52px Heebo;opacity:.6;margin-top:20px">בחלק מהמדינות, עד סוף השנה</div></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [3, 'בוושינגטון'], theme: 'light', tr: 'whipR', ring: [540, 820, 0],
+   mid: `<div class="card" style="top:520px;text-align:center"><div style="font:900 60px Heebo;color:#7B3FF2">02 · וושינגטון</div>
+     <div style="font:900 96px/1.15 Heebo;margin-top:24px">חוק הקריפטו נתקע</div><div style="font:400 52px Heebo;opacity:.6;margin-top:20px">בסנאט האמריקאי</div></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [4, 'וארצות'], theme: 'dark', cls: 'redtint', tr: 'whipR', ring: [540, 820, 0],
+   mid: `<div class="card" style="top:520px;text-align:center"><div style="font:900 60px Heebo;color:#ff8a8e">03 · איראן</div>
+     <div style="font:900 96px/1.15 Heebo;margin-top:24px">סנקציות על 8 חברות</div><div style="font:400 52px Heebo;opacity:.6;margin-top:20px">שעזרו להעביר כסף בקריפטו</div></div>`,
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [5, 'והסיפור'], theme: 'black', tr: 'zoom', ring: [540, 900, 0], noTop: true,
+   mid: G('הסיפור הגדול', 'h1', 760, 'font-size:130px') + G('של היום', 'giga acc', 900, 'font-size:190px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [6, 'מנהל'], theme: 'dark', ring: [540, 720, 260],
+   bp: [{ t: [540, 1060, 'BINANCE // CFO'], anchor: 'middle', at: .2 }],
+   mid: AV(540, 720) + G('מנהל הכספים', 'h1', 1100, 'font-size:110px'),
+   anim(lt, dur, el) { auto(lt, el); avatar(el, lt); } },
+ { at: [6, 'עוזב'], theme: 'light', tr: 'whipR', ring: [540, 860, 0],
+   mid: `<div class="row" style="top:700px"><span class="stamp">עוזב</span></div>`,
+   anim(lt, dur, el) { const s = $(el, '.stamp'), p = P(lt, 0, .3, back); s.style.opacity = clamp(p); s.style.transform = `rotate(-8deg) scale(${2.4 - 1.4 * p})`; } },
+ { at: [7, 'פחות'], theme: 'dark', cls: 'redtint', tr: 'zoom', ring: [540, 720, 300],
+   bp: [{ c: [540, 720, 360], red: 1, at: 0 }],
+   mid: ICON('clock', 540, 720, 600) + G('פחות משבועיים', 'h1', 1080, 'font-size:120px;color:#ff8a8e'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [7, 'גנבו'], theme: 'dark', tr: 'whipL', ring: [600, 690, 140],
+   bp: [{ d: [160, 1050, 920, 1050], label: '6,300,000,000 USD', at: .2 }],
+   mid: ICON('locker', 540, 700, 640) + `<div class="row giga num" style="top:1080px;font-size:250px">$0.0B</div>`,
+   anim(lt, dur, el) { auto(lt, el); const m = $(el, '.giga'), p = P(lt, 0, 1.2, easeInOut);
+     m.textContent = '$' + (6.3 * p).toFixed(1) + 'B'; show(m, P(lt, 0, .25), 40, -300); } },
+ { at: [8, 'לפי'], theme: 'light', tr: 'zoom', ring: [540, 820, 0],
+   mid: G('הסיבה הרשמית:', 'h1', 700, 'font-size:110px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ { at: [8, 'במיזם'], theme: 'dark', tr: 'zoom', ring: [540, 640, 230],
+   mid: ICON('key', 540, 640, 460) + G('מיזם חדש.', 'giga acc', 960, 'font-size:200px'),
+   anim(lt, dur, el) { auto(lt, el); } },
+ // ועוד בקצרה
+ { at: [9, 'זהו'], theme: 'light', tr: 'zoom', ring: [540, 760, 140],
+   mid: `<div class="card follow" style="top:580px"><div class="lg">₿</div><div class="nm">CRYPTO ILS</div><div class="hd">@crypto_ils</div><a class="btn" id="fb">עקבו</a></div>
+         <svg class="cursor" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#111" stroke="#fff" stroke-width="1.5"/></svg>`
+     + G('מחר, סקירה חדשה.', 'h2 acc', 440, 'font-size:72px'),
+   anim(lt, dur, el) { auto(lt, el); const c = $(el, '.cursor'), p = P(lt, 1.2, .7, easeInOut);
+     c.style.left = (900 - 400 * p) + 'px'; c.style.top = (1650 - 470 * p) + 'px';
+     const click = lt > 1.95, b = $(el, '#fb'); b.textContent = click ? 'עוקבים ✓' : 'עקבו'; b.style.background = click ? '#e3e3e5' : 'var(--accent)';
+     b.style.color = click ? '#111' : '#fff'; b.style.transform = `scale(${1 - .07 * (P(lt, 1.85, .1) - P(lt, 1.95, .15))})`; } },
+];
+window.addEventListener('load', () => SCENES.forEach(s => s.cls && s.el.classList.add(s.cls)));
+</script></body></html>

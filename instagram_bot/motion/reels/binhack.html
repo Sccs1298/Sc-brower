@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../base.css">
+<style>
+  .counter { top: 1240px; font-size: 230px; }
+  .timer { top: 1520px; }
+  .timer .pill { background: rgba(229,72,77,.16); color: #ff6b70; border: 2px solid rgba(229,72,77,.5); }
+  .h1 { font: 900 112px/1.05 Heebo; }
+  .h2 { font: 400 54px/1.3 Heebo; }
+  .job { top: 860px; }
+  .job .logo { width: 110px; height: 110px; border-radius: 30px; background: linear-gradient(135deg,#2b2b30,#0d0d0f); display: inline-block; vertical-align: middle; }
+  .job .title { font: 700 56px Heebo; margin: 34px 0 10px; }
+  .job .meta { font: 400 40px Heebo; opacity: .6; }
+  .tag { display: inline-block; margin: 30px 0 34px 14px; padding: 12px 26px; border-radius: 999px; background: rgba(48,164,108,.14); color: #1f8a57; font: 700 34px Heebo; }
+  .steps { top: 760px; left: 70px; right: 70px; display: flex; gap: 26px; }
+  .step { flex: 1; height: 360px; border-radius: 40px; background: rgba(255,255,255,.9); box-shadow: 0 30px 70px rgba(0,0,0,.12); text-align: center; padding-top: 60px; position: relative; }
+  .step .ic { font: 900 88px Heebo; }
+  .step .lb { font: 700 42px Heebo; margin-top: 26px; }
+  .step.danger { background: #151517; color: #fff; }
+  .bar { position: absolute; left: 40px; right: 40px; bottom: 48px; height: 14px; border-radius: 7px; background: rgba(255,255,255,.15); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+  .wallet { top: 760px; }
+  .wallet .lab { font: 700 40px Heebo; opacity: .6; }
+  .wallet .bal { font: 900 118px Heebo; direction: ltr; text-align: right; margin: 26px 0 40px; letter-spacing: -2px; }
+  .live { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: var(--green); margin-left: 14px; box-shadow: 0 0 0 0 rgba(48,164,108,.6); }
+  .toggle { top: 640px; }
+  .sw { display: inline-block; width: 150px; height: 84px; border-radius: 42px; background: var(--green); position: relative; vertical-align: middle; float: left; }
+  .sw i { position: absolute; top: 8px; width: 68px; height: 68px; border-radius: 50%; background: #fff; }
+  .frozen { top: 1060px; left: 90px; right: 90px; display: flex; gap: 40px; position: absolute; }
+  .coin { flex: 1; height: 330px; border-radius: 40px; text-align: center; padding-top: 70px; position: relative; overflow: hidden;
+    background: linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.03)); border: 1.5px solid rgba(255,255,255,.14); }
+  .coin b { font: 900 74px Heebo; display: block; direction: ltr; }
+  .coin span { font: 400 36px Heebo; opacity: .6; }
+  .ice { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(160,210,255,.55), rgba(120,170,255,.15)); opacity: 0; }
+  svg.net { position: absolute; left: 0; top: 520px; }
+  .ownes .k { font: 700 42px Heebo; opacity: .6; }
+  .ownes .v { font: 900 150px Heebo; direction: ltr; text-align: right; margin: 18px 0 8px; }
+  .ownes .s { font: 400 38px Heebo; opacity: .55; }
+  .follow { top: 780px; text-align: center; }
+  .follow .lg { width: 200px; height: 200px; border-radius: 50%; margin: 0 auto 34px; background: radial-gradient(circle at 35% 30%, #ffb14a, #F7931A 55%, #b8650a);
+    font: 900 70px/200px Heebo; color: #111; direction: ltr; box-shadow: 0 30px 60px rgba(247,147,26,.35); }
+  .follow .nm { font: 900 64px Heebo; direction: ltr; }
+  .follow .hd { font: 400 40px Heebo; opacity: .55; margin: 6px 0 44px; direction: ltr; }
+  .cursor { position: absolute; width: 70px; height: 70px; z-index: 4; }
+</style></head>
+<body><div id="stage"></div>
+<script src="timing.js"></script>
+<script src="../lib.js"></script>
+<script>
+const IC = n => `../../assets/icons3d/${n}.png`;
+const icon = (n, top, w = 600) => `<img class="icon i" src="${IC(n)}" style="top:${top}px;width:${w}px;margin-left:-${w/2}px"><img class="reflect" src="${IC(n)}" style="top:${top + w * 0.98}px;width:${w}px;margin-left:-${w/2}px">`;
+function floatIcon(el, lt, base = 1) {
+  const p = P(lt, 0, .6, back);
+  $$(el, '.icon, .reflect').forEach((im, i) => {
+    const y = Math.sin(lt * 1.5) * 12 * (i ? -1 : 1);
+    im.style.opacity = clamp(p) * (i ? .18 : 1);
+    im.style.transform = `translateY(${y + 50 * (1 - p)}px) scale(${(.85 + .15 * p) * (base + .03 * lt / 6)})` + (i ? ' scaleY(-1)' : '');
+  });
+}
+
+window.SCENES = [
+ { // 0 – הוק: 6.3B + 20 דקות
+  theme: 'dark',
+  html: icon('locker', 470, 640) + `<div class="row big counter num">$0</div><div class="row timer"><span class="pill">⏱ 20 דקות</span></div>`,
+  anim(lt, dur, el) {
+    floatIcon(el, lt);
+    const c = $(el, '.counter'); const p = P(lt, .1, 1.6, easeInOut);
+    c.textContent = '$' + (6.3 * p).toFixed(1) + 'B'; show(c, P(lt, 0, .3), 30);
+    show($(el, '.timer'), P(lt, 2.6, .4, back), 30);
+  }},
+ { // 1 – השוד הכי גדול
+  theme: 'dark',
+  html: icon('fire', 430, 600) + `<div class="row h1" style="top:1260px">השוד הכי גדול</div><div class="row h2 muted" style="top:1390px">בהיסטוריה של הקריפטו</div>
+         <div class="row h2" style="top:1540px;color:var(--accent);font-weight:700">ומה פתח את הכספת?</div>`,
+  anim(lt, dur, el) {
+    floatIcon(el, lt);
+    const r = $$(el, '.row'); show(r[0], P(lt, .1)); show(r[1], P(lt, .3)); show(r[2], P(lt, 3.6));
+  }},
+ { // 2 – ראיון עבודה
+  theme: 'light',
+  html: `<div class="row h1" style="top:520px">ראיון עבודה.</div>
+   <div class="card job"><span class="logo"></span><div class="title">Senior Blockchain Engineer</div>
+   <div class="meta">Remote · משכורת חלומית</div><div class="tag">✓ מתאים לך ב-98%</div><a class="btn">קבע ראיון</a></div>`,
+  anim(lt, dur, el) { show($(el, '.h1'), P(lt, 0, .4, back), 30); show($(el, '.job'), P(lt, .25, .6), 160); }},
+ { // 3 – בואו נסביר
+  theme: 'black', noTop: true,
+  html: `<div class="row h1" style="top:880px">בואו נסביר.</div>`,
+  anim(lt, dur, el) { const p = P(lt, 0, .7); const h = $(el, '.h1'); h.style.opacity = p; h.style.filter = `blur(${12 * (1 - p)}px)`; }},
+ { // 4 – ראיון, מטלה, קובץ
+  theme: 'light',
+  html: `<div class="row h2" style="top:520px;font-weight:700">מהנדס בבינאנס קיבל הצעה חלומית</div>
+   <div class="steps abs"><div class="step"><div class="ic">💬</div><div class="lb">ראיון</div></div>
+   <div class="step"><div class="ic">📝</div><div class="lb">מטלה</div></div>
+   <div class="step danger"><div class="ic">⬇</div><div class="lb">קובץ</div><div class="bar"><i></i></div></div></div>`,
+  anim(lt, dur, el) {
+    show($(el, '.h2'), P(lt, 0));
+    const s = $$(el, '.step'), at = [2.7, 3.7, 4.6];
+    s.forEach((x, i) => show(x, P(lt, at[i], .45, back), 60, .9));
+    $(el, '.bar i').style.width = (100 * P(lt, 5.1, 1.8, easeInOut)) + '%';
+  }},
+ { // 5 – המחשב נדבק → ארנק חם
+  theme: 'dark',
+  html: icon('computer', 420, 600) + `<div class="abs" id="virus" style="left:0;right:0;top:380px;height:700px;background:radial-gradient(circle at 50% 50%, rgba(229,72,77,.55), transparent 60%);opacity:0"></div>
+   <div class="row h1" style="top:1250px">המחשב נדבק</div><div class="row h2" style="top:1390px;color:var(--accent);font-weight:700">→ הדרך לארנק החם</div>`,
+  anim(lt, dur, el) {
+    floatIcon(el, lt);
+    const v = $(el, '#virus'); v.style.opacity = P(lt, .8, .6) * (.65 + .35 * Math.sin(lt * 6));
+    const r = $$(el, '.row'); show(r[0], P(lt, .9)); show(r[1], P(lt, 3.0));
+  }},
+ { // 6 – מה זה ארנק חם
+  theme: 'light',
+  html: `<div class="row h1" style="top:500px">ארנק חם</div>
+   <div class="card wallet"><div class="lab"><span class="live"></span>מחובר לאינטרנט · Binance</div><div class="bal">$6,300,000,000</div><a class="btn">משיכה</a></div>`,
+  anim(lt, dur, el) {
+    show($(el, '.h1'), P(lt, 0, .4, back), 30); show($(el, '.wallet'), P(lt, .2, .6), 140);
+    const l = $(el, '.live'); const ph = (lt * 1.2) % 1; l.style.boxShadow = `0 0 0 ${ph * 26}px rgba(48,164,108,${.5 * (1 - ph)})`;
+    const b = $(el, '.btn'); const pr = P(lt, 3.8, .2) - P(lt, 4.1, .2); b.style.transform = `scale(${1 - .05 * pr})`;
+  }},
+ { // 7 – 20 דקות: מתרוקן
+  theme: 'dark',
+  html: `<div class="row h1" style="top:500px;color:var(--red)">20 דקות</div>
+   <div class="card wallet"><div class="lab"><span class="live" style="background:var(--red)"></span>Hot Wallet · Binance</div><div class="bal">$6,300,000,000</div><a class="btn" style="background:#2a2a2e;color:#777">ריק</a></div>`,
+  anim(lt, dur, el) {
+    show($(el, '.h1'), P(lt, 0, .4, back), 30); show($(el, '.wallet'), P(lt, 0, .4), 60);
+    const p = P(lt, .3, 2.2, easeInOut); const b = $(el, '.bal');
+    b.textContent = '$' + fmt(6.3e9 * (1 - p)); b.style.color = p > .98 ? 'var(--red)' : '';
+    const sh = p > .02 && p < .98 ? Math.sin(lt * 70) * 4 : 0; $(el, '.wallet').style.transform = `translateX(${sh}px)`;
+  }},
+ { // 8 – משיכות נעצרו + הקפאה
+  theme: 'dark',
+  html: `<div class="card toggle" style="padding:40px 50px;font:700 50px/84px Heebo">משיכות <span class="sw"><i></i></span></div>
+   <div class="frozen"><div class="coin"><b>USDT</b><span>Tether</span><div class="ice"></div></div><div class="coin"><b>USDC</b><span>Circle</span><div class="ice"></div></div></div>
+   <div class="row big num" style="top:1460px;font-size:150px">$2.3B</div><div class="row h2 muted" style="top:1630px">הוקפאו תוך שעות</div>`,
+  anim(lt, dur, el) {
+    show($(el, '.toggle'), P(lt, 0), 60);
+    const off = P(lt, .9, .35, easeInOut); const sw = $(el, '.sw');
+    sw.style.background = off > .5 ? '#3a3a3f' : 'var(--green)'; $(el, '.sw i').style.left = (8 + 74 * (1 - off)) + 'px';
+    $$(el, '.coin').forEach((c, i) => show(c, P(lt, 2.4 + i * .25, .5, back), 80, .9));
+    $$(el, '.ice').forEach((c, i) => c.style.opacity = P(lt, 3.6 + i * .2, .5));
+    const r = $$(el, '.row'); show(r[0], P(lt, 4.3, .5, back), 30); show(r[1], P(lt, 4.6));
+  }},
+ { // 9 – FBI → צפון קוריאה (מכחישה)
+  theme: 'dark',
+  html: `<svg class="net" width="1080" height="560" viewBox="0 0 1080 560"></svg>
+   <div class="avatar evil" style="left:410px;top:1010px"><span class="eye" style="right:70px"></span><span class="eye" style="left:70px"></span></div>
+   <div class="row h1" style="top:1340px;font-size:96px">צפון קוריאה?</div>
+   <div class="row" style="top:1500px"><span class="pill" style="background:#2a2a2e;color:#bbb;border:2px dashed #555">״זה לא אנחנו״</span></div>`,
+  anim(lt, dur, el) {
+    const svg = $(el, 'svg');
+    if (!svg.dataset.b) {
+      const N = [[200, 120], [470, 60], [760, 140], [900, 330], [330, 300], [610, 330], [540, 520]];
+      const E = [[0, 4], [1, 4], [1, 5], [2, 5], [3, 5], [4, 6], [5, 6]];
+      svg.innerHTML = E.map(([a, b], i) => `<line class="e" x1="${N[a][0]}" y1="${N[a][1]}" x2="${N[b][0]}" y2="${N[b][1]}" stroke="#E5484D" stroke-width="4" stroke-dasharray="10 10" opacity="0"/>`).join('') +
+        N.map(([x, y], i) => `<g class="n" opacity="0"><rect x="${x - 70}" y="${y - 34}" width="140" height="68" rx="16" fill="#1d1d21" stroke="rgba(255,255,255,.18)"/><rect x="${x - 46}" y="${y - 8}" width="${60 + i * 7}" height="14" rx="7" fill="rgba(255,255,255,.25)"/></g>`).join('');
+      svg.dataset.b = 1;
+    }
+    $$(svg, '.n').forEach((g, i) => g.setAttribute('opacity', P(lt, .1 + i * .15, .4)));
+    $$(svg, '.e').forEach((l, i) => { l.setAttribute('opacity', P(lt, .5 + i * .18, .4)); l.setAttribute('stroke-dashoffset', -lt * 40); });
+    show($(el, '.avatar'), P(lt, 1.6, .6, back), 60, .7);
+    show($(el, '.h1'), P(lt, 2.0)); show($(el, '.row:last-child'), P(lt, 4.3, .45, back), 30, .8);
+  }},
+ { // 10 – החלק שכדאי לזכור
+  theme: 'black', noTop: true,
+  html: `<div class="row h2 muted" style="top:800px">ועכשיו,</div><div class="row h1" style="top:890px">החלק שכדאי לזכור.</div>`,
+  anim(lt, dur, el) { const r = $$(el, '.row'); show(r[0], P(lt, 0)); const p = P(lt, .5, .7); r[1].style.opacity = p; r[1].style.filter = `blur(${10 * (1 - p)}px)`; }},
+ { // 11 – אין לכם ביטקוין, יש לכם הבטחה
+  theme: 'light',
+  html: `<div class="card ownes" style="top:700px"><div class="k">בינאנס חייבת לך</div><div class="v">1.00 BTC</div><div class="s">זו הבטחה. לא ביטקוין.</div></div>` + icon('key', 1180, 380),
+  anim(lt, dur, el) {
+    show($(el, '.ownes'), P(lt, 0, .6), 120);
+    const s = $(el, '.s'); s.style.opacity = .55 * P(lt, 3.6);
+    $$(el, '.icon, .reflect').forEach((im, i) => { const p = P(lt, 4.2, .6, back); im.style.opacity = p * (i ? .18 : 1); im.style.transform = `translateY(${60 * (1 - p) + Math.sin(lt * 1.5) * 10}px)` + (i ? ' scaleY(-1)' : ''); });
+  }},
+ { // 12 – עקבו
+  theme: 'light',
+  html: `<div class="card follow"><div class="lg">₿</div><div class="nm">CRYPTO ILS</div><div class="hd">@crypto_ils</div><a class="btn" id="fb">עקבו</a></div>
+   <svg class="cursor" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#111" stroke="#fff" stroke-width="1.5"/></svg>`,
+  anim(lt, dur, el) {
+    show($(el, '.follow'), P(lt, 0, .6, back), 100, .9);
+    const c = $(el, '.cursor'); const p = P(lt, .8, 1.0, easeInOut);
+    c.style.left = (900 - 420 * p) + 'px'; c.style.top = (1700 - 300 * p) + 'px'; c.style.opacity = P(lt, .6, .3);
+    const click = lt > 2.0; const b = $(el, '#fb');
+    b.textContent = click ? 'עוקבים ✓' : 'עקבו'; b.style.background = click ? '#e3e3e5' : 'var(--accent)';
+    b.style.transform = `scale(${1 - .06 * (P(lt, 1.85, .1) - P(lt, 2.0, .15))})`;
+  }},
+];
+</script></body></html>
