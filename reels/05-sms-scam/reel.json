@@ -175,6 +175,15 @@
     ]
    ],
    "brightness": 0.46
+  },
+  "avatar": {
+   "img": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/hood/h7_clean.png",
+   "mask": "/tmp/claude-0/-home-user-Sc-brower/7b84976d-33de-598f-85b8-a3be579dcb44/scratchpad/hood/h7_mask.png",
+   "face_xy": [
+    295,
+    322
+   ],
+   "face_w": 190
   }
  },
  "presenter": {

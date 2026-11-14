@@ -163,6 +163,9 @@ if A.get("flag"):
     fw = cv2.GaussianBlur(fw, (0, 0), 2.0)
     mw = cv2.GaussianBlur(mw, (0, 0), 2.0)[..., None]
     plate = plate * (1 - mw) + fw * mw
+    FLAG = (fw, mw)
+else:
+    FLAG = None
 VIG = (1 - 0.55 * (((xx - W / 2) / (W * 0.75)) ** 2 + ((yy - H / 2) / (H * 0.7)) ** 2)).clip(0.35, 1)[..., None]
 DESK = (1 - 0.94 * np.clip((yy - H * 0.70) / (H * 0.22), 0, 1) ** 1.1)[..., None]  # dark desk edge in the foreground
 RED_RIM = glow(-200, 1100, 900, (0.05, 0.05, 0.9))
@@ -250,7 +253,21 @@ def comp(dst, f, m, x0, y0, shadow=False):
     roi[:] = roi * (1 - mm) + ff * mm
 
 
+LED = None
+if A.get("avatar"):
+    import sys as _s, os as _o
+    _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__)))
+    from avatar_led import LedAvatar
+    av = A["avatar"]
+    LED = LedAvatar(av["img"], av["mask"], av["face_xy"], av["face_w"], sys.argv[2] + ".wav", flag=FLAG,
+                    glow=glow(60, 1300, 800, (0.0, 0.0, 0.5)))
+
+
 def head_frame(t, zoom, lt):
+    if LED is not None:
+        tt = t - CT_OFF[0]
+        out, _ = LED.frame(tt, zoom * (1 + 0.02 * lt))
+        return out * VIG
     P = cfg.get("presenter", {})
     face_w = P.get("face_w", 470)
     f, m, (fx, fy) = presenter_rgba(t, face_w)
@@ -270,6 +287,8 @@ def head_frame(t, zoom, lt):
 
 
 def corner_presenter(base, t):
+    if LED is not None:
+        return LED.corner(base, t - CT_OFF[0])
     f, m, (fx, fy) = presenter_rgba(t, 230, blocks=6)
     comp(base, f, m, W - fx - 150, 1560 - fy, shadow=True)
 
@@ -294,10 +313,14 @@ def scene_frame(name, lt):
     return cv2.imread(os.path.join(d, fl[min(int(lt * FPS), len(fl) - 1)])).astype(np.float32) / 255
 
 
+CT_OFF = [0.0]
+
+
 def frame(t):
     st, en, sh, li, sst = next((p for p in plan if p[0] <= t < p[1]), plan[-1])
     lt = t - st
     ct = li * 2.7 + lt   # different moment of the source clip on every cut
+    CT_OFF[0] = ct - t
     if sh["type"] == "head":
         out = head_frame(ct, sh.get("zoom", 1.0), lt)
         boxed, cy = False, 1330
