@@ -26,7 +26,7 @@ const DEFAULT_WORDS = ['ישראל', 'צרפת', 'יפן', 'ברזיל', 'מצר
 
 const METHODS = {
   grid:     { name: 'מקשים נסתרים 3×3', for: ['number', 'word', 'card'],
-              help: 'בזמן שהסרטון מתנגן, המסך מחולק ל-9 מקשים בלתי נראים: 1 בפינה השמאלית העליונה ו-9 בימנית התחתונה. אחרי מספר הספרות שהגדרת, שאר הנגיעות לא נחשבות. שתי אצבעות מוחקות ספרה.' },
+              help: 'בזמן שהסרטון מתנגן, המסך מחולק ל-9 מקשים בלתי נראים: 1 בפינה השמאלית העליונה ו-9 בימנית התחתונה. עם "עצירה והמשך": הנגיעה הראשונה עוצרת את הסרטון והשנייה ממשיכה, וכל נגיעה נקלטת כספרה. נראה כמו צפייה רגילה. אחרי מספר הספרות שהגדרת, שאר הנגיעות לא נחשבות.' },
   keyboard: { name: 'מקלדת Bluetooth / שלט', for: ['number', 'word', 'card'],
               help: 'מקלידים במקלדת או בשלט Bluetooth מחוברים. נגיעות במסך לא עושות כלום, אז הצופה יכול להחזיק את הטלפון. רווח או חץ מתחיל את הסרטון.' },
   peek:     { name: 'הצופה מחפש בעצמו (חדש)', for: ['number', 'word', 'card'],
@@ -163,6 +163,7 @@ function normalize(it) {
   if (!it.builtin && !it.duration && /\.(jpe?g|png|heic|heif|webp|gif|avif)$/i.test(it.fileName || '')) it.kind = 'photo';
   if (!METHODS[it.method]) it.method = it.content === 'drawing' ? 'draw' : 'grid';
   if (!it.digits) it.digits = 2;
+  if (it.tapPause === undefined) it.tapPause = true;
   if (it.trick === undefined) it.trick = true;
   if (!it.words) it.words = DEFAULT_WORDS.slice();
   if (!it.regions) it.regions = [];
@@ -1005,6 +1006,8 @@ function syncEditorForm() {
   if (!ok.some(([k]) => k === it.method)) it.method = ok[0][0];
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
+  $('#edTapRow').hidden = !(it.method === 'grid' && it.kind !== 'photo');
+  $('#edTap').checked = it.tapPause !== false;
   $('#edWordsWrap').hidden = it.content !== 'word';
   $('#edDigitsRow').hidden = it.content === 'drawing' || it.content === 'card';
   $('#edForce').checked = S.forceId === it.id;
@@ -1147,6 +1150,7 @@ $('#edit').addEventListener('input', e => {
   } else if (el.id === 'edWords') it.words = el.value.split('\n').map(s => s.trim()).filter(Boolean);
   else if (el.id === 'edDigits') { it.digits = parseInt(el.value, 10) || 2; syncEditorForm(); }
   else if (el.id === 'edTrick') { it.trick = el.checked; syncEditorForm(); }
+  else if (el.id === 'edTap') it.tapPause = el.checked;
   else if (el.id === 'edForce') { S.forceId = el.checked ? it.id : (S.forceId === it.id ? '' : S.forceId); saveSettings(); return; }
   else if (el.id === 'edShot') it.shotAt = new Date(el.value).getTime() || undefined;
   else if (el.id === 'edSample') { S.sample = el.value; saveSettings(); return; }
@@ -1294,7 +1298,7 @@ ENTER.perform = async () => {
   const de = document.documentElement;
   if (req.stage) { try { const r = (de.requestFullscreen || de.webkitRequestFullscreen || (() => {})).call(de); if (r && r.catch) r.catch(() => {}); } catch (e) { /* ignore */ } }
   Object.assign(P, { active: true, item, stage: req.stage, started: false, frozen: null, frozenAt: 0, menu: false, clip: null, endAt: 0,
-    lastPlaying: false, phIcon: null, regions: activeRegions(item), isPhoto: item.kind === 'photo', forceFreeze: false, lastStrokeAt: 0,
+    lastPlaying: false, phIcon: null, tapPaused: false, regions: activeRegions(item), isPhoto: item.kind === 'photo', forceFreeze: false, lastStrokeAt: 0,
     meta: item.trick === false ? 'none' : (item.meta || 'none') });
   P.hasTrick = item.trick !== false && (P.regions.length > 0 || P.meta !== 'none');
   P.drawRegions = P.regions;
@@ -1329,6 +1333,7 @@ function sizeStage() {
 addEventListener('resize', () => { if (curScreen() === 'edit') sizeEdCanvas(); if (P.active) { sizeStage(); if (!P.isPhoto) buildStrip(); } });
 
 function begin() {
+  P.tapPaused = false;
   resetLight();
   P.started = true; P.frozen = null; P.frozenAt = 0; P.endAt = 0; P.clip = null; P.drawRegions = P.regions; updateHeader();
   P.src.time = 0;
@@ -1518,6 +1523,7 @@ async function buildStrip() {
 })();
 $('#phPlay').onclick = () => {
   if (!P.src) return; closePops();
+  P.tapPaused = false;
   if (!P.started) begin();
   else if (P.src.paused || P.src.ended) resume();
   else P.src.pause();
@@ -1589,6 +1595,7 @@ function hideCurrent() { // "מחיקה" בגלריה = הסתרה (אפשר ל�
   uiBack();
 }
 function restartPerformance() {
+  P.tapPaused = false;
   resetLight();
   P.input = new SecretInput(P.item); P.started = false; P.frozen = null; P.forceFreeze = false; P.drawRegions = P.regions;
   P.src.pause(); P.src.time = 0; discardRec(); setChrome(photosMode()); updateHeader(); $('.ph-caption').value = '';
@@ -1729,6 +1736,12 @@ function secretTap(e, stroke) {
     if (P.input.digit(String(row * 3 + col + 1))) buzz();
     return;
   }
+  // נגיעה כשהסרטון נעצר בנגיעה קודמת: ממשיכה את הסרטון (וקולטת ספרה)
+  if (P.tapPaused) {
+    P.tapPaused = false;
+    if (!P.frozen && P.hasTrick && P.item.method === 'grid') tapDigit(e);
+    resume(); return;
+  }
   if (!isPlaying()) {
     // לפני ניגון / בסוף: נגיעה מסתירה ומציגה את הכפתורים כמו בגלריה. במצב במה נגיעה מתחילה.
     if (photosMode()) setChrome(!P.chrome);
@@ -1739,6 +1752,11 @@ function secretTap(e, stroke) {
   const it = P.item;
   if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
   if (it.method !== 'grid') return;
+  tapDigit(e);
+  // במצב "עצירה והמשך": כל נגיעה עוצרת את הסרטון, והבאה ממשיכה. נראה כמו צפייה רגילה.
+  if (it.tapPause !== false) { P.src.pause(); P.tapPaused = true; }
+}
+function tapDigit(e) {
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
   if (P.input.digit(String(row * 3 + col + 1))) buzz();
 }
