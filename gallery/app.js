@@ -1007,6 +1007,8 @@ function syncEditorForm() {
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
   $('#edTapRow').hidden = !(it.method === 'grid' && it.kind !== 'photo');
+  $('#edG1').textContent = it.kind === 'photo' ? '1. פרטי התמונה' : '1. פרטי הסרטון';
+  $('#edTrickLbl').textContent = it.kind === 'photo' ? 'תמונת טריק (עם חשיפה)' : 'סרטון טריק (עם חשיפה)';
   $('#edTap').checked = it.tapPause !== false;
   $('#edWordsWrap').hidden = it.content !== 'word';
   $('#edDigitsRow').hidden = it.content === 'drawing' || it.content === 'card';
@@ -1052,6 +1054,8 @@ function renderRegions() {
   }
 }
 ENTER.edit = async () => {
+  $('#edBar').hidden = false; edStatus('');
+  document.documentElement.style.setProperty('--navh', ($('#edit .nav').offsetHeight || 52) + 'px');
   const src = byId(E.id); if (!src) { uiBack(); return; }
   E.item = { ...src, regions: JSON.parse(JSON.stringify(src.regions)), words: (src.words || []).slice() };
   E.sel = Math.min(E.sel, Math.max(0, E.item.regions.length - 1)); E.target = 'start';
@@ -1073,6 +1077,7 @@ ENTER.edit = async () => {
   cancelAnimationFrame(E.raf); edLoop();
 };
 LEAVE.edit = async () => {
+  $('#edBar').hidden = true;
   cancelAnimationFrame(E.raf);
   if (E.src) { E.src.destroy(); E.src = null; }
   await flushEdit();
@@ -1085,12 +1090,20 @@ function commitEdit() {
   if (i >= 0) ITEMS[i] = merged; else ITEMS.push(merged);
   return merged;
 }
-function scheduleSave() { clearTimeout(E.saveT); E.saveT = setTimeout(() => { const m = commitEdit(); if (m) persist(m); }, 400); }
-async function flushEdit() { clearTimeout(E.saveT); const m = commitEdit(); if (m) await persist(m); }
+function edStatus(kind) {
+  const el = $('#edStatus'); if (!el) return;
+  el.className = 'ed-status ' + (kind || '');
+  el.textContent = kind === 'dirty' ? 'שומר…' : kind === 'saved' ? 'נשמר ✓' : 'כל השינויים נשמרים';
+}
+function scheduleSave() {
+  edStatus('dirty'); clearTimeout(E.saveT);
+  E.saveT = setTimeout(async () => { const m = commitEdit(); if (m) { await persist(m); edStatus('saved'); } }, 400);
+}
+async function flushEdit() { clearTimeout(E.saveT); const m = commitEdit(); if (m) { await persist(m); edStatus('saved'); } }
 
 function sizeEdCanvas() {
   if (!E.src) return;
-  const c = $('#edCanvas'), maxW = Math.min($('.preview').clientWidth || 360, 680), maxH = innerHeight * .48;
+  const c = $('#edCanvas'), maxW = Math.min($('#edit .preview').clientWidth || 360, 680), maxH = innerHeight * (innerHeight < 560 ? .42 : .34);
   const s = Math.min(maxW / E.src.w, maxH / E.src.h), dpr = Math.min(devicePixelRatio || 1, 2);
   c.style.width = `${Math.round(E.src.w * s)}px`; c.style.height = `${Math.round(E.src.h * s)}px`;
   c.width = Math.round(E.src.w * s * dpr); c.height = Math.round(E.src.h * s * dpr);
@@ -1161,12 +1174,14 @@ $('#edit').addEventListener('input', e => {
 $('#edScrub').addEventListener('input', e => { E.scrubbing = true; resetLight(); if (E.src) { E.src.pause(); E.src.time = parseFloat(e.target.value); } });
 $('#edScrub').addEventListener('change', () => { E.scrubbing = false; });
 $('#edPlay').onclick = () => { if (!E.src) return; if (E.src.paused) { if (E.src.ended || E.src.time >= E.src.duration - .05) E.src.time = 0; E.src.play(); } else E.src.pause(); };
-$('#rgAdd').onclick = () => { E.item.regions.push(newRegion(+(E.src ? E.src.time : 0).toFixed(2))); E.sel = E.item.regions.length - 1; E.target = 'start'; renderRegions(); scheduleSave(); toast('גרור על התמונה כדי לסמן את האזור החדש'); };
+$('#rgAdd').onclick = () => { E.item.regions.push(newRegion(+(E.src ? E.src.time : 0).toFixed(2))); E.sel = E.item.regions.length - 1; E.target = 'start'; renderRegions(); scheduleSave(); toast('גרור על התמונה כדי לסמן את האזור החדש'); $('#edSticky').scrollIntoView({ block: 'nearest' }); };
 $('#rgDel').onclick = () => { if (!curRegion()) return; E.item.regions.splice(E.sel, 1); E.sel = Math.max(0, E.sel - 1); renderRegions(); scheduleSave(); };
 $('#rgNow').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r.t = +E.src.time.toFixed(2); r.keys = r.keys.filter(k => k.t > r.t); renderRegions(); scheduleSave(); };
 $('#rgKeysClear').onclick = () => { const r = curRegion(); if (!r) return; r.keys = []; renderRegions(); scheduleSave(); };
 $('#rgQuadReset').onclick = () => { const r = curRegion(); if (!r) return; r.persp.q = defQuad(); scheduleSave(); };
-$('#edTry').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit' }); };
+$('#edTry').onclick = async () => { if (!E.item) return; await flushEdit(); openViewer(E.item.id, { from: 'edit' }); };
+$('#edSave').onclick = async () => { if (!E.item) return; await flushEdit(); toast('נשמר ✓', 1400); };
+$('#edDone').onclick = async () => { if (E.item) await flushEdit(); uiBack(); };
 $('#edStage').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit', stage: true }); };
 $('#edHide').onclick = () => { E.item.hidden = !E.item.hidden; syncEditorForm(); scheduleSave(); toast(E.item.hidden ? 'הסרטון הוסתר מהגלריה' : 'הסרטון מוצג בגלריה'); };
 $('#edDup').onclick = async () => {

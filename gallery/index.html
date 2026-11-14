@@ -254,24 +254,27 @@
   <header class="nav">
     <button class="nav-back" data-back type="button">‹ ניהול</button>
     <h1 id="edTitle">עריכה</h1>
-    <button class="nav-act" id="edTry" type="button">נסה</button>
+    <button class="nav-act" id="edDone" type="button">סיום</button>
   </header>
-  <main class="page">
-    <div class="preview">
-      <canvas id="edCanvas"></canvas>
+  <main class="page ed-page">
+    <!-- התצוגה נשארת למעלה בזמן גלילה, כדי לראות כל שינוי -->
+    <div class="ed-stage" id="edSticky">
+      <div class="preview">
+        <canvas id="edCanvas"></canvas>
+      </div>
+      <div class="transport" id="edTransport">
+        <button id="edPlay" type="button" class="round" aria-label="נגן">▶</button>
+        <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="זמן בסרטון">
+        <span id="edTime" class="mono">0.00</span>
+      </div>
     </div>
-    <div class="transport" id="edTransport">
-      <button id="edPlay" type="button" class="round" aria-label="נגן">▶</button>
-      <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="זמן בסרטון">
-      <span id="edTime" class="mono">0.00</span>
-    </div>
-    <p class="foot">גרור על התמונה כדי לסמן איפה הבחירה תופיע. המסגרת הזהובה היא האזור שנבחר.</p>
+    <p class="foot">גרור על התמונה כדי לסמן איפה הבחירה תופיע. פינה צהובה משנה גודל.</p>
 
-    <div class="group-title">1. פרטי הסרטון</div>
+    <div class="group-title" id="edG1">1. פרטי הסרטון</div>
     <div class="group">
       <label class="row"><span>שם (לניהול בלבד)</span><input id="edName" data-i="name"></label>
       <label class="row"><span>תאריך הצילום בגלריה</span><input id="edShot" type="datetime-local"></label>
-      <label class="row"><span>סרטון טריק (עם חשיפה)</span><input id="edTrick" type="checkbox" class="switch"></label>
+      <label class="row"><span id="edTrickLbl">סרטון טריק (עם חשיפה)</span><input id="edTrick" type="checkbox" class="switch"></label>
       <label class="row"><span>פריט ההכרחה במצגת</span><input id="edForce" type="checkbox" class="switch"></label>
     </div>
 
@@ -397,6 +400,12 @@
     </div>
   </main>
 </section>
+
+<div class="ed-bar" id="edBar" hidden>
+  <span id="edStatus" class="ed-status">כל השינויים נשמרים</span>
+  <button id="edTry" class="ed-btn" type="button">נסה ▶</button>
+  <button id="edSave" class="ed-btn primary" type="button">שמור</button>
+</div>
 
 <!-- ===================== הגדרות ===================== -->
 <section id="settings" class="screen ui">

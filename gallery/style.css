@@ -473,3 +473,24 @@ html, body { overscroll-behavior: none; }         /* בלי "משיכה לרענ
 .pe-tabs .on { color: #fff; }
 
 #perform:has(#ph.editing) { background: #000; }
+
+/* ===================== עורך: תצוגה צמודה + סרגל שמירה ===================== */
+.ed-page { padding-bottom: calc(env(safe-area-inset-bottom) + 96px); }
+.ed-stage { position: sticky; top: var(--navh, 52px); z-index: 4; align-self: start; display: grid; gap: 4px;
+  background: var(--bg); padding: 6px 0 4px; margin: 0 -4px; box-shadow: 0 6px 10px -8px rgba(0,0,0,.35); }
+.ed-stage .preview { border-radius: 10px; }
+.ed-bar { position: fixed; z-index: 15; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 10px;
+  padding: 10px max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 10px) max(16px, env(safe-area-inset-left));
+  background: color-mix(in srgb, var(--card) 92%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  border-top: .5px solid var(--sep); }
+.ed-status { flex: 1; min-width: 0; font-size: 13px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ed-status.dirty { color: #ff9f0a; }
+.ed-status.saved { color: #34c759; }
+.ed-btn { border: 0; border-radius: 12px; padding: 12px 18px; font-size: 16px; font-weight: 600; background: var(--fill); color: var(--accent); cursor: pointer; white-space: nowrap; }
+.ed-btn.primary { background: var(--accent); color: #fff; min-width: 96px; }
+.ed-btn:active { filter: brightness(.9); }
+/* מחוונים קלים לתפיסה באצבע */
+#edit input[type=range] { height: 34px; }
+#edit .row { min-height: 52px; }
+
+body:has(#edBar:not([hidden])) #toast { bottom: calc(env(safe-area-inset-bottom) + 96px); }
