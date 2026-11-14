@@ -88,7 +88,7 @@ class LedAvatar:
         for gt, d in self.glances:
             if gt <= t < gt + 0.9:
                 gx = d
-        for ex in (-3.6, 2.0):
+        for ex in (-4.5, 1.5):
             for i in range(4):
                 for j in range(3):
                     if open_rows == 1 and j != 1:
@@ -101,8 +101,8 @@ class LedAvatar:
         for k in range(9):
             h = 1 + int(round(bands[k] * prof[k] * 4))   # 1..5 dots, symmetric around the mouth line
             x = cx + (k - 4) * pitch
-            for j in range(-(h // 2), h - h // 2):
-                dots.append((x, cy + (3.5 + j) * pitch, 0.85 + 0.15 * (h > 1)))
+            for j in range(h):
+                dots.append((x, cy + (2.6 + j * 0.85) * pitch, 0.85 + 0.15 * (h > 1)))
         for x, y, a in dots:
             cv2.circle(lay, (int(x), int(y)), int(r), (a, a, a), -1, cv2.LINE_AA)
         core = lay * self.col
