@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הוואטסאפ שלי נעול</title>
+<meta name="description" content="תוך 30 דקות, הוואטסאפ וכל החשבונות שלכם נעולים. מדריך פשוט, צעד אחרי צעד, באייפון ובאנדרואיד.">
+<style>
+@font-face { font-family: Heebo; src: url("Heebo-400.ttf"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-700.ttf"); font-weight: 700; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-800.ttf"); font-weight: 800; font-display: swap; }
+:root { --navy: #0b1620; --teal: #19b3c4; --teal-soft: #e3f6f8; --red: #c8102e; --ink: #14181f; --muted: #5b6472; --line: #e3e7ec; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Heebo, sans-serif; color: var(--ink); background: #fff; font-size: 19px; line-height: 1.6; }
+.wrap { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+section { padding: 44px 0; }
+h1 { font-size: 38px; line-height: 1.15; font-weight: 800; }
+h2 { font-size: 29px; line-height: 1.2; font-weight: 800; margin-bottom: 18px; }
+p { margin-bottom: 12px; }
+strong { font-weight: 700; }
+
+/* hero */
+.hero { background: var(--navy); color: #fff; padding: 0 0 44px; }
+.hero img { width: 100%; max-width: 680px; display: block; margin: 0 auto; aspect-ratio: 1; object-fit: cover; }
+.hero .wrap { margin-top: -90px; position: relative; }
+.hero .tag { display: inline-block; background: var(--red); color: #fff; font-weight: 700; font-size: 15px; padding: 5px 16px; border-radius: 40px; margin-bottom: 14px; }
+.hero p.sub { color: #cfeff3; font-size: 20px; margin: 14px 0 24px; }
+.cta { display: block; text-align: center; background: var(--red); color: #fff; text-decoration: none; font-weight: 800; font-size: 22px; padding: 18px 20px; border-radius: 16px; box-shadow: 0 8px 24px rgba(200,16,46,.35); }
+.cta small { display: block; font-weight: 400; font-size: 15px; opacity: .9; }
+
+/* problem */
+.story { background: #f4f6f8; border-radius: 18px; padding: 22px 24px; font-size: 20px; margin-bottom: 18px; }
+.stat { border-right: 5px solid var(--teal); padding-right: 14px; color: var(--muted); font-size: 17px; }
+
+/* list */
+ul.get { list-style: none; }
+ul.get li { padding: 12px 0 12px 0; border-bottom: 1px solid var(--line); display: flex; gap: 12px; }
+ul.get li::before { content: "✓"; color: var(--teal); font-weight: 800; font-size: 22px; line-height: 1.3; }
+.bonus { background: var(--teal-soft); border-radius: 18px; padding: 24px; }
+.bonus h2 { color: var(--navy); }
+ol.how { padding-right: 24px; }
+ol.how li { margin-bottom: 8px; }
+ol.how li::marker { font-weight: 800; color: var(--teal); }
+.guarantee { text-align: center; border: 2px dashed var(--teal); border-radius: 18px; padding: 24px; }
+.guarantee .big { font-size: 26px; font-weight: 800; }
+
+/* faq */
+details { border-bottom: 1px solid var(--line); padding: 14px 0; }
+summary { font-weight: 700; cursor: pointer; list-style: none; }
+summary::after { content: "+"; float: left; color: var(--teal); font-weight: 800; }
+details[open] summary::after { content: "−"; }
+details p { margin: 10px 0 0; color: var(--muted); }
+
+.final { background: var(--navy); color: #fff; text-align: center; }
+.final h2 { margin-bottom: 24px; }
+footer { padding: 26px 0 40px; font-size: 14px; color: var(--muted); text-align: center; }
+footer a { color: var(--muted); margin: 0 8px; }
+</style>
+</head>
+<body>
+
+<!-- 1. hero -->
+<section class="hero">
+  <img src="hero.jpg" alt="ההאקר עם המסכה">
+  <div class="wrap">
+    <span class="tag">מדריך הגנה</span>
+    <h1>תוך 30 דקות, הוואטסאפ וכל החשבונות שלכם נעולים.</h1>
+    <p class="sub">מדריך פשוט, צעד אחרי צעד, באייפון ובאנדרואיד. לא צריך להבין בטכנולוגיה.</p>
+    <a class="cta" href="#checkout">אני רוצה לנעול את הוואטסאפ<small>97 ₪, תשלום אחד</small></a>
+  </div>
+</section>
+
+<!-- 2. problem -->
+<section><div class="wrap">
+  <div class="story">
+    <p>בשלוש בלילה, כשאתם ישנים, מישהו מתקין וואטסאפ עם המספר שלכם.</p>
+    <p style="margin:0">בבוקר אתם מתעוררים בלי וואטסאפ, וכל אנשי הקשר שלכם כבר קיבלו הודעה: <strong>"אני תקוע, תעביר לי 800 ש"ח בביט."</strong></p>
+  </div>
+  <p class="stat">לפי סקר של מערך הסייבר הלאומי, <strong>1 מכל 10 ישראלים</strong> חווה פריצה לחשבון ברשתות החברתיות בשנה האחרונה.</p>
+</div></section>
+
+<!-- 3. what you get -->
+<section style="padding-top:0"><div class="wrap">
+  <h2>מה מקבלים</h2>
+  <ul class="get">
+    <li><span><strong>וואטסאפ:</strong> 5 הגדרות שסוגרות את הדלת, גם אם מישהו השיג את הקוד.</span></li>
+    <li><span><strong>4 העוקצים</strong> שגונבים וואטסאפ בישראל, ואיך מזהים אותם.</span></li>
+    <li><span><strong>ג'ימייל, אינסטגרם ופייסבוק:</strong> נעולים.</span></li>
+    <li><span><strong>הטלפון והתא הקולי:</strong> סגורים.</span></li>
+    <li><span><strong>נפרצתי, מה עושים:</strong> צעד אחרי צעד.</span></li>
+    <li><span><strong>רשימת 30 הדקות:</strong> מסמנים וסוגרים.</span></li>
+  </ul>
+</div></section>
+
+<!-- 4. bonus -->
+<section style="padding-top:0"><div class="wrap">
+  <div class="bonus">
+    <h2>🎁 בונוס: אמא לא נופלת בעוקץ</h2>
+    <p style="margin:0">מדריך להורים שלכם, באותיות גדולות. 6 העוקצים הנפוצים אצל מבוגרים, מילת קוד משפחתית, וכרטיס להדפסה ליד הטלפון.</p>
+  </div>
+</div></section>
+
+<!-- 5. who -->
+<section style="padding-top:0"><div class="wrap">
+  <h2>למי זה מתאים</h2>
+  <p>אם אתם יודעים לשלוח הודעה בוואטסאפ, אתם יכולים לעשות את זה. כל הגדרה מוסברת בתמונה עם חץ אדום ובסרטון של דקה.</p>
+</div></section>
+
+<!-- 6. how -->
+<section style="padding-top:0"><div class="wrap">
+  <h2>איך זה עובד</h2>
+  <ol class="how">
+    <li>משלמים.</li>
+    <li>מקבלים את המדריך והסרטונים בהודעת וואטסאפ.</li>
+    <li>30 דקות עם הטלפון ביד, וזהו.</li>
+  </ol>
+</div></section>
+
+<!-- 7. guarantee -->
+<section style="padding-top:0"><div class="wrap">
+  <div class="guarantee">
+    <div class="big">לא מרוצים? כסף בחזרה.</div>
+    <p style="margin:6px 0 0">תוך 14 יום, בלי שאלות.</p>
+  </div>
+</div></section>
+
+<!-- 8. faq -->
+<section style="padding-top:0"><div class="wrap">
+  <h2>שאלות נפוצות</h2>
+  <details><summary>זה מתאים לאייפון וגם לאנדרואיד?</summary><p>כן, לכל אחד יש הסבר משלו.</p></details>
+  <details><summary>כמה זמן זה לוקח?</summary><p>כ-30 דקות.</p></details>
+  <details><summary>אני לא מבין בטכנולוגיה. אני אצליח?</summary><p>כן. כל צעד מוסבר בתמונה ובסרטון.</p></details>
+  <details><summary>כבר פרצו לי. זה יעזור?</summary><p>כן. יש פרק שלם על איך מחזירים את החשבון.</p></details>
+  <details><summary>איך מקבלים את המדריך?</summary><p>בהודעת וואטסאפ, מיד אחרי התשלום.</p></details>
+</div></section>
+
+<!-- 9. final -->
+<section class="final"><div class="wrap">
+  <h2>תנעלו את הוואטסאפ לפני שמישהו אחר ינסה.</h2>
+  <a class="cta" id="checkout" href="#checkout">אני רוצה לנעול את הוואטסאפ<small>97 ₪, תשלום אחד</small></a>
+</div></section>
+
+<footer class="wrap">
+  <a href="#">תקנון</a> · <a href="#">מדיניות פרטיות</a>
+  <p style="margin-top:10px">פרטי העוסק יופיעו כאן</p>
+</footer>
+
+</body>
+</html>
