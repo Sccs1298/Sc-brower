@@ -81,9 +81,17 @@ th { display: none; }
 td { padding: 2.5mm 2mm; border-bottom: 1px solid #c6e4e8; vertical-align: middle; }
 td.box { width: 12mm; text-align: center; font-size: 20pt; line-height: 1; color: var(--navy); }
 
+body.big .chapter { break-before: auto; margin-top: 10mm; }
+
+/* the opening (before the first chapter heading) is set a little tighter so it stays on one page */
+.lead { font-size: .93em; }
+.lead .card { padding-top: 3mm; margin-bottom: 4mm; }
+
 /* printable card */
 .cut { break-before: page; border: 2.5px dashed var(--muted); border-radius: 5mm; padding: 10mm; margin-top: 10mm; font-size: 22pt; }
 .cut .scissors { font-size: 14pt; color: var(--muted); margin-bottom: 4mm; }
+.cut blockquote { max-width: none; background: none; padding: 0; font-size: 1em; }
+.cut blockquote p { margin-bottom: 4mm; }
 
 /* footer */
 .foot { position: running(foot); }

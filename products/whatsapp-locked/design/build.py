@@ -60,7 +60,7 @@ def md_to_html(text):
     h = re.sub(r"<td>☐</td>", '<td class="box">☐</td>', h)
     # every h2 (a new chapter inside the same file) starts a new page
     chunks = re.split(r"(?=<h2>)", h)
-    return "".join((('<div class="chapter">' if i else '<div>') + cards(c) + "</div>") for i, c in enumerate(chunks) if c.strip())
+    return "".join((('<div class="chapter">' if i else '<div class="lead">') + cards(c) + "</div>") for i, c in enumerate(chunks) if c.strip())
 
 
 def cards(h):
@@ -123,7 +123,7 @@ def main(mode):
         body_html = md_to_html(card_split[0])
         if len(card_split) > 1:
             body_html += ('<div class="cut"><div class="scissors">✂️ גזרו לאורך הקו</div>'
-                          + md_to_html("## " + card_split[1].split("\n", 1)[1]) + "</div>")
+                          + md_to_html(re.sub(r"^> (.+)$", r"> \1\n>", card_split[1].split("\n", 1)[1], flags=re.M)) + "</div>")
         bonus = cover("אמא לא נופלת בעוקץ", "בונוס", "המדריך להורים: 6 העוקצים, מילת הקוד, וכרטיס ליד הטלפון",
                       bonus=True)
         render(page(bonus + body_html, big=True), "bonus-parents")
