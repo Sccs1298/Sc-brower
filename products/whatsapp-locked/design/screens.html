@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Heebo; src: url("fonts/Heebo-400.ttf"); font-weight: 400; }
+@font-face { font-family: Heebo; src: url("fonts/Heebo-500.ttf"); font-weight: 500; }
+@font-face { font-family: Heebo; src: url("fonts/Heebo-700.ttf"); font-weight: 700; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { width: 390px; height: 700px; font-family: Heebo, sans-serif; background: transparent; }
+.phone { width: 390px; height: 700px; border-radius: 46px; background: #111; padding: 12px; }
+.scr { width: 100%; height: 100%; border-radius: 36px; overflow: hidden; position: relative; background: var(--bg); }
+.ios { --bg: #f2f2f7; --row: #fff; --sep: #e5e5ea; --txt: #111; --sub: #8a8a8e; }
+.and { --bg: #fff; --row: #fff; --sep: #eceff1; --txt: #1b1b1b; --sub: #6f7479; }
+.status { height: 38px; display: flex; justify-content: space-between; align-items: center; padding: 0 26px; font-size: 13px; font-weight: 700; color: #111; direction: ltr; }
+.hdr { padding: 6px 18px 12px; display: flex; align-items: center; gap: 10px; }
+.ios .hdr { justify-content: center; position: relative; font-size: 17px; font-weight: 700; }
+.ios .hdr .back { position: absolute; right: 14px; color: var(--accent); font-size: 26px; font-weight: 400; }
+.and .hdr { font-size: 21px; font-weight: 500; background: var(--accent-bar, #fff); }
+.and .hdr .back { font-size: 24px; }
+.crumb { margin: 2px 18px 10px; font-size: 12px; color: var(--sub); }
+.hero { text-align: center; padding: 10px 26px 14px; }
+.hero .ic { width: 74px; height: 74px; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 34px; background: var(--accent-soft); }
+.hero p { font-size: 14px; color: var(--sub); line-height: 1.5; }
+.group { background: var(--row); margin: 0 14px 14px; border-radius: 12px; overflow: hidden; }
+.and .group { margin: 0; border-radius: 0; border-bottom: 8px solid #f4f6f7; }
+.row { display: flex; align-items: center; justify-content: space-between; min-height: 50px; padding: 10px 16px; border-bottom: 1px solid var(--sep); font-size: 16px; color: var(--txt); position: relative; }
+.row:last-child { border-bottom: 0; }
+.row .s { display: block; font-size: 12.5px; color: var(--sub); }
+.row .chev { color: #c4c4c7; font-size: 20px; }
+.radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #b8b8bd; }
+.radio.on { border: 6px solid var(--accent); }
+.tg { width: 46px; height: 28px; border-radius: 16px; background: #d1d1d6; position: relative; }
+.tg::after { content: ""; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.tg.on { background: var(--accent); }
+.tg.on::after { right: auto; left: 3px; }
+.btn { margin: 16px 22px; height: 46px; border-radius: 24px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; position: relative; }
+.hl { outline: 4px solid #e11d2a; outline-offset: 2px; border-radius: 12px; z-index: 2; }
+.arrow { position: absolute; z-index: 3; width: 74px; height: 74px; }
+</style></head>
+<body>
+<div class="phone"><div class="scr" id="scr"></div></div>
+<script>
+// SPEC is injected: {os:'ios'|'and', accent, accentSoft, title, crumb, hero:{icon,text}, groups:[[{t,s,toggle,on,radio,chev,hl}]], button:{t,hl}}
+const S = __SPEC__;
+const scr = document.getElementById('scr');
+scr.className = 'scr ' + S.os;
+scr.style.setProperty('--accent', S.accent);
+scr.style.setProperty('--accent-soft', S.accentSoft || '#e7f6ee');
+let h = `<div class="status"><span>9:41</span><span>▮▮▮ 5G ▬</span></div>`;
+h += `<div class="hdr"><span class="back">${S.os === 'ios' ? '‹' : '→'}</span><span>${S.title}</span></div>`;
+if (S.crumb) h += `<div class="crumb">${S.crumb}</div>`;
+if (S.hero) h += `<div class="hero"><div class="ic">${S.hero.icon}</div><p>${S.hero.text}</p></div>`;
+for (const g of (S.groups || [])) {
+  h += '<div class="group">';
+  for (const r of g) {
+    let right = '';
+    if (r.toggle) right = `<span class="tg ${r.on ? 'on' : ''}"></span>`;
+    else if (r.radio) right = `<span class="radio ${r.on ? 'on' : ''}"></span>`;
+    else if (r.chev !== false) right = `<span class="chev">‹</span>`;
+    h += `<div class="row ${r.hl ? 'hl' : ''}"><span>${r.t}${r.s ? `<span class="s">${r.s}</span>` : ''}</span>${right}</div>`;
+  }
+  h += '</div>';
+}
+if (S.button) h += `<div class="btn ${S.button.hl ? 'hl' : ''}">${S.button.t}</div>`;
+scr.innerHTML = h;
+// red arrow pointing at the highlighted element (from the left side)
+const t = scr.querySelector('.hl');
+if (t) {
+  const r = t.getBoundingClientRect(), s = scr.getBoundingClientRect();
+  const a = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  a.setAttribute('viewBox', '0 0 100 100'); a.setAttribute('class', 'arrow');
+  a.innerHTML = '<path d="M8 50 H70" stroke="#e11d2a" stroke-width="12" stroke-linecap="round"/><path d="M52 24 L84 50 L52 76" fill="none" stroke="#e11d2a" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>';
+  const left = Math.max(r.left - s.left - 70, -6);
+  a.style.left = left + 'px'; a.style.top = (r.top - s.top + r.height / 2 - 37) + 'px';
+  if (r.left - s.left < 60) { a.style.left = (r.left - s.left + 6) + 'px'; a.style.top = (r.bottom - s.top + 4) + 'px'; a.style.transform = 'rotate(-90deg)'; }
+  scr.appendChild(a);
+}
+</script></body></html>
