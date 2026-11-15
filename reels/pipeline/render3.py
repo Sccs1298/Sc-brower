@@ -360,6 +360,14 @@ inp = ["-i", sys.argv[2] + ".wav"]
 flt = ["[0]highpass=f=80,acompressor=threshold=-20dB:ratio=3:attack=4:release=60,equalizer=f=3500:t=q:w=1:g=2[v]"]
 lab = ["[v]"]
 k = 1
+if sfx.get("music"):  # background bed, looped, faded, ducked under the voice
+    inp += ["-stream_loop", "-1", "-i", sfx["music"]]
+    mv = A.get("music_volume", 0.2)
+    flt[0] = flt[0][:-3] + "[v0];[v0]asplit[v][key]"
+    flt.append(f"[{k}]atrim=0:{dur:.2f},volume={mv},afade=t=in:d=0.6,afade=t=out:st={max(dur - 1.8, 0):.2f}:d=1.8[m0];"
+               "[m0][key]sidechaincompress=threshold=0.04:ratio=4:attack=30:release=450:makeup=1[m]")
+    lab.append("[m]")
+    k += 1
 prev = "head"
 for st, en, sh, li, _ in plan[1:]:
     if sh["type"] != prev:

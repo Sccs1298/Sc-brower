@@ -23,7 +23,7 @@ ELEVEN_VOICES = {"itamar": "l7Q9rbdCC6j3J5dNlOOg", "nimrod": "ZiofZHcEBTn5sRySe5
 ASSETS = {
     "font": os.path.join(AS, "Heebo-800.ttf"),
     "plate": os.path.join(AS, "r_22.png"),
-    "sfx": {"whoosh": os.path.join(AS, "whoosh.mp3")},
+    "sfx": {"whoosh": os.path.join(AS, "whoosh.mp3"), "music": os.path.join(AS, "music.mp3")},
     "flag": {"quad": [[640, 230], [1110, 170], [1110, 760], [640, 720]], "brightness": 0.46},
     "avatar": {"img": os.path.join(AS, "h7_clean.png"), "mask": os.path.join(AS, "h7_mask.png"),
                "face_xy": [295, 322], "face_w": 190},
