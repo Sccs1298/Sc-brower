@@ -71,10 +71,24 @@ def main(vid, preview=False, voice_id=None):
         if sc in spans and V["lines"][i - 1].get("scene") == sc:
             spans[sc][1] = en
         else:
-            spans[sc] = [st, en]
+            spans[sc] = [st, en, i]
+
+    def at(v, st, i0):
+        """timing "@k+x" = x seconds after the k-th line of this scene starts (relative to the scene)"""
+        if isinstance(v, str) and v.startswith("@"):
+            k, _, x = v[1:].partition("+")
+            return round(LT[i0 + int(k)]["start"] - st + float(x or 0), 2)
+        return v
+
     specs, plan = {}, []
-    for name, (st, en) in spans.items():
-        s = dict(V["scenes"][name])
+    for name, (st, en, i0) in spans.items():
+        s = json.loads(json.dumps(V["scenes"][name]))
+        if "flag_at" in s:
+            s["flag_at"] = at(s["flag_at"], st, i0)
+        for item in s.get("msgs", []) + s.get("notes", []):
+            item["at"] = at(item["at"], st, i0)
+        if s.get("img_asset"):
+            s["img"] = "file://" + os.path.join(AS, s.pop("img_asset"))
         d = en - st
         if s["kind"] == "shot":
             p = os.path.join(SHOTS, s["shot"] + ".png")
@@ -83,6 +97,8 @@ def main(vid, preview=False, voice_id=None):
             s.setdefault("zs", round(min(0.9, d * 0.28), 2))
             s.setdefault("ze", round(s["zs"] + min(0.8, d * 0.3), 2))
             cap = min(d + 0.2, 4.0)
+        elif s["kind"] == "card":
+            cap = min(d + 0.2, 3.0)
         else:
             cap = d + 0.2
         specs[name] = s

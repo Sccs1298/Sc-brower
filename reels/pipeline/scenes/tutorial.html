@@ -38,6 +38,18 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #070d1
 .note { position: absolute; left: 34px; right: 34px; background: rgba(60,66,74,.75); border-radius: 34px; padding: 26px 30px; display: flex; gap: 24px; align-items: center; }
 .note .ic { width: 84px; height: 84px; border-radius: 20px; flex: none; display: flex; align-items: center; justify-content: center; font: 800 46px Heebo; }
 .note .t1 { font: 800 32px Heebo; } .note .t2 { font: 400 32px/1.35 Heebo; color: #e3e8ec; }
+/* ---------- card scenes (price / offer) ---------- */
+.card { position: absolute; left: 90px; right: 90px; top: 170px; height: 1060px; border-radius: 60px; overflow: hidden;
+  background: linear-gradient(160deg, #10202e, #070d14); border: 4px solid rgba(25,179,196,.55);
+  box-shadow: 0 40px 120px rgba(0,0,0,.85), 0 0 90px rgba(25,179,196,.22);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px; gap: 34px; }
+.card .kk { font: 800 40px Heebo; color: #19b3c4; letter-spacing: 1px; }
+.card .tt { font: 800 150px/1.05 Heebo; }
+.card .tt.sm { font-size: 78px; line-height: 1.25; }
+.card .ss { font: 800 50px/1.3 Heebo; color: #dfe9ef; }
+.card .bd { background: #ff1f3d; color: #fff; font: 800 46px Heebo; padding: 16px 44px; border-radius: 60px; box-shadow: 0 16px 50px rgba(255,31,61,.45); }
+.card img { max-height: 640px; max-width: 640px; border-radius: 26px; box-shadow: 0 30px 80px rgba(0,0,0,.7); }
+.card > * { opacity: 0; }
 </style></head><body>
 <div id="root"></div>
 <script>
@@ -66,6 +78,14 @@ for (const [name, s] of Object.entries(SP)) {
     s.notes.forEach((n, i) => h += `<div class="note" style="top:${560 + i * 190}px"><div class="ic" style="background:${n.c}">${n.i}</div><div><div class="t1">${n.a}</div><div class="t2">${n.b}</div></div></div>`);
     h += '</div>';
     if (s.flag) h += `<div class="flag">${s.flag}</div>`;
+  } else if (s.kind === 'card') {
+    h += '<div class="card">';
+    if (s.kicker) h += `<div class="kk">${s.kicker}</div>`;
+    if (s.img) h += `<img src="${s.img}">`;
+    if (s.title) h += `<div class="tt${s.small ? ' sm' : ''}">${s.title}</div>`;
+    if (s.sub) h += `<div class="ss">${s.sub}</div>`;
+    if (s.badge) h += `<div class="bd">${s.badge}</div>`;
+    h += '</div>';
   }
   d.innerHTML = h; root.appendChild(d); els[name] = d;
 }
@@ -110,6 +130,10 @@ function setT(name, t, dur) {
     d.querySelectorAll('.note').forEach((n, i) => { const u = ease((t - s.notes[i].at) / 0.25); n.style.opacity = u; n.style.transform = `translateY(${(1 - u) * -40}px)`; });
     const fl = d.querySelector('.flag');
     if (fl) { const u = ease((t - s.flag_at) / 0.25); fl.style.opacity = u; }
+  } else if (s.kind === 'card') {
+    const c = d.querySelector('.card'), u = ease(t / 0.35);
+    c.style.opacity = u; c.style.transform = `translateY(${(1 - u) * 120}px) scale(${0.94 + 0.06 * u})`;
+    [...c.children].forEach((e, i) => { const v = ease((t - 0.2 - i * 0.18) / 0.25); e.style.opacity = v; e.style.transform = `translateY(${(1 - v) * 40}px)`; });
   }
 }
 </script></body></html>
