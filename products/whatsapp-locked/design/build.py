@@ -23,7 +23,15 @@ CHAPTERS = ["00-intro.md", "01-whatsapp.md", "03-gmail.md", "04-instagram-facebo
             "06-passwords.md", "07-hacked.md", "08-checklist.md"]
 
 
+def find_shot(i):
+    return next((os.path.join(HERE, "shots", i + ext) for ext in (".png", ".jpg", ".jpeg")
+                 if os.path.exists(os.path.join(HERE, "shots", i + ext))), None)
+
+
 def shot_html(ids):
+    # once any screenshot of the pair exists (e.g. iPhone only), show just the real ones
+    if any(find_shot(i) for i in ids):
+        ids = [i for i in ids if find_shot(i)]
     cells = []
     for i in ids:
         img = next((os.path.join(HERE, "shots", i + ext) for ext in (".png", ".jpg", ".jpeg")
