@@ -18,6 +18,7 @@ SHOTS = os.path.join(HERE, "..", "design", "shots")
 AS = os.path.join(HERE, "assets")
 OUT = os.path.join(REPO, "out", "videos")
 WORK = os.path.join(REPO, "out", "videos", "work")
+ELEVEN_VOICES = {"itamar": "l7Q9rbdCC6j3J5dNlOOg", "nimrod": "ZiofZHcEBTn5sRySe5h8", "herzl": "6Ijsl5024dyMrE00loVE"}
 
 ASSETS = {
     "font": os.path.join(AS, "Heebo-800.ttf"),
@@ -34,7 +35,7 @@ def run(*a, **k):
     subprocess.run(*a, check=True, **k)
 
 
-def main(vid, preview=False):
+def main(vid, preview=False, voice_id=None):
     allv = json.load(open(os.path.join(HERE, "videos.json"), encoding="utf-8"))
     V = allv[vid]
     wd = os.path.join(WORK, vid)
@@ -50,11 +51,13 @@ def main(vid, preview=False):
         prev = sc
     reel = {"voice": "he-IL-AvriNeural", "lines": lines, "assets": ASSETS,
             "caption_merge": V.get("caption_merge", []), "caption_replace": V.get("caption_replace", {})}
+    if voice_id:
+        reel["eleven_voice"] = voice_id
     rj = os.path.join(wd, "reel.json")
     json.dump(reel, open(rj, "w"), ensure_ascii=False, indent=1)
     vp = os.path.join(wd, "voice")
     if not os.path.exists(vp + ".words.json") or os.path.getmtime(vp + ".words.json") < os.path.getmtime(rj) - 5:
-        run(["python3", os.path.join(PIPE, "tts_free.py"), rj, vp])
+        run(["python3", os.path.join(PIPE, "tts_eleven.py" if voice_id else "tts_free.py"), rj, vp])
     voice = json.load(open(vp + ".words.json"))
     LT = voice["lines"]
     # 2. scene spans (a scene continues over consecutive lines)
@@ -104,4 +107,6 @@ def main(vid, preview=False):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], "--preview" in sys.argv)
+    # --voice itamar|nimrod|herzl  -> ElevenLabs voice; default is the free Edge voice
+    vname = sys.argv[sys.argv.index("--voice") + 1] if "--voice" in sys.argv else None
+    main(sys.argv[1], "--preview" in sys.argv, ELEVEN_VOICES[vname] if vname else None)
