@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Heebo; src: url("HEEBO_URL"); font-weight: 800; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #070d14; font-family: Heebo, sans-serif; color: #fff; }
+.scene { position: absolute; inset: 0; display: none; overflow: hidden; }
+.bg { position: absolute; inset: 0; background:
+  radial-gradient(900px 700px at 50% 30%, rgba(25,179,196,.22), transparent 70%),
+  radial-gradient(700px 900px at 0% 90%, rgba(200,16,46,.25), transparent 70%), #070d14; }
+.grid { position: absolute; inset: 0; opacity: .08;
+  background-image: linear-gradient(#19b3c4 1px, transparent 1px), linear-gradient(90deg, #19b3c4 1px, transparent 1px);
+  background-size: 60px 60px; }
+/* ---------- screenshot scenes ---------- */
+.cam { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+.phone { position: absolute; border-radius: 58px; background: #0b0b0d; padding: 14px;
+  box-shadow: 0 40px 120px rgba(0,0,0,.85), 0 0 0 2px #2b2f36, 0 0 80px rgba(25,179,196,.25); }
+.phone img { display: block; border-radius: 46px; }
+.frame { position: absolute; border: 9px solid #ff1f3d; border-radius: 22px; box-shadow: 0 0 30px rgba(255,31,61,.7); }
+.arrow { position: absolute; width: 130px; height: 150px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 16px rgba(255,31,61,.6)); }
+.step { position: absolute; top: 70px; right: 60px; background: #ff1f3d; color: #fff; font: 800 44px Heebo; padding: 8px 30px; border-radius: 50px; }
+/* ---------- chat scenes ---------- */
+.chat { position: absolute; left: 90px; top: 120px; width: 900px; height: 1300px; border-radius: 70px; overflow: hidden;
+  background: #0b141a; border: 10px solid #1f2328; box-shadow: 0 40px 120px rgba(0,0,0,.85); }
+.chat .hd { height: 200px; background: #1f2c34; display: flex; align-items: center; gap: 26px; padding: 70px 40px 0; }
+.chat .av { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg,#4c8bf5,#19b3c4); display: flex; align-items: center; justify-content: center; font: 800 48px Heebo; }
+.chat .nm { font: 800 40px Heebo; } .chat .sub { font: 400 28px Heebo; color: #9fb0ba; direction: ltr; text-align: right; }
+.chat .th { padding: 40px 34px; display: flex; flex-direction: column; gap: 22px; }
+.bub { align-self: flex-start; max-width: 700px; background: #1f2c34; border-radius: 30px 30px 30px 6px; padding: 24px 32px; font: 400 40px/1.4 Heebo; transform-origin: right bottom; }
+.bub b { color: #fff; background: rgba(255,31,61,.0); border-radius: 10px; padding: 0 6px; transition: none; }
+.bub .tm { display: block; text-align: left; font-size: 24px; color: #8696a0; margin-top: 6px; }
+.flag { position: absolute; left: 90px; right: 90px; bottom: 470px; background: #ff1f3d; border-radius: 28px; padding: 26px 34px; font: 800 46px Heebo; text-align: center; box-shadow: 0 20px 60px rgba(255,31,61,.45); }
+/* ---------- lock screen ---------- */
+.lock { position: absolute; left: 90px; top: 120px; width: 900px; height: 1300px; border-radius: 70px; overflow: hidden;
+  background: linear-gradient(#0d1b2a, #050a10); border: 10px solid #1f2328; }
+.lock .clk { text-align: center; font: 800 210px Heebo; margin-top: 150px; direction: ltr; letter-spacing: -4px; }
+.lock .dt { text-align: center; font: 400 40px Heebo; color: #c7d3dd; }
+.note { position: absolute; left: 34px; right: 34px; background: rgba(60,66,74,.75); border-radius: 34px; padding: 26px 30px; display: flex; gap: 24px; align-items: center; }
+.note .ic { width: 84px; height: 84px; border-radius: 20px; flex: none; display: flex; align-items: center; justify-content: center; font: 800 46px Heebo; }
+.note .t1 { font: 800 32px Heebo; } .note .t2 { font: 400 32px/1.35 Heebo; color: #e3e8ec; }
+</style></head><body>
+<div id="root"></div>
+<script>
+const SP = SPECS_JSON;
+const root = document.getElementById('root');
+const ARROW = '<svg viewBox="0 0 100 115"><path d="M50 108 L8 58 H32 V6 H68 V58 H92 Z" fill="#ff1f3d" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg>';
+const ease = u => { u = Math.min(Math.max(u, 0), 1); return u * u * (3 - 2 * u); };
+const els = {};
+for (const [name, s] of Object.entries(SP)) {
+  const d = document.createElement('div'); d.className = 'scene'; d.id = 'sc_' + name;
+  let h = '<div class="bg"></div><div class="grid"></div>';
+  if (s.kind === 'shot') {
+    const PH = 1240, sc = PH / s.h, PW = s.w * sc, L = (1080 - PW) / 2 - 14, T = 150;
+    s._g = { sc, L: L + 14, T: T + 14, PW, PH };
+    h += `<div class="cam"><div class="phone" style="left:${L}px;top:${T}px"><img src="${s.img}" style="width:${PW}px;height:${PH}px"></div>`;
+    if (s.mark) h += '<div class="frame"></div>';
+    h += `</div><div class="arrow">${ARROW}</div>`;
+    if (s.step) h += `<div class="step">${s.step}</div>`;
+  } else if (s.kind === 'chat') {
+    h += `<div class="chat"><div class="hd"><div class="av">${s.av || ''}</div><div><div class="nm">${s.name}</div><div class="sub">${s.sub || ''}</div></div></div><div class="th">`;
+    s.msgs.forEach((m, i) => h += `<div class="bub" id="b_${name}_${i}">${m.t}<span class="tm">${m.tm || '21:47'}</span></div>`);
+    h += '</div></div>';
+    if (s.flag) h += `<div class="flag">${s.flag}</div>`;
+  } else if (s.kind === 'lock') {
+    h += `<div class="lock"><div class="clk">${s.clock}</div><div class="dt">${s.date}</div>`;
+    s.notes.forEach((n, i) => h += `<div class="note" style="top:${560 + i * 190}px"><div class="ic" style="background:${n.c}">${n.i}</div><div><div class="t1">${n.a}</div><div class="t2">${n.b}</div></div></div>`);
+    h += '</div>';
+    if (s.flag) h += `<div class="flag">${s.flag}</div>`;
+  }
+  d.innerHTML = h; root.appendChild(d); els[name] = d;
+}
+function setT(name, t, dur) {
+  for (const k in els) els[k].style.display = k === name ? 'block' : 'none';
+  const s = SP[name], d = els[name];
+  if (s.kind === 'shot') {
+    const g = s._g, f = s.focus;
+    const fx0 = g.L + f[0] * g.sc, fy0 = g.T + f[1] * g.sc, fx1 = g.L + f[2] * g.sc, fy1 = g.T + f[3] * g.sc;
+    const fw = fx1 - fx0, fh = fy1 - fy0;
+    const zmax = Math.min(s.zmax || 1.9, 1000 / fw, 640 / fh);
+    const zs = s.zs ?? 0.9, ze = s.ze ?? 1.7;
+    const u = ease((t - zs) / (ze - zs));
+    const z = 1 + (zmax - 1) * u;
+    const tx = (540 - (fx0 + fw / 2) * zmax) * u, ty = (720 - (fy0 + fh / 2) * zmax) * u;
+    const intro = ease(t / 0.4);
+    const cam = d.querySelector('.cam');
+    cam.style.transform = `translate(${tx}px, ${ty + (1 - intro) * 260}px) scale(${z})`;
+    cam.style.opacity = intro;
+    const fr = d.querySelector('.frame');
+    const pad = 10;
+    if (fr) { Object.assign(fr.style, { left: fx0 - pad + 'px', top: fy0 - pad + 'px', width: fw + 2 * pad + 'px', height: fh + 2 * pad + 'px' });
+              fr.style.opacity = ease((t - 0.35) / 0.25); }
+    // arrow above the focus box (screen space), bouncing
+    const sx0 = fx0 * z + tx, sy0 = (fy0 * z + ty) + (1 - intro) * 260;
+    const ar = d.querySelector('.arrow');
+    const a = ease((t - 0.4) / 0.25);
+    const bob = 18 * Math.abs(Math.sin(t * 5));
+    ar.style.left = Math.max(sx0 + 30, 10) + 'px'; ar.style.top = (sy0 - 165 - bob) + 'px';
+    ar.style.opacity = a; ar.style.transform = `scale(${0.6 + 0.4 * a})`;
+  } else if (s.kind === 'chat') {
+    s.msgs.forEach((m, i) => {
+      const b = document.getElementById(`b_${name}_${i}`), u = ease((t - m.at) / 0.22);
+      b.style.display = t >= m.at ? 'block' : 'none';
+      b.style.transform = `scale(${0.85 + 0.15 * u})`; b.style.opacity = u;
+      const hb = b.querySelector('b');
+      if (hb) hb.style.background = (s.flag_at != null && t >= s.flag_at) ? 'rgba(255,31,61,.85)' : 'transparent';
+    });
+    const fl = d.querySelector('.flag');
+    if (fl) { const u = ease((t - s.flag_at) / 0.25); fl.style.opacity = u; fl.style.transform = `translateY(${(1 - u) * 60}px)`; }
+  } else if (s.kind === 'lock') {
+    d.querySelectorAll('.note').forEach((n, i) => { const u = ease((t - s.notes[i].at) / 0.25); n.style.opacity = u; n.style.transform = `translateY(${(1 - u) * -40}px)`; });
+    const fl = d.querySelector('.flag');
+    if (fl) { const u = ease((t - s.flag_at) / 0.25); fl.style.opacity = u; }
+  }
+}
+</script></body></html>

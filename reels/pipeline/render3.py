@@ -203,9 +203,10 @@ def mosaic(img, box, blocks):
     img[y0:y1, x0:x1] = cv2.resize(sm, (x1 - x0, y1 - y0), interpolation=cv2.INTER_NEAREST)
 
 
-clip = Clip(A["clip"])
 MOS = cfg.get("presenter", {}).get("mosaic", [1.3, 1.62])
-FB = np.nanmedian(clip.box, 0)  # typical face box in source px
+if A.get("clip"):  # real presenter clip (not needed with the LED avatar)
+    clip = Clip(A["clip"])
+    FB = np.nanmedian(clip.box, 0)  # typical face box in source px
 
 
 def presenter_rgba(t, face_w, blocks=7):

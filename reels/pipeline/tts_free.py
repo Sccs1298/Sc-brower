@@ -75,7 +75,14 @@ async def main():
     for i, ln in enumerate(cfg["lines"]):
         p = f"{out}_l{i:02d}.mp3"
         raw = p.replace(".mp3", "_raw.mp3")
-        ws = await synth(ln["say"], raw, ln.get("rate", rate), ln.get("pitch", pitch))
+        for attempt in range(5):  # the free service sometimes drops a request
+            try:
+                ws = await synth(ln["say"], raw, ln.get("rate", rate), ln.get("pitch", pitch))
+                break
+            except edge_tts.exceptions.NoAudioReceived:
+                if attempt == 4:
+                    raise
+                await asyncio.sleep(2 + attempt * 3)
         ws, d = squeeze(raw, p, ws, ln.get("max_gap", MAX_GAP))
         for w in ws:
             allw.append({"t": w["t"], "s": round(t + w["s"], 3), "e": round(t + w["e"], 3), "line": i})
