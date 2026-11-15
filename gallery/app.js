@@ -1006,7 +1006,7 @@ function syncEditorForm() {
   if (!ok.some(([k]) => k === it.method)) it.method = ok[0][0];
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
-  $('#edTapRow').hidden = !(it.method === 'grid' && it.kind !== 'photo');
+  $('#edTapRow').hidden = true;
   $('#edG1').textContent = it.kind === 'photo' ? '1. פרטי התמונה' : '1. פרטי הסרטון';
   $('#edTrickLbl').textContent = it.kind === 'photo' ? 'תמונת טריק (עם חשיפה)' : 'סרטון טריק (עם חשיפה)';
   $('#edTap').checked = it.tapPause !== false;
@@ -1688,7 +1688,7 @@ const toVideo = e => {
 };
 const isPlaying = () => !P.isPhoto && !!(P.src && P.started && !P.src.ended && !P.src.paused);
 /* שלב ההזנה: בסרטון – בזמן ניגון; בתמונה – אחרי שהסתירו את הכפתורים ועד שהחשיפה ננעלה */
-const inputPhase = () => P.isPhoto ? (P.hasTrick && P.started && !P.chrome && !P.frozen) : isPlaying();
+const inputPhase = () => P.isPhoto ? (P.hasTrick && P.started && !P.chrome && !P.frozen) : (isPlaying() || P.tapPaused);
 const drawMode = () => P.item && P.item.content === 'drawing' && P.regions.length;
 
 touch.addEventListener('pointerdown', e => {
@@ -1763,13 +1763,12 @@ function secretTap(e, stroke) {
     else if (!P.started) begin();
     return;
   }
-  if (P.frozen || !P.hasTrick) return;
   const it = P.item;
-  if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
-  if (it.method !== 'grid') return;
-  tapDigit(e);
-  // במצב "עצירה והמשך": כל נגיעה עוצרת את הסרטון, והבאה ממשיכה. נראה כמו צפייה רגילה.
-  if (it.tapPause !== false) { P.src.pause(); P.tapPaused = true; }
+  // ציור נסתר: נגיעה היא נקודה בציור, לא עצירה
+  if (it.content === 'drawing' && P.hasTrick && !P.frozen) { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
+  // בכל הסרטונים: נגיעה עוצרת, והנגיעה הבאה ממשיכה. במקשים הנסתרים כל נגיעה גם נקלטת כספרה.
+  if (!P.frozen && P.hasTrick && it.method === 'grid') tapDigit(e);
+  P.src.pause(); P.tapPaused = true;
 }
 function tapDigit(e) {
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
