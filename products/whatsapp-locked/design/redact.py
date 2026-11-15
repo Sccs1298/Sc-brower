@@ -1,8 +1,9 @@
 """Copy a user screenshot into design/shots/<id>.png, blurring personal details.
 
-Usage: python3 redact.py <src.png> <shot id> [x0,y0,x1,y1 ...] [--avatar]
+Usage: python3 redact.py <src.png> <shot id> [x0,y0,x1,y1 ...] [--avatar] [--mark x0,y0,x1,y1]
 Boxes are in the screenshot's own pixels. --avatar blurs the profile photo in the
 WhatsApp bottom tab bar ("את/ה"), which sits at the same place on every iPhone screen.
+--mark draws a red frame around the row the reader should tap.
 """
 import os
 import sys
@@ -22,13 +23,19 @@ def main():
     src, sid, *rest = sys.argv[1:]
     img = cv2.imread(src)
     h, w = img.shape[:2]
-    for r in rest:
-        if r == "--avatar":
+    marks = []
+    it = iter(rest)
+    for r in it:
+        if r == "--mark":
+            marks.append([int(v) for v in next(it).split(",")])
+        elif r == "--avatar":
             # profile photo in the tab bar, relative to a 1179x2556 screenshot
             sx, sy = w / 1179, h / 2556
             blur(img, int(130 * sx), int(2320 * sy), int(240 * sx), int(2430 * sy))
         else:
             blur(img, *[int(v) for v in r.split(",")])
+    for x0, y0, x1, y1 in marks:
+        cv2.rectangle(img, (x0, y0), (x1, y1), (42, 29, 225), max(8, w // 110), cv2.LINE_AA)
     os.makedirs(os.path.join(HERE, "shots"), exist_ok=True)
     out = os.path.join(HERE, "shots", sid + ".png")
     cv2.imwrite(out, img)
