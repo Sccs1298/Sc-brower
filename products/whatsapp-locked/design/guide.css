@@ -1,0 +1,89 @@
+@font-face { font-family: Heebo; src: url("fonts/Heebo-400.ttf"); font-weight: 400; }
+@font-face { font-family: Heebo; src: url("fonts/Heebo-500.ttf"); font-weight: 500; }
+@font-face { font-family: Heebo; src: url("fonts/Heebo-700.ttf"); font-weight: 700; }
+@font-face { font-family: Heebo; src: url("fonts/Heebo-800.ttf"); font-weight: 800; }
+
+:root {
+  --ink: #14181f;
+  --muted: #5b6472;
+  --navy: #0b1620;
+  --teal: #19b3c4;
+  --teal-soft: #e3f6f8;
+  --red: #c8102e;
+  --red-soft: #fdecee;
+  --amber-soft: #fff6dc;
+  --line: #d9dee5;
+  --body: 15pt;
+}
+@page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+@page cover { margin: 0; }
+
+* { box-sizing: border-box; }
+html { direction: rtl; }
+body { margin: 0; font-family: Heebo, "Noto Color Emoji", sans-serif; color: var(--ink); font-size: var(--body); line-height: 1.6; }
+body.big { --body: 18pt; }
+
+/* ---------- cover ---------- */
+.cover { page: cover; height: 297mm; width: 210mm; position: relative; background: var(--navy); color: #fff; overflow: hidden; break-after: page; }
+.cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; }
+.cover .shade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11,22,32,0) 35%, rgba(11,22,32,.85) 62%, #0b1620 80%); }
+.cover .txt { position: absolute; right: 16mm; left: 16mm; bottom: 26mm; }
+.cover .kicker { display: inline-block; background: var(--red); color: #fff; font-weight: 700; font-size: 13pt; padding: 3mm 6mm; border-radius: 30mm; }
+.cover h1 { font-size: 50pt; line-height: 1.05; font-weight: 800; margin: 6mm 0 4mm; }
+.cover .promise { font-size: 19pt; font-weight: 500; color: #cfeff3; max-width: 160mm; }
+.cover .by { margin-top: 10mm; font-size: 12pt; color: #8fa5b5; letter-spacing: .5px; }
+.cover.bonus .kicker { background: var(--teal); color: var(--navy); }
+
+/* ---------- chapters ---------- */
+.chapter { break-before: page; }
+
+h2 { font-size: 27pt; font-weight: 800; line-height: 1.2; margin: 0 0 6mm; padding-bottom: 4mm; border-bottom: 3px solid var(--teal); }
+h2 .num { display: inline-block; background: var(--navy); color: var(--teal); border-radius: 3mm; padding: 0 3.5mm; margin-left: 3mm; font-size: 20pt; vertical-align: 3pt; }
+h1.inner { font-size: 30pt; font-weight: 800; margin: 0 0 6mm; }
+p { margin: 0 0 3.5mm; orphans: 3; widows: 3; }
+li { orphans: 2; widows: 2; }
+strong { font-weight: 700; }
+hr { display: none; }
+
+/* a setting / scam = a card */
+.card { border: 1.5px solid var(--line); border-radius: 4mm; padding: 4mm 6mm 2mm; margin: 0 0 5mm; background: #fff; }
+.card h3 { margin: 0 0 3mm; font-size: 17pt; break-after: avoid; font-weight: 800; color: var(--navy); }
+.card.scam { border-color: #f1b7c0; background: #fffafb; }
+.card.scam h3 { color: var(--red); }
+.card.sum { border: 0; background: var(--teal-soft); }
+.card.stop { border: 0; background: var(--navy); color: #fff; }
+.card.stop h3 { color: var(--teal); }
+ol, ul { margin: 0 0 3.5mm; padding-right: 7mm; padding-left: 0; }
+li { margin-bottom: 1.5mm; }
+ol li::marker { font-weight: 800; color: var(--teal); }
+
+/* quotes = a scam message bubble */
+blockquote { margin: 0 0 4mm; padding: 3.5mm 5mm; background: #eceff3; border-radius: 4mm 4mm 4mm 1mm; font-size: .95em; max-width: 150mm; }
+blockquote p { margin: 0; }
+
+/* callouts */
+.callout { border-radius: 3mm; padding: 3.5mm 5mm; margin: 0 0 4mm; break-inside: avoid; }
+.callout.warn { background: var(--red-soft); border-right: 5px solid var(--red); }
+.callout.tip { background: var(--amber-soft); border-right: 5px solid #e2a400; }
+.callout.video { background: var(--navy); color: #fff; font-weight: 500; }
+.callout.video strong { color: var(--teal); }
+
+/* screenshot frame */
+.shots { display: flex; gap: 6mm; justify-content: center; margin: 2mm 0 5mm; break-inside: avoid; }
+.shot { width: 34mm; height: 60mm; border: 2.5px dashed #9aa6b4; border-radius: 7mm; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--muted); font-size: 12pt; background: #f6f8fa; text-align: center; }
+.shot b { font-size: 13pt; color: var(--ink); }
+.shot img { width: 100%; height: 100%; object-fit: contain; border-radius: 6mm; }
+.shot.real { border: 2.5px solid var(--navy); background: #fff; padding: 1.5mm; }
+
+/* checklists */
+table { width: 100%; border-collapse: collapse; margin: 0 0 3mm; }
+th { display: none; }
+td { padding: 2.5mm 2mm; border-bottom: 1px solid #c6e4e8; vertical-align: middle; }
+td.box { width: 12mm; text-align: center; font-size: 20pt; line-height: 1; color: var(--navy); }
+
+/* printable card */
+.cut { break-before: page; border: 2.5px dashed var(--muted); border-radius: 5mm; padding: 10mm; margin-top: 10mm; font-size: 22pt; }
+.cut .scissors { font-size: 14pt; color: var(--muted); margin-bottom: 4mm; }
+
+/* footer */
+.foot { position: running(foot); }
