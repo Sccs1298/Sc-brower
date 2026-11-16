@@ -267,12 +267,18 @@
         <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="זמן בסרטון">
         <span id="edTime" class="mono">0.00</span>
       </div>
+      <div class="ed-tabs" id="edTabs" role="tablist">
+        <button type="button" role="tab" data-go="basic">בסיס</button>
+        <button type="button" role="tab" data-go="where">חשיפה</button>
+        <button type="button" role="tab" data-go="look">מראה</button>
+        <button type="button" role="tab" data-go="more">מתקדם</button>
+      </div>
     </div>
     <div id="edUnsaved" class="banner warn-banner" hidden><span class="dot" style="background:#ff9f0a"></span><span>הסרטון עדיין <b>לא נשמר בחשבון</b> (גדול מ-20MB). אם תסגור את הדף הוא יימחק.</span><button id="edUnsavedGo" class="btn" type="button">כווץ ושמור</button></div>
-    <p class="foot">גרור על התמונה כדי לסמן איפה הבחירה תופיע. פינה צהובה משנה גודל.</p>
+    <p class="foot" data-tab="where">גרור על התמונה כדי לסמן איפה הבחירה תופיע. פינה צהובה משנה גודל.</p>
 
-    <div class="group-title" id="edG1">1. פרטי הסרטון</div>
-    <div class="group">
+    <div class="group-title" id="edG1" data-tab="basic">פרטי הסרטון</div>
+    <div class="group" data-tab="basic">
       <label class="row"><span>שם (לניהול בלבד)</span><input id="edName" data-i="name"></label>
       <label class="row"><span>תאריך הצילום בגלריה</span><input id="edShot" type="datetime-local"></label>
       <label class="row"><span id="edTrickLbl">סרטון טריק (עם חשיפה)</span><input id="edTrick" type="checkbox" class="switch"></label>
@@ -280,8 +286,8 @@
     </div>
 
     <div id="edTrickWrap">
-      <div class="group-title">2. מה הצופה בוחר</div>
-      <div class="group">
+      <div class="group-title" data-tab="basic">מה הצופה בוחר</div>
+      <div class="group" data-tab="basic">
         <label class="row"><span>סוג</span>
           <select data-i="content" id="edContent">
             <option value="number">מספר</option>
@@ -300,19 +306,19 @@
           <textarea id="edWords" rows="5"></textarea>
         </label>
       </div>
-      <p class="foot" id="edDigitsHelp"></p>
+      <p class="foot" id="edDigitsHelp" data-tab="basic"></p>
 
-      <div class="group-title">3. איך אתה מזין בסתר</div>
-      <div class="group">
+      <div class="group-title" data-tab="basic">איך אתה מזין בסתר</div>
+      <div class="group" data-tab="basic">
         <label class="row"><span>שיטה</span><select data-i="method" id="edMethod"></select></label>
       </div>
-      <div class="group" id="edTapRow">
+      <div class="group" id="edTapRow" data-tab="basic">
         <label class="row"><span>נגיעה עוצרת וממשיכה את הסרטון (מומלץ)</span><input id="edTap" type="checkbox" class="switch"></label>
       </div>
-      <p class="foot" id="edMethodHelp"></p>
+      <details class="hint" data-tab="basic"><summary>איך זה עובד?</summary><p class="foot" id="edMethodHelp"></p></details>
 
-      <div class="group-title">4. איפה ומתי זה מופיע</div>
-      <div class="group">
+      <div class="group-title" data-tab="where">איפה ומתי זה מופיע</div>
+      <div class="group" data-tab="where">
         <div class="row"><span>אזורים</span><div id="edRegions" class="chips"></div></div>
         <div class="row">
           <button id="rgAdd" class="btn" type="button">+ אזור נוסף</button>
@@ -325,9 +331,9 @@
         <label class="row"><span>טקסט לדוגמה</span><input id="edSample" placeholder="47"></label>
       </div>
 
-      <div class="group-title">חשיפה בפרטי הסרטון (חדש)</div>
-      <div class="group">
-        <label class="row"><span>הבחירה תופיע גם ב…</span>
+      <div class="group-title" data-tab="where">חשיפה בפרטי הסרטון</div>
+      <div class="group" data-tab="where">
+        <label class="row"><span>הבחירה תופיע גם ב</span>
           <select data-i="meta" id="edMeta">
             <option value="none">לא בשימוש</option>
             <option value="time">שעת הצילום</option>
@@ -337,10 +343,10 @@
           </select>
         </label>
       </div>
-      <p class="foot">שעה: 47 ← 17:47, ‏1447 ← 14:47. תאריך: 15 ← ה-15 בחודש, ‏1503 ← 15 במרץ. מקום: המילה מופיעה ככותרת. בסוף הסרטון הכותרת למעלה מראה את הבחירה, כאילו הסרטון צולם בשעה, בתאריך או במקום שהצופה בחר. אפשר להשתמש בזה גם בלי אזור חשיפה על התמונה.</p>
+      <details class="hint" data-tab="where"><summary>איך זה עובד?</summary><p class="foot">שעה: 47 ← 17:47, ‏1447 ← 14:47. תאריך: 15 ← ה-15 בחודש, ‏1503 ← 15 במרץ. מקום: המילה מופיעה ככותרת. בסוף הסרטון הכותרת למעלה מראה את הבחירה, כאילו הסרטון צולם בשעה, בתאריך או במקום שהצופה בחר. אפשר להשתמש בזה גם בלי אזור חשיפה על התמונה.</p></details>
 
-      <details class="group-details">
-        <summary>5. מראה החשיפה</summary>
+      <details class="group-details" data-tab="look" open>
+        <summary>מראה החשיפה</summary>
         <div class="group">
           <label class="row"><span>אפקט</span>
             <select data-r="effect">
@@ -374,8 +380,8 @@
         </div>
       </details>
 
-      <details class="group-details">
-        <summary>6. מעקב תנועה (מצלמה ביד / משטח שזז)</summary>
+      <details class="group-details" data-tab="more" open>
+        <summary>מעקב תנועה (מצלמה ביד / משטח שזז)</summary>
         <div class="group">
           <label class="row"><span>הפעל מעקב</span><input data-r="trackOn" type="checkbox" class="switch"></label>
           <div class="row col"><span class="help-inline">מזיזים את הסרגל לרגע אחר וגוררים את המסגרת למקום שבו המשטח נמצא באותו רגע. כל גרירה יוצרת נקודת מעקב, והחשיפה "נצמדת" לתנועה. כדאי לשים נקודה כל חצי שנייה עד שנייה.</span></div>
@@ -384,8 +390,8 @@
         </div>
       </details>
 
-      <details class="group-details">
-        <summary>7. פרספקטיבה (משטח בזווית)</summary>
+      <details class="group-details" data-tab="more" open>
+        <summary>פרספקטיבה (משטח בזווית)</summary>
         <div class="group">
           <label class="row"><span>הפעל פרספקטיבה</span><input data-r="persp.on" type="checkbox" class="switch"></label>
           <div class="row"><span class="help-inline">גרור את 4 הנקודות הכחולות לפינות המשטח בתמונה (לוח, דף, שלט).</span><button id="rgQuadReset" class="btn" type="button">אפס</button></div>
@@ -393,7 +399,8 @@
       </details>
     </div>
 
-    <div class="group">
+    <div class="group-title" data-tab="more">פעולות</div>
+    <div class="group" data-tab="more">
       <button class="row-link" id="edStage" type="button"><span>הופעה על מסך גדול (מצב במה)</span><span class="chev">‹</span></button>
       <button class="row-link" id="edHide" type="button"><span id="edHideLabel">הסתר מהגלריה</span><span class="chev">‹</span></button>
       <button class="row-link" id="edDup" type="button"><span>שכפל</span><span class="chev">‹</span></button>

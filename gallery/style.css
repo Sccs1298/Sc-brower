@@ -511,3 +511,39 @@ body:has(#edBar:not([hidden])) #toast { bottom: calc(env(safe-area-inset-bottom)
 .file-btn { position: relative; overflow: hidden; cursor: pointer; }
 .file-btn input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 200px; }
 .btn-big.secondary { background: var(--fill); color: var(--accent); margin-top: 0; }
+
+/* ===================== עורך מותאם לאייפון ===================== */
+/* לשוניות */
+.ed-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 2px; border-radius: 10px; background: var(--fill); }
+.ed-tabs button { border: 0; border-radius: 8px; padding: 7px 0; background: none; color: var(--fg); font-size: 14px; font-weight: 600; cursor: pointer; }
+.ed-tabs button.on { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+.ed-tabs button:disabled { opacity: .35; }
+#edit[data-tab="basic"] [data-tab]:not([data-tab="basic"]),
+#edit[data-tab="where"] [data-tab]:not([data-tab="where"]),
+#edit[data-tab="look"] [data-tab]:not([data-tab="look"]),
+#edit[data-tab="more"] [data-tab]:not([data-tab="more"]) { display: none !important; }
+#edTrickWrap { display: contents; }
+#edit .group-details[data-tab] > summary { pointer-events: none; }
+#edit .group-details[data-tab] > summary::before { content: none; }
+/* תצוגה קומפקטית */
+.ed-stage { gap: 6px; padding: 4px 0 6px; }
+.ed-stage .transport { padding: 0 2px; }
+.ed-stage .round { width: 32px; height: 32px; }
+/* שדות: תווית למעלה, שדה ברוחב מלא – לא נחתך ולא נשבר */
+#edit .row:has(> input:not([type=checkbox]):not([type=range]):not([type=color]):not([type=radio])),
+#edit .row:has(> select), #edit .row:has(> .inline), #edit .row:has(> textarea) { flex-wrap: wrap; row-gap: 6px; padding-top: 10px; padding-bottom: 10px; }
+#edit .row:has(> input:not([type=checkbox]):not([type=range]):not([type=color]):not([type=radio])) > span:first-child,
+#edit .row:has(> select) > span:first-child, #edit .row:has(> .inline) > span:first-child, #edit .row:has(> textarea) > span:first-child {
+  flex: 1 0 100%; font-size: 13px; color: var(--dim); }
+#edit .row > input:not([type=checkbox]):not([type=range]):not([type=color]):not([type=radio]), #edit .row > select, #edit .row > textarea {
+  flex: 1 1 100%; width: 100%; max-width: 100%; min-height: 40px; font-size: 16px; }
+#edit .row > .inline { flex: 1 1 100%; }
+#edit .row > .inline > input { flex: 1; width: auto; min-height: 40px; }
+#edit .row input[type=range] { flex: 1 1 55%; }
+#edit .row > span:first-child { line-height: 1.3; }
+/* הסברים מקופלים */
+.hint { padding: 0 16px; }
+.hint > summary { cursor: pointer; color: var(--accent); font-size: 14px; padding: 4px 0; list-style: none; }
+.hint > summary::-webkit-details-marker { display: none; }
+.hint > summary::before { content: "ⓘ "; }
+.hint .foot { padding: 4px 0 8px; }

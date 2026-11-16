@@ -160,6 +160,7 @@ function demoItem() {
 function normalize(it) {
   if (it.method === 'list') { it.method = 'grid'; it.digits = 1; }
   delete it._url;
+  if (it.name && /^[0-9a-f-]{16,}$/i.test(it.name)) it.name = (it.kind === 'photo' ? 'תמונה ' : 'סרטון ') + new Date(it.shotAt || it.created || Date.now()).toLocaleDateString('he-IL');
   // תיקון לפריטים שנשמרו בטעות כסרטון
   if (!it.builtin && !it.duration && /\.(jpe?g|png|heic|heif|webp|gif|avif)$/i.test(it.fileName || '')) it.kind = 'photo';
   if (!METHODS[it.method]) it.method = it.content === 'drawing' ? 'draw' : 'grid';
@@ -511,7 +512,11 @@ class VideoSource {
       if (v.readyState >= 2) return ok();
       v.addEventListener('loadeddata', ok, { once: true });
       v.addEventListener('loadedmetadata', () => setTimeout(ok, 900), { once: true });
-      v.addEventListener('error', () => { if (!done) { done = true; rej(new Error('לא ניתן לטעון את הסרטון')); } }, { once: true });
+      v.addEventListener('error', () => {
+        if (done) return; done = true;
+        const c = v.error && v.error.code;
+        rej(new Error(c === 4 ? 'הטלפון לא מצליח לנגן את סוג הסרטון הזה' : c === 2 ? 'בעיית רשת בטעינת הסרטון' : 'לא ניתן לטעון את הסרטון'));
+      }, { once: true });
       // אייפון לא טוען פריים לפני ניגון: מנגנים רגע בשקט ועוצרים
       v.muted = true;
       const p = v.play();
@@ -558,6 +563,20 @@ class ImageSource {
   pause() { this._t = this.time; this.paused = true; }
   draw(ctx, w, h) { if (this.img.naturalWidth) ctx.drawImage(this.img, 0, 0, w, h); }
   destroy() { if (this.owned) URL.revokeObjectURL(this.url); }
+}
+const BLOBS = new Map();
+async function ensureBlob(it) {
+  if (!it || it.blob || !it.assetUrl || it.kind === 'photo' || it.builtin) return;
+  if (BLOBS.has(it.id)) { it.blob = BLOBS.get(it.id); return; }
+  toast('טוען את הסרטון…', 30000);
+  let res;
+  try { res = await fetch(it.assetUrl); } catch (e) { throw new Error('אין חיבור. לא ניתן להוריד את הסרטון מהחשבון'); }
+  if (!res.ok) throw new Error(`לא ניתן להוריד את הסרטון מהחשבון (${res.status})`);
+  let b = await res.blob();
+  if (!b.type || b.type === 'application/octet-stream') b = new Blob([b], { type: 'video/mp4' });
+  BLOBS.set(it.id, b); it.blob = b;
+  const live = byId(it.id); if (live) live.blob = b;
+  $('#toast').hidden = true;
 }
 const makeSource = item => {
   if (item.builtin === 'demo') return new DemoSource();
@@ -943,7 +962,8 @@ function renderManage() {
     b.innerHTML = '<img alt=""><div class="txt"><b></b><span></span></div><span class="tag"></span>';
     const th = thumbFor(it); if (th) $('img', b).src = th;
     $('b', b).textContent = it.name;
-    $('.txt span', b).textContent = (it.kind === 'photo' ? 'תמונה · ' : `${fmtDur(it.duration)} · `) + (isTrick ? `${kind} · ${METHODS[it.method].name}` : (it.kind === 'photo' ? 'רגילה' : 'סרטון רגיל'));
+    const SHORT = { grid: 'מקשים', keyboard: 'מקלדת', peek: 'הצופה מחפש', pre: 'מסך חיפוש', scrub: 'גרירה', draw: 'ציור' };
+    $('.txt span', b).textContent = (it.kind === 'photo' ? 'תמונה · ' : `${fmtDur(it.duration)} · `) + (isTrick ? `${kind} · ${SHORT[it.method] || ''}` : (it.kind === 'photo' ? 'רגילה' : 'סרטון רגיל'));
     const tag = $('.tag', b);
     tag.textContent = (Store.mode === 'cloud' && it.unsaved) ? 'לא נשמר' : it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
     if (Store.mode === 'cloud' && it.unsaved) tag.classList.add('warn');
@@ -1071,11 +1091,25 @@ function offerCompress(it) {
       .catch(err => { $('#cmpText').textContent = 'הכיווץ או השמירה נכשלו: ' + errText(err) + '. הסרטון עדיין בגלריה עד סגירת הדף.'; $('#cmpLater').disabled = false; $('#cmpLater').textContent = 'סגור'; });
   };
 }
+function setEdTab(t) {
+  $('#edit').dataset.tab = t;
+  $$('#edTabs [data-go]').forEach(b => { b.classList.toggle('on', b.dataset.go === t); b.setAttribute('aria-selected', b.dataset.go === t); });
+  window.scrollTo(0, 0);
+}
+$('#edTabs').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b && !b.disabled) setEdTab(b.dataset.go); });
 function syncUnsaved() {
   const b = $('#edUnsaved'); if (!b || !E.item) return;
   b.hidden = !(Store.mode === 'cloud' && E.item.unsaved);
 }
 
+function niceName(f, photo) {
+  const base = f.name.replace(/\.[^.]+$/, '');
+  if (/^[0-9a-f-]{16,}$/i.test(base) || /^(image|video|trim)[-_.]?\d*$/i.test(base)) {
+    const d = new Date(f.lastModified || Date.now());
+    return `${photo ? 'תמונה' : 'סרטון'} ${d.getDate()}.${d.getMonth() + 1} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+  return base;
+}
 async function onFiles(e) {
   const files = [...e.target.files]; e.target.value = ''; if (!files.length) return;
   let last = null, n = 0; const bigOnes = [];
@@ -1086,7 +1120,7 @@ async function onFiles(e) {
     const photo = info.kind === 'photo';
     const t = photo ? 1.5 : info.duration ? +(info.duration * .75).toFixed(2) : 3;
     const it = normalize({
-      id: uid(), kind: photo ? 'photo' : 'video', name: f.name.replace(/\.[^.]+$/, ''), fileName: f.name, size: f.size, blob: f,
+      id: uid(), kind: photo ? 'photo' : 'video', name: niceName(f, photo), fileName: f.name, size: f.size, blob: f,
       w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, created: Date.now(), shotAt: f.lastModified || Date.now(),
       content: 'number', method: 'grid', digits: 2, trick: !photo, meta: 'none', words: DEFAULT_WORDS.slice(), regions: [newRegion(t, photo ? { fade: 3, effect: 'develop' } : {})],
     });
@@ -1128,7 +1162,9 @@ function syncEditorForm() {
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
   $('#edTapRow').hidden = true;
-  $('#edG1').textContent = it.kind === 'photo' ? '1. פרטי התמונה' : '1. פרטי הסרטון';
+  $('#edG1').textContent = it.kind === 'photo' ? 'פרטי התמונה' : 'פרטי הסרטון';
+  $$('#edTabs [data-go]').forEach(b => { if (b.dataset.go === 'where' || b.dataset.go === 'look') b.disabled = it.trick === false; });
+  if (it.trick === false && ['where', 'look'].includes($('#edit').dataset.tab)) setEdTab('basic');
   $('#edTrickLbl').textContent = it.kind === 'photo' ? 'תמונת טריק (עם חשיפה)' : 'סרטון טריק (עם חשיפה)';
   $('#edTap').checked = it.tapPause !== false;
   $('#edWordsWrap').hidden = it.content !== 'word';
@@ -1175,7 +1211,7 @@ function renderRegions() {
   }
 }
 ENTER.edit = async () => {
-  $('#edBar').hidden = false; edStatus('');
+  $('#edBar').hidden = false; edStatus(''); if (!$('#edit').dataset.tab || E.id !== E.lastId) setEdTab('basic'); E.lastId = E.id;
   document.documentElement.style.setProperty('--navh', ($('#edit .nav').offsetHeight || 52) + 'px');
   const src = byId(E.id); if (!src) { uiBack(); return; }
   E.item = { ...src, regions: JSON.parse(JSON.stringify(src.regions)), words: (src.words || []).slice() };
@@ -1189,7 +1225,7 @@ ENTER.edit = async () => {
   $('#edShot').value = new Date(ts - new Date(ts).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   fillSelect($('#rgFont'), Object.entries(FONTS).map(([k, f]) => [k, f.name]), 'hand');
   syncEditorForm(); renderRegions();
-  try { E.src = makeSource(E.item); await E.src.ready(); } catch (err) { toast(err.message); return; }
+  try { const live = byId(E.item.id); await ensureBlob(live); if (live && live.blob) E.item.blob = live.blob; E.src = makeSource(E.item); await E.src.ready(); } catch (err) { toast(err.message, 5000); return; }
   if (curScreen() !== 'edit') { E.src.destroy(); E.src = null; return; }
   if (!E.item.duration && E.src.duration) E.item.duration = E.src.duration;
   E.item.w = E.src.w; E.item.h = E.src.h;
@@ -1225,7 +1261,7 @@ async function flushEdit() { clearTimeout(E.saveT); const m = commitEdit(); if (
 
 function sizeEdCanvas() {
   if (!E.src) return;
-  const c = $('#edCanvas'), maxW = Math.min($('#edit .preview').clientWidth || 360, 680), maxH = innerHeight * (innerHeight < 560 ? .42 : .34);
+  const c = $('#edCanvas'), maxW = Math.min($('#edit .preview').clientWidth || 360, 680), maxH = innerHeight * (innerHeight < 560 ? .36 : .24);
   const s = Math.min(maxW / E.src.w, maxH / E.src.h), dpr = Math.min(devicePixelRatio || 1, 2);
   c.style.width = `${Math.round(E.src.w * s)}px`; c.style.height = `${Math.round(E.src.h * s)}px`;
   c.width = Math.round(E.src.w * s * dpr); c.height = Math.round(E.src.h * s * dpr);
@@ -1444,7 +1480,7 @@ ENTER.perform = async () => {
   P.minT = P.regions.length ? Math.min(...P.regions.map(r => r.t)) : Infinity;
   $('#pmenu').hidden = true; closePops();
   initPhotosUI();
-  try { P.src = makeSource(item); await P.src.ready(); } catch (err) { toast(err.message); uiBack(); return; }
+  try { await ensureBlob(item); P.src = makeSource(item); await P.src.ready(); } catch (err) { toast(err.message, 5000); uiBack(); return; }
   if (!P.active) { P.src.destroy(); P.src = null; return; }
   P.src.time = 0;
   if (req.stage && screen.orientation && screen.orientation.lock) screen.orientation.lock(P.src.w >= P.src.h ? 'landscape' : 'portrait').catch(() => {});
