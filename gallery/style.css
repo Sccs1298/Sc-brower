@@ -568,3 +568,62 @@ body:has(#edBar:not([hidden])) #toast { bottom: calc(env(safe-area-inset-bottom)
 .pay-row { display: flex; gap: 8px; }
 .pay-row input { flex: 1; min-width: 0; height: 46px; border: 0; border-radius: 10px; background: var(--fill); padding: 0 12px; font-size: 17px; letter-spacing: 1px; text-transform: uppercase; color: var(--fg); }
 .pay-err { color: var(--danger) !important; font-size: 14px !important; }
+
+/* ===================== שיחה נכנסת ===================== */
+.hub-quick { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 12px; }
+.call { background: #000; color: #fff; font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; }
+.call-ui { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+  background: linear-gradient(170deg, #2b3a55, #1b2233 55%, #10131c); padding: calc(env(safe-area-inset-top) + 90px) 28px calc(env(safe-area-inset-bottom) + 70px); animation: callIn .35s ease; }
+@keyframes callIn { from { opacity: 0; } }
+.call-top { text-align: center; }
+.call-name { font-size: 38px; font-weight: 500; line-height: 1.15; overflow-wrap: anywhere; }
+.call-sub { margin-top: 6px; font-size: 19px; color: rgba(255,255,255,.65); font-variant-numeric: tabular-nums; }
+.call-btns { display: flex; justify-content: space-around; }
+.cb { border: 0; background: none; color: #fff; display: grid; justify-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.cb svg { width: 74px; height: 74px; border-radius: 50%; padding: 17px; }
+.cb.red svg { background: #ff3b30; } .cb.green svg { background: #34c759; }
+/* ===================== פתקים ===================== */
+.notes { background: var(--bg); color: var(--fg); overflow-y: auto; }
+.nt-list { padding: calc(env(safe-area-inset-top) + 54px) max(16px, env(safe-area-inset-right)) 30px max(16px, env(safe-area-inset-left)); max-width: 640px; margin: 0 auto; }
+.nt-list h1 { margin: 0 0 10px; font-size: 34px; }
+.nt-search { display: flex; align-items: center; gap: 6px; height: 38px; border-radius: 10px; background: var(--fill); padding: 0 10px; color: var(--dim); margin-bottom: 16px; }
+.nt-search svg { width: 17px; height: 17px; flex: none; }
+.nt-search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; color: var(--fg); font-size: 17px; -webkit-appearance: none; appearance: none; -webkit-user-select: text; user-select: text; }
+.nt-items { background: var(--card); border-radius: 12px; overflow: hidden; }
+.nt-item { width: 100%; display: grid; gap: 2px; text-align: start; border: 0; background: none; color: var(--fg); padding: 11px 16px; cursor: pointer; }
+.nt-item + .nt-item { border-top: .5px solid var(--sep); }
+.nt-item b { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nt-item span { font-size: 15px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nt-count { text-align: center; color: var(--dim); font-size: 13px; margin-top: 14px; }
+.nt-view { position: absolute; inset: 0; background: var(--card); padding: calc(env(safe-area-inset-top) + 50px) max(20px, env(safe-area-inset-right)) 30px max(20px, env(safe-area-inset-left)); overflow-y: auto; }
+.nt-back { border: 0; background: none; color: #e0a800; font-size: 17px; padding: 6px 0; cursor: pointer; }
+.nt-date { text-align: center; color: var(--dim); font-size: 13px; margin: 6px 0 14px; }
+.nt-view h2 { margin: 0 0 8px; font-size: 28px; }
+.nt-body { font-size: 19px; line-height: 1.6; white-space: pre-wrap; margin: 0; overflow-wrap: anywhere; }
+/* ===================== סטופר ===================== */
+.sw { background: #000; color: #fff; font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; }
+.sw-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; padding: calc(env(safe-area-inset-top) + 16vh) 20px calc(env(safe-area-inset-bottom) + 20px); max-width: 520px; margin: 0 auto; }
+.sw-time { text-align: center; font-size: clamp(56px, 19vw, 92px); font-weight: 200; font-variant-numeric: tabular-nums; direction: ltr; line-height: 1.1; }
+.sw-btns { display: flex; justify-content: space-between; margin-top: 8vh; direction: ltr; }
+.sw-b { width: 84px; height: 84px; border-radius: 50%; border: 0; font-size: 17px; cursor: pointer; box-shadow: 0 0 0 2px #000, 0 0 0 4px currentColor; }
+.sw-b.gray { background: #333; color: #333; }
+.sw-b.go { background: #0a3d1c; color: #0a3d1c; } .sw-b.stop { background: #3d0f0c; color: #3d0f0c; }
+.sw-b.gray { -webkit-text-fill-color: #fff; } .sw-b.go { -webkit-text-fill-color: #30d158; } .sw-b.stop { -webkit-text-fill-color: #ff453a; }
+.sw-laps { margin-top: 26px; border-top: .5px solid #333; overflow-y: auto; direction: ltr; font-variant-numeric: tabular-nums; }
+.sw-laps div { display: flex; justify-content: space-between; padding: 11px 4px; border-bottom: .5px solid #333; font-size: 17px; }
+@media (max-height: 560px) { .sw-wrap { padding-top: calc(env(safe-area-inset-top) + 48px); } .sw-btns { margin-top: 12px; } .sw-b { width: 64px; height: 64px; font-size: 14px; } .sw-time { font-size: 52px; } .sw-laps { display: none; } }
+/* ===================== חיפוש: טעינה והיסטוריה ===================== */
+.w-bar { position: absolute; top: env(safe-area-inset-top); left: 0; right: 0; height: 3px; z-index: 5; direction: ltr; }
+.w-bar i { display: block; height: 100%; width: 0; background: #0a84ff; animation: wload 1.300s cubic-bezier(.2,.6,.3,1) forwards; }
+@keyframes wload { to { width: 72%; } }
+.w-histbtn { position: absolute; z-index: 4; bottom: calc(env(safe-area-inset-bottom) + 18px); left: max(18px, env(safe-area-inset-left)); width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--pg-btn); font-size: 19px; cursor: pointer; }
+.w-hist { position: absolute; inset: 0; z-index: 6; background: var(--pg-bg); color: var(--pg-fg); overflow-y: auto; padding: calc(env(safe-area-inset-top) + 48px) max(16px, env(safe-area-inset-right)) 30px max(16px, env(safe-area-inset-left)); }
+.w-hist-head { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; text-align: center; font-size: 17px; margin-bottom: 8px; }
+.w-hist-head button { border: 0; background: none; color: #0a84ff; font-size: 28px; cursor: pointer; }
+.w-day { font-size: 13px; color: var(--pg-dim); padding: 14px 4px 6px; }
+.w-row { display: flex; justify-content: space-between; gap: 12px; padding: 11px 4px; border-bottom: .5px solid rgba(127,127,127,.25); font-size: 16px; }
+.w-row span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.w-row span:last-child { color: var(--pg-dim); font-size: 14px; flex: none; direction: ltr; }
+/* זום בתמונה */
+#stage { transform-origin: 0 0; transition: transform .22s ease; }
+#stage.panning { transition: none; }

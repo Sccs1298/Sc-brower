@@ -39,6 +39,9 @@
         <button type="button" data-open="web"><span class="tc-ico" style="background:#0a84ff"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><circle cx="18" cy="18" r="8"/><path d="M24 24l7 7"/></svg></span>חיפוש</button>
         <button type="button" data-open="deck"><span class="tc-ico" style="background:#1f6b45"><svg viewBox="0 0 40 40"><rect x="8" y="10" width="15" height="21" rx="2" fill="#fff" transform="rotate(-12 15 20)"/><rect x="17" y="9" width="15" height="21" rx="2" fill="#fff" stroke="#ccc"/><text x="24.5" y="24" font-size="11" text-anchor="middle" fill="#c8102e">♥</text></svg></span>קלפים</button>
         <button type="button" data-open="lock"><span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>התראה</button>
+        <button type="button" data-open="call"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span> שיחה</button>
+        <button type="button" data-open="notes"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span> פתק</button>
+        <button type="button" data-open="sw"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff9f0a" stroke-width="2.600" stroke-linecap="round"><circle cx="20" cy="22" r="10"/><path d="M20 22v-6M17 8h6M20 8v4"/></svg></span> סטופר</button>
       </div>
     </div>
 
@@ -92,7 +95,8 @@
         <li>"תחשוב על מדינה ותחפש אותה, שנראה תמונות."</li>
         <li>הצופה מקליד ומחפש, ומופיע <b>"אין חיבור לאינטרנט"</b>. נראה כמו תקלה.</li>
         <li>להצצה: <b>לחיצה ארוכה על סמל הענן</b> מראה לך את המילה לשנייה.</li>
-        <li>המילה עוברת אוטומטית לכל הקסמים: סרטון בגלריה, התראה, פסיפס.</li>
+        <li>המילה עוברת אוטומטית לכל הקסמים: סרטון בגלריה, התראה, שיחה נכנסת, פתק.</li>
+        <li><b>היסטוריה:</b> הכפתור 🕘 מראה "היסטוריית חיפושים" שבה המילה מופיעה מאתמול, בין חיפושים ישנים.</li>
       </ol>
       <div class="tc-acts"><button class="btn-big primary" data-open="web" type="button">פתח חיפוש</button></div>
     </div>
@@ -139,6 +143,61 @@
       <div class="tc-acts"><button class="btn-big primary" data-open="lock" type="button">פתח מסך נעול</button></div>
     </div>
 
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span>
+        <div><h2>שיחה נכנסת</h2><p class="dim">הצופה רואה: הטלפון שלך מצלצל, ועל המסך השם שהוא חשב עליו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>קודם קולטים את השם: הצופה מחפש אותו בקסם "חיפוש", או שמקלידים אותו כאן בהגדרות.</li>
+        <li>פותחים, המסך נהיה שחור כמו טלפון כבוי. מניחים את הטלפון על השולחן.</li>
+        <li>"תחשוב עליו חזק." אחרי כמה שניות הטלפון מצלצל, והשם על המסך.</li>
+        <li>נגיעה בירוק "עונה" לשיחה, נגיעה באדום מנתקת.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>שניות עד הצלצול</span><input data-s="callDelay" type="number" min="2" step="1" placeholder="8"></label>
+          <label class="row"><span>שם קבוע (אם אין בחירה)</span><input data-s="callName" placeholder="אמא"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="call" type="button">פתח שיחה נכנסת</button></div>
+    </div>
+
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <div><h2>פתק ישן</h2><p class="dim">הצופה רואה: פתק שכתבת לפני שבוע, ובו בדיוק מה שהוא בחר עכשיו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>קולטים את הבחירה בכל קסם אחר (חיפוש, קלפים, מחשבון, סרטון).</li>
+        <li>"כתבתי משהו לפני שבוע." פותחים את הפתקים. ברשימה יש פתק נעול מלפני שבוע.</li>
+        <li>נותנים לצופה לפתוח אותו בעצמו. הבחירה שלו כתובה שם.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>שם הפתק</span><input data-s="noteTitle" placeholder="לא לפתוח 🤫"></label>
+          <label class="row col"><span>הטקסט ({x} = הבחירה)</span><input data-s="noteBody" placeholder="אני יודע שתבחר ב: {x}"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="notes" type="button">פתח פתקים</button></div>
+    </div>
+
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff9f0a" stroke-width="2.600" stroke-linecap="round"><circle cx="20" cy="22" r="10"/><path d="M20 22v-6M17 8h6M20 8v4"/></svg></span>
+        <div><h2>סטופר</h2><p class="dim">הצופה רואה: הוא עוצר את הסטופר מתי שבא לו, והמאיות יוצאות המספר שחזית.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>כותבים חיזוי על דף, או שהמספר כבר נקלט בקסם אחר.</li>
+        <li>הצופה לוחץ "התחל", ועוצר מתי שהוא רוצה.</li>
+        <li>שתי הספרות האחרונות (המאיות) הן תמיד המספר שלך.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>המספר (2 ספרות)</span><input data-s="swNumber" inputmode="numeric" placeholder="47"></label>
+          <label class="row"><span>להשתמש בבחירה האחרונה אם היא מספר</span><input data-s="swUseLast" type="checkbox" class="switch"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="sw" type="button">פתח סטופר</button></div>
+    </div>
+
     <div class="group pad">
       <h2>יציאה מקסם</h2>
       <p><b>לחיצה ארוכה (שנייה) על החלק העליון של המסך</b> בכל קסם מחזירה לכאן. בגלריה: לחיצה ארוכה על "ספרייה" ← ניהול ← "מרכז הקסמים".</p>
@@ -173,6 +232,12 @@
     </form>
     <div class="w-chips"><span>חדשות</span><span>מזג אוויר</span><span>תמונות</span><span>מפות</span></div>
   </div>
+  <button id="wHistBtn" class="w-histbtn" type="button" aria-label="היסטוריה">🕘</button>
+  <div id="wBar" class="w-bar" hidden><i></i></div>
+  <div id="wHist" class="w-hist" hidden>
+    <div class="w-hist-head"><button id="wHistBack" type="button">‹</button><b>היסטוריה</b><span></span></div>
+    <div id="wHistList"></div>
+  </div>
   <div id="wOff" class="w-off" hidden>
     <svg id="wOffIco" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 46h26a10 10 0 001-20 14 14 0 00-27-3 11 11 0 000 23z"/><path d="M10 10l44 44"/></svg>
     <b>אין חיבור לאינטרנט</b>
@@ -189,6 +254,51 @@
   <div id="dFan" class="d-fan"></div>
   <button id="dShuffle" class="d-shuffle" type="button">ערבב</button>
   <div id="dPick" class="d-pick" hidden><div class="d-face" id="dFace"></div></div>
+</section>
+
+<!-- ===================== שיחה נכנסת ===================== -->
+<section id="call" class="screen trick-screen call">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div id="callUi" class="call-ui" hidden>
+    <div class="call-top"><div id="callName" class="call-name"></div><div id="callSub" class="call-sub">נייד</div></div>
+    <div class="call-btns" id="callIn">
+      <button id="callNo" type="button" class="cb red" aria-label="דחה"><svg viewBox="0 0 40 40" fill="#fff"><path d="M6 23c8-8 20-8 28 0l-3 4-6-2v-4c-3-1-7-1-10 0v4l-6 2z"/></svg><span>דחה</span></button>
+      <button id="callYes" type="button" class="cb green" aria-label="ענה"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg><span>ענה</span></button>
+    </div>
+    <div class="call-btns" id="callOn" hidden>
+      <button id="callEnd" type="button" class="cb red" aria-label="נתק"><svg viewBox="0 0 40 40" fill="#fff"><path d="M6 23c8-8 20-8 28 0l-3 4-6-2v-4c-3-1-7-1-10 0v4l-6 2z"/></svg><span>נתק</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== פתקים ===================== -->
+<section id="notes" class="screen trick-screen notes">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div id="ntList" class="nt-list">
+    <h1>פתקים</h1>
+    <div class="nt-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" aria-hidden="true"><circle cx="10.500" cy="10.500" r="6.500"/><path d="M15.500 15.500L20 20"/></svg><input id="ntSearch" type="search" placeholder="חיפוש" autocomplete="off" aria-label="חיפוש בפתקים"></div>
+    <div id="ntItems" class="nt-items"></div>
+    <p class="nt-count" id="ntCount"></p>
+  </div>
+  <div id="ntView" class="nt-view" hidden>
+    <button id="ntBack" type="button" class="nt-back">‹ פתקים</button>
+    <p id="ntDate" class="nt-date"></p>
+    <h2 id="ntTitle"></h2>
+    <p id="ntBody" class="nt-body"></p>
+  </div>
+</section>
+
+<!-- ===================== סטופר ===================== -->
+<section id="sw" class="screen trick-screen sw">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="sw-wrap">
+    <div id="swTime" class="sw-time">00:00.00</div>
+    <div class="sw-btns">
+      <button id="swLeft" type="button" class="sw-b gray">הקפה</button>
+      <button id="swRight" type="button" class="sw-b go">התחל</button>
+    </div>
+    <div id="swLaps" class="sw-laps"></div>
+  </div>
 </section>
 
 <!-- ===================== מסך נעול + התראה ===================== -->
@@ -1049,7 +1159,7 @@
     <p id="payWhy">בגרסת הניסיון אפשר לנסות את סרטון ההדגמה. הגרסה המלאה פותחת הכל:</p>
     <ul class="pay-list">
       <li>הסרטונים והתמונות שלך, בלי הגבלה</li>
-      <li>מחשבון, חיפוש, קלפים והתראה</li>
+      <li>מחשבון, חיפוש, קלפים, התראה, שיחה נכנסת, פתק וסטופר</li>
       <li>גלריה מתנפצת, פסיפס ומצגת</li>
       <li>כל העדכונים. תשלום אחד, בלי מנוי</li>
     </ul>
