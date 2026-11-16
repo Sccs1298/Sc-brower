@@ -5,54 +5,164 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>הוואטסאפ שלי נעול | האזור שלכם</title>
+<!-- Meta pixel: base code + fbq('track', 'Purchase', {value: 97, currency: 'ILS'}) go here once the pixel id exists -->
 <style>
-@font-face { font-family: Heebo; src: url("Heebo-400.ttf"); font-weight: 400; font-display: swap; }
-@font-face { font-family: Heebo; src: url("Heebo-800.ttf"); font-weight: 800; font-display: swap; }
-:root { --navy: #0b1620; --teal: #19b3c4; --red: #c8102e; --muted: #5b6472; --line: #e3e7ec; }
+@font-face { font-family: Heebo; src: url("Heebo-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-800.woff2") format("woff2"); font-weight: 800; font-display: swap; }
+:root { --navy: #0b1620; --teal: #19b3c4; --teal-soft: #e3f6f8; --red: #c8102e; --muted: #5b6472; --line: #e3e7ec; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Heebo, sans-serif; background: #f4f6f8; color: #14181f; font-size: 18px; line-height: 1.6; }
-header { background: var(--navy); color: #fff; padding: 34px 16px 30px; text-align: center; }
-header h1 { font-size: 30px; font-weight: 800; }
-header p { color: #cfeff3; margin-top: 6px; }
+header { background: var(--navy); color: #fff; padding: 30px 16px 44px; text-align: center; }
+header h1 { font-size: 28px; font-weight: 800; }
+header p { color: #cfeff3; margin-top: 4px; }
 .wrap { max-width: 680px; margin: 0 auto; padding: 0 16px 50px; }
-.dl { display: flex; gap: 12px; margin: -22px 0 26px; flex-wrap: wrap; }
-.dl a { flex: 1 1 240px; background: var(--red); color: #fff; text-decoration: none; font-weight: 800; text-align: center; padding: 16px; border-radius: 14px; box-shadow: 0 8px 22px rgba(200,16,46,.3); }
-.dl a.b { background: var(--teal); box-shadow: 0 8px 22px rgba(25,179,196,.3); }
-.tip { background: #fff; border-right: 5px solid var(--teal); border-radius: 12px; padding: 14px 18px; margin-bottom: 22px; color: var(--muted); }
-.v { background: #fff; border-radius: 18px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
-.v video { display: block; width: 100%; max-height: 78vh; background: #000; }
-.v .t { padding: 14px 18px; display: flex; gap: 12px; align-items: center; }
-.v .n { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-.v b { display: block; } .v span { color: var(--muted); font-size: 15px; }
-footer { text-align: center; color: var(--muted); font-size: 14px; }
+h2 { font-size: 22px; font-weight: 800; margin: 30px 0 12px; }
+.box { background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+.start { margin-top: -26px; }
+.start ol { list-style: none; counter-reset: s; }
+.start li { counter-increment: s; display: flex; gap: 12px; margin-top: 12px; align-items: flex-start; }
+.start li::before { content: counter(s); flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.dl { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.dl a, .btn { flex: 1 1 220px; background: var(--red); color: #fff; text-decoration: none; font: 800 18px Heebo, sans-serif; text-align: center; padding: 14px; border-radius: 14px; border: 0; cursor: pointer; display: block; }
+.dl a.b, .btn.b { background: var(--teal); }
+.btn.w { background: #1faa59; }
+
+.prog { position: sticky; top: 0; z-index: 3; background: #f4f6f8; padding: 10px 0; }
+.prog .lbl { display: flex; justify-content: space-between; font-weight: 800; font-size: 16px; }
+.prog .track { height: 12px; background: var(--line); border-radius: 12px; overflow: hidden; margin-top: 6px; }
+.prog .fill { height: 100%; width: 0; background: var(--teal); transition: width .3s; }
+
+.ch { margin-bottom: 16px; overflow: hidden; padding: 0; }
+.ch video { display: block; width: 100%; max-height: 72vh; background: #000; }
+.ch .t { padding: 14px 18px 4px; display: flex; gap: 12px; align-items: center; }
+.ch .n { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.ch b { display: block; font-weight: 800; } .ch .t span { color: var(--muted); font-size: 15px; }
+.ch ul { list-style: none; padding: 4px 18px 14px; }
+.ch label { display: flex; gap: 12px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.ch input { width: 24px; height: 24px; flex: none; accent-color: var(--teal); }
+.ch input:checked + span { color: var(--muted); text-decoration: line-through; }
+.done { display: none; background: var(--teal-soft); color: #0b5560; font-weight: 800; text-align: center; border-radius: 18px; padding: 20px; margin-bottom: 16px; }
+.done.show { display: block; }
+.note { color: var(--muted); font-size: 16px; margin-top: 8px; }
+footer { text-align: center; color: var(--muted); font-size: 14px; margin-top: 30px; }
 </style>
 </head>
 <body>
 <header>
   <h1>הוואטסאפ שלי נעול 🔒</h1>
-  <p>שומרים את העמוד הזה. הוא שלכם.</p>
+  <p>העמוד הזה שלכם. שמרו את הקישור.</p>
 </header>
 <main class="wrap">
-  <div class="dl">
-    <a href="guide.pdf" download>⬇ המדריך (PDF)</a>
-    <a class="b" href="bonus-parents.pdf" download>🎁 אמא לא נופלת בעוקץ</a>
+
+  <div class="box start">
+    <b style="font-weight:800;font-size:20px">מתחילים כאן</b>
+    <ol>
+      <li><span>מורידים את המדריך. הכי נוח לפתוח אותו במחשב או בטאבלט, ולעשות את ההגדרות בטלפון.</span></li>
+      <li><span>רואים את סרטון 1, ועושים את ההגדרות של הוואטסאפ. זה לוקח 10 דקות.</span></li>
+      <li><span>מסמנים ✓ כאן למטה על כל הגדרה שעשיתם, וממשיכים לפרק הבא.</span></li>
+    </ol>
+    <div class="dl">
+      <a href="guide.pdf" download>⬇ המדריך (PDF)</a>
+      <a class="b" href="bonus-parents.pdf" download>🎁 הבונוס להורים</a>
+    </div>
   </div>
-  <p class="tip">💡 הכי קל: פותחים את המדריך במחשב או בטלפון אחר, ועושים את ההגדרות בטלפון שלכם. כל סרטון כאן מראה פרק אחד, צעד אחרי צעד.</p>
 
-  <section class="v"><video src="v1-whatsapp.mp4" controls playsinline preload="metadata"></video>
-    <div class="t"><div class="n">1</div><div><b>לנעול את הוואטסאפ</b><span>5 הגדרות, 10 דקות</span></div></div></section>
-  <section class="v"><video src="v2-scams.mp4" controls playsinline preload="metadata"></video>
-    <div class="t"><div class="n">2</div><div><b>4 העוקצים שגונבים וואטסאפ</b><span>ואיך מזהים כל אחד</span></div></div></section>
-  <section class="v"><video src="v3-gmail.mp4" controls playsinline preload="metadata"></video>
-    <div class="t"><div class="n">3</div><div><b>לנעול את הג'ימייל</b><span>4 הגדרות, 7 דקות</span></div></div></section>
-  <section class="v"><video src="v4-instagram.mp4" controls playsinline preload="metadata"></video>
-    <div class="t"><div class="n">4</div><div><b>אינסטגרם ופייסבוק</b><span>2 הגדרות, 5 דקות</span></div></div></section>
-  <section class="v"><video src="v5-phone.mp4" controls playsinline preload="metadata"></video>
-    <div class="t"><div class="n">5</div><div><b>הטלפון והתא הקולי</b><span>4 הגדרות, 6 דקות</span></div></div></section>
-  <section class="v"><video src="v6-passwords.mp4" controls playsinline preload="metadata"></video>
-    <div class="t"><div class="n">6</div><div><b>סיסמאות בלי כאב ראש</b><span>2 צעדים, 5 דקות</span></div></div></section>
+  <div class="prog">
+    <div class="lbl"><span>ההתקדמות שלכם</span><span id="cnt">0 מתוך 19</span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+  <div class="done" id="done">🔒 סימנתם הכול. החשבונות שלכם נעולים.<br>עכשיו שלחו את הבונוס להורים.</div>
 
-  <footer>שאלה? כותבים לנו בוואטסאפ, באותו מספר ששלח לכם את הקישור.</footer>
+  <section class="box ch"><video src="v1-whatsapp.mp4" poster="p1.jpg" controls playsinline preload="none"></video>
+    <div class="t"><div class="n">1</div><div><b>לנעול את הוואטסאפ</b><span>פרק 1 · 5 הגדרות · 10 דקות</span></div></div>
+    <ul>
+      <li><label><input type="checkbox"><span>אימות דו-שלבי עם קוד סודי ומייל</span></label></li>
+      <li><label><input type="checkbox"><span>מפתח גישה</span></label></li>
+      <li><label><input type="checkbox"><span>בדקתי מכשירים מקושרים</span></label></li>
+      <li><label><input type="checkbox"><span>קבוצות: אנשי הקשר שלי</span></label></li>
+      <li><label><input type="checkbox"><span>השתקת מתקשרים לא מוכרים</span></label></li>
+    </ul></section>
+
+  <section class="box ch"><video src="v2-scams.mp4" poster="p2.jpg" controls playsinline preload="none"></video>
+    <div class="t"><div class="n">2</div><div><b>4 העוקצים שגונבים וואטסאפ</b><span>פרק 2 · רק לראות, אין מה להגדיר</span></div></div>
+    <ul></ul></section>
+
+  <section class="box ch"><video src="v3-gmail.mp4" poster="p3.jpg" controls playsinline preload="none"></video>
+    <div class="t"><div class="n">3</div><div><b>לנעול את הג'ימייל</b><span>פרק 3 · 4 הגדרות · 7 דקות</span></div></div>
+    <ul>
+      <li><label><input type="checkbox"><span>אימות דו-שלבי</span></label></li>
+      <li><label><input type="checkbox"><span>מפתח גישה</span></label></li>
+      <li><label><input type="checkbox"><span>טלפון ומייל לשחזור מעודכנים</span></label></li>
+      <li><label><input type="checkbox"><span>בדקתי מכשירים ואפליקציות מחוברים</span></label></li>
+    </ul></section>
+
+  <section class="box ch"><video src="v4-instagram.mp4" poster="p4.jpg" controls playsinline preload="none"></video>
+    <div class="t"><div class="n">4</div><div><b>אינסטגרם ופייסבוק</b><span>פרק 4 · 3 הגדרות · 5 דקות</span></div></div>
+    <ul>
+      <li><label><input type="checkbox"><span>אימות דו-שלבי באינסטגרם</span></label></li>
+      <li><label><input type="checkbox"><span>אימות דו-שלבי בפייסבוק</span></label></li>
+      <li><label><input type="checkbox"><span>בדקתי איפה אני מחובר</span></label></li>
+    </ul></section>
+
+  <section class="box ch"><video src="v5-phone.mp4" poster="p5.jpg" controls playsinline preload="none"></video>
+    <div class="t"><div class="n">5</div><div><b>הטלפון והתא הקולי</b><span>פרק 5 · 4 הגדרות · 6 דקות</span></div></div>
+    <ul>
+      <li><label><input type="checkbox"><span>שיניתי או ביטלתי את הקוד של התא הקולי</span></label></li>
+      <li><label><input type="checkbox"><span>נעילת מסך עם קוד של 6 ספרות</span></label></li>
+      <li><label><input type="checkbox"><span>עדכונים אוטומטיים</span></label></li>
+      <li><label><input type="checkbox"><span>איתור הטלפון</span></label></li>
+    </ul></section>
+
+  <section class="box ch"><video src="v6-passwords.mp4" poster="p6.jpg" controls playsinline preload="none"></video>
+    <div class="t"><div class="n">6</div><div><b>סיסמאות בלי כאב ראש</b><span>פרק 6 · 3 צעדים · 5 דקות</span></div></div>
+    <ul>
+      <li><label><input type="checkbox"><span>בדקתי את הסיסמאות ששמורות בטלפון</span></label></li>
+      <li><label><input type="checkbox"><span>שיניתי כל סיסמה שדלפה</span></label></li>
+      <li><label><input type="checkbox"><span>הסיסמה של הג'ימייל לא משמשת לשום דבר אחר</span></label></li>
+    </ul></section>
+
+  <h2>🎁 ההורים שלכם</h2>
+  <div class="box">
+    <p>"אמא לא נופלת בעוקץ" נכתב בשבילם, באותיות גדולות. הכי טוב לשבת איתם רבע שעה ולעבור עליו ביחד.</p>
+    <div class="dl">
+      <a class="b" href="bonus-parents.pdf" download>⬇ הורדת הבונוס</a>
+      <button class="btn w" id="share">שליחה להורים בוואטסאפ</button>
+    </div>
+  </div>
+
+  <h2>נתקעתם?</h2>
+  <div class="box">
+    <p>שלחו לנו צילום מסך של המקום שבו נתקעתם, ונגיד לכם בדיוק איפה ללחוץ.</p>
+    <div class="dl"><a class="btn w" href="https://wa.me/972559397892">כתבו לנו בוואטסאפ</a></div>
+    <p class="note">אנחנו אף פעם לא נבקש מכם קוד או סיסמה.</p>
+  </div>
+
+  <footer>הסימונים נשמרים בטלפון שבו סימנתם אותם.</footer>
 </main>
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.ch input')), KEY = 'locked-progress', saved = [];
+  try { saved = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+  function upd() {
+    var n = boxes.filter(function (b) { return b.checked; }).length;
+    document.getElementById('cnt').textContent = n + ' מתוך ' + boxes.length;
+    document.getElementById('fill').style.width = (100 * n / boxes.length) + '%';
+    document.getElementById('done').classList.toggle('show', n === boxes.length);
+  }
+  boxes.forEach(function (b, i) {
+    b.checked = !!saved[i];
+    b.addEventListener('change', function () {
+      try { localStorage.setItem(KEY, JSON.stringify(boxes.map(function (x) { return x.checked ? 1 : 0; }))); } catch (e) {}
+      upd();
+    });
+  });
+  upd();
+  document.getElementById('share').addEventListener('click', function () {
+    var url = new URL('bonus-parents.pdf', location.href).href, text = 'מדריך קצר נגד עוקצים בטלפון, שווה לקרוא: ';
+    if (navigator.share) navigator.share({ title: 'אמא לא נופלת בעוקץ', text: text, url: url }).catch(function () {});
+    else location.href = 'https://wa.me/?text=' + encodeURIComponent(text + url);
+  });
+})();
+</script>
 </body>
 </html>
