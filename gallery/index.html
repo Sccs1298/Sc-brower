@@ -54,6 +54,7 @@
         <li><b>גלריה מתנפצת, פסיפס, מצגת שעוצרת</b></li>
       </ul>
       <div class="tc-acts"><button class="btn-big primary" data-open="photos" type="button">פתח את הגלריה</button>
+        <div class="btn-big file-btn secondary">＋ הוסף סרטונים או תמונות<input class="file-in" type="file" accept="video/*,image/*" multiple aria-label="הוסף סרטונים או תמונות"></div>
         <div class="tc-sub"><button class="btn" data-open="manage" type="button">ניהול הסרטונים</button><button class="btn" data-open="help" type="button">מדריך מלא עם ציורים</button></div></div>
     </div>
 
@@ -146,7 +147,7 @@
 </section>
 
 <!-- ===================== מחשבון ===================== -->
-<section id="calc" class="screen trick">
+<section id="calc" class="screen trick-screen">
   <div class="exit-band" aria-hidden="true"></div>
   <div class="calc">
     <div class="c-disp" id="cDisp">0</div>
@@ -161,7 +162,7 @@
 </section>
 
 <!-- ===================== חיפוש באינטרנט ===================== -->
-<section id="web" class="screen trick web">
+<section id="web" class="screen trick-screen web">
   <div class="exit-band" aria-hidden="true"></div>
   <div id="wHome" class="w-home">
     <div class="w-logo">חיפוש</div>
@@ -181,7 +182,7 @@
 </section>
 
 <!-- ===================== חפיסת קלפים ===================== -->
-<section id="deck" class="screen trick deck">
+<section id="deck" class="screen trick-screen deck">
   <div class="exit-band" aria-hidden="true"></div>
   <p class="d-hint">בחר קלף</p>
   <div id="dFan" class="d-fan"></div>
@@ -190,7 +191,7 @@
 </section>
 
 <!-- ===================== מסך נעול + התראה ===================== -->
-<section id="lock" class="screen trick lock">
+<section id="lock" class="screen trick-screen lock">
   <div class="exit-band" aria-hidden="true"></div>
   <div class="l-top"><div id="lDate" class="l-date"></div><div id="lTime" class="l-time"></div></div>
   <div id="lNote" class="l-note" hidden>
@@ -237,8 +238,7 @@
     <div class="group-title">הסרטונים שלך</div>
     <div id="mgList" class="group"></div>
 
-    <label class="btn-big primary" for="fileIn">הוסף סרטונים או תמונות</label>
-    <input id="fileIn" type="file" accept="video/*,image/*" multiple hidden>
+    <div class="btn-big primary file-btn">＋ הוסף סרטונים או תמונות<input id="fileIn" class="file-in" type="file" accept="video/*,image/*" multiple aria-label="הוסף סרטונים או תמונות"></div>
     <p class="foot">כל מה שתוסיף יופיע בגלריה. אפשר לבחור כמה קבצים יחד. פריט עם "חשיפה" הוא טריק. תמונות וסרטונים רגילים מוסיפים אמינות לגלריה.</p>
 
     <div class="group">

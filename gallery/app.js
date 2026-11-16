@@ -947,7 +947,7 @@ function renderManage() {
     const tag = $('.tag', b);
     tag.textContent = (Store.mode === 'cloud' && it.unsaved) ? 'לא נשמר' : it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
     if (Store.mode === 'cloud' && it.unsaved) tag.classList.add('warn');
-    if (isTrick && !it.hidden) tag.classList.add('trick');
+    if (isTrick && !it.hidden) tag.classList.add('is-trick');
     b.addEventListener('click', () => { E.id = it.id; go('edit'); });
     box.appendChild(b);
   }
@@ -1076,7 +1076,7 @@ function syncUnsaved() {
   b.hidden = !(Store.mode === 'cloud' && E.item.unsaved);
 }
 
-$('#fileIn').addEventListener('change', async e => {
+async function onFiles(e) {
   const files = [...e.target.files]; e.target.value = ''; if (!files.length) return;
   let last = null, n = 0; const bigOnes = [];
   for (const f of files) {
@@ -1108,7 +1108,8 @@ $('#fileIn').addEventListener('change', async e => {
   if (bigOnes.length) setTimeout(() => offerCompress(bigOnes[0]), 400);
   if (n === 1) { toast(last.kind === 'photo' ? 'נוספה תמונה רגילה. אפשר להפוך אותה לטריק כאן' : 'נוסף. עכשיו סמן איפה ומתי הבחירה תופיע'); E.id = last.id; go('edit'); }
   else { toast(`נוספו ${n} פריטים לגלריה`); renderManage(); }
-});
+}
+$$('.file-in').forEach(inp => inp.addEventListener('change', onFiles));
 
 /* ===================== עורך ===================== */
 const E = { id: null, item: null, src: null, sel: 0, target: 'start', raf: 0, drag: null, saveT: 0, scrubbing: false };
