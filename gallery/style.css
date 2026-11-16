@@ -552,3 +552,19 @@ body:has(#edBar:not([hidden])) #toast { bottom: calc(env(safe-area-inset-bottom)
 .p-load { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; pointer-events: none; }
 .spin { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(255,255,255,.25); border-top-color: #fff; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===================== רישיון ותשלום ===================== */
+.lic-chip { border: 0; border-radius: 99px; padding: 6px 14px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 10px;
+  background: rgba(255,159,10,.16); color: #c77700; }
+.lic-chip.full { background: rgba(52,199,89,.16); color: #1f9d4c; cursor: default; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .lic-chip { color: #ffb340; } :root:not([data-theme="light"]) .lic-chip.full { color: #4cd964; } }
+.pay-box { position: relative; gap: 12px; }
+.pay-box > b { font-size: 22px; }
+.pay-x { position: absolute; top: 10px; left: 10px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--fill); color: var(--dim); font-size: 14px; cursor: pointer; }
+.pay-list { margin: 0; padding-inline-start: 20px; display: grid; gap: 4px; font-size: 15px; }
+.pay-box .btn-big { margin-top: 2px; text-decoration: none; }
+.pay-form { display: grid; gap: 6px; border-top: .5px solid var(--sep); padding-top: 12px; }
+.pay-form label { font-size: 14px; color: var(--dim); }
+.pay-row { display: flex; gap: 8px; }
+.pay-row input { flex: 1; min-width: 0; height: 46px; border: 0; border-radius: 10px; background: var(--fill); padding: 0 12px; font-size: 17px; letter-spacing: 1px; text-transform: uppercase; color: var(--fg); }
+.pay-err { color: var(--danger) !important; font-size: 14px !important; }
