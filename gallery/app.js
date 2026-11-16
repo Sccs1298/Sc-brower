@@ -2115,6 +2115,6 @@ $('#lTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כ
   try { history.replaceState({ g: 1 }, ''); } catch (e) { /* ignore */ }
   const root = S.startIn === 'photos' ? 'photos' : 'hub';
   NAV.stack = [root]; paint(root); ENTER[root]();
-  try { if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {}); }
+  try { if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => {}); }
   catch (e) { /* מסגרת מוגבלת */ }
 })();
