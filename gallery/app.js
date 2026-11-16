@@ -129,10 +129,11 @@ const saveSettings = () => { clearTimeout(settingsT); settingsT = setTimeout(() 
 /* שמירה בתור – כתיבה אחת בכל פעם לכל סרטון */
 const saveChains = {};
 function persist(item) {
+  if (Store.mode === 'cloud' && item.unsaved) return Promise.resolve(); // עדיין לא נשמר בחשבון
   const snap = { ...item, regions: JSON.parse(JSON.stringify(item.regions || [])) };
   saveChains[item.id] = (saveChains[item.id] || Promise.resolve())
     .then(() => Store.put(snap))
-    .catch(() => toast('השמירה נכשלה. נסה שוב'));
+    .catch(err => toast('השמירה נכשלה' + (err && err.code ? ` (${err.code})` : '') + '. נסה שוב'));
   return saveChains[item.id];
 }
 
@@ -159,6 +160,7 @@ function demoItem() {
 function normalize(it) {
   if (it.method === 'list') { it.method = 'grid'; it.digits = 1; }
   delete it._url;
+  if (it.name && /^[0-9a-f-]{16,}$/i.test(it.name)) it.name = (it.kind === 'photo' ? 'תמונה ' : 'סרטון ') + new Date(it.shotAt || it.created || Date.now()).toLocaleDateString('he-IL');
   // תיקון לפריטים שנשמרו בטעות כסרטון
   if (!it.builtin && !it.duration && /\.(jpe?g|png|heic|heif|webp|gif|avif)$/i.test(it.fileName || '')) it.kind = 'photo';
   if (!METHODS[it.method]) it.method = it.content === 'drawing' ? 'draw' : 'grid';
@@ -510,7 +512,11 @@ class VideoSource {
       if (v.readyState >= 2) return ok();
       v.addEventListener('loadeddata', ok, { once: true });
       v.addEventListener('loadedmetadata', () => setTimeout(ok, 900), { once: true });
-      v.addEventListener('error', () => { if (!done) { done = true; rej(new Error('לא ניתן לטעון את הסרטון')); } }, { once: true });
+      v.addEventListener('error', () => {
+        if (done) return; done = true;
+        const c = v.error && v.error.code;
+        rej(new Error(c === 4 ? 'הטלפון לא מצליח לנגן את סוג הסרטון הזה' : c === 2 ? 'בעיית רשת בטעינת הסרטון' : 'לא ניתן לטעון את הסרטון'));
+      }, { once: true });
       // אייפון לא טוען פריים לפני ניגון: מנגנים רגע בשקט ועוצרים
       v.muted = true;
       const p = v.play();
@@ -557,6 +563,20 @@ class ImageSource {
   pause() { this._t = this.time; this.paused = true; }
   draw(ctx, w, h) { if (this.img.naturalWidth) ctx.drawImage(this.img, 0, 0, w, h); }
   destroy() { if (this.owned) URL.revokeObjectURL(this.url); }
+}
+const BLOBS = new Map();
+async function ensureBlob(it) {
+  if (!it || it.blob || !it.assetUrl || it.kind === 'photo' || it.builtin) return;
+  if (BLOBS.has(it.id)) { it.blob = BLOBS.get(it.id); return; }
+  toast('טוען את הסרטון…', 30000);
+  let res;
+  try { res = await fetch(it.assetUrl); } catch (e) { throw new Error('אין חיבור. לא ניתן להוריד את הסרטון מהחשבון'); }
+  if (!res.ok) throw new Error(`לא ניתן להוריד את הסרטון מהחשבון (${res.status})`);
+  let b = await res.blob();
+  if (!b.type || b.type === 'application/octet-stream') b = new Blob([b], { type: 'video/mp4' });
+  BLOBS.set(it.id, b); it.blob = b;
+  const live = byId(it.id); if (live) live.blob = b;
+  $('#toast').hidden = true;
 }
 const makeSource = item => {
   if (item.builtin === 'demo') return new DemoSource();
@@ -942,10 +962,12 @@ function renderManage() {
     b.innerHTML = '<img alt=""><div class="txt"><b></b><span></span></div><span class="tag"></span>';
     const th = thumbFor(it); if (th) $('img', b).src = th;
     $('b', b).textContent = it.name;
-    $('.txt span', b).textContent = (it.kind === 'photo' ? 'תמונה · ' : `${fmtDur(it.duration)} · `) + (isTrick ? `${kind} · ${METHODS[it.method].name}` : (it.kind === 'photo' ? 'רגילה' : 'סרטון רגיל'));
+    const SHORT = { grid: 'מקשים', keyboard: 'מקלדת', peek: 'הצופה מחפש', pre: 'מסך חיפוש', scrub: 'גרירה', draw: 'ציור' };
+    $('.txt span', b).textContent = (it.kind === 'photo' ? 'תמונה · ' : `${fmtDur(it.duration)} · `) + (isTrick ? `${kind} · ${SHORT[it.method] || ''}` : (it.kind === 'photo' ? 'רגילה' : 'סרטון רגיל'));
     const tag = $('.tag', b);
-    tag.textContent = it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
-    if (isTrick && !it.hidden) tag.classList.add('trick');
+    tag.textContent = (Store.mode === 'cloud' && it.unsaved) ? 'לא נשמר' : it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
+    if (Store.mode === 'cloud' && it.unsaved) tag.classList.add('warn');
+    if (isTrick && !it.hidden) tag.classList.add('is-trick');
     b.addEventListener('click', () => { E.id = it.id; go('edit'); });
     box.appendChild(b);
   }
@@ -961,9 +983,136 @@ $('#help .toc').addEventListener('click', e => {
 });
 $('#helpDone').onclick = () => { if (!S.seenHelp) { S.seenHelp = true; saveSettings(); } uiBack(); };
 
-$('#fileIn').addEventListener('change', async e => {
+
+/* ===================== העלאה לחשבון: סוגים, גודל, כיווץ ===================== */
+const MAX_ASSET = 20 * 1024 * 1024 - 96 * 1024;
+const IMG_OK = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+const ERR_TEXT = {
+  too_large: 'גדול מ-20MB', unsupported_type: 'סוג קובץ לא נתמך', not_granted: 'לא אישרת שמירת קבצים',
+  quota_or_state: 'נגמר המקום בחשבון', rate_limited: 'יותר מדי העלאות, נסה עוד דקה', store_unavailable: 'השירות לא זמין כרגע',
+};
+const errText = err => (err && ERR_TEXT[err.code]) || (err && err.message) || 'שגיאה לא ידועה';
+/* תמונה: ממירים ל-JPEG (גם HEIC של אייפון) ומקטינים אם צריך */
+async function toJpeg(file, maxSide = 2600, q = .86) {
+  const u = URL.createObjectURL(file), img = new Image();
+  try {
+    await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('לא ניתן לפתוח את התמונה')); img.src = u; });
+    const sc = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+  } finally { URL.revokeObjectURL(u); }
+}
+async function uploadMedia(file, kind) {
+  let blob = file, type = (file.type || '').split(';')[0];
+  if (kind === 'photo') {
+    if (!IMG_OK.includes(type) || blob.size > MAX_ASSET) {
+      blob = await toJpeg(file); type = 'image/jpeg';
+      if (blob.size > MAX_ASSET) blob = await toJpeg(file, 1800, .8);
+    }
+  } else {
+    // סרטון אייפון (MOV) הוא אותו מבנה כמו MP4 – שומרים אותו כ-MP4
+    if (type !== 'video/mp4' && type !== 'video/webm') type = 'video/mp4';
+    if (blob.size > MAX_ASSET) throw { code: 'too_large' };
+  }
+  return Store.assets.upload(blob, { type });
+}
+/* כיווץ סרטון גדול: מנגנים אותו בשקט ומקליטים מחדש באיכות נמוכה יותר, עם הקול */
+function compressVideo(file, onProgress) {
+  // כל ההכנה קורית מיד בתוך הלחיצה, כדי שהדפדפן ירשה לנגן עם קול
+  const v = document.createElement('video'), u = URL.createObjectURL(file);
+  v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = u;
+  $('#vhost').appendChild(v);
+  let ac = null, dest = null;
+  try {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    const node = ac.createMediaElementSource(v); dest = ac.createMediaStreamDestination(); node.connect(dest); // לא לרמקולים
+  } catch (e) { v.muted = true; dest = null; }
+  const playP = v.play();
+  return (async () => {
+    try {
+      if (playP && playP.catch) await playP.catch(() => { v.muted = true; return v.play(); });
+      v.pause(); v.currentTime = 0;
+      if (ac) await ac.resume().catch(() => {});
+      const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 30;
+      const sc = Math.min(1, 1280 / Math.max(v.videoWidth || 1280, v.videoHeight || 720));
+      const c = document.createElement('canvas'); c.width = Math.round((v.videoWidth || 1280) * sc / 2) * 2; c.height = Math.round((v.videoHeight || 720) * sc / 2) * 2;
+      const x = c.getContext('2d'), stream = c.captureStream(30);
+      if (dest) dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      const mime = pickMime();
+      const vbps = Math.max(500e3, Math.min(4e6, (MAX_ASSET * 8 * .82) / dur - 96e3));
+      const rec = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), videoBitsPerSecond: vbps, audioBitsPerSecond: 96e3 });
+      const chunks = []; rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      const stopped = new Promise(r => { rec.onstop = r; });
+      x.drawImage(v, 0, 0, c.width, c.height);
+      rec.start(1000);
+      await v.play();
+      await new Promise(res => {
+        const tick = () => {
+          if (v.readyState >= 2) x.drawImage(v, 0, 0, c.width, c.height);
+          onProgress && onProgress(Math.min(1, v.currentTime / dur));
+          if (v.ended || v.currentTime >= dur - .03) return res();
+          requestAnimationFrame(tick);
+        };
+        v.onended = res; tick();
+      });
+      rec.stop(); await stopped;
+      const type = ((rec.mimeType || mime || 'video/webm').split(';')[0]) || 'video/webm';
+      return new Blob(chunks, { type });
+    } finally {
+      v.pause(); v.remove(); URL.revokeObjectURL(u);
+      if (ac) ac.close().catch(() => {});
+    }
+  })();
+}
+/* חלון "כווץ ושמור" */
+function offerCompress(it) {
+  if (!it || !it.blob || !Store.assets) return;
+  const dlg = $('#cmp'), mb = (it.blob.size / 1048576).toFixed(0);
+  $('#cmpTitle').textContent = `הסרטון גדול (${mb}MB)`;
+  $('#cmpText').textContent = `כדי לשמור אותו בחשבון צריך לכווץ אותו מתחת ל-20MB. זה לוקח בערך ${Math.ceil(it.duration || 20)} שניות. עד אז הוא בגלריה ואפשר להופיע איתו, אבל הוא יימחק אם תסגור את הדף.`;
+  $('#cmpBar').style.width = '0%'; $('#cmpProg').hidden = true; $('#cmpGo').disabled = false; $('#cmpLater').disabled = false;
+  dlg.hidden = false;
+  $('#cmpLater').onclick = () => { dlg.hidden = true; };
+  $('#cmpGo').onclick = () => {
+    $('#cmpGo').disabled = true; $('#cmpLater').disabled = true; $('#cmpProg').hidden = false;
+    $('#cmpText').textContent = 'מכווץ… אל תסגור את המסך.';
+    compressVideo(it.blob, p => { $('#cmpBar').style.width = Math.round(p * 100) + '%'; })
+      .then(async small => {
+        $('#cmpText').textContent = `שומר בחשבון (${(small.size / 1048576).toFixed(1)}MB)…`;
+        const r = await Store.assets.upload(small, { type: small.type });
+        Object.assign(it, { assetId: r.id, assetUrl: r.url, size: r.sizeBytes, blob: small }); delete it.unsaved;
+        const live = byId(it.id); if (live && live !== it) Object.assign(live, it), delete live.unsaved;
+        await persist(byId(it.id) || it);
+        dlg.hidden = true; toast('הסרטון כווץ ונשמר בחשבון ✓');
+        if (curScreen() === 'manage') renderManage();
+        if (E.item && E.item.id === it.id) { Object.assign(E.item, { assetId: r.id, assetUrl: r.url, size: r.sizeBytes }); delete E.item.unsaved; syncUnsaved(); }
+      })
+      .catch(err => { $('#cmpText').textContent = 'הכיווץ או השמירה נכשלו: ' + errText(err) + '. הסרטון עדיין בגלריה עד סגירת הדף.'; $('#cmpLater').disabled = false; $('#cmpLater').textContent = 'סגור'; });
+  };
+}
+function setEdTab(t) {
+  $('#edit').dataset.tab = t;
+  $$('#edTabs [data-go]').forEach(b => { b.classList.toggle('on', b.dataset.go === t); b.setAttribute('aria-selected', b.dataset.go === t); });
+  window.scrollTo(0, 0);
+}
+$('#edTabs').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b && !b.disabled) setEdTab(b.dataset.go); });
+function syncUnsaved() {
+  const b = $('#edUnsaved'); if (!b || !E.item) return;
+  b.hidden = !(Store.mode === 'cloud' && E.item.unsaved);
+}
+
+function niceName(f, photo) {
+  const base = f.name.replace(/\.[^.]+$/, '');
+  if (/^[0-9a-f-]{16,}$/i.test(base) || /^(image|video|trim)[-_.]?\d*$/i.test(base)) {
+    const d = new Date(f.lastModified || Date.now());
+    return `${photo ? 'תמונה' : 'סרטון'} ${d.getDate()}.${d.getMonth() + 1} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+  return base;
+}
+async function onFiles(e) {
   const files = [...e.target.files]; e.target.value = ''; if (!files.length) return;
-  let last = null, n = 0;
+  let last = null, n = 0; const bigOnes = [];
   for (const f of files) {
     toast(files.length > 1 ? `טוען ${n + 1} מתוך ${files.length}…` : 'טוען…', 60000);
     let info;
@@ -971,24 +1120,30 @@ $('#fileIn').addEventListener('change', async e => {
     const photo = info.kind === 'photo';
     const t = photo ? 1.5 : info.duration ? +(info.duration * .75).toFixed(2) : 3;
     const it = normalize({
-      id: uid(), kind: photo ? 'photo' : 'video', name: f.name.replace(/\.[^.]+$/, ''), fileName: f.name, size: f.size, blob: f,
+      id: uid(), kind: photo ? 'photo' : 'video', name: niceName(f, photo), fileName: f.name, size: f.size, blob: f,
       w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, created: Date.now(), shotAt: f.lastModified || Date.now(),
       content: 'number', method: 'grid', digits: 2, trick: !photo, meta: 'none', words: DEFAULT_WORDS.slice(), regions: [newRegion(t, photo ? { fade: 3, effect: 'develop' } : {})],
     });
     if (Store.mode === 'cloud') {
-      if (!Store.assets) toast('אין הרשאה לשמור קבצים בקישור הזה. הפריט יישמר רק עד הסגירה', 4000);
+      if (!Store.assets) { it.unsaved = true; toast('אין הרשאה לשמור קבצים בקישור הזה. הפריט בגלריה עד סגירת הדף', 4500); }
       else {
-        toast('שומר בחשבון…', 60000);
-        try { const r = await Store.assets.upload(f); it.assetId = r.id; it.assetUrl = r.url; it.size = r.sizeBytes; }
-        catch (err) { toast(err && err.code === 'too_large' ? `${f.name} גדול מ-20MB. קצר אותו או השתמש באפליקציה המותקנת` : 'השמירה נכשלה. נסה שוב', 6000); continue; }
+        toast(files.length > 1 ? `שומר ${n + 1} מתוך ${files.length} בחשבון…` : 'שומר בחשבון…', 60000);
+        try { const r = await uploadMedia(f, it.kind); it.assetId = r.id; it.assetUrl = r.url; it.size = r.sizeBytes; }
+        catch (err) {
+          it.unsaved = true;   // נשאר בגלריה עכשיו, גם אם לא נשמר
+          if (err && err.code === 'too_large' && it.kind !== 'photo') bigOnes.push(it);
+          else toast(`${f.name}: לא נשמר בחשבון (${errText(err)}). הוא בגלריה עד סגירת הדף`, 6000);
+        }
       }
     }
     ITEMS.push(it); await persist(it); last = it; n++;
   }
   if (!last) return;
+  if (bigOnes.length) setTimeout(() => offerCompress(bigOnes[0]), 400);
   if (n === 1) { toast(last.kind === 'photo' ? 'נוספה תמונה רגילה. אפשר להפוך אותה לטריק כאן' : 'נוסף. עכשיו סמן איפה ומתי הבחירה תופיע'); E.id = last.id; go('edit'); }
   else { toast(`נוספו ${n} פריטים לגלריה`); renderManage(); }
-});
+}
+$$('.file-in').forEach(inp => inp.addEventListener('change', onFiles));
 
 /* ===================== עורך ===================== */
 const E = { id: null, item: null, src: null, sel: 0, target: 'start', raf: 0, drag: null, saveT: 0, scrubbing: false };
@@ -1006,8 +1161,10 @@ function syncEditorForm() {
   if (!ok.some(([k]) => k === it.method)) it.method = ok[0][0];
   fillSelect($('#edMethod'), ok.map(([k, m]) => [k, m.name]), it.method);
   $('#edMethodHelp').textContent = METHODS[it.method].help;
-  $('#edTapRow').hidden = !(it.method === 'grid' && it.kind !== 'photo');
-  $('#edG1').textContent = it.kind === 'photo' ? '1. פרטי התמונה' : '1. פרטי הסרטון';
+  $('#edTapRow').hidden = true;
+  $('#edG1').textContent = it.kind === 'photo' ? 'פרטי התמונה' : 'פרטי הסרטון';
+  $$('#edTabs [data-go]').forEach(b => { if (b.dataset.go === 'where' || b.dataset.go === 'look') b.disabled = it.trick === false; });
+  if (it.trick === false && ['where', 'look'].includes($('#edit').dataset.tab)) setEdTab('basic');
   $('#edTrickLbl').textContent = it.kind === 'photo' ? 'תמונת טריק (עם חשיפה)' : 'סרטון טריק (עם חשיפה)';
   $('#edTap').checked = it.tapPause !== false;
   $('#edWordsWrap').hidden = it.content !== 'word';
@@ -1054,10 +1211,11 @@ function renderRegions() {
   }
 }
 ENTER.edit = async () => {
-  $('#edBar').hidden = false; edStatus('');
+  $('#edBar').hidden = false; edStatus(''); if (!$('#edit').dataset.tab || E.id !== E.lastId) setEdTab('basic'); E.lastId = E.id;
   document.documentElement.style.setProperty('--navh', ($('#edit .nav').offsetHeight || 52) + 'px');
   const src = byId(E.id); if (!src) { uiBack(); return; }
   E.item = { ...src, regions: JSON.parse(JSON.stringify(src.regions)), words: (src.words || []).slice() };
+  syncUnsaved();
   E.sel = Math.min(E.sel, Math.max(0, E.item.regions.length - 1)); E.target = 'start';
   $('#edName').value = E.item.name;
   $('#edContent').value = E.item.content;
@@ -1067,7 +1225,7 @@ ENTER.edit = async () => {
   $('#edShot').value = new Date(ts - new Date(ts).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   fillSelect($('#rgFont'), Object.entries(FONTS).map(([k, f]) => [k, f.name]), 'hand');
   syncEditorForm(); renderRegions();
-  try { E.src = makeSource(E.item); await E.src.ready(); } catch (err) { toast(err.message); return; }
+  try { const live = byId(E.item.id); await ensureBlob(live); if (live && live.blob) E.item.blob = live.blob; E.src = makeSource(E.item); await E.src.ready(); } catch (err) { toast(err.message, 5000); return; }
   if (curScreen() !== 'edit') { E.src.destroy(); E.src = null; return; }
   if (!E.item.duration && E.src.duration) E.item.duration = E.src.duration;
   E.item.w = E.src.w; E.item.h = E.src.h;
@@ -1103,7 +1261,7 @@ async function flushEdit() { clearTimeout(E.saveT); const m = commitEdit(); if (
 
 function sizeEdCanvas() {
   if (!E.src) return;
-  const c = $('#edCanvas'), maxW = Math.min($('#edit .preview').clientWidth || 360, 680), maxH = innerHeight * (innerHeight < 560 ? .42 : .34);
+  const c = $('#edCanvas'), maxW = Math.min($('#edit .preview').clientWidth || 360, 680), maxH = innerHeight * (innerHeight < 560 ? .36 : .24);
   const s = Math.min(maxW / E.src.w, maxH / E.src.h), dpr = Math.min(devicePixelRatio || 1, 2);
   c.style.width = `${Math.round(E.src.w * s)}px`; c.style.height = `${Math.round(E.src.h * s)}px`;
   c.width = Math.round(E.src.w * s * dpr); c.height = Math.round(E.src.h * s * dpr);
@@ -1180,6 +1338,7 @@ $('#rgNow').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r
 $('#rgKeysClear').onclick = () => { const r = curRegion(); if (!r) return; r.keys = []; renderRegions(); scheduleSave(); };
 $('#rgQuadReset').onclick = () => { const r = curRegion(); if (!r) return; r.persp.q = defQuad(); scheduleSave(); };
 $('#edTry').onclick = async () => { if (!E.item) return; await flushEdit(); openViewer(E.item.id, { from: 'edit' }); };
+$('#edUnsavedGo').onclick = () => { const it = byId(E.item && E.item.id); if (it) offerCompress(it); };
 $('#edSave').onclick = async () => { if (!E.item) return; await flushEdit(); toast('נשמר ✓', 1400); };
 $('#edDone').onclick = async () => { if (E.item) await flushEdit(); uiBack(); };
 $('#edStage').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit', stage: true }); };
@@ -1321,7 +1480,7 @@ ENTER.perform = async () => {
   P.minT = P.regions.length ? Math.min(...P.regions.map(r => r.t)) : Infinity;
   $('#pmenu').hidden = true; closePops();
   initPhotosUI();
-  try { P.src = makeSource(item); await P.src.ready(); } catch (err) { toast(err.message); uiBack(); return; }
+  try { await ensureBlob(item); P.src = makeSource(item); await P.src.ready(); } catch (err) { toast(err.message, 5000); uiBack(); return; }
   if (!P.active) { P.src.destroy(); P.src = null; return; }
   P.src.time = 0;
   if (req.stage && screen.orientation && screen.orientation.lock) screen.orientation.lock(P.src.w >= P.src.h ? 'landscape' : 'portrait').catch(() => {});
@@ -1688,7 +1847,7 @@ const toVideo = e => {
 };
 const isPlaying = () => !P.isPhoto && !!(P.src && P.started && !P.src.ended && !P.src.paused);
 /* שלב ההזנה: בסרטון – בזמן ניגון; בתמונה – אחרי שהסתירו את הכפתורים ועד שהחשיפה ננעלה */
-const inputPhase = () => P.isPhoto ? (P.hasTrick && P.started && !P.chrome && !P.frozen) : isPlaying();
+const inputPhase = () => P.isPhoto ? (P.hasTrick && P.started && !P.chrome && !P.frozen) : (isPlaying() || P.tapPaused);
 const drawMode = () => P.item && P.item.content === 'drawing' && P.regions.length;
 
 touch.addEventListener('pointerdown', e => {
@@ -1763,13 +1922,12 @@ function secretTap(e, stroke) {
     else if (!P.started) begin();
     return;
   }
-  if (P.frozen || !P.hasTrick) return;
   const it = P.item;
-  if (it.content === 'drawing') { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
-  if (it.method !== 'grid') return;
-  tapDigit(e);
-  // במצב "עצירה והמשך": כל נגיעה עוצרת את הסרטון, והבאה ממשיכה. נראה כמו צפייה רגילה.
-  if (it.tapPause !== false) { P.src.pause(); P.tapPaused = true; }
+  // ציור נסתר: נגיעה היא נקודה בציור, לא עצירה
+  if (it.content === 'drawing' && P.hasTrick && !P.frozen) { if (stroke) { P.input.strokes.push(stroke); buzz(); } return; }
+  // בכל הסרטונים: נגיעה עוצרת, והנגיעה הבאה ממשיכה. במקשים הנסתרים כל נגיעה גם נקלטת כספרה.
+  if (!P.frozen && P.hasTrick && it.method === 'grid') tapDigit(e);
+  P.src.pause(); P.tapPaused = true;
 }
 function tapDigit(e) {
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);

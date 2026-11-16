@@ -112,7 +112,7 @@ input[type=range] { direction: ltr; }
 .mg-item .txt b { font-weight: 600; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mg-item .txt span { font-size: 13px; color: var(--dim); }
 .mg-item .tag { font-size: 12px; padding: 3px 8px; border-radius: 99px; background: var(--fill); color: var(--dim); white-space: nowrap; }
-.mg-item .tag.trick { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+.mg-item .tag.is-trick { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
 
 /* עורך */
 .preview { display: flex; justify-content: center; background: #000; border-radius: 12px; overflow: hidden; }
@@ -351,7 +351,7 @@ input[type=range] { direction: ltr; }
 .hub .dim { color: var(--dim); font-size: 14px; }
 
 /* מסכי קסם: פס עליון נסתר ליציאה */
-.trick { position: fixed; inset: 0; z-index: 9; overflow: hidden; }
+.trick-screen { position: fixed; inset: 0; z-index: 9; overflow: hidden; }
 .exit-band { position: absolute; z-index: 30; top: 0; left: 0; right: 0; height: calc(env(safe-area-inset-top) + 44px); -webkit-touch-callout: none; user-select: none; }
 
 /* מחשבון */
@@ -436,7 +436,7 @@ input[type=range] { direction: ltr; }
 /* ===================== תיקוני מכשיר אמיתי ===================== */
 * { touch-action: manipulation; }                 /* בלי זום בהקשה כפולה (מקשים מהירים) */
 html, body { overscroll-behavior: none; }         /* בלי "משיכה לרענון" באמצע קסם */
-.trick, #perform, #memories { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.trick-screen, #perform, #memories { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .w-form input, .sr-field input, .pre-in, .ph-caption { -webkit-user-select: text; user-select: text; }
 
 /* מרכז הקסמים: פתיחה מהירה */
@@ -494,3 +494,56 @@ html, body { overscroll-behavior: none; }         /* בלי "משיכה לרענ
 #edit .row { min-height: 52px; }
 
 body:has(#edBar:not([hidden])) #toast { bottom: calc(env(safe-area-inset-bottom) + 96px); }
+
+/* ===================== חלון כיווץ + סימון "לא נשמר" ===================== */
+.modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(0,0,0,.45); padding: 20px; }
+.modal-box { width: min(100%, 420px); background: var(--card); color: var(--fg); border-radius: 16px; padding: 18px; display: grid; gap: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+.modal-box b { font-size: 18px; }
+.modal-box p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--dim); }
+.modal-acts { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.prog { height: 8px; border-radius: 4px; background: var(--fill); overflow: hidden; }
+.prog i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.mg-item .tag.warn { background: rgba(255,159,10,.18); color: #ff9f0a; }
+.warn-banner { align-items: center; flex-wrap: wrap; }
+.warn-banner > span:nth-child(2) { flex: 1 1 180px; min-width: 0; }
+
+/* כפתור הוספת קבצים: השדה האמיתי שקוף מעל הכפתור */
+.file-btn { position: relative; overflow: hidden; cursor: pointer; }
+.file-btn input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 200px; }
+.btn-big.secondary { background: var(--fill); color: var(--accent); margin-top: 0; }
+
+/* ===================== עורך מותאם לאייפון ===================== */
+/* לשוניות */
+.ed-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 2px; border-radius: 10px; background: var(--fill); }
+.ed-tabs button { border: 0; border-radius: 8px; padding: 7px 0; background: none; color: var(--fg); font-size: 14px; font-weight: 600; cursor: pointer; }
+.ed-tabs button.on { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+.ed-tabs button:disabled { opacity: .35; }
+#edit[data-tab="basic"] [data-tab]:not([data-tab="basic"]),
+#edit[data-tab="where"] [data-tab]:not([data-tab="where"]),
+#edit[data-tab="look"] [data-tab]:not([data-tab="look"]),
+#edit[data-tab="more"] [data-tab]:not([data-tab="more"]) { display: none !important; }
+#edTrickWrap { display: contents; }
+#edit .group-details[data-tab] > summary { pointer-events: none; }
+#edit .group-details[data-tab] > summary::before { content: none; }
+/* תצוגה קומפקטית */
+.ed-stage { gap: 6px; padding: 4px 0 6px; }
+.ed-stage .transport { padding: 0 2px; }
+.ed-stage .round { width: 32px; height: 32px; }
+/* שדות: תווית למעלה, שדה ברוחב מלא – לא נחתך ולא נשבר */
+#edit .row:has(> input:not([type=checkbox]):not([type=range]):not([type=color]):not([type=radio])),
+#edit .row:has(> select), #edit .row:has(> .inline), #edit .row:has(> textarea) { flex-wrap: wrap; row-gap: 6px; padding-top: 10px; padding-bottom: 10px; }
+#edit .row:has(> input:not([type=checkbox]):not([type=range]):not([type=color]):not([type=radio])) > span:first-child,
+#edit .row:has(> select) > span:first-child, #edit .row:has(> .inline) > span:first-child, #edit .row:has(> textarea) > span:first-child {
+  flex: 1 0 100%; font-size: 13px; color: var(--dim); }
+#edit .row > input:not([type=checkbox]):not([type=range]):not([type=color]):not([type=radio]), #edit .row > select, #edit .row > textarea {
+  flex: 1 1 100%; width: 100%; max-width: 100%; min-height: 40px; font-size: 16px; }
+#edit .row > .inline { flex: 1 1 100%; }
+#edit .row > .inline > input { flex: 1; width: auto; min-height: 40px; }
+#edit .row input[type=range] { flex: 1 1 55%; }
+#edit .row > span:first-child { line-height: 1.3; }
+/* הסברים מקופלים */
+.hint { padding: 0 16px; }
+.hint > summary { cursor: pointer; color: var(--accent); font-size: 14px; padding: 4px 0; list-style: none; }
+.hint > summary::-webkit-details-marker { display: none; }
+.hint > summary::before { content: "ⓘ "; }
+.hint .foot { padding: 4px 0 8px; }

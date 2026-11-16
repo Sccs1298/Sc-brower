@@ -54,6 +54,7 @@
         <li><b>גלריה מתנפצת, פסיפס, מצגת שעוצרת</b></li>
       </ul>
       <div class="tc-acts"><button class="btn-big primary" data-open="photos" type="button">פתח את הגלריה</button>
+        <div class="btn-big file-btn secondary">＋ הוסף סרטונים או תמונות<input class="file-in" type="file" accept="video/*,image/*" multiple aria-label="הוסף סרטונים או תמונות"></div>
         <div class="tc-sub"><button class="btn" data-open="manage" type="button">ניהול הסרטונים</button><button class="btn" data-open="help" type="button">מדריך מלא עם ציורים</button></div></div>
     </div>
 
@@ -146,7 +147,7 @@
 </section>
 
 <!-- ===================== מחשבון ===================== -->
-<section id="calc" class="screen trick">
+<section id="calc" class="screen trick-screen">
   <div class="exit-band" aria-hidden="true"></div>
   <div class="calc">
     <div class="c-disp" id="cDisp">0</div>
@@ -161,7 +162,7 @@
 </section>
 
 <!-- ===================== חיפוש באינטרנט ===================== -->
-<section id="web" class="screen trick web">
+<section id="web" class="screen trick-screen web">
   <div class="exit-band" aria-hidden="true"></div>
   <div id="wHome" class="w-home">
     <div class="w-logo">חיפוש</div>
@@ -181,7 +182,7 @@
 </section>
 
 <!-- ===================== חפיסת קלפים ===================== -->
-<section id="deck" class="screen trick deck">
+<section id="deck" class="screen trick-screen deck">
   <div class="exit-band" aria-hidden="true"></div>
   <p class="d-hint">בחר קלף</p>
   <div id="dFan" class="d-fan"></div>
@@ -190,7 +191,7 @@
 </section>
 
 <!-- ===================== מסך נעול + התראה ===================== -->
-<section id="lock" class="screen trick lock">
+<section id="lock" class="screen trick-screen lock">
   <div class="exit-band" aria-hidden="true"></div>
   <div class="l-top"><div id="lDate" class="l-date"></div><div id="lTime" class="l-time"></div></div>
   <div id="lNote" class="l-note" hidden>
@@ -237,8 +238,7 @@
     <div class="group-title">הסרטונים שלך</div>
     <div id="mgList" class="group"></div>
 
-    <label class="btn-big primary" for="fileIn">הוסף סרטונים או תמונות</label>
-    <input id="fileIn" type="file" accept="video/*,image/*" multiple hidden>
+    <div class="btn-big primary file-btn">＋ הוסף סרטונים או תמונות<input id="fileIn" class="file-in" type="file" accept="video/*,image/*" multiple aria-label="הוסף סרטונים או תמונות"></div>
     <p class="foot">כל מה שתוסיף יופיע בגלריה. אפשר לבחור כמה קבצים יחד. פריט עם "חשיפה" הוא טריק. תמונות וסרטונים רגילים מוסיפים אמינות לגלריה.</p>
 
     <div class="group">
@@ -267,11 +267,18 @@
         <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="זמן בסרטון">
         <span id="edTime" class="mono">0.00</span>
       </div>
+      <div class="ed-tabs" id="edTabs" role="tablist">
+        <button type="button" role="tab" data-go="basic">בסיס</button>
+        <button type="button" role="tab" data-go="where">חשיפה</button>
+        <button type="button" role="tab" data-go="look">מראה</button>
+        <button type="button" role="tab" data-go="more">מתקדם</button>
+      </div>
     </div>
-    <p class="foot">גרור על התמונה כדי לסמן איפה הבחירה תופיע. פינה צהובה משנה גודל.</p>
+    <div id="edUnsaved" class="banner warn-banner" hidden><span class="dot" style="background:#ff9f0a"></span><span>הסרטון עדיין <b>לא נשמר בחשבון</b> (גדול מ-20MB). אם תסגור את הדף הוא יימחק.</span><button id="edUnsavedGo" class="btn" type="button">כווץ ושמור</button></div>
+    <p class="foot" data-tab="where">גרור על התמונה כדי לסמן איפה הבחירה תופיע. פינה צהובה משנה גודל.</p>
 
-    <div class="group-title" id="edG1">1. פרטי הסרטון</div>
-    <div class="group">
+    <div class="group-title" id="edG1" data-tab="basic">פרטי הסרטון</div>
+    <div class="group" data-tab="basic">
       <label class="row"><span>שם (לניהול בלבד)</span><input id="edName" data-i="name"></label>
       <label class="row"><span>תאריך הצילום בגלריה</span><input id="edShot" type="datetime-local"></label>
       <label class="row"><span id="edTrickLbl">סרטון טריק (עם חשיפה)</span><input id="edTrick" type="checkbox" class="switch"></label>
@@ -279,8 +286,8 @@
     </div>
 
     <div id="edTrickWrap">
-      <div class="group-title">2. מה הצופה בוחר</div>
-      <div class="group">
+      <div class="group-title" data-tab="basic">מה הצופה בוחר</div>
+      <div class="group" data-tab="basic">
         <label class="row"><span>סוג</span>
           <select data-i="content" id="edContent">
             <option value="number">מספר</option>
@@ -299,19 +306,19 @@
           <textarea id="edWords" rows="5"></textarea>
         </label>
       </div>
-      <p class="foot" id="edDigitsHelp"></p>
+      <p class="foot" id="edDigitsHelp" data-tab="basic"></p>
 
-      <div class="group-title">3. איך אתה מזין בסתר</div>
-      <div class="group">
+      <div class="group-title" data-tab="basic">איך אתה מזין בסתר</div>
+      <div class="group" data-tab="basic">
         <label class="row"><span>שיטה</span><select data-i="method" id="edMethod"></select></label>
       </div>
-      <div class="group" id="edTapRow">
+      <div class="group" id="edTapRow" data-tab="basic">
         <label class="row"><span>נגיעה עוצרת וממשיכה את הסרטון (מומלץ)</span><input id="edTap" type="checkbox" class="switch"></label>
       </div>
-      <p class="foot" id="edMethodHelp"></p>
+      <details class="hint" data-tab="basic"><summary>איך זה עובד?</summary><p class="foot" id="edMethodHelp"></p></details>
 
-      <div class="group-title">4. איפה ומתי זה מופיע</div>
-      <div class="group">
+      <div class="group-title" data-tab="where">איפה ומתי זה מופיע</div>
+      <div class="group" data-tab="where">
         <div class="row"><span>אזורים</span><div id="edRegions" class="chips"></div></div>
         <div class="row">
           <button id="rgAdd" class="btn" type="button">+ אזור נוסף</button>
@@ -324,9 +331,9 @@
         <label class="row"><span>טקסט לדוגמה</span><input id="edSample" placeholder="47"></label>
       </div>
 
-      <div class="group-title">חשיפה בפרטי הסרטון (חדש)</div>
-      <div class="group">
-        <label class="row"><span>הבחירה תופיע גם ב…</span>
+      <div class="group-title" data-tab="where">חשיפה בפרטי הסרטון</div>
+      <div class="group" data-tab="where">
+        <label class="row"><span>הבחירה תופיע גם ב</span>
           <select data-i="meta" id="edMeta">
             <option value="none">לא בשימוש</option>
             <option value="time">שעת הצילום</option>
@@ -336,10 +343,10 @@
           </select>
         </label>
       </div>
-      <p class="foot">שעה: 47 ← 17:47, ‏1447 ← 14:47. תאריך: 15 ← ה-15 בחודש, ‏1503 ← 15 במרץ. מקום: המילה מופיעה ככותרת. בסוף הסרטון הכותרת למעלה מראה את הבחירה, כאילו הסרטון צולם בשעה, בתאריך או במקום שהצופה בחר. אפשר להשתמש בזה גם בלי אזור חשיפה על התמונה.</p>
+      <details class="hint" data-tab="where"><summary>איך זה עובד?</summary><p class="foot">שעה: 47 ← 17:47, ‏1447 ← 14:47. תאריך: 15 ← ה-15 בחודש, ‏1503 ← 15 במרץ. מקום: המילה מופיעה ככותרת. בסוף הסרטון הכותרת למעלה מראה את הבחירה, כאילו הסרטון צולם בשעה, בתאריך או במקום שהצופה בחר. אפשר להשתמש בזה גם בלי אזור חשיפה על התמונה.</p></details>
 
-      <details class="group-details">
-        <summary>5. מראה החשיפה</summary>
+      <details class="group-details" data-tab="look" open>
+        <summary>מראה החשיפה</summary>
         <div class="group">
           <label class="row"><span>אפקט</span>
             <select data-r="effect">
@@ -373,8 +380,8 @@
         </div>
       </details>
 
-      <details class="group-details">
-        <summary>6. מעקב תנועה (מצלמה ביד / משטח שזז)</summary>
+      <details class="group-details" data-tab="more" open>
+        <summary>מעקב תנועה (מצלמה ביד / משטח שזז)</summary>
         <div class="group">
           <label class="row"><span>הפעל מעקב</span><input data-r="trackOn" type="checkbox" class="switch"></label>
           <div class="row col"><span class="help-inline">מזיזים את הסרגל לרגע אחר וגוררים את המסגרת למקום שבו המשטח נמצא באותו רגע. כל גרירה יוצרת נקודת מעקב, והחשיפה "נצמדת" לתנועה. כדאי לשים נקודה כל חצי שנייה עד שנייה.</span></div>
@@ -383,8 +390,8 @@
         </div>
       </details>
 
-      <details class="group-details">
-        <summary>7. פרספקטיבה (משטח בזווית)</summary>
+      <details class="group-details" data-tab="more" open>
+        <summary>פרספקטיבה (משטח בזווית)</summary>
         <div class="group">
           <label class="row"><span>הפעל פרספקטיבה</span><input data-r="persp.on" type="checkbox" class="switch"></label>
           <div class="row"><span class="help-inline">גרור את 4 הנקודות הכחולות לפינות המשטח בתמונה (לוח, דף, שלט).</span><button id="rgQuadReset" class="btn" type="button">אפס</button></div>
@@ -392,7 +399,8 @@
       </details>
     </div>
 
-    <div class="group">
+    <div class="group-title" data-tab="more">פעולות</div>
+    <div class="group" data-tab="more">
       <button class="row-link" id="edStage" type="button"><span>הופעה על מסך גדול (מצב במה)</span><span class="chev">‹</span></button>
       <button class="row-link" id="edHide" type="button"><span id="edHideLabel">הסתר מהגלריה</span><span class="chev">‹</span></button>
       <button class="row-link" id="edDup" type="button"><span>שכפל</span><span class="chev">‹</span></button>
@@ -525,7 +533,7 @@
           <li>אחרי מספר הספרות שהגדרת, <b>שאר הנגיעות לא נחשבות</b>.</li>
           <li>אין 0. כשצריך 0, משתמשים בגרירה ברצועה.</li>
           <li>במילים: הספרה היא מספר המילה ברשימה.</li>
-          <li><b>הכי טבעי, "עצירה והמשך":</b> הנגיעה הראשונה עוצרת את הסרטון ("רגע, תסתכל") והשנייה ממשיכה אותו. שתי הנגיעות נקלטות כספרות. מפעילים בעורך (מופעל כברירת מחדל).</li>
+          <li><b>עצירה והמשך:</b> בכל הסרטונים, נגיעה עוצרת את הסרטון ("רגע, תסתכל") והנגיעה הבאה ממשיכה. במקשים הנסתרים כל נגיעה גם נקלטת כספרה.</li>
           <li><b>טעות:</b> הקשה בשתי אצבעות מוחקת ספרה.</li>
         </ul>
       </div>
@@ -844,6 +852,7 @@
         <h2>בזמן ההופעה</h2>
         <ol>
           <li>נוגעים בסרטון בגלריה ולוחצים ▶. הכפתורים נעלמים כמו בגלריה אמיתית.</li>
+          <li>בזמן הניגון: נגיעה עוצרת, נגיעה נוספת ממשיכה. ככה בכל סרטון.</li>
           <li>מזינים בסתר <b>לפני רגע החשיפה</b>. גם קצת אחרי זה עובד, והחשיפה תתחיל ברגע שהזנת.</li>
           <li>בסוף הכפתורים חוזרים, ואפשר לנגן שוב.</li>
         </ol>
@@ -1026,6 +1035,14 @@
 </section>
 
 <div id="vhost" aria-hidden="true"></div>
+<div id="cmp" class="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cmpTitle">
+    <b id="cmpTitle"></b>
+    <p id="cmpText"></p>
+    <div id="cmpProg" class="prog" hidden><i id="cmpBar"></i></div>
+    <div class="modal-acts"><button id="cmpLater" class="btn" type="button">אחר כך</button><button id="cmpGo" class="ed-btn primary" type="button">כווץ ושמור</button></div>
+  </div>
+</div>
 <div id="toast" hidden></div>
 <script src="app.js"></script>
 </body>
