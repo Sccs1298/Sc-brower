@@ -403,6 +403,7 @@
     <div class="group" data-tab="more">
       <button class="row-link" id="edStage" type="button"><span>הופעה על מסך גדול (מצב במה)</span><span class="chev">‹</span></button>
       <button class="row-link" id="edHide" type="button"><span id="edHideLabel">הסתר מהגלריה</span><span class="chev">‹</span></button>
+      <div class="row-link file-btn"><span>החלף את קובץ הסרטון</span><span class="chev">‹</span><input id="edReplace" type="file" accept="video/*,image/*" aria-label="החלף את קובץ הסרטון"></div>
       <button class="row-link" id="edDup" type="button"><span>שכפל</span><span class="chev">‹</span></button>
       <button class="row-link danger" id="edDelete" type="button"><span>מחק סרטון</span></button>
     </div>
@@ -958,6 +959,7 @@
   <canvas id="stage"></canvas>
   <div id="touch"></div>
   <button id="pBack" class="stage-back" type="button">‹ חזרה</button>
+  <div id="pLoad" class="p-load" hidden><span class="spin" aria-label="טוען"></span></div>
 
   <div id="ph" hidden>
     <div class="ph-top">
