@@ -129,10 +129,11 @@ const saveSettings = () => { clearTimeout(settingsT); settingsT = setTimeout(() 
 /* שמירה בתור – כתיבה אחת בכל פעם לכל סרטון */
 const saveChains = {};
 function persist(item) {
+  if (Store.mode === 'cloud' && item.unsaved) return Promise.resolve(); // עדיין לא נשמר בחשבון
   const snap = { ...item, regions: JSON.parse(JSON.stringify(item.regions || [])) };
   saveChains[item.id] = (saveChains[item.id] || Promise.resolve())
     .then(() => Store.put(snap))
-    .catch(() => toast('השמירה נכשלה. נסה שוב'));
+    .catch(err => toast('השמירה נכשלה' + (err && err.code ? ` (${err.code})` : '') + '. נסה שוב'));
   return saveChains[item.id];
 }
 
@@ -944,7 +945,8 @@ function renderManage() {
     $('b', b).textContent = it.name;
     $('.txt span', b).textContent = (it.kind === 'photo' ? 'תמונה · ' : `${fmtDur(it.duration)} · `) + (isTrick ? `${kind} · ${METHODS[it.method].name}` : (it.kind === 'photo' ? 'רגילה' : 'סרטון רגיל'));
     const tag = $('.tag', b);
-    tag.textContent = it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
+    tag.textContent = (Store.mode === 'cloud' && it.unsaved) ? 'לא נשמר' : it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
+    if (Store.mode === 'cloud' && it.unsaved) tag.classList.add('warn');
     if (isTrick && !it.hidden) tag.classList.add('trick');
     b.addEventListener('click', () => { E.id = it.id; go('edit'); });
     box.appendChild(b);
@@ -961,9 +963,122 @@ $('#help .toc').addEventListener('click', e => {
 });
 $('#helpDone').onclick = () => { if (!S.seenHelp) { S.seenHelp = true; saveSettings(); } uiBack(); };
 
+
+/* ===================== העלאה לחשבון: סוגים, גודל, כיווץ ===================== */
+const MAX_ASSET = 20 * 1024 * 1024 - 96 * 1024;
+const IMG_OK = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+const ERR_TEXT = {
+  too_large: 'גדול מ-20MB', unsupported_type: 'סוג קובץ לא נתמך', not_granted: 'לא אישרת שמירת קבצים',
+  quota_or_state: 'נגמר המקום בחשבון', rate_limited: 'יותר מדי העלאות, נסה עוד דקה', store_unavailable: 'השירות לא זמין כרגע',
+};
+const errText = err => (err && ERR_TEXT[err.code]) || (err && err.message) || 'שגיאה לא ידועה';
+/* תמונה: ממירים ל-JPEG (גם HEIC של אייפון) ומקטינים אם צריך */
+async function toJpeg(file, maxSide = 2600, q = .86) {
+  const u = URL.createObjectURL(file), img = new Image();
+  try {
+    await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('לא ניתן לפתוח את התמונה')); img.src = u; });
+    const sc = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+  } finally { URL.revokeObjectURL(u); }
+}
+async function uploadMedia(file, kind) {
+  let blob = file, type = (file.type || '').split(';')[0];
+  if (kind === 'photo') {
+    if (!IMG_OK.includes(type) || blob.size > MAX_ASSET) {
+      blob = await toJpeg(file); type = 'image/jpeg';
+      if (blob.size > MAX_ASSET) blob = await toJpeg(file, 1800, .8);
+    }
+  } else {
+    // סרטון אייפון (MOV) הוא אותו מבנה כמו MP4 – שומרים אותו כ-MP4
+    if (type !== 'video/mp4' && type !== 'video/webm') type = 'video/mp4';
+    if (blob.size > MAX_ASSET) throw { code: 'too_large' };
+  }
+  return Store.assets.upload(blob, { type });
+}
+/* כיווץ סרטון גדול: מנגנים אותו בשקט ומקליטים מחדש באיכות נמוכה יותר, עם הקול */
+function compressVideo(file, onProgress) {
+  // כל ההכנה קורית מיד בתוך הלחיצה, כדי שהדפדפן ירשה לנגן עם קול
+  const v = document.createElement('video'), u = URL.createObjectURL(file);
+  v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = u;
+  $('#vhost').appendChild(v);
+  let ac = null, dest = null;
+  try {
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    const node = ac.createMediaElementSource(v); dest = ac.createMediaStreamDestination(); node.connect(dest); // לא לרמקולים
+  } catch (e) { v.muted = true; dest = null; }
+  const playP = v.play();
+  return (async () => {
+    try {
+      if (playP && playP.catch) await playP.catch(() => { v.muted = true; return v.play(); });
+      v.pause(); v.currentTime = 0;
+      if (ac) await ac.resume().catch(() => {});
+      const dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 30;
+      const sc = Math.min(1, 1280 / Math.max(v.videoWidth || 1280, v.videoHeight || 720));
+      const c = document.createElement('canvas'); c.width = Math.round((v.videoWidth || 1280) * sc / 2) * 2; c.height = Math.round((v.videoHeight || 720) * sc / 2) * 2;
+      const x = c.getContext('2d'), stream = c.captureStream(30);
+      if (dest) dest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      const mime = pickMime();
+      const vbps = Math.max(500e3, Math.min(4e6, (MAX_ASSET * 8 * .82) / dur - 96e3));
+      const rec = new MediaRecorder(stream, { ...(mime ? { mimeType: mime } : {}), videoBitsPerSecond: vbps, audioBitsPerSecond: 96e3 });
+      const chunks = []; rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      const stopped = new Promise(r => { rec.onstop = r; });
+      x.drawImage(v, 0, 0, c.width, c.height);
+      rec.start(1000);
+      await v.play();
+      await new Promise(res => {
+        const tick = () => {
+          if (v.readyState >= 2) x.drawImage(v, 0, 0, c.width, c.height);
+          onProgress && onProgress(Math.min(1, v.currentTime / dur));
+          if (v.ended || v.currentTime >= dur - .03) return res();
+          requestAnimationFrame(tick);
+        };
+        v.onended = res; tick();
+      });
+      rec.stop(); await stopped;
+      const type = ((rec.mimeType || mime || 'video/webm').split(';')[0]) || 'video/webm';
+      return new Blob(chunks, { type });
+    } finally {
+      v.pause(); v.remove(); URL.revokeObjectURL(u);
+      if (ac) ac.close().catch(() => {});
+    }
+  })();
+}
+/* חלון "כווץ ושמור" */
+function offerCompress(it) {
+  if (!it || !it.blob || !Store.assets) return;
+  const dlg = $('#cmp'), mb = (it.blob.size / 1048576).toFixed(0);
+  $('#cmpTitle').textContent = `הסרטון גדול (${mb}MB)`;
+  $('#cmpText').textContent = `כדי לשמור אותו בחשבון צריך לכווץ אותו מתחת ל-20MB. זה לוקח בערך ${Math.ceil(it.duration || 20)} שניות. עד אז הוא בגלריה ואפשר להופיע איתו, אבל הוא יימחק אם תסגור את הדף.`;
+  $('#cmpBar').style.width = '0%'; $('#cmpProg').hidden = true; $('#cmpGo').disabled = false; $('#cmpLater').disabled = false;
+  dlg.hidden = false;
+  $('#cmpLater').onclick = () => { dlg.hidden = true; };
+  $('#cmpGo').onclick = () => {
+    $('#cmpGo').disabled = true; $('#cmpLater').disabled = true; $('#cmpProg').hidden = false;
+    $('#cmpText').textContent = 'מכווץ… אל תסגור את המסך.';
+    compressVideo(it.blob, p => { $('#cmpBar').style.width = Math.round(p * 100) + '%'; })
+      .then(async small => {
+        $('#cmpText').textContent = `שומר בחשבון (${(small.size / 1048576).toFixed(1)}MB)…`;
+        const r = await Store.assets.upload(small, { type: small.type });
+        Object.assign(it, { assetId: r.id, assetUrl: r.url, size: r.sizeBytes, blob: small }); delete it.unsaved;
+        const live = byId(it.id); if (live && live !== it) Object.assign(live, it), delete live.unsaved;
+        await persist(byId(it.id) || it);
+        dlg.hidden = true; toast('הסרטון כווץ ונשמר בחשבון ✓');
+        if (curScreen() === 'manage') renderManage();
+        if (E.item && E.item.id === it.id) { Object.assign(E.item, { assetId: r.id, assetUrl: r.url, size: r.sizeBytes }); delete E.item.unsaved; syncUnsaved(); }
+      })
+      .catch(err => { $('#cmpText').textContent = 'הכיווץ או השמירה נכשלו: ' + errText(err) + '. הסרטון עדיין בגלריה עד סגירת הדף.'; $('#cmpLater').disabled = false; $('#cmpLater').textContent = 'סגור'; });
+  };
+}
+function syncUnsaved() {
+  const b = $('#edUnsaved'); if (!b || !E.item) return;
+  b.hidden = !(Store.mode === 'cloud' && E.item.unsaved);
+}
+
 $('#fileIn').addEventListener('change', async e => {
   const files = [...e.target.files]; e.target.value = ''; if (!files.length) return;
-  let last = null, n = 0;
+  let last = null, n = 0; const bigOnes = [];
   for (const f of files) {
     toast(files.length > 1 ? `טוען ${n + 1} מתוך ${files.length}…` : 'טוען…', 60000);
     let info;
@@ -976,16 +1091,21 @@ $('#fileIn').addEventListener('change', async e => {
       content: 'number', method: 'grid', digits: 2, trick: !photo, meta: 'none', words: DEFAULT_WORDS.slice(), regions: [newRegion(t, photo ? { fade: 3, effect: 'develop' } : {})],
     });
     if (Store.mode === 'cloud') {
-      if (!Store.assets) toast('אין הרשאה לשמור קבצים בקישור הזה. הפריט יישמר רק עד הסגירה', 4000);
+      if (!Store.assets) { it.unsaved = true; toast('אין הרשאה לשמור קבצים בקישור הזה. הפריט בגלריה עד סגירת הדף', 4500); }
       else {
-        toast('שומר בחשבון…', 60000);
-        try { const r = await Store.assets.upload(f); it.assetId = r.id; it.assetUrl = r.url; it.size = r.sizeBytes; }
-        catch (err) { toast(err && err.code === 'too_large' ? `${f.name} גדול מ-20MB. קצר אותו או השתמש באפליקציה המותקנת` : 'השמירה נכשלה. נסה שוב', 6000); continue; }
+        toast(files.length > 1 ? `שומר ${n + 1} מתוך ${files.length} בחשבון…` : 'שומר בחשבון…', 60000);
+        try { const r = await uploadMedia(f, it.kind); it.assetId = r.id; it.assetUrl = r.url; it.size = r.sizeBytes; }
+        catch (err) {
+          it.unsaved = true;   // נשאר בגלריה עכשיו, גם אם לא נשמר
+          if (err && err.code === 'too_large' && it.kind !== 'photo') bigOnes.push(it);
+          else toast(`${f.name}: לא נשמר בחשבון (${errText(err)}). הוא בגלריה עד סגירת הדף`, 6000);
+        }
       }
     }
     ITEMS.push(it); await persist(it); last = it; n++;
   }
   if (!last) return;
+  if (bigOnes.length) setTimeout(() => offerCompress(bigOnes[0]), 400);
   if (n === 1) { toast(last.kind === 'photo' ? 'נוספה תמונה רגילה. אפשר להפוך אותה לטריק כאן' : 'נוסף. עכשיו סמן איפה ומתי הבחירה תופיע'); E.id = last.id; go('edit'); }
   else { toast(`נוספו ${n} פריטים לגלריה`); renderManage(); }
 });
@@ -1058,6 +1178,7 @@ ENTER.edit = async () => {
   document.documentElement.style.setProperty('--navh', ($('#edit .nav').offsetHeight || 52) + 'px');
   const src = byId(E.id); if (!src) { uiBack(); return; }
   E.item = { ...src, regions: JSON.parse(JSON.stringify(src.regions)), words: (src.words || []).slice() };
+  syncUnsaved();
   E.sel = Math.min(E.sel, Math.max(0, E.item.regions.length - 1)); E.target = 'start';
   $('#edName').value = E.item.name;
   $('#edContent').value = E.item.content;
@@ -1180,6 +1301,7 @@ $('#rgNow').onclick = () => { const r = curRegion(); if (!r || !E.src) return; r
 $('#rgKeysClear').onclick = () => { const r = curRegion(); if (!r) return; r.keys = []; renderRegions(); scheduleSave(); };
 $('#rgQuadReset').onclick = () => { const r = curRegion(); if (!r) return; r.persp.q = defQuad(); scheduleSave(); };
 $('#edTry').onclick = async () => { if (!E.item) return; await flushEdit(); openViewer(E.item.id, { from: 'edit' }); };
+$('#edUnsavedGo').onclick = () => { const it = byId(E.item && E.item.id); if (it) offerCompress(it); };
 $('#edSave').onclick = async () => { if (!E.item) return; await flushEdit(); toast('נשמר ✓', 1400); };
 $('#edDone').onclick = async () => { if (E.item) await flushEdit(); uiBack(); };
 $('#edStage').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit', stage: true }); };

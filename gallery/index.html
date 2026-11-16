@@ -268,6 +268,7 @@
         <span id="edTime" class="mono">0.00</span>
       </div>
     </div>
+    <div id="edUnsaved" class="banner warn-banner" hidden><span class="dot" style="background:#ff9f0a"></span><span>הסרטון עדיין <b>לא נשמר בחשבון</b> (גדול מ-20MB). אם תסגור את הדף הוא יימחק.</span><button id="edUnsavedGo" class="btn" type="button">כווץ ושמור</button></div>
     <p class="foot">גרור על התמונה כדי לסמן איפה הבחירה תופיע. פינה צהובה משנה גודל.</p>
 
     <div class="group-title" id="edG1">1. פרטי הסרטון</div>
@@ -1027,6 +1028,14 @@
 </section>
 
 <div id="vhost" aria-hidden="true"></div>
+<div id="cmp" class="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cmpTitle">
+    <b id="cmpTitle"></b>
+    <p id="cmpText"></p>
+    <div id="cmpProg" class="prog" hidden><i id="cmpBar"></i></div>
+    <div class="modal-acts"><button id="cmpLater" class="btn" type="button">אחר כך</button><button id="cmpGo" class="ed-btn primary" type="button">כווץ ושמור</button></div>
+  </div>
+</div>
 <div id="toast" hidden></div>
 <script src="app.js"></script>
 </body>

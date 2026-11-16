@@ -494,3 +494,15 @@ html, body { overscroll-behavior: none; }         /* בלי "משיכה לרענ
 #edit .row { min-height: 52px; }
 
 body:has(#edBar:not([hidden])) #toast { bottom: calc(env(safe-area-inset-bottom) + 96px); }
+
+/* ===================== חלון כיווץ + סימון "לא נשמר" ===================== */
+.modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(0,0,0,.45); padding: 20px; }
+.modal-box { width: min(100%, 420px); background: var(--card); color: var(--fg); border-radius: 16px; padding: 18px; display: grid; gap: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+.modal-box b { font-size: 18px; }
+.modal-box p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--dim); }
+.modal-acts { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.prog { height: 8px; border-radius: 4px; background: var(--fill); overflow: hidden; }
+.prog i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.mg-item .tag.warn { background: rgba(255,159,10,.18); color: #ff9f0a; }
+.warn-banner { align-items: center; flex-wrap: wrap; }
+.warn-banner > span:nth-child(2) { flex: 1 1 180px; min-width: 0; }
