@@ -46,6 +46,8 @@ def main(vid, preview=False, voice_id=None):
         sc = ln.get("scene")
         shot = {"type": "head", "zoom": ln.get("zoom", 1.0)} if not sc else \
             {"type": "screen", "scene": sc, "cont": sc == prev}
+        if ln.get("title"):
+            shot["title"] = ln["title"]
         lines.append({"say": ln["say"], "shot": shot, "rate": ln.get("rate", "+6%"), "pitch": ln.get("pitch", "-3Hz"),
                       "pause": ln.get("pause", 0.22)})
         prev = sc

@@ -97,6 +97,29 @@ def caption_at(t, boxed):
     return None
 
 
+TF = ImageFont.truetype(A["font"], 84)
+_tc = {}
+
+
+def title_img(text):
+    """big hook title for a head shot: white lines on red rounded boxes (for viewers watching muted)"""
+    if text not in _tc:
+        rows = text.split("\n")
+        bb = [TF.getbbox(r, direction="rtl" if is_he(r) else "ltr") for r in rows]
+        px, py, lh = 34, 14, 118
+        wmax = max(b[2] - b[0] for b in bb) + 2 * px
+        im = Image.new("RGBA", (wmax, lh * len(rows) + 10), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        for j, (r, b_) in enumerate(zip(rows, bb)):
+            w_ = b_[2] - b_[0] + 2 * px
+            x0 = (wmax - w_) // 2
+            d.rounded_rectangle([x0, j * lh, x0 + w_, j * lh + lh - 12], 18, fill=(200, 16, 46, 245))
+            d.text((x0 + px - b_[0], j * lh + py - 6), r, font=TF, fill=(255, 255, 255, 255),
+                   direction="rtl" if is_he(r) else "ltr")
+        _tc[text] = np.array(im)
+    return _tc[text]
+
+
 def paste(dst, rgba, x0, y0, alpha=1.0):
     h, w = rgba.shape[:2]
     xs, ys, xe, ye = max(x0, 0), max(y0, 0), min(x0 + w, W), min(y0 + h, H)
@@ -337,6 +360,10 @@ def frame(t):
     n = rng.normal(0, 0.012, (H // 2, W // 2, 1)).astype(np.float32)
     out = out + cv2.resize(n, (W, H), interpolation=cv2.INTER_NEAREST)[..., None]
     out = np.clip(out, 0, 1)
+    if sh.get("title"):
+        ti = title_img(sh["title"])
+        u = ease(min(lt / 0.25, 1.0)) if st > 0 else 1.0
+        paste(out, ti, int(W / 2 - ti.shape[1] / 2), int(250 - 30 * (1 - u)), alpha=u)
     cap = caption_at(t, boxed)
     if cap is not None:
         paste(out, cap, int(W / 2 - cap.shape[1] / 2), int(cy - cap.shape[0] / 2))

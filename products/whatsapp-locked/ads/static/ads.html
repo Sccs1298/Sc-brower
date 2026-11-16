@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Heebo; src: url("../../../../docs/Heebo-400.woff2"); font-weight: 400; }
+@font-face { font-family: Heebo; src: url("../../../../docs/Heebo-700.woff2"); font-weight: 700; }
+@font-face { font-family: Heebo; src: url("../../../../docs/Heebo-800.woff2"); font-weight: 800; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Heebo, sans-serif; background: #333; }
+.ad { width: 1080px; height: 1350px; background: radial-gradient(circle at 20% 100%, #3a0d18 0, transparent 45%), #0b1620; color: #fff; position: relative; overflow: hidden; padding: 70px 70px 0; }
+h1 { font-size: 92px; line-height: 1.08; font-weight: 800; }
+h1 em { font-style: normal; color: #ff4a66; }
+.foot { position: absolute; inset: auto 0 0 0; background: #c8102e; padding: 30px 70px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 44px; }
+.foot small { display: block; font-weight: 400; font-size: 30px; opacity: .92; }
+.foot .p { font-size: 74px; }
+/* chat */
+.phone { margin-top: 50px; background: #efe7dd; border-radius: 40px; padding: 0 0 34px; overflow: hidden; color: #111; }
+.phone .top { background: #f6f6f6; padding: 22px 30px; display: flex; gap: 20px; align-items: center; font-weight: 700; font-size: 38px; border-bottom: 1px solid #ddd; }
+.phone .top small { display: block; font-weight: 400; font-size: 26px; color: #777; direction: ltr; text-align: right; }
+.phone .av { width: 76px; height: 76px; border-radius: 50%; background: #19b3c4; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.m { background: #fff; border-radius: 6px 24px 24px 24px; padding: 18px 26px; font-size: 40px; margin: 22px 30px 0; width: fit-content; max-width: 84%; box-shadow: 0 2px 4px rgba(0,0,0,.08); }
+.m b { background: #ffd9df; color: #b00020; padding: 0 8px; border-radius: 8px; }
+/* lock */
+.lock { margin-top: 44px; text-align: center; }
+.lock .clock { font-size: 210px; font-weight: 800; line-height: 1; }
+.lock .day { font-size: 34px; color: #b8c7cf; margin-bottom: 26px; }
+.n { background: rgba(255,255,255,.1); border-radius: 26px; padding: 20px 26px; display: flex; gap: 22px; align-items: center; text-align: right; margin-top: 16px; font-size: 32px; }
+.n i { font-style: normal; flex: none; width: 70px; height: 70px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 38px; }
+.n b { display: block; font-weight: 700; }
+.n span { color: #c9d6dc; }
+/* quiz */
+.qz { margin-top: 44px; }
+.qz .k { color: #19b3c4; font-weight: 800; font-size: 40px; margin-bottom: 10px; }
+.qq { background: #fff; color: #14181f; border-radius: 26px; padding: 26px 30px; font-size: 42px; font-weight: 700; margin-top: 20px; display: flex; gap: 24px; align-items: center; }
+.qq i { flex: none; width: 62px; height: 62px; border: 5px solid #c8102e; border-radius: 14px; }
+.res { margin-top: 30px; font-size: 46px; font-weight: 800; color: #ff4a66; }
+</style></head><body>
+
+<div class="ad" id="chat">
+  <h1>זה נראה כמו הבן שלכם.<br><em>זה לא הוא.</em></h1>
+  <div class="phone">
+    <div class="top"><div class="av">ד</div><div>הבן ❤️<small>+972 53-555-0192</small></div></div>
+    <div class="m">היי זה אני, החלפתי מספר 🙂</div>
+    <div class="m">מה נשמע? מה שלומך?</div>
+    <div class="m">אני תקוע, תוכל להעביר לי <b>800 ש"ח בביט</b>? אחזיר לך מחר</div>
+  </div>
+  <div class="foot"><div>הוואטסאפ שלי נעול 🔒<small>4 העוקצים, ואיך נועלים את הוואטסאפ</small></div><div class="p">97 ₪</div></div>
+</div>
+
+<div class="ad" id="night">
+  <h1>ככה גונבים לכם את הוואטסאפ <em>כשאתם ישנים.</em></h1>
+  <div class="lock">
+    <div class="clock">03:00</div><div class="day">יום שלישי</div>
+    <div class="n"><i style="background:#25d366">✆</i><div><b>וואטסאפ</b><span>קוד האימות שלך הוא ‎•••-•••</span></div></div>
+    <div class="n"><i style="background:#34c759">☎</i><div><b>שיחה שלא נענתה</b><span>WhatsApp</span></div></div>
+    <div class="n"><i style="background:#ff9f0a">▶</i><div><b>הודעה קולית חדשה</b><span>הקוד נשמר בתא הקולי</span></div></div>
+  </div>
+  <div class="foot"><div>הוואטסאפ שלי נעול 🔒<small>שתי הגדרות סוגרות את זה</small></div><div class="p">97 ₪</div></div>
+</div>
+
+<div class="ad" id="quiz">
+  <h1>הוואטסאפ שלכם <em>פתוח?</em></h1>
+  <div class="qz">
+    <div class="k">בדיקה של 10 שניות</div>
+    <div class="qq"><i></i>יש לכם אימות דו-שלבי בוואטסאפ?</div>
+    <div class="qq"><i></i>שיניתם פעם את הקוד של התא הקולי?</div>
+    <div class="qq"><i></i>בדקתם אילו מכשירים מחוברים לוואטסאפ שלכם?</div>
+    <div class="res">לא בטוחים? אז כנראה שהוא פתוח.</div>
+  </div>
+  <div class="foot"><div>הוואטסאפ שלי נעול 🔒<small>17 הגדרות · 30 דקות · צעד אחרי צעד</small></div><div class="p">97 ₪</div></div>
+</div>
+</body></html>
