@@ -42,7 +42,7 @@ const METHODS = {
 /* ---------- הגדרות ---------- */
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
   startIn: 'hub', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
-  notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6' };
+  notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '' };
 const PEEK = { text: '', at: 0 };
 const LAST = { text: '' }; // הבחירה האחרונה (מחיפוש או מחשיפה) – לפסיפס ולמצגת
 let LASTVIEW = null;       // הפריט האחרון שנפתח מהגלריה – לגלריה המתנפצת // החיפוש האחרון של הצופה (בזיכרון בלבד)
@@ -1133,6 +1133,7 @@ function niceName(f, photo) {
   return base;
 }
 async function onFiles(e) {
+  if (!licensed()) { e.target.value = ''; paywall('הוספת סרטונים ותמונות משלך היא חלק מהגרסה המלאה.'); return; }
   const files = [...e.target.files]; e.target.value = ''; if (!files.length) return;
   let last = null, n = 0; const bigOnes = [];
   for (const f of files) {
@@ -1141,6 +1142,7 @@ async function onFiles(e) {
     try { info = await inspect(f); } catch (err) { toast(`${f.name}: ${err.message || 'לא ניתן לפתוח'}`, 4000); continue; }
     const photo = info.kind === 'photo';
     let data = f;
+    if (f.size > 300 * 1048576) { toast(`${f.name}: הסרטון גדול מדי (${Math.round(f.size / 1048576)}MB). קצר אותו לעד דקה ונסה שוב`, 7000); continue; }
     try { data = new Blob([await f.arrayBuffer()], { type: f.type || (photo ? 'image/jpeg' : 'video/mp4') }); } catch (e) { /* נשאר הקובץ המקורי */ }
     const t = photo ? 1.5 : info.duration ? +(info.duration * .75).toFixed(2) : 3;
     const it = normalize({
@@ -1444,7 +1446,7 @@ edCanvas.addEventListener('pointerup', endDrag); edCanvas.addEventListener('poin
 
 /* ===================== הגדרות ===================== */
 const fillS = root => $$('[data-s]', root).forEach(el => { if (el.type === 'checkbox') el.checked = !!S[el.dataset.s]; else el.value = S[el.dataset.s] ?? ''; });
-ENTER.settings = () => { $('#stPeek').textContent = PEEK.text || '—'; fillS($('#settings')); };
+ENTER.settings = () => { $('#stPeek').textContent = PEEK.text || '—'; fillS($('#settings')); syncLicense(); };
 const onSetting = e => {
   const el = e.target; if (!el.dataset.s) return;
   S[el.dataset.s] = el.type === 'checkbox' ? el.checked : el.value;
@@ -2003,6 +2005,50 @@ document.addEventListener('visibilitychange', async () => {
 });
 
 
+
+/* ===================== רישיון: גרסת ניסיון / גרסה מלאה ===================== */
+const GK = window.GK || { NAME: 'גלריית הקסם', PRICE: 99, PAY_URL: '', WHATSAPP: '', SITE: '', SALT: '', CODES: [] };
+const cyrb53 = (str, seed = 7) => {
+  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909); h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+};
+const normCode = c => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^GK/, '');
+const codeValid = c => { const n = normCode(c); return n.length === 8 && GK.CODES.includes(cyrb53(n + GK.SALT)); };
+const DEV = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && !/[?&]lock=1/.test(location.search); // סביבת פיתוח בלבד
+const licensed = () => DEV || codeValid(S.license);
+const buyUrl = () => GK.PAY_URL || (GK.SITE ? GK.SITE + 'buy.html#buy' : '#');
+function syncLicense() {
+  const full = licensed(), chip = $('#hubLic');
+  chip.textContent = full ? 'גרסה מלאה ✓' : `גרסת ניסיון · לגרסה המלאה ב-${GK.PRICE} ₪`;
+  chip.classList.toggle('full', full);
+  $('#stLicText').textContent = full ? 'גרסה מלאה ✓' : 'גרסת ניסיון. הזן קוד או רכוש';
+}
+function paywall(why) {
+  $('#payWhy').textContent = (why ? why + ' ' : '') + 'בגרסת הניסיון אפשר לנסות את סרטון ההדגמה. הגרסה המלאה פותחת הכל:';
+  const a = $('#payBuy'); a.textContent = `לרכישה · ${GK.PRICE} ₪, תשלום אחד`; a.href = buyUrl();
+  $('#payErr').hidden = true; $('#payCode').value = ''; $('#pay').hidden = false;
+}
+/* בדיקה לפני פעולה בתשלום. מחזיר true אם מותר להמשיך */
+function needFull(why) { if (licensed()) return true; paywall(why); return false; }
+$('#payClose').onclick = () => { $('#pay').hidden = true; };
+$('#pay').addEventListener('click', e => { if (e.target.id === 'pay') $('#pay').hidden = true; });
+$('#payForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('#payCode').value;
+  if (!codeValid(v)) { $('#payErr').hidden = false; return; }
+  S.license = 'GK-' + normCode(v).slice(0, 4) + '-' + normCode(v).slice(4); saveSettings();
+  $('#pay').hidden = true; syncLicense(); toast('הגרסה המלאה הופעלה ✓ תהנה!', 3500);
+});
+$('#hubLic').onclick = () => { if (!licensed()) paywall(); };
+$('#stLic').onclick = () => { if (licensed()) toast('הגרסה המלאה פעילה ✓'); else paywall(); };
+/* בחירת קבצים נחסמת לפני שהגלריה של הטלפון נפתחת */
+document.addEventListener('click', e => {
+  const inp = e.target.closest('input[type=file]');
+  if (inp && !licensed()) { e.preventDefault(); paywall('הוספת סרטונים ותמונות משלך היא חלק מהגרסה המלאה.'); }
+}, true);
+
 /* ===================== מרכז הקסמים ===================== */
 function longPress(el, ms, fn) {
   let t = 0;
@@ -2016,8 +2062,14 @@ async function goHome() {
   NAV.stack = ['hub']; try { history.pushState({ g: 1 }, ''); } catch (e) { /* ignore */ }
   paint('hub'); ENTER.hub();
 }
-ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); };
-$('#hub').addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) go(b.dataset.open); });
+ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); };
+const PAID_SCREENS = { calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה' };
+$('#hub').addEventListener('click', e => {
+  const b = e.target.closest('[data-open]'); if (!b) return;
+  const t = b.dataset.open;
+  if (PAID_SCREENS[t] && !needFull(`${PAID_SCREENS[t]} הוא חלק מהגרסה המלאה.`)) return;
+  go(t);
+});
 $('#mgHub').onclick = () => goHome();
 $$('.exit-band').forEach(el => longPress(el, 900, goHome));
 let AWAKE = null;
