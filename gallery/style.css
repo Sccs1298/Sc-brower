@@ -211,7 +211,7 @@ input[type=range] { direction: ltr; }
 #pmenu button { border: 0; border-radius: 12px; padding: 14px; background: rgba(255,255,255,.1); color: #fff; font-size: 17px; }
 #pmenu button.danger { color: #ff453a; }
 
-#vhost { position: fixed; left: 0; top: 0; width: 2px; height: 2px; overflow: hidden; opacity: 0; pointer-events: none; }
+#vhost { position: fixed; left: 0; top: 0; width: 2px; height: 2px; overflow: hidden; opacity: .01; pointer-events: none; z-index: -1; }
 #vhost video { width: 2px; height: 2px; }
 #toast { position: fixed; z-index: 50; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 40px); transform: translateX(-50%);
   background: rgba(30,30,32,.92); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 15px; max-width: calc(100vw - 32px); text-align: center; }
@@ -547,3 +547,8 @@ body:has(#edBar:not([hidden])) #toast { bottom: calc(env(safe-area-inset-bottom)
 .hint > summary::-webkit-details-marker { display: none; }
 .hint > summary::before { content: "ⓘ "; }
 .hint .foot { padding: 4px 0 8px; }
+
+/* טעינה בצפייה */
+.p-load { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; pointer-events: none; }
+.spin { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(255,255,255,.25); border-top-color: #fff; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

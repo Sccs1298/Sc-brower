@@ -578,6 +578,18 @@ async function ensureBlob(it) {
   const live = byId(it.id); if (live) live.blob = b;
   $('#toast').hidden = true;
 }
+async function blobReadable(b) {
+  if (!(b instanceof Blob)) return true;
+  try { await Promise.race([b.slice(0, 64).arrayBuffer(), new Promise((_, r) => setTimeout(() => r(new Error('t')), 4000))]); return true; } catch (e) { return false; }
+}
+const BROKEN_MSG = 'הקובץ של הסרטון נמחק מהזיכרון של הטלפון. פתח אותו בעורך ← לשונית "מתקדם" ← "החלף את קובץ הסרטון", ובחר אותו שוב מהגלריה.';
+async function checkPlayable(it) {
+  if (!it || it.builtin) return;
+  await ensureBlob(it);
+  if (it.blob && !(await blobReadable(it.blob))) { it.broken = true; throw new Error(BROKEN_MSG); }
+  if (it.broken) { delete it.broken; }
+}
+const withTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(r, ms))]);
 const makeSource = item => {
   if (item.builtin === 'demo') return new DemoSource();
   if (item.kind === 'photo') { const src = mediaSrc(item); if (!src) throw new Error('קובץ התמונה חסר'); return new ImageSource(src); }
@@ -605,6 +617,16 @@ async function inspect(file) {
     const info = { w: v.videoWidth, h: v.videoHeight, duration: isFinite(v.duration) ? v.duration : 0 };
     await new Promise(res => { v.onseeked = res; v.currentTime = Math.min(.5, (info.duration || 1) / 2); setTimeout(res, 1500); });
     info.thumb = thumbOf(c => c.drawImage(v, 0, 0, info.w || 1, info.h || 1), info.w || 1, info.h || 1);
+    // רצועת פריימים קטנה (12 תמונות) – נשמרת עם הסרטון, כך שבזמן הצפייה לא צריך מפענח וידאו נוסף
+    try {
+      const N = 12, th = 64, tw = Math.max(8, Math.round(th * (info.w || 9) / (info.h || 16)));
+      const c = document.createElement('canvas'); c.width = tw * N; c.height = th; const x = c.getContext('2d');
+      for (let i = 0; i < N; i++) {
+        await new Promise(res => { v.onseeked = res; v.currentTime = Math.min(((i + .5) / N) * (info.duration || 1), Math.max(0, (info.duration || 1) - .05)); setTimeout(res, 1200); });
+        x.drawImage(v, i * tw, 0, tw, th);
+      }
+      info.strip = c.toDataURL('image/jpeg', .6);
+    } catch (e) { /* בלי רצועה */ }
     return info;
   } finally { v.remove(); URL.revokeObjectURL(u); }
 }
@@ -965,8 +987,8 @@ function renderManage() {
     const SHORT = { grid: 'מקשים', keyboard: 'מקלדת', peek: 'הצופה מחפש', pre: 'מסך חיפוש', scrub: 'גרירה', draw: 'ציור' };
     $('.txt span', b).textContent = (it.kind === 'photo' ? 'תמונה · ' : `${fmtDur(it.duration)} · `) + (isTrick ? `${kind} · ${SHORT[it.method] || ''}` : (it.kind === 'photo' ? 'רגילה' : 'סרטון רגיל'));
     const tag = $('.tag', b);
-    tag.textContent = (Store.mode === 'cloud' && it.unsaved) ? 'לא נשמר' : it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
-    if (Store.mode === 'cloud' && it.unsaved) tag.classList.add('warn');
+    tag.textContent = it.broken ? 'צריך קובץ' : (Store.mode === 'cloud' && it.unsaved) ? 'לא נשמר' : it.hidden ? 'מוסתר' : isTrick ? 'טריק' : 'רגיל';
+    if (it.broken || (Store.mode === 'cloud' && it.unsaved)) tag.classList.add('warn');
     if (isTrick && !it.hidden) tag.classList.add('is-trick');
     b.addEventListener('click', () => { E.id = it.id; go('edit'); });
     box.appendChild(b);
@@ -1118,10 +1140,12 @@ async function onFiles(e) {
     let info;
     try { info = await inspect(f); } catch (err) { toast(`${f.name}: ${err.message || 'לא ניתן לפתוח'}`, 4000); continue; }
     const photo = info.kind === 'photo';
+    let data = f;
+    try { data = new Blob([await f.arrayBuffer()], { type: f.type || (photo ? 'image/jpeg' : 'video/mp4') }); } catch (e) { /* נשאר הקובץ המקורי */ }
     const t = photo ? 1.5 : info.duration ? +(info.duration * .75).toFixed(2) : 3;
     const it = normalize({
-      id: uid(), kind: photo ? 'photo' : 'video', name: niceName(f, photo), fileName: f.name, size: f.size, blob: f,
-      w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, created: Date.now(), shotAt: f.lastModified || Date.now(),
+      id: uid(), kind: photo ? 'photo' : 'video', name: niceName(f, photo), fileName: f.name, size: f.size, blob: data,
+      w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, strip: info.strip || '', created: Date.now(), shotAt: f.lastModified || Date.now(),
       content: 'number', method: 'grid', digits: 2, trick: !photo, meta: 'none', words: DEFAULT_WORDS.slice(), regions: [newRegion(t, photo ? { fade: 3, effect: 'develop' } : {})],
     });
     if (Store.mode === 'cloud') {
@@ -1225,7 +1249,7 @@ ENTER.edit = async () => {
   $('#edShot').value = new Date(ts - new Date(ts).getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   fillSelect($('#rgFont'), Object.entries(FONTS).map(([k, f]) => [k, f.name]), 'hand');
   syncEditorForm(); renderRegions();
-  try { const live = byId(E.item.id); await ensureBlob(live); if (live && live.blob) E.item.blob = live.blob; E.src = makeSource(E.item); await E.src.ready(); } catch (err) { toast(err.message, 5000); return; }
+  try { const live = byId(E.item.id); await checkPlayable(live); if (live && live.blob) E.item.blob = live.blob; E.src = makeSource(E.item); await E.src.ready(); } catch (err) { toast(err.message, 8000); if (/נמחק/.test(err.message)) setEdTab('more'); return; }
   if (curScreen() !== 'edit') { E.src.destroy(); E.src = null; return; }
   if (!E.item.duration && E.src.duration) E.item.duration = E.src.duration;
   E.item.w = E.src.w; E.item.h = E.src.h;
@@ -1339,6 +1363,23 @@ $('#rgKeysClear').onclick = () => { const r = curRegion(); if (!r) return; r.key
 $('#rgQuadReset').onclick = () => { const r = curRegion(); if (!r) return; r.persp.q = defQuad(); scheduleSave(); };
 $('#edTry').onclick = async () => { if (!E.item) return; await flushEdit(); openViewer(E.item.id, { from: 'edit' }); };
 $('#edUnsavedGo').onclick = () => { const it = byId(E.item && E.item.id); if (it) offerCompress(it); };
+/* החלפת קובץ הסרטון / התמונה – כל ההגדרות נשמרות */
+$('#edReplace').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f || !E.item) return;
+  toast('טוען את הקובץ החדש…', 30000);
+  let info; try { info = await inspect(f); } catch (err) { toast(err.message || 'לא ניתן לפתוח את הקובץ'); return; }
+  let data = f; try { data = new Blob([await f.arrayBuffer()], { type: f.type || 'video/mp4' }); } catch (err) { /* ignore */ }
+  const live = byId(E.item.id);
+  const patch = { blob: data, kind: info.kind || 'video', w: info.w, h: info.h, duration: info.duration, thumb: info.thumb, strip: info.strip || '', size: f.size, fileName: f.name };
+  if (Store.mode === 'cloud' && Store.assets) {
+    try { const r = await uploadMedia(f, patch.kind); Object.assign(patch, { assetId: r.id, assetUrl: r.url, size: r.sizeBytes }); delete live.unsaved; }
+    catch (err) { live.unsaved = true; toast('הקובץ הוחלף, אבל לא נשמר בחשבון: ' + errText(err), 6000); }
+  }
+  Object.assign(live, patch); Object.assign(E.item, patch); delete live.broken; BLOBS.delete(live.id);
+  await persist(live);
+  toast('הקובץ הוחלף ✓');
+  go('edit', { replace: true });
+});
 $('#edSave').onclick = async () => { if (!E.item) return; await flushEdit(); toast('נשמר ✓', 1400); };
 $('#edDone').onclick = async () => { if (E.item) await flushEdit(); uiBack(); };
 $('#edStage').onclick = async () => { await flushEdit(); openViewer(E.item.id, { from: 'edit', stage: true }); };
@@ -1480,16 +1521,28 @@ ENTER.perform = async () => {
   P.minT = P.regions.length ? Math.min(...P.regions.map(r => r.t)) : Infinity;
   $('#pmenu').hidden = true; closePops();
   initPhotosUI();
-  try { await ensureBlob(item); P.src = makeSource(item); await P.src.ready(); } catch (err) { toast(err.message, 5000); uiBack(); return; }
+  $('#pLoad').hidden = false;
+  try {
+    await checkPlayable(item);
+    P.src = makeSource(item); await P.src.ready();
+    // אם אחרי ההמתנה הסרטון עדיין בלי תמונה – מחכים עוד קצת ואז מודיעים במקום להיתקע
+    if (P.src.el && !P.src.el.videoWidth) {
+      await withTimeout(new Promise(r => P.src.el.addEventListener('loadedmetadata', r, { once: true })), 6000);
+      if (!P.src.el.videoWidth) throw new Error('הסרטון לא נטען. נסה לסגור ולפתוח את האפליקציה, או להחליף את הקובץ בעורך');
+    }
+  } catch (err) { $('#pLoad').hidden = true; toast(err.message, 7000); if (P.src) { P.src.destroy(); P.src = null; } uiBack(); return; }
+  $('#pLoad').hidden = true;
   if (!P.active) { P.src.destroy(); P.src = null; return; }
   P.src.time = 0;
   if (req.stage && screen.orientation && screen.orientation.lock) screen.orientation.lock(P.src.w >= P.src.h ? 'landscape' : 'portrait').catch(() => {});
-  try { P.wake = await navigator.wakeLock?.request('screen'); } catch (e) { /* ignore */ }
-  for (const r of P.regions) { try { await document.fonts.load(`700 40px ${(FONTS[r.font] || FONTS.clean).css}`); } catch (e) { /* ignore */ } }
+  try { P.wake = await withTimeout(navigator.wakeLock?.request('screen'), 1500); } catch (e) { /* ignore */ }
+  // גופנים מהאינטרנט: מחכים לכל היותר שנייה וחצי, כדי לא להיתקע בלי רשת
+  try { await withTimeout(Promise.all(P.regions.map(r => document.fonts.load(`700 40px ${(FONTS[r.font] || FONTS.clean).css}`).catch(() => {}))), 1500); } catch (e) { /* ignore */ }
   sizeStage(); if (!P.isPhoto) buildStrip();
   cancelAnimationFrame(P.raf); perfLoop();
 };
 LEAVE.perform = () => {
+  $('#pLoad').hidden = true;
   P.active = false; cancelAnimationFrame(P.raf); P.stripRun = (P.stripRun || 0) + 1;
   if (P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; }
   discardRec();
@@ -1657,19 +1710,17 @@ async function buildStrip() {
   let draw;
   if (item.builtin === 'demo') { const d = new DemoSource(); draw = async (t, x) => { d.time = t; ctx.save(); ctx.translate(x, 0); d.draw(ctx, tw, cv.height); ctx.restore(); }; }
   else {
-    const src = mediaSrc(item); if (!src) return;
-    const v = document.createElement('video'), owned = src instanceof Blob, u = owned ? URL.createObjectURL(src) : src;
-    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = u;
-    $('#vhost').appendChild(v);
-    P.stripCleanup = () => { v.remove(); if (owned) URL.revokeObjectURL(u); };
-    try {
-      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = rej; setTimeout(res, 4000); });
-      try { await v.play(); v.pause(); } catch (e) { /* ignore */ }
-    } catch (e) { if (P.stripCleanup) { P.stripCleanup(); P.stripCleanup = null; } return; }
-    draw = (t, x) => new Promise(res => {
-      v.onseeked = () => { try { ctx.drawImage(v, x, 0, tw, cv.height); } catch (e) { /* ignore */ } res(); };
-      v.currentTime = Math.min(t, Math.max(0, dur - .05)); setTimeout(res, 1500);
-    });
+    // בלי מפענח וידאו שני: משתמשים ברצועה שנשמרה בהוספה, או בתמונה הממוזערת
+    const img = new Image(); img.src = item.strip || item.thumb || '';
+    if (!img.src) return;
+    await new Promise(res => { if (img.complete) res(); else { img.onload = res; img.onerror = res; } });
+    if (!img.naturalWidth) return;
+    const frames = item.strip ? 12 : 1, fw = img.naturalWidth / frames;
+    draw = async (t, x) => {
+      const f = Math.min(frames - 1, Math.floor((t / dur) * frames));
+      const sh = img.naturalHeight, sw = Math.min(fw, sh * aspect), sx = f * fw + (fw - sw) / 2;
+      ctx.drawImage(img, sx, 0, sw, sh, x, 0, tw, cv.height);
+    };
   }
   for (let i = 0; i < n; i++) {
     if (P.stripRun !== myRun || !P.active) break;
