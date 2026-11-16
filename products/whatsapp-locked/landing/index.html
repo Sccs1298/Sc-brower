@@ -3,70 +3,134 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>הוואטסאפ שלי נעול</title>
-<meta name="description" content="תוך 30 דקות, הוואטסאפ וכל החשבונות שלכם נעולים. מדריך פשוט, צעד אחרי צעד, באייפון ובאנדרואיד.">
+<title>הוואטסאפ שלי נעול | נועלים את הוואטסאפ ב-30 דקות</title>
+<meta name="description" content="מדריך עם 6 סרטונים שנועל את הוואטסאפ, הג'ימייל, האינסטגרם והטלפון שלכם ב-30 דקות. צעד אחרי צעד, גם בלי להבין בטכנולוגיה. 97 ₪.">
+<meta property="og:title" content="הוואטסאפ שלי נעול">
+<meta property="og:description" content="נועלים את הוואטסאפ ואת כל החשבונות ב-30 דקות. מדריך + 6 סרטונים, צעד אחרי צעד.">
+<meta property="og:image" content="hero.jpg">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta name="theme-color" content="#0b1620">
+<link rel="preload" href="Heebo-800.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-@font-face { font-family: Heebo; src: url("Heebo-400.ttf"); font-weight: 400; font-display: swap; }
-@font-face { font-family: Heebo; src: url("Heebo-700.ttf"); font-weight: 700; font-display: swap; }
-@font-face { font-family: Heebo; src: url("Heebo-800.ttf"); font-weight: 800; font-display: swap; }
-:root { --navy: #0b1620; --teal: #19b3c4; --teal-soft: #e3f6f8; --red: #c8102e; --ink: #14181f; --muted: #5b6472; --line: #e3e7ec; }
+@font-face { font-family: Heebo; src: url("Heebo-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-800.woff2") format("woff2"); font-weight: 800; font-display: swap; }
+:root { --navy: #0b1620; --navy2: #132534; --teal: #19b3c4; --teal-soft: #e3f6f8; --red: #c8102e; --ink: #14181f; --muted: #5b6472; --line: #e3e7ec; --bg: #f4f6f8; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: Heebo, sans-serif; color: var(--ink); background: #fff; font-size: 19px; line-height: 1.6; }
+html { scroll-behavior: smooth; }
+body { font-family: Heebo, sans-serif; color: var(--ink); background: #fff; font-size: 19px; line-height: 1.6; padding-bottom: 84px; }
 .wrap { max-width: 680px; margin: 0 auto; padding: 0 20px; }
-section { padding: 44px 0; }
-h1 { font-size: 38px; line-height: 1.15; font-weight: 800; }
-h2 { font-size: 29px; line-height: 1.2; font-weight: 800; margin-bottom: 18px; }
+section { padding: 40px 0; }
+h1 { font-size: 34px; line-height: 1.15; font-weight: 800; }
+h2 { font-size: 28px; line-height: 1.2; font-weight: 800; margin-bottom: 16px; }
+h3 { font-size: 20px; font-weight: 800; }
 p { margin-bottom: 12px; }
 strong { font-weight: 700; }
+.kicker { color: var(--teal); font-weight: 800; font-size: 15px; letter-spacing: .3px; margin-bottom: 6px; }
 
 /* hero */
-.hero { background: var(--navy); color: #fff; padding: 0 0 44px; }
-.hero img { width: 100%; max-width: 680px; display: block; margin: 0 auto; aspect-ratio: 1; object-fit: cover; }
-.hero .wrap { margin-top: -90px; position: relative; }
-.hero .tag { display: inline-block; background: var(--red); color: #fff; font-weight: 700; font-size: 15px; padding: 5px 16px; border-radius: 40px; margin-bottom: 14px; }
-.hero p.sub { color: #cfeff3; font-size: 20px; margin: 14px 0 24px; }
-.cta { display: block; text-align: center; background: var(--red); color: #fff; text-decoration: none; font-weight: 800; font-size: 22px; padding: 18px 20px; border-radius: 16px; box-shadow: 0 8px 24px rgba(200,16,46,.35); }
-.cta small { display: block; font-weight: 400; font-size: 15px; opacity: .9; }
+.hero { background: var(--navy); color: #fff; padding: 0 0 34px; }
+.hero .pic { height: 250px; background: url("hero.jpg") center 22% / cover; position: relative; }
+.hero .pic::after { content: ""; position: absolute; inset: 40% 0 0; background: linear-gradient(transparent, var(--navy)); }
+.hero .wrap { margin-top: -54px; position: relative; }
+.hero .tag { display: inline-block; background: var(--red); color: #fff; font-weight: 700; font-size: 14px; padding: 4px 14px; border-radius: 40px; margin-bottom: 10px; }
+.hero p.sub { color: #cfeff3; font-size: 19px; margin: 12px 0 20px; }
+.cta { display: block; text-align: center; background: var(--red); color: #fff; text-decoration: none; font-weight: 800; font-size: 22px; padding: 16px 20px; border-radius: 16px; box-shadow: 0 8px 24px rgba(200,16,46,.35); }
+.cta small { display: block; font-weight: 400; font-size: 15px; opacity: .92; }
+.trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin-top: 14px; font-size: 14px; color: #a9c4cc; }
+.trust span::before { content: "✓ "; color: var(--teal); font-weight: 800; }
 
-/* problem */
-.story { background: #f4f6f8; border-radius: 18px; padding: 22px 24px; font-size: 20px; margin-bottom: 18px; }
+/* story */
+.story { background: var(--bg); border-radius: 18px; padding: 22px 24px; font-size: 20px; margin-bottom: 18px; }
 .stat { border-right: 5px solid var(--teal); padding-right: 14px; color: var(--muted); font-size: 17px; }
 
-/* list */
+/* video */
+.vid { background: var(--navy); color: #fff; }
+.vid h2 { text-align: center; }
+.vid p { text-align: center; color: #cfeff3; }
+.vid video { display: block; width: 100%; max-width: 330px; margin: 18px auto 0; border-radius: 18px; background: #000; aspect-ratio: 9/16; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+
+/* quiz */
+.quiz { background: var(--bg); border-radius: 18px; padding: 22px 20px; }
+.q { background: #fff; border-radius: 14px; padding: 14px 16px; margin-top: 12px; }
+.q p { font-weight: 700; margin-bottom: 10px; }
+.q .btns { display: flex; gap: 10px; }
+.q button { flex: 1; font: 700 17px Heebo, sans-serif; padding: 10px; border-radius: 10px; border: 2px solid var(--line); background: #fff; color: var(--ink); cursor: pointer; }
+.q button.on.y { background: var(--teal); border-color: var(--teal); color: #fff; }
+.q button.on.n { background: var(--red); border-color: var(--red); color: #fff; }
+.res { display: none; margin-top: 14px; border-radius: 14px; padding: 16px; font-weight: 700; text-align: center; }
+.res.bad { display: block; background: #fde8ec; color: #8f0b20; }
+.res.ok { display: block; background: var(--teal-soft); color: #0b5560; }
+.res a { color: inherit; }
+
+/* scams */
+.scam { border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+.scam h3 { margin-bottom: 8px; }
+.scam h3 span { color: var(--red); }
+.bub { background: #e7ffdb; border-radius: 4px 14px 14px 14px; padding: 8px 12px; display: inline-block; font-size: 17px; margin-bottom: 8px; max-width: 92%; }
+.scam p { margin: 0; color: var(--muted); font-size: 17px; }
+
+/* inside */
+.nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; text-align: center; }
+.nums div { background: var(--navy); color: #fff; border-radius: 14px; padding: 12px 4px; font-size: 13px; line-height: 1.3; }
+.nums b { display: block; font-size: 26px; font-weight: 800; color: var(--teal); }
+.pages { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 12px; scroll-snap-type: x mandatory; }
+.pages img { flex: none; width: 46%; max-width: 250px; border-radius: 10px; border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0,0,0,.08); scroll-snap-align: start; height: auto; }
 ul.get { list-style: none; }
-ul.get li { padding: 12px 0 12px 0; border-bottom: 1px solid var(--line); display: flex; gap: 12px; }
+ul.get li { padding: 12px 0; border-bottom: 1px solid var(--line); display: flex; gap: 12px; }
 ul.get li::before { content: "✓"; color: var(--teal); font-weight: 800; font-size: 22px; line-height: 1.3; }
-.bonus { background: var(--teal-soft); border-radius: 18px; padding: 24px; }
-.bonus h2 { color: var(--navy); }
-ol.how { padding-right: 24px; }
-ol.how li { margin-bottom: 8px; }
-ol.how li::marker { font-weight: 800; color: var(--teal); }
+ul.get small { display: block; color: var(--muted); font-size: 16px; }
+.bonus { background: var(--teal-soft); border-radius: 18px; padding: 22px; display: flex; gap: 16px; align-items: center; }
+.bonus img { width: 110px; height: auto; flex: none; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.bonus h2 { color: var(--navy); font-size: 23px; margin-bottom: 8px; }
+.bonus p { margin: 0; font-size: 17px; }
+
+/* price */
+.price { background: var(--navy); color: #fff; border-radius: 20px; padding: 26px 22px; text-align: center; }
+.price .big { font-size: 60px; font-weight: 800; line-height: 1; margin: 6px 0; }
+.price .vs { color: #cfeff3; margin-bottom: 18px; }
+.price ul { list-style: none; text-align: right; margin: 0 auto 20px; max-width: 340px; font-size: 17px; }
+.price li::before { content: "✓ "; color: var(--teal); font-weight: 800; }
+ol.how { list-style: none; counter-reset: s; }
+ol.how li { counter-increment: s; display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+ol.how li::before { content: counter(s); flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
 .guarantee { text-align: center; border: 2px dashed var(--teal); border-radius: 18px; padding: 24px; }
 .guarantee .big { font-size: 26px; font-weight: 800; }
 
 /* faq */
 details { border-bottom: 1px solid var(--line); padding: 14px 0; }
-summary { font-weight: 700; cursor: pointer; list-style: none; }
-summary::after { content: "+"; float: left; color: var(--teal); font-weight: 800; }
+summary { font-weight: 700; cursor: pointer; list-style: none; padding-left: 26px; position: relative; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; left: 0; top: 0; color: var(--teal); font-weight: 800; font-size: 22px; line-height: 1.3; }
 details[open] summary::after { content: "−"; }
 details p { margin: 10px 0 0; color: var(--muted); }
 
 .final { background: var(--navy); color: #fff; text-align: center; }
-.final h2 { margin-bottom: 24px; }
+.final h2 { margin-bottom: 20px; }
+.wa { display: inline-block; margin-top: 18px; color: #cfeff3; font-size: 16px; }
 footer { padding: 26px 0 40px; font-size: 14px; color: var(--muted); text-align: center; }
 footer a { color: var(--muted); margin: 0 8px; }
+
+/* sticky buy bar */
+.bar { position: fixed; inset: auto 0 0 0; background: #fff; border-top: 1px solid var(--line); padding: 10px 14px; box-shadow: 0 -6px 20px rgba(0,0,0,.1); transform: translateY(110%); transition: transform .25s; z-index: 5; }
+.bar.show { transform: none; }
+.bar a { display: flex; justify-content: space-between; align-items: center; max-width: 640px; margin: 0 auto; background: var(--red); color: #fff; text-decoration: none; font-weight: 800; font-size: 18px; padding: 13px 18px; border-radius: 14px; }
+.bar a span { font-size: 20px; }
+@media (min-width: 700px) { h1 { font-size: 44px; } .hero .pic { height: 340px; } }
 </style>
 </head>
 <body>
 
 <!-- 1. hero -->
 <section class="hero">
-  <img src="hero.jpg" alt="ההאקר עם המסכה">
+  <div class="pic" role="img" aria-label="ההאקר עם המסכה"></div>
   <div class="wrap">
-    <span class="tag">מדריך הגנה</span>
+    <span class="tag">מדריך + 6 סרטונים</span>
     <h1>תוך 30 דקות, הוואטסאפ וכל החשבונות שלכם נעולים.</h1>
-    <p class="sub">מדריך פשוט, צעד אחרי צעד, באייפון ובאנדרואיד. לא צריך להבין בטכנולוגיה.</p>
-    <a class="cta" href="#checkout">אני רוצה לנעול את הוואטסאפ<small>97 ₪, תשלום אחד</small></a>
+    <p class="sub">צעד אחרי צעד, עם צילום מסך וסרטון לכל פרק. לא צריך להבין בטכנולוגיה.</p>
+    <a class="cta buy" href="#checkout">אני רוצה לנעול את הוואטסאפ<small>97 ₪, תשלום אחד</small></a>
+    <div class="trust"><span>תשלום מאובטח</span><span>מקבלים מיד</span><span>הכסף חוזר תוך 14 יום</span></div>
   </div>
 </section>
 
@@ -79,71 +143,170 @@ footer a { color: var(--muted); margin: 0 8px; }
   <p class="stat">לפי סקר של מערך הסייבר הלאומי, <strong>1 מכל 10 ישראלים</strong> חווה פריצה לחשבון ברשתות החברתיות בשנה האחרונה.</p>
 </div></section>
 
-<!-- 3. what you get -->
+<!-- 3. quiz -->
+<section style="padding-top:0"><div class="wrap">
+  <div class="quiz" id="quiz">
+    <div class="kicker">בדיקה של 10 שניות</div>
+    <h2 style="margin-bottom:4px">הוואטסאפ שלכם פתוח?</h2>
+    <div class="q"><p>יש לכם אימות דו-שלבי בוואטסאפ?</p><div class="btns"><button class="y">כן</button><button class="n">לא / לא בטוח</button></div></div>
+    <div class="q"><p>שיניתם פעם את הקוד של התא הקולי?</p><div class="btns"><button class="y">כן</button><button class="n">לא / לא בטוח</button></div></div>
+    <div class="q"><p>בדקתם בחודש האחרון אילו מכשירים מחוברים לוואטסאפ שלכם?</p><div class="btns"><button class="y">כן</button><button class="n">לא / לא בטוח</button></div></div>
+    <div class="res" id="res"></div>
+  </div>
+</div></section>
+
+<!-- 4. sample video -->
+<section class="vid"><div class="wrap">
+  <div class="kicker" style="text-align:center">סרטון מתוך המדריך</div>
+  <h2>4 העוקצים שגונבים וואטסאפ בישראל</h2>
+  <p>דקה אחת. ככה נראה כל סרטון במדריך.</p>
+  <video src="sample.mp4" poster="poster.jpg" controls playsinline preload="none"></video>
+</div></section>
+
+<!-- 5. scams -->
+<section><div class="wrap">
+  <h2>ככה זה נראה כשמנסים עליכם</h2>
+  <div class="scam"><h3><span>1.</span> "החלפתי מספר"</h3><div class="bub">היי זה אני, החלפתי מספר 🙂 תוכל להעביר לי 800 ש"ח בביט?</div><p>התמונה של הבן. המספר של הנוכל.</p></div>
+  <div class="scam"><h3><span>2.</span> "שלחתי לך קוד בטעות"</h3><div class="bub">שלחתי לך בטעות קוד של 6 ספרות. תוכל לשלוח לי אותו? זה דחוף</div><p>הקוד הזה הוא המפתח לוואטסאפ שלכם.</p></div>
+  <div class="scam"><h3><span>3.</span> התא הקולי בשלוש בלילה</h3><p>וואטסאפ מקריאה את הקוד לתא הקולי שלכם, והנוכל מאזין לו מרחוק. אתם ישנים.</p></div>
+  <div class="scam"><h3><span>4.</span> "זכיתם בשובר, סרקו את הקוד"</h3><p>סרקתם, והוואטסאפ שלכם מחובר למחשב שלו. הוא קורא כל הודעה.</p></div>
+  <p style="margin-top:16px">במדריך תלמדו לזהות כל אחד מהם, ותסגרו את ההגדרות שמאפשרות אותם.</p>
+</div></section>
+
+<!-- 6. what's inside -->
 <section style="padding-top:0"><div class="wrap">
   <h2>מה מקבלים</h2>
+  <div class="nums">
+    <div><b>29</b>עמודים</div><div><b>6</b>סרטונים</div><div><b>17</b>הגדרות</div><div><b>30</b>דקות</div>
+  </div>
+  <div class="pages">
+    <img src="guide-cover.jpg" alt="שער המדריך" loading="lazy" width="496" height="702">
+    <img src="guide-p1.jpg" alt="עמוד מתוך פרק הוואטסאפ" loading="lazy" width="496" height="702">
+    <img src="guide-p2.jpg" alt="עמוד עם צילומי מסך" loading="lazy" width="496" height="702">
+    <img src="guide-p3.jpg" alt="רשימת 30 הדקות" loading="lazy" width="496" height="702">
+  </div>
   <ul class="get">
-    <li><span><strong>וואטסאפ:</strong> 5 הגדרות שסוגרות את הדלת, גם אם מישהו השיג את הקוד.</span></li>
-    <li><span><strong>4 העוקצים</strong> שגונבים וואטסאפ בישראל, ואיך מזהים אותם.</span></li>
-    <li><span><strong>ג'ימייל, אינסטגרם ופייסבוק:</strong> נעולים.</span></li>
-    <li><span><strong>הטלפון והתא הקולי:</strong> סגורים.</span></li>
-    <li><span><strong>נפרצתי, מה עושים:</strong> צעד אחרי צעד.</span></li>
-    <li><span><strong>רשימת 30 הדקות:</strong> מסמנים וסוגרים.</span></li>
+    <li><span><strong>וואטסאפ: 5 הגדרות</strong><small>אימות דו-שלבי, מפתח גישה, מכשירים מקושרים ועוד. גם מי שהשיג את הקוד נשאר בחוץ.</small></span></li>
+    <li><span><strong>4 העוקצים</strong><small>איך כל אחד נראה על המסך, ומה מסגיר אותו.</small></span></li>
+    <li><span><strong>ג'ימייל, אינסטגרם ופייסבוק</strong><small>מי ששולט במייל שולט בכל השאר. נועלים גם אותם.</small></span></li>
+    <li><span><strong>הטלפון והתא הקולי</strong><small>סוגרים את הפרצה של שלוש בלילה.</small></span></li>
+    <li><span><strong>סיסמאות בלי כאב ראש</strong><small>בודקים אילו סיסמאות שלכם דלפו, ומחליפים רק אותן.</small></span></li>
+    <li><span><strong>נפרצתי, מה עושים</strong><small>איך מחזירים את החשבון, צעד אחרי צעד.</small></span></li>
+    <li><span><strong>רשימת 30 הדקות</strong><small>עמוד אחד להדפסה. מסמנים וסוגרים.</small></span></li>
   </ul>
 </div></section>
 
-<!-- 4. bonus -->
+<!-- 7. bonus -->
 <section style="padding-top:0"><div class="wrap">
   <div class="bonus">
-    <h2>🎁 בונוס: אמא לא נופלת בעוקץ</h2>
-    <p style="margin:0">מדריך להורים שלכם, באותיות גדולות. 6 העוקצים הנפוצים אצל מבוגרים, מילת קוד משפחתית, וכרטיס להדפסה ליד הטלפון.</p>
+    <img src="bonus-cover.jpg" alt="שער הבונוס" loading="lazy" width="496" height="702">
+    <div>
+      <h2>🎁 בונוס: אמא לא נופלת בעוקץ</h2>
+      <p>מדריך להורים שלכם, באותיות גדולות. 6 העוקצים הנפוצים אצל מבוגרים, מילת קוד משפחתית, וכרטיס להדפסה ליד הטלפון.</p>
+    </div>
   </div>
 </div></section>
 
-<!-- 5. who -->
+<!-- 8. who -->
 <section style="padding-top:0"><div class="wrap">
   <h2>למי זה מתאים</h2>
-  <p>אם אתם יודעים לשלוח הודעה בוואטסאפ, אתם יכולים לעשות את זה. כל הגדרה מוסברת בתמונה עם חץ אדום ובסרטון של דקה.</p>
+  <p>אם אתם יודעים לשלוח הודעה בוואטסאפ, אתם יכולים לעשות את זה. כל הגדרה מוסברת בצילום מסך עם חץ אדום, ולכל פרק יש סרטון קצר.</p>
+  <p>אתם עושים הכול לבד, בטלפון שלכם. אף אחד לא מקבל גישה לטלפון או לסיסמאות שלכם.</p>
 </div></section>
 
-<!-- 6. how -->
+<!-- 9. price -->
+<section style="padding-top:0"><div class="wrap">
+  <div class="price">
+    <div class="kicker">הוואטסאפ שלי נעול 🔒</div>
+    <div class="big">97 ₪</div>
+    <p class="vs">פחות מהעברת ביט אחת לנוכל.</p>
+    <ul>
+      <li>המדריך המלא (29 עמודים)</li>
+      <li>6 סרטונים, אחד לכל פרק</li>
+      <li>הבונוס להורים</li>
+      <li>תשלום אחד, שלכם לתמיד</li>
+    </ul>
+    <a class="cta buy" href="#checkout">אני רוצה לנעול את הוואטסאפ<small>הכסף חוזר תוך 14 יום</small></a>
+  </div>
+</div></section>
+
+<!-- 10. how -->
 <section style="padding-top:0"><div class="wrap">
   <h2>איך זה עובד</h2>
   <ol class="how">
-    <li>משלמים.</li>
-    <li>מקבלים את המדריך והסרטונים בהודעת וואטסאפ.</li>
-    <li>30 דקות עם הטלפון ביד, וזהו.</li>
+    <li><span><strong>משלמים.</strong> תשלום מאובטח בכרטיס אשראי, וקבלה נשלחת אליכם.</span></li>
+    <li><span><strong>מקבלים מיד.</strong> אחרי התשלום נפתח העמוד האישי שלכם, עם המדריך, הסרטונים והבונוס.</span></li>
+    <li><span><strong>30 דקות עם הטלפון ביד.</strong> פרק אחרי פרק, מסמנים ✓ וממשיכים.</span></li>
   </ol>
 </div></section>
 
-<!-- 7. guarantee -->
+<!-- 11. guarantee -->
 <section style="padding-top:0"><div class="wrap">
   <div class="guarantee">
-    <div class="big">לא מרוצים? כסף בחזרה.</div>
-    <p style="margin:6px 0 0">תוך 14 יום, בלי שאלות.</p>
+    <div class="big">לא מרוצים? הכסף חוזר.</div>
+    <p style="margin:6px 0 0">תוך 14 יום, בלי שאלות. שולחים הודעה, ומקבלים החזר מלא.</p>
   </div>
 </div></section>
 
-<!-- 8. faq -->
+<!-- 12. faq -->
 <section style="padding-top:0"><div class="wrap">
   <h2>שאלות נפוצות</h2>
-  <details><summary>זה מתאים לאייפון וגם לאנדרואיד?</summary><p>כן, לכל אחד יש הסבר משלו.</p></details>
-  <details><summary>כמה זמן זה לוקח?</summary><p>כ-30 דקות.</p></details>
-  <details><summary>אני לא מבין בטכנולוגיה. אני אצליח?</summary><p>כן. כל צעד מוסבר בתמונה ובסרטון.</p></details>
-  <details><summary>כבר פרצו לי. זה יעזור?</summary><p>כן. יש פרק שלם על איך מחזירים את החשבון.</p></details>
-  <details><summary>איך מקבלים את המדריך?</summary><p>בהודעת וואטסאפ, מיד אחרי התשלום.</p></details>
+  <details><summary>זה מתאים לאייפון וגם לאנדרואיד?</summary><p>כן. לכל הגדרה כתוב המסלול באייפון ובאנדרואיד. צילומי המסך במדריך הם מאייפון, ובאנדרואיד המסכים של וואטסאפ, ג'ימייל ואינסטגרם נראים כמעט אותו דבר.</p></details>
+  <details><summary>אני לא מבין בטכנולוגיה. אני אצליח?</summary><p>כן. כל צעד כתוב במילים פשוטות, עם צילום מסך שמראה איפה ללחוץ וסרטון לכל פרק. ואם נתקעתם, כותבים לנו בוואטסאפ ואנחנו עוזרים.</p></details>
+  <details><summary>כמה זמן זה לוקח?</summary><p>כ-30 דקות לכל המדריך. אפשר גם לחלק: הוואטסאפ לבדו לוקח 10 דקות.</p></details>
+  <details><summary>אפשר למצוא את כל זה בחינם באינטרנט?</summary><p>כל הגדרה בנפרד, כן. כאן הכול מרוכז במקום אחד, בעברית, לפי הסדר הנכון, ובלי לחפש בעשרה סרטונים שונים. בשביל זה משלמים.</p></details>
+  <details><summary>אתם מקבלים גישה לטלפון שלי?</summary><p>לא. אתם עושים את כל ההגדרות בעצמכם. אנחנו לא מבקשים קודים, סיסמאות או גישה לשום חשבון, ואף פעם לא נבקש.</p></details>
+  <details><summary>כבר פרצו לי. זה יעזור?</summary><p>כן. יש פרק שלם על איך מחזירים את החשבון בוואטסאפ, בג'ימייל ובאינסטגרם, ומה עושים אם כבר הועבר כסף.</p></details>
+  <details><summary>איך מקבלים את המדריך?</summary><p>מיד אחרי התשלום נפתח העמוד האישי שלכם, ובו המדריך להורדה, 6 הסרטונים והבונוס. שומרים את הקישור, והוא נשאר שלכם.</p></details>
+  <details><summary>מקבלים קבלה?</summary><p>כן, קבלה נשלחת אליכם אחרי התשלום.</p></details>
+  <details><summary>איך מבקשים החזר?</summary><p>שולחים לנו הודעה בוואטסאפ או במייל תוך 14 יום מהקנייה, ומקבלים החזר מלא. לא צריך להסביר למה.</p></details>
 </div></section>
 
-<!-- 9. final -->
-<section class="final"><div class="wrap">
+<!-- 13. final -->
+<section class="final" id="checkout"><div class="wrap">
   <h2>תנעלו את הוואטסאפ לפני שמישהו אחר ינסה.</h2>
-  <a class="cta" id="checkout" href="#checkout">אני רוצה לנעול את הוואטסאפ<small>97 ₪, תשלום אחד</small></a>
+  <a class="cta buy" href="#checkout">אני רוצה לנעול את הוואטסאפ<small>97 ₪, תשלום אחד · הכסף חוזר תוך 14 יום</small></a>
+  <a class="wa" href="https://wa.me/972559397892">יש שאלה לפני הקנייה? כתבו לנו בוואטסאפ</a>
 </div></section>
 
 <footer class="wrap">
   <a href="terms.html">תקנון</a> · <a href="privacy.html">מדיניות פרטיות</a>
-  <p style="margin-top:10px">פרטי העוסק יופיעו כאן</p>
+  <p style="margin-top:10px">gynohide · עוסק פטור 328277025 · דליות 5, קצרין · <a href="mailto:nullbyteacademy1@gmail.com">nullbyteacademy1@gmail.com</a> · וואטסאפ <a href="https://wa.me/972559397892">055-939-7892</a></p>
 </footer>
 
+<div class="bar" id="bar"><a class="buy" href="#checkout">אני רוצה לנעול את הוואטסאפ <span>97 ₪</span></a></div>
+
+<script>
+// quiz
+(function () {
+  var qs = document.querySelectorAll('#quiz .q'), res = document.getElementById('res');
+  qs.forEach(function (q) {
+    q.querySelectorAll('button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        q.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        var done = document.querySelectorAll('#quiz button.on').length, open = document.querySelectorAll('#quiz button.n.on').length;
+        if (done < qs.length) return;
+        if (open) {
+          res.className = 'res bad';
+          res.innerHTML = (open === 1 ? 'דלת אחת פתוחה' : open + ' דלתות פתוחות') + ' מתוך 3. <a href="#checkout">סוגרים אותן ב-30 דקות ←</a>';
+        } else {
+          res.className = 'res ok';
+          res.innerHTML = 'כל הכבוד, שלוש הדלתות האלה סגורות. במדריך יש עוד 14 הגדרות, וגם מדריך להורים שלכם.';
+        }
+      });
+    });
+  });
+})();
+// sticky buy bar: shown after the hero, hidden at the final section
+(function () {
+  var bar = document.getElementById('bar'), hero = document.querySelector('.hero'), fin = document.querySelector('.final');
+  function upd() {
+    var past = hero.getBoundingClientRect().bottom < 0, atEnd = fin.getBoundingClientRect().top < window.innerHeight - 60;
+    bar.classList.toggle('show', past && !atEnd);
+  }
+  window.addEventListener('scroll', upd, { passive: true }); upd();
+})();
+</script>
 </body>
 </html>

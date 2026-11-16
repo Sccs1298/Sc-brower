@@ -1,6 +1,6 @@
-@font-face { font-family: Heebo; src: url("Heebo-400.ttf"); font-weight: 400; font-display: swap; }
-@font-face { font-family: Heebo; src: url("Heebo-700.ttf"); font-weight: 700; font-display: swap; }
-@font-face { font-family: Heebo; src: url("Heebo-800.ttf"); font-weight: 800; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-700.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: Heebo; src: url("Heebo-800.woff2") format("woff2"); font-weight: 800; font-display: swap; }
 :root { --navy: #0b1620; --teal: #19b3c4; --ink: #14181f; --muted: #5b6472; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Heebo, sans-serif; color: var(--ink); background: #fff; font-size: 17px; line-height: 1.7; }
