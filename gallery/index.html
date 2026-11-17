@@ -224,26 +224,53 @@
 <!-- ===================== חיפוש באינטרנט ===================== -->
 <section id="web" class="screen trick-screen web">
   <div class="exit-band" aria-hidden="true"></div>
+  <div class="sbar"></div>
   <div id="wHome" class="w-home">
-    <div class="w-logo">חיפוש</div>
-    <form id="wForm" class="w-form">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
-      <input id="wIn" type="search" enterkeyhint="search" placeholder="חפש באינטרנט" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="חיפוש">
-    </form>
-    <div class="w-chips"><span>חדשות</span><span>מזג אוויר</span><span>תמונות</span><span>מפות</span></div>
-  </div>
-  <button id="wHistBtn" class="w-histbtn" type="button" aria-label="היסטוריה">🕘</button>
-  <div id="wBar" class="w-bar" hidden><i></i></div>
-  <div id="wHist" class="w-hist" hidden>
-    <div class="w-hist-head"><button id="wHistBack" type="button">‹</button><b>היסטוריה</b><span></span></div>
-    <div id="wHistList"></div>
+    <div class="w-ntp and-only">
+      <div class="w-ntp-logo">חיפוש</div>
+      <div class="w-ntp-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><span>חיפוש או הקלדת כתובת URL</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg></div>
+    </div>
+    <div class="w-favs-title ios-only">מועדפים</div>
+    <div class="w-favs" id="wFavs"></div>
+    <div class="w-favs-title ios-only">דוח פרטיות</div>
+    <div class="w-priv ios-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg><span>ב-7 הימים האחרונים נמנע ממעקבים לאסוף עליך פרופיל.</span></div>
   </div>
   <div id="wOff" class="w-off" hidden>
-    <svg id="wOffIco" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M20 46h26a10 10 0 001-20 14 14 0 00-27-3 11 11 0 000 23z"/><path d="M10 10l44 44"/></svg>
-    <b>אין חיבור לאינטרנט</b>
-    <p>בדקו את החיבור לרשת ונסו שוב.</p>
-    <button id="wRetry" type="button">נסה שוב</button>
+    <div class="ios-only w-off-ios">
+      <b id="wOffT">אינך מחובר/ת לאינטרנט</b>
+      <p>לא ניתן לפתוח את הדף מכיוון שה-iPhone שלך אינו מחובר לאינטרנט.</p>
+    </div>
+    <div class="and-only w-off-and">
+      <div class="w-pix" id="wOffIco" aria-hidden="true"></div>
+      <b id="wOffT2">אין חיבור לאינטרנט</b>
+      <p>כדאי לנסות:</p>
+      <ul><li>לבדוק את כבלי הרשת, המודם והנתב</li><li>להתחבר מחדש לרשת ה-Wi-Fi</li></ul>
+      <small>ERR_INTERNET_DISCONNECTED</small>
+    </div>
     <span id="wPeek" class="w-peek" hidden></span>
+  </div>
+  <div class="w-chrome">
+    <div class="w-addr">
+      <form id="wForm" class="w-form">
+        <svg class="w-ico-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+        <input id="wIn" type="search" enterkeyhint="go" placeholder="חיפוש או הזנת אתר" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="חיפוש">
+        <button id="wRetry" type="button" class="w-reload" aria-label="טען מחדש"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12a7 7 0 11-2.1-5M19 4v4h-4"/></svg></button>
+      </form>
+      <div id="wBar" class="w-bar" hidden><i></i></div>
+    </div>
+    <div class="w-tools">
+      <span class="ios-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+      <span class="ios-only dim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></span>
+      <span class="ios-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v9h12v-9"/></svg></span>
+      <button id="wHistBtn" type="button" aria-label="היסטוריה"><svg class="ios-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1z"/><path d="M12 6v14"/></svg><svg class="and-only" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+      <span class="ios-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="7" width="12" height="12" rx="2"/><path d="M8 4h10a2 2 0 012 2v10"/></svg></span>
+      <span class="and-only w-tabs">2</span>
+    </div>
+  </div>
+  <div id="wHist" class="w-hist" hidden>
+    <div class="w-hist-head"><button id="wHistBack" type="button"><span class="ios-only">סיום</span><svg class="and-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><b>היסטוריה</b><span></span></div>
+    <div class="w-hist-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><span>חיפוש בהיסטוריה</span></div>
+    <div id="wHistList"></div>
   </div>
 </section>
 
@@ -260,13 +287,26 @@
 <section id="call" class="screen trick-screen call">
   <div class="exit-band" aria-hidden="true"></div>
   <div id="callUi" class="call-ui" hidden>
-    <div class="call-top"><div id="callName" class="call-name"></div><div id="callSub" class="call-sub">נייד</div></div>
-    <div class="call-btns" id="callIn">
-      <button id="callNo" type="button" class="cb red" aria-label="דחה"><svg viewBox="0 0 40 40" fill="#fff"><path d="M6 23c8-8 20-8 28 0l-3 4-6-2v-4c-3-1-7-1-10 0v4l-6 2z"/></svg><span>דחה</span></button>
-      <button id="callYes" type="button" class="cb green" aria-label="ענה"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg><span>ענה</span></button>
+    <div class="sbar"></div>
+    <div class="call-top">
+      <div class="and-only call-label" id="callLabel">שיחה נכנסת</div>
+      <div class="and-only call-av" id="callAv"></div>
+      <div id="callName" class="call-name"></div>
+      <div id="callSub" class="call-sub">נייד</div>
     </div>
-    <div class="call-btns" id="callOn" hidden>
-      <button id="callEnd" type="button" class="cb red" aria-label="נתק"><svg viewBox="0 0 40 40" fill="#fff"><path d="M6 23c8-8 20-8 28 0l-3 4-6-2v-4c-3-1-7-1-10 0v4l-6 2z"/></svg><span>נתק</span></button>
+    <div id="callIn" class="call-in">
+      <div class="ios-only call-mini"><span><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 2M5 4L2.5 6.5M19 4l2.5 2.5"/></svg></i>תזכורת</span><span><i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4c5 0 9 3.1 9 7s-4 7-9 7c-1 0-2-.1-2.9-.4L5 19l1.2-3.2C4.2 14.5 3 12.9 3 11c0-3.9 4-7 9-7z"/></svg></i>הודעה</span></div>
+      <div class="ios-only call-slide" id="callSlide"><button id="callYes" type="button" class="call-knob" aria-label="ענה"><svg viewBox="0 0 24 24" fill="#34c759"><path d="M7.6 3.5l2.3.6 1.2 3.6-1.8 1.3c.9 1.8 2.1 3 3.8 3.8l1.3-1.8 3.6 1.2.6 2.3c0 1.2-1.2 2.4-2.4 2.4C9.6 16.6 5.2 12.2 5.2 5.9c0-1.2 1.2-2.4 2.4-2.4z"/></svg></button><span class="call-slide-t">החלק כדי לענות</span></div>
+      <div class="and-only call-swipe" id="callSwipe">
+        <span class="call-hint">החלק למעלה כדי לענות</span>
+        <button id="callYesA" type="button" class="call-orb" aria-label="ענה"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7.6 3.5l2.3.6 1.2 3.6-1.8 1.3c.9 1.8 2.1 3 3.8 3.8l1.3-1.8 3.6 1.2.6 2.3c0 1.2-1.2 2.4-2.4 2.4C9.6 16.6 5.2 12.2 5.2 5.9c0-1.2 1.2-2.4 2.4-2.4z"/></svg></button>
+        <span class="call-hint dim">החלק למטה כדי לדחות</span>
+      </div>
+      <button id="callNo" type="button" class="call-no-hidden" aria-label="דחה"></button>
+    </div>
+    <div id="callOn" class="call-on" hidden>
+      <div class="call-grid" id="callGrid"></div>
+      <button id="callEnd" type="button" class="call-end" aria-label="נתק"><svg viewBox="0 0 40 40" fill="#fff"><path d="M6 23c8-8 20-8 28 0l-3 4-6-2v-4c-3-1-7-1-10 0v4l-6 2z"/></svg></button>
     </div>
   </div>
 </section>
@@ -274,17 +314,40 @@
 <!-- ===================== פתקים ===================== -->
 <section id="notes" class="screen trick-screen notes">
   <div class="exit-band" aria-hidden="true"></div>
+  <div class="sbar"></div>
   <div id="ntList" class="nt-list">
-    <h1>פתקים</h1>
-    <div class="nt-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" aria-hidden="true"><circle cx="10.500" cy="10.500" r="6.500"/><path d="M15.500 15.500L20 20"/></svg><input id="ntSearch" type="search" placeholder="חיפוש" autocomplete="off" aria-label="חיפוש בפתקים"></div>
+    <div class="nt-nav ios-only"><span class="nt-link">‹ תיקיות</span><span class="nt-more">⋯</span></div>
+    <h1 class="ios-only">פתקים</h1>
+    <div class="nt-search">
+      <svg class="and-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <svg class="ios-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+      <input id="ntSearch" type="search" placeholder="חיפוש" autocomplete="off" aria-label="חיפוש בפתקים">
+      <svg class="ios-only nt-mic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg>
+      <span class="and-only nt-avatar">ש</span>
+    </div>
     <div id="ntItems" class="nt-items"></div>
-    <p class="nt-count" id="ntCount"></p>
   </div>
+  <div class="nt-bar ios-only"><span></span><span id="ntCount"></span><svg class="nt-compose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6"/><path d="M17 3l4 4-9 9H8v-4z"/></svg></div>
+  <div class="nt-fabbar and-only"><span class="nt-tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20c4 0 4-4 8-4M15 4l5 5-8 8-5-5z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg></span><span class="nt-fab">+</span></div>
   <div id="ntView" class="nt-view" hidden>
-    <button id="ntBack" type="button" class="nt-back">‹ פתקים</button>
-    <p id="ntDate" class="nt-date"></p>
-    <h2 id="ntTitle"></h2>
-    <p id="ntBody" class="nt-body"></p>
+    <div class="sbar"></div>
+    <div class="nt-vnav"><button id="ntBack" type="button" class="nt-back"><span class="ios-only">‹ פתקים</span><svg class="and-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <span class="nt-vicons ios-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v9h12v-9"/></svg><span class="nt-more">⋯</span></span>
+      <span class="nt-vicons and-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6l-1 6 3 3H7l3-3zM12 12v9"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4a6 6 0 016 6v4l2 3H4l2-3v-4a6 6 0 016-6zM10 20a2 2 0 004 0"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg></span>
+    </div>
+    <div id="ntLocked" class="nt-locked" hidden>
+      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="10" y="21" width="28" height="21" rx="4"/><path d="M16 21v-6a8 8 0 0116 0v6"/></svg>
+      <b>הפתק הזה נעול.</b>
+      <button id="ntUnlock" type="button">הצג פתק</button>
+    </div>
+    <div id="ntFace" class="nt-face" hidden><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 20V12a6 6 0 016-6h8M44 6h8a6 6 0 016 6v8M58 44v8a6 6 0 01-6 6h-8M20 58h-8a6 6 0 01-6-6v-8"/><path class="nt-face-eyes" d="M22 24v4M42 24v4M32 24v12h-3M24 44c5 4 11 4 16 0"/><path class="nt-face-ok" d="M20 33l9 9 16-18"/></svg></div>
+    <div id="ntContent" class="nt-content">
+      <p id="ntDate" class="nt-date"></p>
+      <h2 id="ntTitle"></h2>
+      <p id="ntBody" class="nt-body"></p>
+    </div>
+    <div class="nt-bar ios-only nt-vbar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="7" r="2"/><circle cx="6" cy="17" r="2"/><path d="M11 7h9M11 17h9"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 11l-8.5 8.5a5 5 0 01-7-7L14 4a3.5 3.5 0 015 5l-8.5 8.5a2 2 0 01-3-3L15 7"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg><svg class="nt-compose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6"/><path d="M17 3l4 4-9 9H8v-4z"/></svg></div>
+    <p id="ntEdited" class="nt-edited and-only"></p>
   </div>
 </section>
 
@@ -304,12 +367,25 @@
 <!-- ===================== מסך נעול + התראה ===================== -->
 <section id="lock" class="screen trick-screen lock">
   <div class="exit-band" aria-hidden="true"></div>
-  <div class="l-top"><div id="lDate" class="l-date"></div><div id="lTime" class="l-time"></div></div>
+  <div class="sbar sbar-lock"></div>
+  <div class="l-top">
+    <svg class="l-pad ios-only" viewBox="0 0 24 24" fill="#fff"><path d="M7 10V7a5 5 0 0110 0v3h1a1 1 0 011 1v9a1 1 0 01-1 1H6a1 1 0 01-1-1v-9a1 1 0 011-1zm2 0h6V7a3 3 0 00-6 0z"/></svg>
+    <div id="lDate" class="l-date"></div>
+    <div id="lTime" class="l-time"></div>
+    <div id="lWx" class="l-wx and-only"></div>
+  </div>
   <div id="lNote" class="l-note" hidden>
     <span class="l-ico"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4c5 0 9 3.1 9 7s-4 7-9 7c-1 0-2-.1-2.9-.4L5 19l1.2-3.2C4.2 14.5 3 12.9 3 11c0-3.9 4-7 9-7z"/></svg></span>
-    <div class="l-body"><div class="l-row"><b id="lFrom"></b><span>עכשיו</span></div><div id="lText"></div></div>
+    <div class="l-body"><div class="l-row"><span class="l-app">הודעות</span><span class="l-when">עכשיו</span></div><b id="lFrom"></b><div id="lText"></div></div>
   </div>
-  <div class="l-bottom"><span class="l-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M9 3h6l-1 6h-4z"/><rect x="9" y="9" width="6" height="12" rx="2"/></svg></span><span class="l-btn"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M9 7l1.5-3h3L15 7"/></svg></span></div>
+  <div class="l-bottom">
+    <button id="lTorch" type="button" class="l-btn" aria-label="פנס"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M8 3h8v3l-2 4v10a1 1 0 01-1 1h-2a1 1 0 01-1-1V10L8 6z"/><path d="M12 13v2"/></svg></button>
+    <span class="l-fp and-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 8a8 8 0 0112 0M4.5 11a10 10 0 0115 0M8 20c1-2 1.5-4 1.5-7a2.5 2.5 0 015 0c0 3 .5 5 1.5 7M12 13c0 3-.5 6-2 8M7 17c.5-1.5.8-3 .8-4.5a4.2 4.2 0 018.4 0"/></svg></span>
+    <button id="lCam" type="button" class="l-btn" aria-label="מצלמה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M9 7l1.5-3h3L15 7"/></svg></button>
+  </div>
+  <div class="l-home ios-only"></div>
+  <input id="lCamIn" type="file" accept="image/*" capture="environment" hidden>
+  <div id="lFlash" class="l-flash" hidden></div>
   <div id="lTouch" class="l-touch"></div>
 </section>
 
@@ -543,6 +619,9 @@
     <div class="group">
       <label class="row"><span>מראה</span>
         <select data-s="phTheme"><option value="auto">לפי הטלפון</option><option value="light">בהיר</option><option value="dark">כהה</option></select>
+      </label>
+      <label class="row"><span>הקסמים נראים כמו</span>
+        <select data-s="phoneOS"><option value="auto">הטלפון שלי (אוטומטי)</option><option value="ios">אייפון</option><option value="android">אנדרואיד</option></select>
       </label>
       <label class="row"><span>כשהצופה מחפש בגלריה</span>
         <select data-s="searchMode"><option value="result">מוצא את סרטון הטריק</option><option value="none">"אין תוצאות" (רק הצצה)</option></select>
