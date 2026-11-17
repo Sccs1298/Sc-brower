@@ -43,7 +43,7 @@ const METHODS = {
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
   startIn: 'hub', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
   notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '',
-  callDelay: '8', callName: 'אמא', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
+  callDelay: '8', callName: 'אמא', phoneOS: 'auto', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
   histFill: 'מזג אוויר מחר\nמתכון לפנקייקים\nכמה זה 30 דולר בשקלים\nשעות פתיחה סופר\nתרגום מאנגלית לעברית' };
 const PEEK = { text: '', at: 0 };
 const LAST = { text: '' }; // הבחירה האחרונה (מחיפוש או מחשיפה) – לפסיפס ולמצגת
@@ -668,6 +668,32 @@ function applyTheme() {
   document.body.classList.toggle('pg-light', S.phTheme === 'light');
   document.body.classList.toggle('pg-dark', S.phTheme === 'dark');
 }
+/* ---------- מראה הטלפון: הקסמים נראים כמו אייפון או כמו אנדרואיד ---------- */
+const isAndroid = () => S.phoneOS === 'android' || (S.phoneOS !== 'ios' && /android/i.test(navigator.userAgent));
+function applyOS() { document.documentElement.dataset.os = isAndroid() ? 'android' : 'ios'; fillSbars(); }
+// פס עליון מדומה רק כשאין פס אמיתי של הטלפון (תצוגה במחשב או צילום מסך)
+const FAKE_SBAR = /[?&]sb=1/.test(location.search) || (matchMedia('(hover: hover) and (pointer: fine)').matches && !/[?&]sb=0/.test(location.search));
+document.documentElement.classList.toggle('fake-sbar', FAKE_SBAR);
+function fillSbars() {
+  if (!FAKE_SBAR) return;
+  const d = new Date(), t = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
+  const sig = '<svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>';
+  const wifi = '<svg viewBox="0 0 16 12"><path d="M8 12l-2.4-2.6a3.4 3.4 0 014.8 0zM3.4 7.1a6.5 6.5 0 019.2 0l1.4-1.5a8.6 8.6 0 00-12 0zM.9 4.5a10 10 0 0114.2 0L16.5 3A12 12 0 00-.5 3z"/></svg>';
+  const bat = '<svg viewBox="0 0 27 12"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="16" height="8" rx="2"/><path d="M24.5 4v4a2 2 0 000-4z" opacity=".45"/></svg>';
+  $$('.sbar').forEach(el => {
+    const lock = el.classList.contains('sbar-lock') && !isAndroid();
+    el.innerHTML = `<span>${lock ? '' : t}</span><span class="sb-i">${isAndroid() ? wifi + sig + bat : sig + wifi + bat}</span>`;
+  });
+}
+setInterval(fillSbars, 30000);
+/* צבע הפס העליון האמיתי של הטלפון מתאים את עצמו למסך הקסם (במקום פס לבן מעל מסך נעול) */
+const BAR_COLORS = { lock: () => isAndroid() ? '#22302a' : '#1d2a5c', call: () => '#000000', deck: () => '#1b5e3c', calc: () => '#000000', sw: () => '#000000' };
+function setBarColor(id) {
+  $$('meta[name="theme-color"]').forEach(m => {
+    if (!m.dataset.orig) m.dataset.orig = m.content;
+    m.content = BAR_COLORS[id] ? BAR_COLORS[id]() : m.dataset.orig;
+  });
+}
 
 /* ===================== ניווט =====================
    מחסנית מסכים. כל מסך יכול לקבל פעולת כניסה ויציאה.
@@ -678,6 +704,7 @@ const SCREEN_NAMES = { hub: 'מרכז הקסמים', photos: 'גלריה', manag
 const SCROLL = {};
 function paint(id, restore) {
   $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  setBarColor(id); fillSbars();
   const prev = NAV.stack[NAV.stack.length - 2], back = $(`#${id} .nav-back[data-back]`);
   if (back) back.textContent = '‹ ' + (SCREEN_NAMES[prev] || 'חזרה');
   if (id !== 'photos') window.scrollTo(0, restore ? (SCROLL[id] || 0) : 0);
@@ -1465,6 +1492,7 @@ const onSetting = e => {
   const el = e.target; if (!el.dataset.s) return;
   S[el.dataset.s] = el.type === 'checkbox' ? el.checked : el.value;
   if (el.dataset.s === 'phTheme') applyTheme();
+  if (el.dataset.s === 'phoneOS') applyOS();
   saveSettings();
 };
 $('#settings').addEventListener('input', onSetting);
@@ -2180,24 +2208,41 @@ LEAVE.calc = () => keepAwake(false);
   });
 })();
 
-/* ---------- חיפוש באינטרנט (הצצה) ---------- */
-ENTER.web = () => { $('#wIn').value = ''; $('#wHome').hidden = false; $('#wOff').hidden = true; $('#wPeek').hidden = true; $('#wHist').hidden = true; $('#wBar').hidden = true; clearTimeout(W.t); setTimeout(() => $('#wIn').focus(), 80); };
+/* ---------- חיפוש באינטרנט (הצצה): נראה כמו הדפדפן של הטלפון ---------- */
+const W = { t: 0, at: 0 };
+const WEB_FAVS = [['חדשות', '#e0332f'], ['מזג אוויר', '#2f7fe0'], ['ספורט', '#1f9d55'], ['מתכונים', '#f08a24'], ['מפות', '#34a3a0'], ['בנק', '#6a4fd0'], ['קניות', '#d0447a'], ['דואר', '#4a5568']];
+function webFavs() {
+  const box = $('#wFavs'); if (box.childElementCount) return;
+  for (const [n, c] of WEB_FAVS) { const d = document.createElement('div'); d.className = 'w-fav'; const i = document.createElement('i'); i.style.background = c; i.textContent = n[0]; d.append(i, document.createTextNode(n)); box.appendChild(d); }
+}
+ENTER.web = () => {
+  webFavs(); $('#wIn').value = ''; $('#wHome').hidden = false; $('#wOff').hidden = true; $('#wPeek').hidden = true; $('#wHist').hidden = true; $('#wBar').hidden = true;
+  $('#web').classList.remove('is-off'); $('#wIn').placeholder = isAndroid() ? 'חיפוש או הקלדת כתובת URL' : 'חיפוש או הזנת אתר';
+  clearTimeout(W.t); setTimeout(() => $('#wIn').focus(), 80);
+};
 $('#wForm').addEventListener('submit', e => {
   e.preventDefault(); const q = $('#wIn').value.trim(); if (!q) return;
   setChoice(q); W.at = Date.now(); $('#wIn').blur();
   const bar = $('#wBar'); bar.hidden = true; void bar.offsetWidth; bar.hidden = false;   // נראה כמו טעינה אמיתית
-  clearTimeout(W.t); W.t = setTimeout(() => { bar.hidden = true; $('#wHome').hidden = true; $('#wOff').hidden = false; }, 2300);
+  clearTimeout(W.t); W.t = setTimeout(() => { bar.hidden = true; $('#wHome').hidden = true; $('#wOff').hidden = false; $('#web').classList.add('is-off'); }, 2300);
 });
-const W = { t: 0, at: 0 };
 function showHistory() {
   const box = $('#wHistList'), term = PEEK.text || LAST.text || '', fill = String(S.histFill || '').split('\n').map(x => x.trim()).filter(Boolean);
   const hhmm = (h, m) => String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
-  const row = (t, time) => { const d = document.createElement('div'); d.className = 'w-row'; const a = document.createElement('span'), b = document.createElement('span'); a.textContent = t; b.textContent = time; d.append(a, b); return d; };
+  const and = isAndroid();
+  const row = (t, time) => {
+    const d = document.createElement('div'); d.className = 'w-row';
+    const i = document.createElement('i'), b = document.createElement('b'), s = document.createElement('small');
+    i.textContent = 'G'; b.textContent = t + ' - חיפוש ב-Google'; s.textContent = and ? 'google.com' : 'google.com · ' + time;
+    d.append(i, b, s); return d;
+  };
   const day = t => { const d = document.createElement('div'); d.className = 'w-day'; d.textContent = t; return d; };
+  const today = new Date(), yest = new Date(Date.now() - 864e5);
+  const dayName = d => d.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'short' });
   box.innerHTML = '';
   // המילה של הצופה מופיעה כחיפוש מאתמול, בין חיפושים רגילים
-  box.append(day('היום'), row(fill[0] || 'מזג אוויר', hhmm(8, 12)));
-  box.append(day('אתמול'));
+  box.append(day(and ? 'היום - ' + dayName(today) : 'היום'), row(fill[0] || 'מזג אוויר', hhmm(8, 12)));
+  box.append(day(and ? 'אתמול - ' + dayName(yest) : 'אתמול'));
   if (fill[1]) box.append(row(fill[1], hhmm(22, 41)));
   if (term) box.append(row(term, hhmm(21, 7)));
   fill.slice(2).forEach((t, i) => box.append(row(t, hhmm(18 - i * 2, 15 + i * 9))));
@@ -2205,8 +2250,9 @@ function showHistory() {
 }
 $('#wHistBtn').onclick = showHistory;
 $('#wHistBack').onclick = () => { $('#wHist').hidden = true; };
-$('#wRetry').onclick = () => { const b = $('#wRetry'); b.textContent = 'טוען…'; setTimeout(() => { b.textContent = 'נסה שוב'; }, 1400); };
-longPress($('#wOffIco'), 600, () => { const p = $('#wPeek'); p.textContent = PEEK.text; p.hidden = false; setTimeout(() => p.hidden = true, 1600); });
+$('#wRetry').onclick = () => { const bar = $('#wBar'); bar.hidden = true; void bar.offsetWidth; bar.hidden = false; clearTimeout(W.t); W.t = setTimeout(() => { bar.hidden = true; }, 1900); };
+const webPeek = () => { const p = $('#wPeek'); p.textContent = PEEK.text; p.hidden = false; setTimeout(() => p.hidden = true, 1600); };
+longPress($('#wOffT'), 600, webPeek); longPress($('#wOffIco'), 600, webPeek); longPress($('#wOffT2'), 600, webPeek);
 
 /* ---------- חפיסת קלפים ---------- */
 function buildDeck() {
@@ -2230,18 +2276,43 @@ $('#dFan').addEventListener('click', e => {
 $('#dPick').onclick = () => { $('#dPick').hidden = true; };
 
 /* ---------- מסך נעול + התראה ---------- */
-const L = { t: 0, tick: 0, buf: '', fired: false };
+const L = { t: 0, tick: 0, buf: '', fired: false, torch: false, stream: null };
 function lockClock() {
-  const d = new Date();
-  $('#lTime').textContent = d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
-  $('#lDate').textContent = d.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const d = new Date(), hh = String(d.getHours()).padStart(2, '0'), mm = String(d.getMinutes()).padStart(2, '0');
+  $('#lTime').textContent = isAndroid() ? hh + '\n' + mm : hh + ':' + mm;
+  $('#lDate').textContent = d.toLocaleDateString('he-IL', isAndroid() ? { weekday: 'short', day: 'numeric', month: 'short' } : { weekday: 'long', day: 'numeric', month: 'long' });
+  $('#lWx').textContent = '☁︎ 19°';
 }
 function fireNote(x) {
   if (L.fired) return; L.fired = true;
   $('#lFrom').textContent = S.notifyFrom || 'הודעה';
   $('#lText').textContent = (S.notifyBody || '{x}').split('{x}').join(x);
-  const n = $('#lNote'); n.hidden = true; void n.offsetWidth; n.hidden = false; buzz();
+  const n = $('#lNote'); n.hidden = true; void n.offsetWidth; n.hidden = false;
+  if (navigator.vibrate && S.vibrate) navigator.vibrate(isAndroid() ? [60, 60, 60] : [30, 90, 30]); // רטט של הודעה, לא של הקשה
 }
+/* פנס: באנדרואיד מדליק את הפנס האמיתי של המצלמה. באייפון הדפדפן לא מאפשר, אז רק הכפתור נדלק כמו באמת */
+async function setTorch(on) {
+  L.torch = on; $('#lTorch').classList.toggle('on', on);
+  if (!isAndroid() || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  try {
+    if (on) {
+      L.stream = L.stream || await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+      const tr = L.stream.getVideoTracks()[0], caps = tr.getCapabilities ? tr.getCapabilities() : {};
+      if (caps.torch) await tr.applyConstraints({ advanced: [{ torch: true }] });
+    } else if (L.stream) { L.stream.getTracks().forEach(t => t.stop()); L.stream = null; }
+  } catch (e) { /* בלי הרשאה: הכפתור עדיין נדלק */ }
+}
+/* כפתורי מסך הנעילה עובדים כמו בטלפון: לחיצה ארוכה */
+function lockHold(el, fn) {
+  let t = 0;
+  el.addEventListener('pointerdown', e => { e.stopPropagation(); el.classList.add('press'); clearTimeout(t); t = setTimeout(() => { el.classList.remove('press'); if (navigator.vibrate && S.vibrate) navigator.vibrate(18); fn(); }, isAndroid() ? 380 : 450); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => el.addEventListener(ev, () => { clearTimeout(t); el.classList.remove('press'); }));
+  el.addEventListener('click', e => e.stopPropagation());
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+lockHold($('#lTorch'), () => setTorch(!L.torch));
+lockHold($('#lCam'), () => { $('#lCamIn').value = ''; $('#lCamIn').click(); }); // פותח את המצלמה האמיתית של הטלפון
+$('#lCamIn').addEventListener('change', () => { $('#lCamIn').value = ''; });
 ENTER.lock = () => {
   lockClock(); clearInterval(L.tick); L.tick = setInterval(lockClock, 15000);
   clearTimeout(L.t); L.buf = ''; L.fired = false; $('#lNote').hidden = true;
@@ -2249,7 +2320,7 @@ ENTER.lock = () => {
   if (L.auto) L.t = setTimeout(() => fireNote(LAST.text), (parseFloat(S.notifyDelay) || 6) * 1000);
   keepAwake(true);
 };
-LEAVE.lock = () => { clearTimeout(L.t); clearInterval(L.tick); keepAwake(false); };
+LEAVE.lock = () => { clearTimeout(L.t); clearInterval(L.tick); keepAwake(false); if (L.torch) setTorch(false); };
 $('#lTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כשאין בחירה שנקלטה
   if (L.fired || L.auto || L.buf.length >= 2) return;
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
@@ -2259,58 +2330,145 @@ $('#lTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כ
 
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };
+const ICO = {
+  speaker: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  video: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="6" width="13" height="12" rx="3"/><path d="M17 10l4-3v10l-4-3z"/></svg>',
+  mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zM6 11a6 6 0 0012 0M12 17v4M4 4l16 16"/></svg>',
+  more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>',
+  keypad: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="5" r="1.7"/><circle cx="12" cy="5" r="1.7"/><circle cx="18" cy="5" r="1.7"/><circle cx="6" cy="11" r="1.7"/><circle cx="12" cy="11" r="1.7"/><circle cx="18" cy="11" r="1.7"/><circle cx="6" cy="17" r="1.7"/><circle cx="12" cy="17" r="1.7"/><circle cx="18" cy="17" r="1.7"/><circle cx="12" cy="22" r="1.7"/></svg>',
+  add: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  hold: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>',
+};
 function ringStart() {
   try {
     const ac = CALL.ac; if (!ac) return; ac.resume();
-    const beep = () => { [0, .22].forEach(dt => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; o.type = 'sine';
-      g.gain.setValueAtTime(0, ac.currentTime + dt); g.gain.linearRampToValueAtTime(.18, ac.currentTime + dt + .02); g.gain.linearRampToValueAtTime(0, ac.currentTime + dt + .18);
-      o.connect(g); g.connect(ac.destination); o.start(ac.currentTime + dt); o.stop(ac.currentTime + dt + .2); }); if (navigator.vibrate && S.vibrate) navigator.vibrate([180, 80, 180]); };
-    beep(); CALL.ring = setInterval(beep, 1800);
+    // מנגינת צלצול קצרה (שונה באייפון ובאנדרואיד), במקום צפצוף
+    const notes = isAndroid() ? [659, 784, 988, 784, 659, 523] : [1047, 784, 1319, 1047, 784, 1175];
+    const ring = () => {
+      notes.forEach((f, k) => {
+        const t = ac.currentTime + k * .17, o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain();
+        o.type = 'sine'; o.frequency.value = f; o2.type = 'sine'; o2.frequency.value = f * 2.01;
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.16, t + .012); g.gain.exponentialRampToValueAtTime(.001, t + .45);
+        const g2 = ac.createGain(); g2.gain.value = .25; o2.connect(g2); g2.connect(g);
+        o.connect(g); g.connect(ac.destination); o.start(t); o2.start(t); o.stop(t + .5); o2.stop(t + .5);
+      });
+      if (navigator.vibrate && S.vibrate) navigator.vibrate([400, 200, 400]);
+    };
+    ring(); CALL.ring = setInterval(ring, 2600);
   } catch (e) { /* בלי צליל */ }
 }
-function ringStop() { clearInterval(CALL.ring); CALL.ring = 0; }
-function callReset() { clearTimeout(CALL.t); clearInterval(CALL.tick); ringStop(); $('#callUi').hidden = true; $('#callIn').hidden = false; $('#callOn').hidden = true; }
+function ringStop() { clearInterval(CALL.ring); CALL.ring = 0; if (navigator.vibrate) navigator.vibrate(0); }
+function callReset() {
+  clearTimeout(CALL.t); clearInterval(CALL.tick); ringStop(); $('#callUi').hidden = true; $('#callIn').hidden = false; $('#callOn').hidden = true;
+  $('#callYes').style.transform = ''; $('#callYesA').style.transform = '';
+}
+function fakeNumber(name) { let h = 7; for (const ch of String(name)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const n = String(1000000 + h % 8999999).slice(-7); return '05' + (2 + h % 7) + '-' + n.slice(0, 3) + '-' + n.slice(3); }
+function buildCallGrid() {
+  const g = $('#callGrid'); g.innerHTML = '';
+  const items = isAndroid()
+    ? [['השתק', 'mute'], ['מקלדת', 'keypad'], ['רמקול', 'speaker'], ['הוספת שיחה', 'add'], ['המתנה', 'hold'], ['וידאו', 'video']]
+    : [['רמקול', 'speaker'], ['FaceTime', 'video'], ['השתק', 'mute'], ['עוד', 'more'], [null], ['מקלדת', 'keypad']];
+  for (const [label, ic] of items) {
+    if (!label) { g.appendChild($('#callEnd')); continue; } // באייפון כפתור הניתוק יושב בתוך הרשת
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'cg';
+    b.innerHTML = `<i>${ICO[ic]}</i>`; b.append(label);
+    if (ic === 'speaker' || ic === 'mute' || ic === 'hold') b.onclick = () => b.classList.toggle('on');
+    g.appendChild(b);
+  }
+  if (isAndroid()) $('#callOn').appendChild($('#callEnd'));
+}
 ENTER.call = () => {
   callReset(); keepAwake(true);
   try { CALL.ac = CALL.ac || new (window.AudioContext || window.webkitAudioContext)(); CALL.ac.resume(); } catch (e) { CALL.ac = null; }
   CALL.t = setTimeout(() => {
-    $('#callName').textContent = LAST.text || S.callName || 'מספר חסוי'; $('#callSub').textContent = 'נייד';
+    const name = LAST.text || S.callName || 'מספר חסוי';
+    $('#callName').textContent = name; $('#callSub').textContent = isAndroid() ? 'נייד ' + fakeNumber(name) : 'נייד';
+    $('#callAv').textContent = name.trim()[0] || '?'; $('#callLabel').textContent = 'שיחה נכנסת';
     $('#callUi').hidden = false; ringStart();
+    $$('meta[name="theme-color"]').forEach(m => { m.content = isAndroid() ? '#141218' : '#6b7280'; });
   }, (parseFloat(S.callDelay) || 8) * 1000);
 };
 LEAVE.call = () => { callReset(); keepAwake(false); };
-$('#callNo').onclick = () => callReset();
-$('#callEnd').onclick = () => callReset();
-$('#callYes').onclick = () => {
-  ringStop(); $('#callIn').hidden = true; $('#callOn').hidden = false; CALL.t0 = Date.now();
+function callAnswer() {
+  ringStop(); buildCallGrid(); $('#callIn').hidden = true; $('#callOn').hidden = false; CALL.t0 = Date.now();
   const tick = () => { const sec = Math.floor((Date.now() - CALL.t0) / 1000); $('#callSub').textContent = String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0'); };
   tick(); CALL.tick = setInterval(tick, 500);
-};
+}
+$('#callNo').onclick = () => callReset();
+$('#callEnd').onclick = () => callReset();
+/* אייפון: מחליקים את הכפתור ימינה כדי לענות (נגיעה בו גם עונה) */
+(function slideToAnswer() {
+  const k = $('#callYes'), box = $('#callSlide'); let x0 = null, dx = 0, moved = false;
+  k.addEventListener('pointerdown', e => { x0 = e.clientX; dx = 0; moved = false; k.style.transition = 'none'; try { k.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } });
+  k.addEventListener('pointermove', e => { if (x0 == null) return; const max = box.clientWidth - k.offsetWidth - 10; dx = clamp(e.clientX - x0, 0, max); if (dx > 6) moved = true; k.style.transform = `translateX(${dx}px)`; });
+  const end = () => { if (x0 == null) return; x0 = null; const max = box.clientWidth - k.offsetWidth - 10; k.style.transition = 'transform .25s'; if (dx > max * .7) { k.style.transform = `translateX(${max}px)`; setTimeout(callAnswer, 150); } else k.style.transform = ''; };
+  k.addEventListener('pointerup', end); k.addEventListener('pointercancel', end);
+  k.addEventListener('click', () => { if (!moved) callAnswer(); });
+})();
+/* אנדרואיד: מחליקים למעלה כדי לענות, למטה כדי לדחות (נגיעה גם עונה) */
+(function swipeToAnswer() {
+  const o = $('#callYesA'); let y0 = null, dy = 0, moved = false;
+  o.addEventListener('pointerdown', e => { y0 = e.clientY; dy = 0; moved = false; o.style.animation = 'none'; try { o.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } });
+  o.addEventListener('pointermove', e => { if (y0 == null) return; dy = clamp(e.clientY - y0, -140, 140); if (Math.abs(dy) > 6) moved = true; o.style.transform = `translateY(${dy}px)`; });
+  const end = () => { if (y0 == null) return; y0 = null; o.style.transform = ''; o.style.animation = ''; if (dy < -80) callAnswer(); else if (dy > 80) callReset(); };
+  o.addEventListener('pointerup', end); o.addEventListener('pointercancel', end);
+  o.addEventListener('click', () => { if (!moved) callAnswer(); });
+})();
 
 /* ===================== פתק ישן ===================== */
-const NOTE_FILL = [['רשימת קניות', 'חלב, ביצים, לחם, עגבניות'], ['רעיונות למתנה', 'אוזניות, ספר, שובר למסעדה'], ['דברים לעשות', 'להתקשר לביטוח, לקבוע תור'], ['סיסמה לוויי-פיי של העבודה', 'לשאול את דנה']];
-function noteDate(daysAgo) { const d = new Date(Date.now() - daysAgo * 864e5); return d; }
+const NOTE_FILL = [['רשימת קניות', 'חלב\nביצים\nלחם\nעגבניות'], ['רעיונות למתנה', 'אוזניות, ספר, שובר למסעדה'], ['דברים לעשות', 'להתקשר לביטוח\nלקבוע תור לרופא'], ['סיסמה לוויי-פיי של העבודה', 'לשאול את דנה'], ['חניה', 'קומה 2, אזור C']];
+function noteDate(daysAgo) { const d = new Date(Date.now() - daysAgo * 864e5); d.setHours(21, 14, 0, 0); return d; }
+function noteBody() { return (S.noteBody || '{x}').split('{x}').join(LAST.text || '…'); }
 function renderNotes(q) {
   const box = $('#ntItems'); box.innerHTML = '';
+  const and = isAndroid();
+  const all = [[NOTE_FILL[0][0], NOTE_FILL[0][1], 1], [S.noteTitle || 'לא לפתוח 🤫', '', 7, true], [NOTE_FILL[4][0], NOTE_FILL[4][1], 5],
+    ...NOTE_FILL.slice(1, 4).map((n, i) => [n[0], n[1], 12 + i * 9])];
+  const list = q ? all.filter(n => (n[0] + ' ' + (n[3] ? '' : n[1])).includes(q)) : all;
   const fmt = d => d.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric', year: '2-digit' });
-  const all = [[NOTE_FILL[0][0], NOTE_FILL[0][1], 1], [S.noteTitle || 'לא לפתוח 🤫', 'נעול', 7, true], ...NOTE_FILL.slice(1).map((n, i) => [n[0], n[1], 12 + i * 9])];
-  const body = (S.noteBody || '{x}').split('{x}').join(LAST.text || '');
-  const list = q ? all.filter(n => (n[0] + ' ' + (n[3] ? body : n[1])).includes(q)) : all;
-  for (const n of list) {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'nt-item';
-    const t = document.createElement('b'), sp = document.createElement('span'); t.textContent = n[0]; sp.textContent = fmt(noteDate(n[2])) + '  ' + n[1];
-    b.append(t, sp); b.onclick = () => openNote(n); box.appendChild(b);
+  const groups = and ? [['מוצמדים', n => n[3]], ['אחרים', n => !n[3]]] : [['7 הימים הקודמים', n => n[2] <= 7], ['30 הימים הקודמים', n => n[2] > 7]];
+  for (const [title, f] of groups) {
+    const part = list.filter(f); if (!part.length) continue;
+    const h = document.createElement('div'); h.className = 'nt-sec'; h.textContent = title; box.appendChild(h);
+    const g = document.createElement('div'); g.className = 'nt-group'; box.appendChild(g);
+    for (const n of part) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'nt-item';
+      const t = document.createElement('b'), sp = document.createElement('span'); t.textContent = n[0];
+      if (and) { sp.textContent = n[3] ? '' : n[1]; b.append(t); if (sp.textContent) b.append(sp); if (n[3]) { const c = document.createElement('small'); c.className = 'nt-chip'; c.textContent = noteDate(n[2]).toLocaleDateString('he-IL', { day: 'numeric', month: 'short' }); b.append(c); } }
+      else {
+        sp.textContent = fmt(noteDate(n[2]));
+        const em = document.createElement('em');
+        if (n[3]) em.innerHTML = '<svg class="nt-lockico" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0110 0v3h1a1 1 0 011 1v9a1 1 0 01-1 1H6a1 1 0 01-1-1v-9a1 1 0 011-1zm2 0h6V7a3 3 0 00-6 0z"/></svg>נעול';
+        else em.textContent = n[1].split('\n').join(' ');
+        sp.append(em); b.append(t, sp);
+      }
+      b.onclick = () => openNote(n); g.appendChild(b);
+    }
   }
   $('#ntCount').textContent = list.length === 1 ? 'פתק 1' : `${list.length} פתקים`;
 }
-function openNote(n) {
-  const d = noteDate(n[2]); d.setHours(21, 14);
+function showNoteText(n) {
+  const d = noteDate(n[2]);
   $('#ntDate').textContent = d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' }) + ' בשעה ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
   $('#ntTitle').textContent = n[0];
-  $('#ntBody').textContent = n[3] ? (S.noteBody || '{x}').split('{x}').join(LAST.text || '…') : n[1];
-  $('#ntView').hidden = false; if (n[3]) buzz();
+  $('#ntBody').textContent = n[3] ? noteBody() : n[1];
+  $('#ntEdited').textContent = 'נערך ב-' + d.toLocaleDateString('he-IL', { day: 'numeric', month: 'short' });
+  $('#ntLocked').hidden = true; $('#ntContent').hidden = false;
 }
-ENTER.notes = () => { $('#ntSearch').value = ''; $('#ntView').hidden = true; renderNotes(''); };
+function openNote(n) {
+  $('#ntView').hidden = false; $('#ntView').scrollTop = 0;
+  if (n[3] && !isAndroid()) { // באייפון הפתק נעול: "הצג פתק", זיהוי פנים, ואז הוא נפתח
+    $('#ntContent').hidden = true; $('#ntLocked').hidden = false; NT.cur = n; return;
+  }
+  showNoteText(n); if (n[3]) buzz();
+}
+const NT = { cur: null };
+$('#ntUnlock').onclick = () => {
+  const f = $('#ntFace'); f.classList.remove('ok'); f.hidden = false;
+  setTimeout(() => f.classList.add('ok'), 700);
+  setTimeout(() => { f.hidden = true; f.classList.remove('ok'); showNoteText(NT.cur); buzz(); }, 1250);
+};
+ENTER.notes = () => { $('#ntSearch').value = ''; $('#ntView').hidden = true; $('#ntSearch').placeholder = isAndroid() ? 'חיפוש בפתקים' : 'חיפוש'; renderNotes(''); };
 $('#ntBack').onclick = () => { $('#ntView').hidden = true; };
 $('#ntSearch').addEventListener('input', e => renderNotes(e.target.value.trim()));
 
@@ -2363,6 +2521,7 @@ const zoomAllowed = () => P.isPhoto && (!P.hasTrick || !!P.frozen);
   await Store.init();
   await Store.loadSettings();
   applyTheme();
+  applyOS();
   try { ITEMS = (await Store.all()).map(normalize); } catch (e) { ITEMS = []; }
   if (!ITEMS.some(i => i.id === 'demo')) { const d = normalize(demoItem()); ITEMS.push(d); persist(d); }
   try { history.replaceState({ g: 1 }, ''); } catch (e) { /* ignore */ }
