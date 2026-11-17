@@ -1768,7 +1768,7 @@ $('#phPlay').onclick = () => {
   P.tapPaused = false;
   if (!P.started) begin();
   else if (P.src.paused || P.src.ended) resume();
-  else P.src.pause();
+  else { P.src.pause(); P.tapPaused = true; } // נגיעה בסרטון אחרי עצירה מהכפתור ממשיכה אותו
 };
 $('#phBack').onclick = () => uiBack();
 $('#pBack').onclick = () => uiBack();
@@ -2004,6 +2004,8 @@ function secretTap(e, stroke) {
   // בכל הסרטונים: נגיעה עוצרת, והנגיעה הבאה ממשיכה. במקשים הנסתרים כל נגיעה גם נקלטת כספרה.
   if (!P.frozen && P.hasTrick && it.method === 'grid') tapDigit(e);
   P.src.pause(); P.tapPaused = true;
+  // כמו באייפון: העצירה מציגה גם את הפס התחתון עם כל הכפתורים. ההמשך מסתיר אותו שוב
+  if (photosMode()) setChrome(true);
 }
 function tapDigit(e) {
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
