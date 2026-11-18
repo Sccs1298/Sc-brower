@@ -2188,6 +2188,7 @@ function calcKey(k) {
   if (k === '=') {
     if (C.done) return;
     const exp = calcMain();
+    if (C.op === '×') wkPairFrom(exp);
     if (C.op) { C.acc = calcApply(C.acc, C.op, parseFloat(C.cur)); C.op = null; }
     else C.acc = parseFloat(C.cur);
     C.cur = String(C.acc); C.fresh = true; C.expr = ''; C.done = true; if (C.force !== null) { C.armed = false; C.force = null; }
@@ -2500,7 +2501,7 @@ $('#ntSearch').addEventListener('input', e => renderNotes(e.target.value.trim())
 /* ===================== הטלפון של הצופה + שעון =====================
    הצופה מחפש בדף go.html בטלפון שלו. הדף שולח את המילה דרך ntfy.sh:
    ntfy מקפיץ התראה בטלפון של הקוסם ומשם לשעון, והאפליקציה הזאת קולטת אותה ומעבירה לכל הקסמים. */
-const REM = { es: null, last: 0 };
+const REM = { es: null, last: 0, qr: '' };
 try { REM.last = +localStorage.getItem('gk-rem-last') || 0; } catch (e) { /* ignore */ }
 const remNew = () => { const a = 'abcdefghijkmnpqrstuvwxyz23456789'; let s = 'gk'; const r = new Uint32Array(14); crypto.getRandomValues(r); for (const x of r) s += a[x % a.length]; return s; };
 function remTopic() { if (!S.remoteTopic) { S.remoteTopic = remNew(); saveSettings(); } return S.remoteTopic; }
@@ -2545,12 +2546,49 @@ $('#rmTest').onclick = async () => {
 ENTER.remote = () => {
   remListen();
   const box = $('#rmQr'); box.innerHTML = '';
-  try { const qr = qrcode(0, 'M'); qr.addData(remLink()); qr.make(); box.innerHTML = qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
-  catch (e) { box.textContent = remLink(); }
+  const link = REM.qr || remLink(); REM.qr = '';
+  try { const qr = qrcode(0, 'M'); qr.addData(link); qr.make(); box.innerHTML = qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
+  catch (e) { box.textContent = link; }
   keepAwake(true);
 };
 LEAVE.remote = () => keepAwake(false);
 $('#rmDone').onclick = () => uiBack();
+
+/* ===================== ויקיפדיה בטלפון של הצופה =====================
+   wikistat.html מציג מספר ערכים שארבע הספרות האחרונות שלו הן קוד, וממוצע מילים 5XX (עוד שתי ספרות).
+   כשהקוסם מכפיל את שני המספרים במחשבון, האפליקציה מזהה את הקוד ומאזינה לחיפושים של הצופה (w.html). */
+const WK = { es: null, code: '', got: false, t: 0 };
+const wkLink = () => new URL('wikistat.html', location.href).href;
+function wkPairFrom(expr) {
+  const m = String(expr).match(/^([\d,]{6,9})×(5\d\d)$/); if (!m) return;
+  const pages = +m[1].replace(/,/g, ''), words = +m[2];
+  if (pages < 100000) return;
+  wkPair(String(pages % 10000).padStart(4, '0') + String(words - 500).padStart(2, '0'));
+}
+function wkPair(code) {
+  if (WK.es) { try { WK.es.close(); } catch (e) { /* ignore */ } }
+  WK.code = code; WK.got = false; clearTimeout(WK.t);
+  if (typeof EventSource === 'undefined') return;
+  try {
+    WK.es = new EventSource(`https://ntfy.sh/gkw${code}/sse?since=${Math.floor(Date.now() / 1000) - 120}`);
+    WK.es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.event === 'message') wkGot(m.message); } catch (err) { /* ignore */ } };
+  } catch (e) { WK.es = null; }
+  WK.t = setTimeout(() => { if (WK.es) { WK.es.close(); WK.es = null; } }, 30 * 60 * 1000); // החיבור נסגר אחרי חצי שעה
+}
+function wkGot(raw) {
+  let d = {}; try { d = JSON.parse(raw); } catch (e) { d = { t: String(raw) }; }
+  const word = String(d.t || d.q || '').slice(0, 80); if (!word || WK.got) return;
+  WK.got = true; setChoice(word);
+  if (navigator.vibrate) navigator.vibrate([25, 60, 25]);
+  if (S.remoteTopic) { // מעביר גם לשעון, דרך ההתראות של "הטלפון של הצופה + שעון"
+    const body = d.q && d.t && d.q !== d.t ? `${d.t} (חיפש: ${d.q})` : word;
+    fetch(`https://ntfy.sh/${S.remoteTopic}?title=${encodeURIComponent('תזכורת')}`, { method: 'POST', body }).catch(() => {});
+  }
+}
+// הצצה במחשבון: לחיצה ארוכה על השורה האפורה שמעל התוצאה
+longPress($('#cExp'), 600, () => { const el = $('#cExp'), old = el.textContent; el.textContent = LAST.text || '—'; setTimeout(() => { el.textContent = old; }, 1500); });
+$('#wkQr').onclick = () => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; REM.qr = wkLink(); go('remote'); };
+$('#wkCopy').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remCopy(wkLink(), e.currentTarget); };
 
 /* ===================== סטופר ===================== */
 const SW = { run: false, t0: 0, acc: 0, raf: 0, laps: 0, lapAt: 0 };

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>כמה ערכים יש בוויקיפדיה? מונה חי | ויקי-סטט</title>
+<meta name="description" content="כמה ערכים יש בוויקיפדיה העברית ממש עכשיו? מונה חי של מספר הערכים, ממוצע המילים בערך, עריכות ועורכים פעילים. מתעדכן כל דקה.">
+<meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111318" media="(prefers-color-scheme: dark)">
+<style>
+  /* אתר סטטיסטיקה ניטרלי. המספרים חיים מוויקיפדיה; הספרות האחרונות הן קוד השיוך לקוסם */
+  :root { --bg: #f6f7fb; --card: #fff; --fg: #15171c; --dim: #626876; --line: #e3e6ee; --acc: #2f6fde; --acc-soft: #e8effc; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111318; --card: #1b1e25; --fg: #eef0f4; --dim: #9aa1b0; --line: #2a2f39; --acc: #6b9cff; --acc-soft: #1d2a45; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 18px) max(18px, env(safe-area-inset-right)) 40px max(18px, env(safe-area-inset-left)); display: grid; gap: 18px; }
+  header { display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; }
+  .brand i { width: 28px; height: 28px; border-radius: 8px; background: var(--acc); display: grid; place-items: center; color: #fff; font-style: normal; font-size: 15px; font-weight: 800; }
+  .live { font-size: 13px; color: var(--dim); display: flex; align-items: center; gap: 6px; }
+  .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #2fb36b; box-shadow: 0 0 0 4px rgba(47,179,107,.18); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(47,179,107,0); } }
+  h1 { margin: 6px 0 0; font-size: 26px; line-height: 1.25; text-wrap: balance; }
+  .lede { margin: 0; color: var(--dim); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+  .big .lbl { font-size: 14px; color: var(--dim); }
+  .big .num { font-size: clamp(44px, 14vw, 64px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; font-variant-numeric: tabular-nums; direction: ltr; text-align: right; }
+  .big .sub { font-size: 13px; color: var(--dim); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .stat b { display: block; font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; direction: ltr; text-align: right; }
+  .stat span { font-size: 13px; color: var(--dim); }
+  .stat.hl { border-color: var(--acc); background: var(--acc-soft); }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 70px; margin-top: 12px; direction: ltr; }
+  .bars i { flex: 1; background: var(--acc); opacity: .35; border-radius: 4px 4px 0 0; }
+  .bars i:last-child { opacity: 1; }
+  .go { display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; background: var(--fg); color: var(--bg); font-weight: 700; font-size: 18px; border-radius: 16px; padding: 16px; }
+  .go span { font-family: "Linux Libertine", Georgia, "Times New Roman", serif; font-weight: 400; font-size: 20px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { margin: 8px 0 2px; color: var(--dim); font-size: 15px; }
+  footer { text-align: center; font-size: 12px; color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="brand"><i>W</i>ויקי-סטט</div><div class="live">מתעדכן בזמן אמת</div></header>
+  <div>
+    <h1>כמה ערכים יש בוויקיפדיה העברית?</h1>
+    <p class="lede">המספרים בעמוד נמשכים ישירות מוויקיפדיה ומתעדכנים כל דקה.</p>
+  </div>
+  <div class="card big">
+    <div class="lbl">מספר הערכים בוויקיפדיה העברית, נכון לעכשיו</div>
+    <div class="num" id="pages">—</div>
+    <div class="sub" id="asof"></div>
+    <div class="bars" aria-hidden="true"><i style="height:38%"></i><i style="height:46%"></i><i style="height:52%"></i><i style="height:59%"></i><i style="height:66%"></i><i style="height:74%"></i><i style="height:83%"></i><i style="height:100%"></i></div>
+  </div>
+  <div class="grid">
+    <div class="stat hl"><b id="words">—</b><span>ממוצע מילים בערך</span></div>
+    <div class="stat"><b id="edits">—</b><span>עריכות מאז ההקמה</span></div>
+    <div class="stat"><b id="active">—</b><span>עורכים פעילים החודש</span></div>
+    <div class="stat"><b id="today">—</b><span>ערכים חדשים השבוע</span></div>
+  </div>
+  <a class="go" id="go" href="w.html">למעבר <span>לוויקיפדיה</span> ←</a>
+  <details><summary>איך מחשבים את מספר המילים?</summary><p>ממוצע המילים מחושב על מדגם של ערכים אקראיים ומתעדכן פעם ביום. כדי לקבל את מספר המילים הכולל, מכפילים את מספר הערכים בממוצע המילים לערך.</p></details>
+  <details><summary>מה נחשב "ערך"?</summary><p>דף במרחב הערכים שאינו דף הפניה ומכיל לפחות קישור פנימי אחד. דפי שיחה, תבניות ודפי משתמשים לא נספרים.</p></details>
+  <footer>הנתונים מוויקיפדיה, תחת רישיון CC BY-SA. האתר אינו קשור לקרן ויקימדיה.</footer>
+</div>
+<script>
+(function () {
+  // קוד שיוך אקראי לביקור הזה: 4 ספרות במספר הערכים + 2 ספרות בממוצע המילים
+  var code = '';
+  try { code = sessionStorage.getItem('ws-code') || ''; } catch (e) {}
+  if (!/^\d{6}$/.test(code)) { var r = new Uint32Array(1); crypto.getRandomValues(r); code = String(r[0] % 1000000).padStart(6, '0'); try { sessionStorage.setItem('ws-code', code); } catch (e) {} }
+  var c4 = +code.slice(0, 4), c2 = +code.slice(4);
+  var fmt = function (n) { return Number(n).toLocaleString('en-US'); };
+  function show(real, edits, active) {
+    var pages = Math.floor(real / 10000) * 10000 + c4;
+    document.getElementById('pages').textContent = fmt(pages);
+    document.getElementById('words').textContent = String(500 + c2);
+    document.getElementById('edits').textContent = edits ? fmt(Math.round(edits / 1e5) / 10) + 'M' : '43.6M';
+    document.getElementById('active').textContent = active ? fmt(active) : '2,914';
+    document.getElementById('today').textContent = String(180 + (c4 % 70));
+    var d = new Date();
+    document.getElementById('asof').textContent = 'עודכן היום בשעה ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+  show(370000);
+  fetch('https://he.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json&origin=*')
+    .then(function (r) { return r.json(); })
+    .then(function (j) { var s = j.query.statistics; show(s.articles, s.edits, s.activeusers); })
+    .catch(function () {});
+  document.getElementById('go').href = 'w.html#' + code;
+})();
+</script>
+</body>
+</html>
