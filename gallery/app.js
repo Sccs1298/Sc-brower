@@ -2590,37 +2590,47 @@ longPress($('#cExp'), 600, () => { const el = $('#cExp'), old = el.textContent; 
 $('#wkQr').onclick = () => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; REM.qr = wkLink(); go('remote'); };
 $('#wkCopy').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remCopy(wkLink(), e.currentTarget); };
 
-/* ===================== סטופר ===================== */
-const SW = { run: false, t0: 0, acc: 0, raf: 0, laps: 0, lapAt: 0 };
+/* ===================== סטופר (כמו iOS 26) ===================== */
+const SW = { run: false, t0: 0, acc: 0, raf: 0, laps: [], lapAt: 0 };
 const swFmt = ms => { const cs = Math.floor(ms / 10) % 100, sec = Math.floor(ms / 1000) % 60, min = Math.floor(ms / 60000); return String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0') + '.' + String(cs).padStart(2, '0'); };
 function swTarget() {
   const last = String(LAST.text || '').replace(/\D/g, '');
   const src = (S.swUseLast && last) ? last : String(S.swNumber || '47').replace(/\D/g, '');
   return (parseInt(src.slice(-2), 10) || 0) % 100;
 }
-function swLoop() { if (!SW.run) return; $('#swTime').textContent = swFmt(SW.acc + performance.now() - SW.t0); SW.raf = requestAnimationFrame(swLoop); }
+const swNow = () => SW.acc + (SW.run ? performance.now() - SW.t0 : 0);
+function swRow(label, val, cls) { const d = document.createElement('div'); if (cls) d.className = cls; const a = document.createElement('span'), b = document.createElement('span'); a.textContent = label; b.textContent = val; d.append(a, b); return d; }
+function swRenderLaps() {
+  const box = $('#swLaps'); box.innerHTML = '';
+  const started = SW.run || SW.acc > 0; if (!started) return;
+  const n = SW.laps.length, cur = swNow() - SW.lapAt;
+  box.appendChild(swRow(`הקפה מס׳ ${n + 1}`, swFmt(cur)));            // ההקפה שרצה עכשיו, למעלה
+  const mn = n >= 2 ? Math.min(...SW.laps) : -1, mx = n >= 2 ? Math.max(...SW.laps) : -1;
+  for (let i = n - 1; i >= 0; i--) box.appendChild(swRow(`הקפה מס׳ ${i + 1}`, swFmt(SW.laps[i]), SW.laps[i] === mn ? 'best' : SW.laps[i] === mx ? 'worst' : ''));
+}
+function swLoop() { if (!SW.run) return; $('#swTime').textContent = swFmt(swNow()); const first = $('#swLaps').firstChild; if (first) first.lastChild.textContent = swFmt(swNow() - SW.lapAt); SW.raf = requestAnimationFrame(swLoop); }
 function swSync() {
   const r = $('#swRight'), l = $('#swLeft');
-  r.textContent = SW.run ? 'עצור' : 'התחל'; r.className = 'sw-b ' + (SW.run ? 'stop' : 'go');
-  l.textContent = (!SW.run && SW.acc) ? 'איפוס' : 'הקפה';
+  r.textContent = SW.run ? 'עצירה' : 'התחלה'; r.className = 'sw-b ' + (SW.run ? 'stop' : 'go');
+  l.textContent = (!SW.run && SW.acc) ? 'איפוס' : 'הקפה'; l.className = 'sw-b gray' + (!SW.run && !SW.acc ? ' dim' : '');
 }
 $('#swRight').onclick = () => {
-  if (!SW.run) { SW.run = true; SW.t0 = performance.now(); if (!SW.acc) SW.lapAt = 0; swLoop(); }
+  if (!SW.run) { SW.run = true; SW.t0 = performance.now(); swRenderLaps(); swLoop(); }
   else {
     SW.run = false; cancelAnimationFrame(SW.raf);
     let ms = SW.acc + performance.now() - SW.t0;
     // ההכרחה: המאיות יוצאות המספר שנקבע (מעגלים לזמן הקרוב ביותר שמסתיים בו)
     const base = Math.floor(ms / 1000) * 1000, want = swTarget() * 10; ms = base + want + 4; if (ms < 300) ms += 1000;
-    SW.acc = ms; $('#swTime').textContent = swFmt(ms); buzz();
+    SW.acc = ms; $('#swTime').textContent = swFmt(ms); swRenderLaps(); buzz();
   }
   swSync();
 };
 $('#swLeft').onclick = () => {
-  if (SW.run) { const now = SW.acc + performance.now() - SW.t0; SW.laps++; const d = document.createElement('div'); const a = document.createElement('span'), b = document.createElement('span'); a.textContent = 'הקפה ' + SW.laps; b.textContent = swFmt(now - SW.lapAt); d.append(a, b); $('#swLaps').prepend(d); SW.lapAt = now; }
-  else { SW.acc = 0; SW.laps = 0; SW.lapAt = 0; $('#swLaps').innerHTML = ''; $('#swTime').textContent = '00:00.00'; }
+  if (SW.run) { const now = swNow(); SW.laps.push(now - SW.lapAt); SW.lapAt = now; swRenderLaps(); }
+  else if (SW.acc) { SW.acc = 0; SW.laps = []; SW.lapAt = 0; $('#swLaps').innerHTML = ''; $('#swTime').textContent = '00:00.00'; }
   swSync();
 };
-ENTER.sw = () => { SW.run = false; cancelAnimationFrame(SW.raf); SW.acc = 0; SW.laps = 0; $('#swLaps').innerHTML = ''; $('#swTime').textContent = '00:00.00'; swSync(); keepAwake(true); };
+ENTER.sw = () => { SW.run = false; cancelAnimationFrame(SW.raf); SW.acc = 0; SW.laps = []; SW.lapAt = 0; $('#swLaps').innerHTML = ''; $('#swTime').textContent = '00:00.00'; swSync(); keepAwake(true); };
 LEAVE.sw = () => { SW.run = false; cancelAnimationFrame(SW.raf); keepAwake(false); };
 
 /* ===================== זום בתמונה (כמו בגלריה) ===================== */
