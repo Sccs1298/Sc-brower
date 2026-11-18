@@ -2209,7 +2209,7 @@ LEAVE.calc = () => keepAwake(false);
 })();
 
 /* ---------- חיפוש באינטרנט (הצצה): נראה כמו הדפדפן של הטלפון ---------- */
-const W = { t: 0, at: 0 };
+const W = { t: 0, at: 0, host: 'google.com' };
 const WEB_FAVS = [['חדשות', '#e0332f'], ['מזג אוויר', '#2f7fe0'], ['ספורט', '#1f9d55'], ['מתכונים', '#f08a24'], ['מפות', '#34a3a0'], ['בנק', '#6a4fd0'], ['קניות', '#d0447a'], ['דואר', '#4a5568']];
 function webFavs() {
   const box = $('#wFavs'); if (box.childElementCount) return;
@@ -2221,8 +2221,9 @@ ENTER.web = () => {
   clearTimeout(W.t); setTimeout(() => $('#wIn').focus(), 80);
 };
 $('#wForm').addEventListener('submit', e => {
-  e.preventDefault(); const q = $('#wIn').value.trim(); if (!q) return;
+  e.preventDefault(); const q = $('#wIn').value.trim(); if (!q || q === W.host) return;
   setChoice(q); W.at = Date.now(); $('#wIn').blur();
+  $('#wIn').value = W.host; // כמו בדפדפן אמיתי: בשורת הכתובת נשאר רק שם האתר, בלי המילה של הצופה
   const bar = $('#wBar'); bar.hidden = true; void bar.offsetWidth; bar.hidden = false;   // נראה כמו טעינה אמיתית
   clearTimeout(W.t); W.t = setTimeout(() => { bar.hidden = true; $('#wHome').hidden = true; $('#wOff').hidden = false; $('#web').classList.add('is-off'); }, 2300);
 });
@@ -2249,6 +2250,7 @@ function showHistory() {
   $('#wHist').hidden = false;
 }
 $('#wHistBtn').onclick = showHistory;
+$('#wIn').addEventListener('focus', () => { if ($('#wIn').value === W.host) $('#wIn').value = ''; });
 $('#wHistBack').onclick = () => { $('#wHist').hidden = true; };
 $('#wRetry').onclick = () => { const bar = $('#wBar'); bar.hidden = true; void bar.offsetWidth; bar.hidden = false; clearTimeout(W.t); W.t = setTimeout(() => { bar.hidden = true; }, 1900); };
 const webPeek = () => { const p = $('#wPeek'); p.textContent = PEEK.text; p.hidden = false; setTimeout(() => p.hidden = true, 1600); };
