@@ -43,7 +43,7 @@ const METHODS = {
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
   startIn: 'hub', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
   notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '',
-  callDelay: '8', callName: 'אמא', phoneOS: 'auto', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
+  callDelay: '8', callName: 'אמא', phoneOS: 'auto', remoteTopic: '', remoteMode: 'g', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
   histFill: 'מזג אוויר מחר\nמתכון לפנקייקים\nכמה זה 30 דולר בשקלים\nשעות פתיחה סופר\nתרגום מאנגלית לעברית' };
 const PEEK = { text: '', at: 0 };
 const LAST = { text: '' }; // הבחירה האחרונה (מחיפוש או מחשיפה) – לפסיפס ולמצגת
@@ -2116,7 +2116,7 @@ async function goHome() {
   paint('hub'); ENTER.hub();
 }
 ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); };
-const PAID_SCREENS = { calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
+const PAID_SCREENS = { remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
 $('#hub').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (!b) return;
   const t = b.dataset.open;
@@ -2474,6 +2474,61 @@ ENTER.notes = () => { $('#ntSearch').value = ''; $('#ntView').hidden = true; $('
 $('#ntBack').onclick = () => { $('#ntView').hidden = true; };
 $('#ntSearch').addEventListener('input', e => renderNotes(e.target.value.trim()));
 
+/* ===================== הטלפון של הצופה + שעון =====================
+   הצופה מחפש בדף go.html בטלפון שלו. הדף שולח את המילה דרך ntfy.sh:
+   ntfy מקפיץ התראה בטלפון של הקוסם ומשם לשעון, והאפליקציה הזאת קולטת אותה ומעבירה לכל הקסמים. */
+const REM = { es: null, last: 0 };
+try { REM.last = +localStorage.getItem('gk-rem-last') || 0; } catch (e) { /* ignore */ }
+const remNew = () => { const a = 'abcdefghijkmnpqrstuvwxyz23456789'; let s = 'gk'; const r = new Uint32Array(14); crypto.getRandomValues(r); for (const x of r) s += a[x % a.length]; return s; };
+function remTopic() { if (!S.remoteTopic) { S.remoteTopic = remNew(); saveSettings(); } return S.remoteTopic; }
+const remLink = () => new URL('go.html', location.href).href + '#' + remTopic() + '~' + (S.remoteMode || 'g');
+function remGot(m) {
+  if (!m || m.event !== 'message' || !m.message) return;
+  if (m.time && m.time <= REM.last) return;
+  REM.last = m.time || Math.floor(Date.now() / 1000); try { localStorage.setItem('gk-rem-last', String(REM.last)); } catch (e) { /* ignore */ }
+  if (m.title === 'בדיקה') { $('#rmTestRes').textContent = 'התקבלה ✓'; return; }
+  setChoice(String(m.message).slice(0, 80));
+  if (curScreen() === 'hub') $('#hubPeek').textContent = LAST.text;
+}
+function remListen() {
+  if (REM.es) { try { REM.es.close(); } catch (e) { /* ignore */ } REM.es = null; }
+  if (!S.remoteTopic || typeof EventSource === 'undefined' || !navigator.onLine) return;
+  const since = Math.max(REM.last + 1, Math.floor(Date.now() / 1000) - 15 * 60); // רק מילים מ-15 הדקות האחרונות
+  try {
+    REM.es = new EventSource(`https://ntfy.sh/${S.remoteTopic}/sse?since=${since}`);
+    REM.es.onmessage = e => { try { remGot(JSON.parse(e.data)); } catch (err) { /* ignore */ } };
+  } catch (e) { REM.es = null; }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') remListen(); });
+addEventListener('online', remListen);
+async function remCopy(text, btn) {
+  const old = btn.textContent;
+  try { await navigator.clipboard.writeText(text); btn.textContent = 'הועתק ✓'; }
+  catch (e) { prompt('העתק:', text); }
+  setTimeout(() => { btn.textContent = old; }, 1600);
+}
+function remFill() { $('#rmTopic').textContent = remTopic(); }
+$('#rmSetup').addEventListener('toggle', () => { if ($('#rmSetup').open) remFill(); });
+$('#rmCopyTopic').onclick = e => remCopy(remTopic(), e.currentTarget);
+$('#rmCopyLink').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remListen(); remCopy(remLink(), e.currentTarget); };
+$('#rmNew').onclick = () => { S.remoteTopic = remNew(); saveSettings(); remFill(); remListen(); toast('נוצר קוד חדש. צריך להחליף אותו גם באפליקציית ntfy'); };
+$('#rmTest').onclick = async () => {
+  const res = $('#rmTestRes'); res.textContent = 'שולח…'; remListen();
+  try {
+    const r = await fetch(`https://ntfy.sh/${remTopic()}?title=${encodeURIComponent('בדיקה')}`, { method: 'POST', body: 'אם זה הגיע לשעון, הכל מוכן ✓' });
+    res.textContent = r.ok ? 'נשלחה. בדוק את השעון' : r.status === 429 ? 'יותר מדי בדיקות היום, נסה מחר' : 'לא נשלחה (' + r.status + ')';
+  } catch (e) { res.textContent = 'אין חיבור לאינטרנט'; }
+};
+ENTER.remote = () => {
+  remListen();
+  const box = $('#rmQr'); box.innerHTML = '';
+  try { const qr = qrcode(0, 'M'); qr.addData(remLink()); qr.make(); box.innerHTML = qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
+  catch (e) { box.textContent = remLink(); }
+  keepAwake(true);
+};
+LEAVE.remote = () => keepAwake(false);
+$('#rmDone').onclick = () => uiBack();
+
 /* ===================== סטופר ===================== */
 const SW = { run: false, t0: 0, acc: 0, raf: 0, laps: 0, lapAt: 0 };
 const swFmt = ms => { const cs = Math.floor(ms / 10) % 100, sec = Math.floor(ms / 1000) % 60, min = Math.floor(ms / 60000); return String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0') + '.' + String(cs).padStart(2, '0'); };
@@ -2524,6 +2579,7 @@ const zoomAllowed = () => P.isPhoto && (!P.hasTrick || !!P.frozen);
   await Store.loadSettings();
   applyTheme();
   applyOS();
+  remListen();
   try { ITEMS = (await Store.all()).map(normalize); } catch (e) { ITEMS = []; }
   if (!ITEMS.some(i => i.id === 'demo')) { const d = normalize(demoItem()); ITEMS.push(d); persist(d); }
   try { history.replaceState({ g: 1 }, ''); } catch (e) { /* ignore */ }
