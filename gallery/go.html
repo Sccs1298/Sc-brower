@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#202124" media="(prefers-color-scheme: dark)">
+<title>חיפוש</title>
+<style>
+  /* דף חיפוש פשוט שנפתח בטלפון של הצופה. אחרי החיפוש הוא עובר לתוצאות אמיתיות */
+  :root { --bg: #fff; --fg: #202124; --dim: #70757a; --box: #f1f3f4; --line: #dfe1e5; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #202124; --fg: #e8eaed; --dim: #9aa0a6; --box: #303134; --line: #5f6368; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: calc(env(safe-area-inset-top) + 22vh) max(18px, env(safe-area-inset-right)) 40px max(18px, env(safe-area-inset-left)); gap: 26px; }
+  .logo { font-size: 40px; font-weight: 600; letter-spacing: -1px; color: var(--fg); }
+  form { width: 100%; max-width: 584px; display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; border-radius: 24px; border: 1px solid var(--line); background: var(--bg); box-shadow: 0 1px 6px rgba(32,33,36,.18); }
+  svg { width: 20px; height: 20px; flex: none; color: var(--dim); }
+  input { flex: 1; min-width: 0; border: 0; outline: none; background: none; color: var(--fg); font-size: 17px; -webkit-appearance: none; appearance: none; }
+  input::-webkit-search-cancel-button { display: none; }
+  .bar { position: fixed; top: env(safe-area-inset-top); left: 0; height: 3px; width: 0; background: #4285f4; transition: width 1.2s cubic-bezier(.2,.6,.3,1); }
+  .bar.go { width: 80%; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 584px; }
+  .chips span { font-size: 14px; color: var(--dim); background: var(--box); border-radius: 16px; padding: 6px 12px; }
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<main>
+  <div class="logo" aria-hidden="true">חיפוש</div>
+  <form id="f" role="search" action="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+    <input id="q" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="חיפוש" aria-label="חיפוש">
+  </form>
+  <div class="chips" aria-hidden="true"><span>מזג אוויר</span><span>חדשות</span><span>תוצאות משחקים</span><span>מתכונים</span></div>
+</main>
+<script>
+(function () {
+  // הקישור: go.html#<קוד אישי>~<g|w>  (g = תוצאות בגוגל, w = ויקיפדיה)
+  var h = decodeURIComponent(location.hash.slice(1)).split('~'), topic = (h[0] || '').replace(/[^A-Za-z0-9_-]/g, ''), mode = h[1] || 'g';
+  var f = document.getElementById('f'), q = document.getElementById('q'), sent = false;
+  setTimeout(function () { try { q.focus(); } catch (e) {} }, 250);
+  function target(t) {
+    return mode === 'w' ? 'https://he.m.wikipedia.org/w/index.php?search=' + encodeURIComponent(t)
+      : 'https://www.google.com/search?q=' + encodeURIComponent(t);
+  }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var t = q.value.trim(); if (!t || sent) return; sent = true; q.blur();
+    document.getElementById('bar').className = 'bar go';
+    var go = function () { location.replace(target(t)); };
+    if (!topic) { go(); return; }
+    // שולח את המילה להתראה בטלפון ובשעון של הקוסם, ואז עובר לתוצאות האמיתיות
+    var url = 'https://ntfy.sh/' + topic + '?title=' + encodeURIComponent('תזכורת') + '&tags=' + encodeURIComponent('memo');
+    var done = false, finish = function () { if (!done) { done = true; go(); } };
+    try {
+      fetch(url, { method: 'POST', body: t, keepalive: true, mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer' }).then(finish, finish);
+    } catch (err) { finish(); }
+    setTimeout(finish, 1500);
+  });
+})();
+</script>
+</body>
+</html>
