@@ -412,11 +412,18 @@
   <div class="sw-wrap">
     <div id="swTime" class="sw-time">00:00.00</div>
     <div class="sw-btns">
+      <button id="swRight" type="button" class="sw-b go">התחלה</button>
+      <span class="sw-dots ios-only" aria-hidden="true"><i></i><i></i></span>
       <button id="swLeft" type="button" class="sw-b gray">הקפה</button>
-      <button id="swRight" type="button" class="sw-b go">התחל</button>
     </div>
     <div id="swLaps" class="sw-laps"></div>
   </div>
+  <nav class="sw-tabs ios-only" aria-hidden="true">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>שעון עולמי</span>
+    <span><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="13" r="8"/><path d="M4.5 6.5l3-3M19.5 6.5l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 9v4.5h-3" fill="none" stroke="#1c1c1e" stroke-width="1.8" stroke-linecap="round"/></svg>שעונים מעוררים</span>
+    <span class="on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="13.5" r="8"/><rect x="10.5" y="2.5" width="3" height="3" rx="1"/><path d="M12 10v4" stroke="#1c1c1e" stroke-width="1.9" stroke-linecap="round"/></svg>שעון עצר</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v3M12 12l-3.5-3.5"/></svg>ספירות לאחור</span>
+  </nav>
 </section>
 
 <!-- ===================== קוד לצופה ===================== -->

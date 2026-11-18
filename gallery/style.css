@@ -959,3 +959,24 @@ html[data-os="ios"] .l-home { height: 5px; width: 140px; margin-left: -70px; }
   .c-keys { gap: 6px; }
   .ck, .ck.fn { font-size: 22px; } .ck.op { font-size: 26px; }
 }
+
+/* ===================== סטופר iOS 26 (לפי צילום מסך אמיתי) ===================== */
+#sw.sw { background: #000; color: #fff; font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; }
+#sw .sw-wrap { padding: calc(env(safe-area-inset-top) + 160px) 16px calc(env(safe-area-inset-bottom) + 100px); max-width: 520px; }
+#sw .sw-time { font-size: clamp(60px, 22vw, 88px); font-weight: 100; letter-spacing: -1px; white-space: nowrap; line-height: 1; }
+#sw .sw-btns { margin-top: 96px; align-items: center; direction: ltr; }
+#sw .sw-b { width: 84px; height: 84px; border-radius: 50%; border: 0; box-shadow: none; font-size: 18px; font-weight: 400; -webkit-text-fill-color: currentColor; }
+#sw .sw-b.gray { background: #333; color: #fff; }
+#sw .sw-b.gray.dim { color: #8e8e93; }
+#sw .sw-b.go { background: #0e2f17; color: #34c759; }
+#sw .sw-b.stop { background: #331313; color: #eb4e3d; }
+.sw-dots { display: flex; gap: 14px; } .sw-dots i { width: 8px; height: 8px; border-radius: 50%; background: #fff; } .sw-dots i:first-child { background: #636366; }
+#sw .sw-laps { margin-top: 16px; border-top: .5px solid #3a3a3c; direction: rtl; font-variant-numeric: tabular-nums; }
+#sw .sw-laps div { display: flex; justify-content: space-between; padding: 0 2px; height: 44px; align-items: center; border-bottom: .5px solid #3a3a3c; font-size: 19px; }
+#sw .sw-laps div span:last-child { direction: ltr; }
+#sw .sw-laps .best { color: #34c759; } #sw .sw-laps .worst { color: #eb4e3d; }
+.sw-tabs { position: absolute; left: 21px; right: 21px; bottom: calc(env(safe-area-inset-bottom) + 22px); height: 62px; border-radius: 31px; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; background: rgba(28,28,30,.94); border: 1px solid rgba(255,255,255,.1); }
+.sw-tabs span { flex: 1; height: 54px; border-radius: 27px; display: grid; justify-items: center; align-content: center; gap: 2px; font-size: 11.5px; color: #fff; }
+.sw-tabs svg { width: 26px; height: 26px; }
+.sw-tabs .on { background: #3a3a3c; color: #f19a37; }
+@media (max-height: 560px) { #sw .sw-wrap { padding-top: calc(env(safe-area-inset-top) + 40px); padding-bottom: 10px; } #sw .sw-btns { margin-top: 12px; } #sw .sw-b { width: 64px; height: 64px; font-size: 15px; } #sw .sw-time { font-size: 52px; } .sw-tabs, #sw .sw-laps { display: none; } }
