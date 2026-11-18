@@ -2115,7 +2115,7 @@ async function goHome() {
   NAV.stack = ['hub']; try { history.pushState({ g: 1 }, ''); } catch (e) { /* ignore */ }
   paint('hub'); ENTER.hub();
 }
-ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); };
+ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); try { $('#lWallDel').hidden = !localStorage.getItem('gk-lockwall'); } catch (e) { /* ignore */ } };
 const PAID_SCREENS = { remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
 $('#hub').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (!b) return;
@@ -2132,8 +2132,8 @@ async function keepAwake(on) {
 $('#hubClear').onclick = () => { PEEK.text = ''; LAST.text = ''; LASTVIEW = null; ENTER.hub(); toast('הבחירה נוקתה'); };
 const setChoice = t => { PEEK.text = t; PEEK.at = Date.now(); LAST.text = t; };
 
-/* ---------- מחשבון עם הכרחה ---------- */
-const C = { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null, fi: 0 };
+/* ---------- מחשבון עם הכרחה (כמו iOS 26: כל התרגיל מוצג בזמן ההקלדה) ---------- */
+const C = { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null, fi: 0, expr: '', done: false };
 function calcTarget() {
   const d = new Date(), p2 = n => String(n).padStart(2, '0');
   if (S.calcMode === 'time') return +(p2(d.getHours()) + p2(d.getMinutes()));
@@ -2151,16 +2151,17 @@ const curFmt = () => {
   const neg = C.cur.startsWith('-'), [i, f] = C.cur.replace('-', '').split('.');
   return (neg ? '-' : '') + Number(i || '0').toLocaleString('en-US') + (C.cur.includes('.') ? '.' + (f || '') : '');
 };
-function calcShow(txt) {
+const OPS = { '+': '+', '-': '−', '×': '×', '÷': '÷' };
+function calcShow(txt, exp) {
   const el = $('#cDisp'); el.textContent = txt;
-  const n = txt.replace(/[^\d]/g, '').length; el.style.fontSize = n > 9 ? '52px' : n > 7 ? '66px' : '86px';
+  const n = txt.length; el.style.fontSize = n <= 7 ? '' : Math.max(30, Math.floor(68 * 7.4 / n)) + 'px';
+  $('#cExp').textContent = exp || '';
 }
+const calcMain = () => C.expr + ((C.fresh && C.op) ? '' : curFmt());
 const calcApply = (a, op, b) => op === '+' ? a + b : op === '-' ? a - b : op === '×' ? a * b : op === '÷' ? (b === 0 ? NaN : a / b) : b;
-const syncAC = () => { $('#calc [data-k="ac"]').textContent = (!C.fresh && C.cur !== '0') ? 'C' : 'AC'; };
 function calcKey(k) {
-  setTimeout(syncAC, 0);
-  $$('.ck.op').forEach(b => b.classList.remove('on'));
   if (/^[\d.]$/.test(k)) {
+    if (C.done) { Object.assign(C, { acc: null, op: null, cur: '0', fresh: true, expr: '', done: false }); }
     if (C.armed && C.op === '+') { // הכרחה: כל מקש מקליד את הספרה הבאה של המספר הדרוש
       if (C.force === null) {
         let need = Math.round((calcTarget() - C.acc) * 1e6) / 1e6;
@@ -2169,30 +2170,37 @@ function calcKey(k) {
       }
       if (C.fi >= C.force.length) return;
       C.cur += C.force[C.fi++]; if (C.cur === '-') C.cur += C.force[C.fi++] || '';
-      C.fresh = false; calcShow(curFmt()); return;
+      C.fresh = false; calcShow(calcMain()); return;
     }
     if (C.fresh) { C.cur = k === '.' ? '0.' : k; C.fresh = false; }
     else { if (k === '.' && C.cur.includes('.')) return; if (C.cur.replace(/[-.]/g, '').length >= 9) return; C.cur = C.cur === '0' && k !== '.' ? k : C.cur + k; }
-    calcShow(curFmt()); return;
+    calcShow(calcMain()); return;
   }
-  if (k === 'ac') {
-    if (!C.fresh && C.cur !== '0' && C.force === null) { C.cur = '0'; C.fresh = true; calcShow('0'); syncAC(); return; } // C: מוחק רק את המספר הנוכחי
-    Object.assign(C, { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null }); calcShow('0'); syncAC(); return;
+  if (k === 'ac') { Object.assign(C, { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null, expr: '', done: false }); calcShow('0'); return; }
+  if (k === 'del') {
+    if (C.done || C.force !== null) return;
+    if (!C.fresh) { C.cur = C.cur.length > 1 ? C.cur.slice(0, -1) : '0'; if (C.cur === '-' || C.cur === '') C.cur = '0'; if (C.cur === '0' && C.op) C.fresh = true; }
+    else return;
+    calcShow(calcMain() || '0'); return;
   }
-  if (k === 'neg') { C.cur = C.cur.startsWith('-') ? C.cur.slice(1) : (C.cur === '0' ? '0' : '-' + C.cur); calcShow(curFmt()); return; }
-  if (k === 'pct') { C.cur = String(parseFloat(C.cur) / 100); calcShow(calcFmt(+C.cur)); return; }
+  if (k === 'neg') { if (C.done) return; C.cur = C.cur.startsWith('-') ? C.cur.slice(1) : (C.cur === '0' ? '0' : '-' + C.cur); C.fresh = false; calcShow(calcMain()); return; }
+  if (k === 'pct') { if (C.done) return; C.cur = String(parseFloat(C.cur) / 100); C.fresh = false; calcShow(calcMain()); return; }
   if (k === '=') {
+    if (C.done) return;
+    const exp = calcMain();
     if (C.op) { C.acc = calcApply(C.acc, C.op, parseFloat(C.cur)); C.op = null; }
     else C.acc = parseFloat(C.cur);
-    C.cur = String(C.acc); C.fresh = true; if (C.force !== null) { C.armed = false; C.force = null; }
-    calcShow(calcFmt(C.acc)); return;
+    C.cur = String(C.acc); C.fresh = true; C.expr = ''; C.done = true; if (C.force !== null) { C.armed = false; C.force = null; }
+    calcShow(calcFmt(C.acc), exp); return;
   }
   // + − × ÷
-  if (C.op && !C.fresh) C.acc = calcApply(C.acc, C.op, parseFloat(C.cur));
-  else if (!C.op) C.acc = parseFloat(C.cur);
+  if (C.done) { C.done = false; C.expr = ''; C.acc = parseFloat(C.cur); C.op = null; C.fresh = false; C.cur = String(C.acc); }
+  if (C.op && C.fresh) { C.expr = C.expr.slice(0, -1) + OPS[k]; C.op = k; calcShow(calcMain()); return; } // החלפת פעולה
+  if (C.op) C.acc = calcApply(C.acc, C.op, parseFloat(C.cur));
+  else C.acc = parseFloat(C.cur);
+  C.expr += curFmt() + OPS[k];
   C.op = k; C.fresh = true; if (C.force !== null) { C.force = null; }
-  $(`.ck.op[data-k="${k}"]`).classList.add('on');
-  calcShow(calcFmt(C.acc));
+  calcShow(calcMain());
 }
 $('#calc .c-keys').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) calcKey(b.dataset.k); });
 longPress($('#cDisp'), 800, () => { C.armed = true; const d = $('#cDisp'); d.style.opacity = '.55'; setTimeout(() => d.style.opacity = '', 160); });
@@ -2202,18 +2210,16 @@ LEAVE.calc = () => keepAwake(false);
 (() => {
   const d = $('#cDisp'); let sx = null;
   d.addEventListener('pointerdown', e => { sx = e.clientX; });
-  d.addEventListener('pointerup', e => {
-    if (sx !== null && Math.abs(e.clientX - sx) > 30 && !C.fresh && C.force === null) { C.cur = C.cur.length > 1 ? C.cur.slice(0, -1) : '0'; if (C.cur === '-') C.cur = '0'; calcShow(curFmt()); }
-    sx = null;
-  });
+  d.addEventListener('pointerup', e => { if (sx !== null && Math.abs(e.clientX - sx) > 30) calcKey('del'); sx = null; });
 })();
 
 /* ---------- חיפוש באינטרנט (הצצה): נראה כמו הדפדפן של הטלפון ---------- */
 const W = { t: 0, at: 0, host: 'google.com' };
 const WEB_FAVS = [['חדשות', '#e0332f'], ['מזג אוויר', '#2f7fe0'], ['ספורט', '#1f9d55'], ['מתכונים', '#f08a24'], ['מפות', '#34a3a0'], ['בנק', '#6a4fd0'], ['קניות', '#d0447a'], ['דואר', '#4a5568']];
 function webFavs() {
-  const box = $('#wFavs'); if (box.childElementCount) return;
-  for (const [n, c] of WEB_FAVS) { const d = document.createElement('div'); d.className = 'w-fav'; const i = document.createElement('i'); i.style.background = c; i.textContent = n[0]; d.append(i, document.createTextNode(n)); box.appendChild(d); }
+  const box = $('#wFavs'); box.innerHTML = '';
+  const list = isAndroid() ? WEB_FAVS : [['Apple', '#fff', '\uF8FF'], ['Bing', '#fff', 'b'], ['Google', '#fff', 'G']];
+  for (const [n, c, g] of list) { const d = document.createElement('div'); d.className = 'w-fav'; const i = document.createElement('i'); i.style.background = c; i.textContent = g || n[0]; d.append(i, document.createTextNode(n)); box.appendChild(d); }
 }
 ENTER.web = () => {
   webFavs(); $('#wIn').value = ''; $('#wHome').hidden = false; $('#wOff').hidden = true; $('#wPeek').hidden = true; $('#wHist').hidden = true; $('#wBar').hidden = true;
@@ -2315,8 +2321,22 @@ function lockHold(el, fn) {
 lockHold($('#lTorch'), () => setTorch(!L.torch));
 lockHold($('#lCam'), () => { $('#lCamIn').value = ''; $('#lCamIn').click(); }); // פותח את המצלמה האמיתית של הטלפון
 $('#lCamIn').addEventListener('change', () => { $('#lCamIn').value = ''; });
+function lockWall() {
+  let w = ''; try { w = localStorage.getItem('gk-lockwall') || ''; } catch (e) { /* ignore */ }
+  const el = $('#lWall'); el.classList.toggle('own', !!w); el.style.backgroundImage = w ? `url("${w}")` : '';
+  $('#lWallDel').hidden = !w;
+}
+$('#lWallIn').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const bmp = await createImageBitmap(f), k = Math.min(1, 1170 / bmp.width), cv = document.createElement('canvas');
+    cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k); cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+    localStorage.setItem('gk-lockwall', cv.toDataURL('image/jpeg', .86)); lockWall(); toast('הטפט נשמר');
+  } catch (err) { toast('לא הצלחתי לשמור את התמונה. נסה תמונה אחרת'); }
+});
+$('#lWallDel').onclick = () => { try { localStorage.removeItem('gk-lockwall'); } catch (e) { /* ignore */ } lockWall(); };
 ENTER.lock = () => {
-  lockClock(); clearInterval(L.tick); L.tick = setInterval(lockClock, 15000);
+  lockWall(); lockClock(); clearInterval(L.tick); L.tick = setInterval(lockClock, 15000);
   clearTimeout(L.t); L.buf = ''; L.fired = false; $('#lNote').hidden = true;
   L.auto = !!LAST.text;
   if (L.auto) L.t = setTimeout(() => fireNote(LAST.text), (parseFloat(S.notifyDelay) || 6) * 1000);
@@ -2427,8 +2447,9 @@ function renderNotes(q) {
   const all = [[NOTE_FILL[0][0], NOTE_FILL[0][1], 1], [S.noteTitle || 'לא לפתוח 🤫', '', 7, true], [NOTE_FILL[4][0], NOTE_FILL[4][1], 5],
     ...NOTE_FILL.slice(1, 4).map((n, i) => [n[0], n[1], 12 + i * 9])];
   const list = q ? all.filter(n => (n[0] + ' ' + (n[3] ? '' : n[1])).includes(q)) : all;
-  const fmt = d => d.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric', year: '2-digit' });
-  const groups = and ? [['מוצמדים', n => n[3]], ['אחרים', n => !n[3]]] : [['7 הימים הקודמים', n => n[2] <= 7], ['30 הימים הקודמים', n => n[2] > 7]];
+  const fmt = d => d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear();
+  const period = n => n[2] < 1 ? 'היום' : n[2] < 2 ? 'אתמול' : n[2] <= 7 ? '7 הימים הקודמים' : n[2] <= 30 ? '30 הימים הקודמים' : noteDate(n[2]).toLocaleDateString('he-IL', { month: 'long' });
+  const groups = and ? [['מוצמדים', n => n[3]], ['אחרים', n => !n[3]]] : [...new Set(list.map(period))].map(t => [t, n => period(n) === t]);
   for (const [title, f] of groups) {
     const part = list.filter(f); if (!part.length) continue;
     const h = document.createElement('div'); h.className = 'nt-sec'; h.textContent = title; box.appendChild(h);
@@ -2440,14 +2461,14 @@ function renderNotes(q) {
       else {
         sp.textContent = fmt(noteDate(n[2]));
         const em = document.createElement('em');
-        if (n[3]) em.innerHTML = '<svg class="nt-lockico" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10V7a5 5 0 0110 0v3h1a1 1 0 011 1v9a1 1 0 01-1 1H6a1 1 0 01-1-1v-9a1 1 0 011-1zm2 0h6V7a3 3 0 00-6 0z"/></svg>נעול';
+        if (n[3]) { em.textContent = 'נעול'; b.insertAdjacentHTML('beforeend', '<svg class="nt-lk" viewBox="0 0 12 16"><path d="M3 7V5a3 3 0 016 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="0" y="6.5" width="12" height="9.5" rx="2" fill="currentColor"/></svg>'); }
         else em.textContent = n[1].split('\n').join(' ');
         sp.append(em); b.append(t, sp);
       }
       b.onclick = () => openNote(n); g.appendChild(b);
     }
   }
-  $('#ntCount').textContent = list.length === 1 ? 'פתק 1' : `${list.length} פתקים`;
+  $('#ntCount').textContent = all.length === 1 ? 'פתק אחד' : `${all.length} פתקים`;
 }
 function showNoteText(n) {
   const d = noteDate(n[2]);
@@ -2459,16 +2480,18 @@ function showNoteText(n) {
 }
 function openNote(n) {
   $('#ntView').hidden = false; $('#ntView').scrollTop = 0;
-  if (n[3] && !isAndroid()) { // באייפון הפתק נעול: "הצג פתק", זיהוי פנים, ואז הוא נפתח
+  $('#ntPadArc').setAttribute('d', PAD_SHUT); $('#ntPad').style.display = n[3] ? '' : 'none';
+  if (n[3] && !isAndroid()) { // באייפון הפתק נעול: "הצגת הפתק", זיהוי פנים, ואז הוא נפתח
     $('#ntContent').hidden = true; $('#ntLocked').hidden = false; NT.cur = n; return;
   }
   showNoteText(n); if (n[3]) buzz();
 }
 const NT = { cur: null };
-$('#ntUnlock').onclick = () => {
+const PAD_SHUT = 'M8.5 10.5V7.5a3.5 3.5 0 017 0v3', PAD_OPEN = 'M8.5 10.5V7.5a3.5 3.5 0 017 0';
+$('#ntUnlock').onclick = () => { // כמו בטלפון: Face ID קופץ למעלה, מזהה, והפתק נפתח
   const f = $('#ntFace'); f.classList.remove('ok'); f.hidden = false;
-  setTimeout(() => f.classList.add('ok'), 700);
-  setTimeout(() => { f.hidden = true; f.classList.remove('ok'); showNoteText(NT.cur); buzz(); }, 1250);
+  setTimeout(() => f.classList.add('ok'), 800);
+  setTimeout(() => { f.hidden = true; f.classList.remove('ok'); $('#ntPadArc').setAttribute('d', PAD_OPEN); showNoteText(NT.cur); buzz(); }, 1300);
 };
 ENTER.notes = () => { $('#ntSearch').value = ''; $('#ntView').hidden = true; $('#ntSearch').placeholder = isAndroid() ? 'חיפוש בפתקים' : 'חיפוש'; renderNotes(''); };
 $('#ntBack').onclick = () => { $('#ntView').hidden = true; };
