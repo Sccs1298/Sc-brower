@@ -2566,14 +2566,14 @@ $('#rmDone').onclick = () => uiBack();
 const WK = { es: null, code: '', got: false, t: 0 };
 const wkLink = () => new URL('wikistat.html', location.href).href;
 function wkPairFrom(expr) {
-  const m = String(expr).match(/^([\d,]{6,9})×(5\d\d)$/); if (!m) return;
-  const pages = +m[1].replace(/,/g, ''), words = +m[2];
+  const e = String(expr), m = e.match(/^([\d,]{6,9})×(5\d\d)$/), r = e.match(/^(5\d\d)×([\d,]{6,9})$/); if (!m && !r) return;
+  const pages = +(m ? m[1] : r[2]).replace(/,/g, ''), words = +(m ? m[2] : r[1]);
   if (pages < 100000) return;
   wkPair(String(pages % 10000).padStart(4, '0') + String(words - 500).padStart(2, '0'));
 }
 function wkPair(code) {
   if (WK.es) { try { WK.es.close(); } catch (e) { /* ignore */ } }
-  WK.code = code; WK.got = ''; clearTimeout(WK.t);
+  WK.code = code; WK.got = ''; WK.hello = false; clearTimeout(WK.t);
   if (typeof EventSource === 'undefined') return;
   try {
     WK.es = new EventSource(`https://ntfy.sh/gkw${code}/sse?since=${Math.floor(Date.now() / 1000) - 120}`);
@@ -2583,6 +2583,12 @@ function wkPair(code) {
 }
 function wkGot(raw) {
   let d = {}; try { d = JSON.parse(raw); } catch (e) { d = { t: String(raw) }; }
+  if (d.hello) { // הטלפון של הצופה מחובר: אישור שקט לשעון, כדי שתדע שהקלדת נכון
+    if (WK.hello) return; WK.hello = true;
+    if (navigator.vibrate) navigator.vibrate(20);
+    if (S.remoteTopic) fetch(`https://ntfy.sh/${S.remoteTopic}?title=${encodeURIComponent('תזכורת')}`, { method: 'POST', body: '✓' }).catch(() => {});
+    return;
+  }
   const word = String(d.t || d.q || '').slice(0, 80); if (!word || word === WK.got) return;
   WK.got = word; setChoice(word); // הצופה עבר לערך אחר: תמיד הערך האחרון שהוא פתח
   if (navigator.vibrate) navigator.vibrate([25, 60, 25]);
