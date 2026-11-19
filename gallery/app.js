@@ -2567,7 +2567,7 @@ function wkPairFrom(expr) {
 }
 function wkPair(code) {
   if (WK.es) { try { WK.es.close(); } catch (e) { /* ignore */ } }
-  WK.code = code; WK.got = false; clearTimeout(WK.t);
+  WK.code = code; WK.got = ''; clearTimeout(WK.t);
   if (typeof EventSource === 'undefined') return;
   try {
     WK.es = new EventSource(`https://ntfy.sh/gkw${code}/sse?since=${Math.floor(Date.now() / 1000) - 120}`);
@@ -2577,8 +2577,8 @@ function wkPair(code) {
 }
 function wkGot(raw) {
   let d = {}; try { d = JSON.parse(raw); } catch (e) { d = { t: String(raw) }; }
-  const word = String(d.t || d.q || '').slice(0, 80); if (!word || WK.got) return;
-  WK.got = true; setChoice(word);
+  const word = String(d.t || d.q || '').slice(0, 80); if (!word || word === WK.got) return;
+  WK.got = word; setChoice(word); // הצופה עבר לערך אחר: תמיד הערך האחרון שהוא פתח
   if (navigator.vibrate) navigator.vibrate([25, 60, 25]);
   if (S.remoteTopic) { // מעביר גם לשעון, דרך ההתראות של "הטלפון של הצופה + שעון"
     const body = d.q && d.t && d.q !== d.t ? `${d.t} (חיפש: ${d.q})` : word;
