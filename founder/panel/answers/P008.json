@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like the idea of blowing people's minds at a birthday, but an app that's not in the App Store or Google Play, where I type my card into some website I've never heard of? No way. I'd play with the free tricks and stop there.",
+  "objection": "Paying 99 shekels by card on an unknown website for an app installed from the browser feels like a scam risk, and I'm not sure my friends won't see it's fake.",
+  "would_change_my_mind": "If it were sold through the App Store or Google Play, so I pay the way I always do and can get a refund if it doesn't work.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 70,
+  "price_too_expensive": 120
+}

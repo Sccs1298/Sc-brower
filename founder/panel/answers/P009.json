@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "quality",
+  "reason": "I already pay for magic stuff, and a phone mind-reading kit in Hebrew with gallery, notes, calculator and search reveals is the kind of thing I'd love to show my WhatsApp groups. If the free tricks actually fool my partner, I'd pay the 99 ₪ that same evening.",
+  "objection": "It's a website, not a real App Store app, and I'm typing my card into some site I just saw in a Reel. Is it a scam, and will it still work after the next iOS update?",
+  "would_change_my_mind": "If the free tricks feel clunky or obviously fake, or the payment page looks sketchy with no reviews or Israeli contact details, I walk away.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 129,
+  "price_too_expensive": 199
+}

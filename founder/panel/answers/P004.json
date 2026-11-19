@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "quality",
+  "reason": "I already own a few paid mind-reading apps, and 99 ₪ one time is nothing for me. A Hebrew version that puts the word in the Photos gallery, the calculator or a fake call fills a real gap in my kit, but I'd only pay after the free tricks fool my own family.",
+  "objection": "A browser-installed web app has to look exactly like the real Photos gallery or calculator. If anything looks off, a sharp friend will spot it, and then it's just one more gimmick that sits unused in my collection.",
+  "would_change_my_mind": "If the free tricks look fake or laggy next to the paid apps I already use, I won't buy.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 249
+}
