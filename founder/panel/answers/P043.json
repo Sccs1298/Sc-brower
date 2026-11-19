@@ -1,0 +1,13 @@
+{
+  "id": "P043",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "As a working magician I'd actually use tricks like these, and 99 ₪ is nothing for me. But it's a browser-installed app that wants my card on its own website, and I don't type my card into sites I've never heard of. I'd play with the free tricks and stop there.",
+  "objection": "It's not in the App Store or Google Play, so nobody vetted it. If they take my card and it breaks after the next iOS update, or the 'lifetime' site disappears, I have no one to complain to.",
+  "would_change_my_mind": "Selling it through the App Store or Google Play, or at least paying with Apple Pay / Google Pay / PayPal, so I'm covered if it's a scam.",
+  "price_too_cheap": 20,
+  "price_cheap": 50,
+  "price_expensive": 180,
+  "price_too_expensive": 350
+}

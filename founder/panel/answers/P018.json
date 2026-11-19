@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already pay for magic apps, and a Hebrew one with the gallery, calculator and search reveals is something I don't have yet. I'd try the free tricks at home first, and if one of them fools my wife I'd pay the 99 before the next party.",
+  "objection": "I'm not a magician, so if the reveal is clunky or I mess up the setup I'll look like an idiot in front of everyone. And I'm a bit wary of typing my card on a website for something installed from the browser and not the App Store.",
+  "would_change_my_mind": "If the free tricks feel clumsy or obviously fake when I try them on a friend, I won't pay.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 129,
+  "price_too_expensive": 199
+}

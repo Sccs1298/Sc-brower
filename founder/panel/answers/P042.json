@@ -1,0 +1,13 @@
+{
+  "id": "P042",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I do magic for a living, and a phone mind-reading effect in Hebrew that I can do close-up at birthdays is worth far more than 99 ₪ to me. I'd try the free tricks first, and if they fool my own family I'd buy before my next booking.",
+  "objection": "On a real gig I can't let it fail in front of everyone. An app installed from the browser instead of the App Store makes me worry it breaks after a phone update, or that the guest sees the method.",
+  "would_change_my_mind": "If the free tricks glitch or look obviously fake when I test them on friends, I won't pay.",
+  "price_too_cheap": 20,
+  "price_cheap": 60,
+  "price_expensive": 250,
+  "price_too_expensive": 500
+}

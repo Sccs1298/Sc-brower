@@ -1,0 +1,13 @@
+{
+  "id": "P026",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I'd grab the free tricks, show them to the kids at a Friday dinner, and that's probably enough for me. I don't pay for apps, and 99 shekels for something I'll use twice and forget isn't going to happen.",
+  "objection": "I'll use it twice and get bored, and it installs from a browser with my card on some website, not from the App Store, which makes me a bit uneasy.",
+  "would_change_my_mind": "If the free tricks really blew my kids' or my students' minds and the full version were around 30 shekels, I might pay once.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 35,
+  "price_too_expensive": 60
+}

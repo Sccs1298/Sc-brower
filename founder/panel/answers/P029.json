@@ -1,0 +1,13 @@
+{
+  "id": "P029",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd totally play with the free tricks if a Reel blew me away, but typing my card into some website that installs from the browser instead of the App Store? That smells like a scam to me, so I'd probably stop there.",
+  "objection": "It's not in the App Store, so who's behind it, and will my card details be safe, or will it just vanish after I pay?",
+  "would_change_my_mind": "Seeing it on the App Store or Google Play, or a friend in my WhatsApp group actually doing the trick on me and saying they paid and it works.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 79,
+  "price_too_expensive": 149
+}

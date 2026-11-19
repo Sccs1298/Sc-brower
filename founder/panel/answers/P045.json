@@ -1,0 +1,13 @@
+{
+  "id": "P045",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Honestly the tricks sound like exactly what I'd pull out at a party, but I'd just use the free ones first. Putting my card into some random site that isn't even on the App Store is where I stop.",
+  "objection": "It's installed from the browser and paid by card on a website I've never heard of. No App Store, no reviews I can see, so how do I know my card is safe or that the full version actually works?",
+  "would_change_my_mind": "Being able to pay with Bit, Apple Pay or PayPal instead of typing my card, or a friend showing me the full version working at a party.",
+  "price_too_cheap": 15,
+  "price_cheap": 40,
+  "price_expensive": 90,
+  "price_too_expensive": 150
+}

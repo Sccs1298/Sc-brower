@@ -1,0 +1,13 @@
+{
+  "id": "P028",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I'd play with the free tricks for a family evening, but I just don't pay for apps, and there are free magic apps that do something similar. 99 shekels for a party trick I'll use a few times isn't how I spend money on my phone.",
+  "objection": "There are free magic apps that do the same, and I'm not typing my card into some website for an app that isn't even in the App Store.",
+  "would_change_my_mind": "If the free tricks genuinely blew my kids or students away and nothing free came close, maybe I'd pay a small one-off amount like 20-30 shekels.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 35,
+  "price_too_expensive": 60
+}

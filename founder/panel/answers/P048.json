@@ -1,0 +1,13 @@
+{
+  "id": "P048",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd try the free tricks at Friday dinner for fun, but putting my card into some app's website for 99 shekels, for an app that's not even in the App Store? No. If it was on Google Play or the App Store I'd think about it.",
+  "objection": "Paying by card on an unknown website with no App Store behind it, and I'm not sure my family wouldn't just see it's a trick and laugh at me.",
+  "would_change_my_mind": "If it were sold through the App Store or Google Play, and the free tricks actually fooled my family at dinner.",
+  "price_too_cheap": 10,
+  "price_cheap": 25,
+  "price_expensive": 59,
+  "price_too_expensive": 99
+}

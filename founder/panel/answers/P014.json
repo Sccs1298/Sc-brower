@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already pay for mentalism apps like this, and a Hebrew one I can use at Israeli birthdays and events is something I don't have. 99 shekels once is less than what I charge for ten minutes of a show, so if the free tricks hold up I'll buy it to compare with what I own.",
+  "objection": "It installs from a website, not the App Store, and I pay by card on some site I've never heard of. I also worry whether a browser app is reliable enough in front of a paying crowd, offline, when the reveal has to work every single time.",
+  "would_change_my_mind": "If the free tricks glitch or look fake in the gallery or calculator on my own phone, or the payment page looks sketchy, I won't pay.",
+  "price_too_cheap": 20,
+  "price_cheap": 60,
+  "price_expensive": 180,
+  "price_too_expensive": 350
+}

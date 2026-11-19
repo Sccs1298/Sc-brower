@@ -1,0 +1,13 @@
+{
+  "id": "P040",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd try the free tricks, but paying 99 ₪ by card on a website for an app that isn't in the App Store, with no reviews or real videos I can check, isn't something I do. The money's fine; I just don't know who's behind it or whether it fools anyone outside a demo.",
+  "objection": "Not being in the App Store, plus not knowing who made it or seeing real people using it, makes me worry it's a gimmick or a scam with my card. I'd also want to know how long it takes to learn the trick so it works at a party without me fumbling.",
+  "would_change_my_mind": "Real unedited videos of Israelis doing the tricks on their friends, plus reviews I can check and a named person or company behind it. Then I'd buy after a free trick works for me at a party.",
+  "price_too_cheap": 15,
+  "price_cheap": 40,
+  "price_expensive": 120,
+  "price_too_expensive": 200
+}

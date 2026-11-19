@@ -1,0 +1,13 @@
+{
+  "id": "P031",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "If a TikTok showed the calculator or incoming-call trick I'd totally open the link and play with the free tricks at the party. But typing my card into some site I've never heard of, for an app that isn't even in the App Store, for 99 ₪? Not this week.",
+  "objection": "Paying on an unknown website with my card feels risky, and with no App Store page or reviews I don't know if it's legit or if the tricks actually fool anyone.",
+  "would_change_my_mind": "Paying through Apple Pay, Google Pay or Bit instead of typing my card, plus a real video of the trick fooling someone, would get me to buy on the spot.",
+  "price_too_cheap": 10,
+  "price_cheap": 25,
+  "price_expensive": 59,
+  "price_too_expensive": 99
+}

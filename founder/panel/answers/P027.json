@@ -1,0 +1,13 @@
+{
+  "id": "P027",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "It sounds fun for a party, but I'd only pay if I knew my friends wouldn't catch on, and 99 shekels from some website that isn't in the App Store, with no event coming up right now, is not something I'd do this week. I'd try the free tricks and maybe come back before a birthday.",
+  "objection": "Will my friends actually be fooled, or will they see it's a fake video or a set-up? And I don't love giving my card to a site that isn't the App Store.",
+  "would_change_my_mind": "Trying a free trick on my friends and seeing it really work, plus a party coming up soon.",
+  "price_too_cheap": 15,
+  "price_cheap": 35,
+  "price_expensive": 70,
+  "price_too_expensive": 120
+}
