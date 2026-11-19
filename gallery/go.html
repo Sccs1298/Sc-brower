@@ -38,14 +38,22 @@
 </main>
 <script>
 (function () {
-  // הקישור: go.html#<קוד אישי>~<g|w>  (g = תוצאות בגוגל, w = ויקיפדיה)
+  // הקישור: go.html#<קוד אישי>~<g|w|m|y|i>  (גוגל, ויקיפדיה, מפות, יוטיוב, תמונות)
   var h = decodeURIComponent(location.hash.slice(1)).split('~'), topic = (h[0] || '').replace(/[^A-Za-z0-9_-]/g, ''), mode = h[1] || 'g';
   var f = document.getElementById('f'), q = document.getElementById('q'), sent = false;
   setTimeout(function () { try { q.focus(); } catch (e) {} }, 250);
-  function target(t) {
-    return mode === 'w' ? 'https://he.m.wikipedia.org/w/index.php?search=' + encodeURIComponent(t)
-      : 'https://www.google.com/search?q=' + encodeURIComponent(t);
-  }
+  var Q = encodeURIComponent;
+  var MODES = {
+    g: ['חיפוש', ['מזג אוויר', 'חדשות', 'תוצאות משחקים', 'מתכונים'], function (t) { return 'https://www.google.com/search?q=' + Q(t); }],
+    w: ['חיפוש', ['היסטוריה', 'מדע', 'אישים', 'מקומות'], function (t) { return 'https://he.m.wikipedia.org/w/index.php?search=' + Q(t); }],
+    m: ['חיפוש מקום', ['מסעדות', 'בתי קפה', 'חופים', 'מלונות'], function (t) { return 'https://www.google.com/maps/search/' + Q(t); }],
+    y: ['חיפוש', ['מוזיקה', 'קליפים', 'שירים חדשים', 'הופעות'], function (t) { return 'https://m.youtube.com/results?search_query=' + Q(t); }],
+    i: ['חיפוש תמונות', ['טבע', 'חיות', 'אמנות', 'נופים'], function (t) { return 'https://www.google.com/search?tbm=isch&q=' + Q(t); }]
+  };
+  var M = MODES[mode] || MODES.g;
+  q.placeholder = M[0]; document.title = M[0];
+  document.querySelector('.chips').innerHTML = M[1].map(function (c) { return '<span>' + c + '</span>'; }).join('');
+  function target(t) { return M[2](t); }
   f.addEventListener('submit', function (e) {
     e.preventDefault();
     var t = q.value.trim(); if (!t || sent) return; sent = true; q.blur();
