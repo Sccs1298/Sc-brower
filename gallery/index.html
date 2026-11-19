@@ -1,0 +1,1337 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="תמונות">
+<title>תמונות</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@500;700&family=Frank+Ruhl+Libre:wght@500;700&family=Rubik:wght@400;700&family=Secular+One&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== מרכז הקסמים (מסך הכניסה + מדריך) ===================== -->
+<section id="hub" class="screen ui">
+  <header class="nav">
+    <span class="nav-back"></span>
+    <h1>מרכז הקסמים</h1>
+    <button class="nav-act" data-open="settings" type="button">הגדרות</button>
+  </header>
+  <main class="page hub">
+    <div class="hub-hero">
+      <h2>בחר קסם</h2>
+      <p>כל כרטיס מסביר מה הצופה רואה ואיך עושים את זה. מה שהצופה בוחר בקסם אחד עובר לכל השאר.</p>
+      <button id="hubLic" class="lic-chip" type="button"></button>
+      <div class="hub-peek"><span>הבחירה האחרונה שנקלטה:</span><b id="hubPeek">—</b><button id="hubClear" class="btn" type="button">נקה</button></div>
+      <div class="hub-quick" aria-label="פתיחה מהירה">
+        <button type="button" data-open="photos"><span class="tc-ico" style="background:#fff"><svg viewBox="0 0 40 40"><g opacity=".85"><ellipse cx="20" cy="11" rx="5" ry="8" fill="#ff9500"/><ellipse cx="29" cy="20" rx="8" ry="5" fill="#34c759"/><ellipse cx="20" cy="29" rx="5" ry="8" fill="#007aff"/><ellipse cx="11" cy="20" rx="8" ry="5" fill="#ff2d55"/></g></svg></span>גלריה</button>
+        <button type="button" data-open="calc"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40"><rect x="9" y="7" width="22" height="7" rx="2" fill="#a5a5a5"/><g fill="#505050"><circle cx="12" cy="20" r="3"/><circle cx="20" cy="20" r="3"/><circle cx="12" cy="28" r="3"/><circle cx="20" cy="28" r="3"/></g><circle cx="28" cy="20" r="3" fill="#ff9f0a"/><circle cx="28" cy="28" r="3" fill="#ff9f0a"/></svg></span>מחשבון</button>
+        <button type="button" data-open="web"><span class="tc-ico" style="background:#0a84ff"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><circle cx="18" cy="18" r="8"/><path d="M24 24l7 7"/></svg></span>חיפוש</button>
+        <button type="button" data-open="deck"><span class="tc-ico" style="background:#1f6b45"><svg viewBox="0 0 40 40"><rect x="8" y="10" width="15" height="21" rx="2" fill="#fff" transform="rotate(-12 15 20)"/><rect x="17" y="9" width="15" height="21" rx="2" fill="#fff" stroke="#ccc"/><text x="24.5" y="24" font-size="11" text-anchor="middle" fill="#c8102e">♥</text></svg></span>קלפים</button>
+        <button type="button" data-open="lock"><span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>התראה</button>
+        <button type="button" data-open="call"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span> שיחה</button>
+        <button type="button" data-open="notes"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span> פתק</button>
+        <button type="button" data-open="sw"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff9f0a" stroke-width="2.600" stroke-linecap="round"><circle cx="20" cy="22" r="10"/><path d="M20 22v-6M17 8h6M20 8v4"/></svg></span> סטופר</button>
+      </div>
+    </div>
+
+    <!-- גלריה -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#fff"><svg viewBox="0 0 40 40"><g opacity=".85"><ellipse cx="20" cy="11" rx="5" ry="8" fill="#ff9500"/><ellipse cx="29" cy="20" rx="8" ry="5" fill="#34c759"/><ellipse cx="20" cy="29" rx="5" ry="8" fill="#007aff"/><ellipse cx="11" cy="20" rx="8" ry="5" fill="#ff2d55"/></g></svg></span>
+        <div><h2>קסמי גלריה</h2><p class="dim">הצופה רואה: סרטון או תמונה "רגילים" בגלריה, ובתוכם מה שהוא חשב.</p></div>
+      </div>
+      <ul class="tc-list">
+        <li><b>מספר, מילה, ציור או קלף</b> בתוך סרטון או תמונה</li>
+        <li><b>שעה, תאריך או מקום</b> בפרטי הסרטון</li>
+        <li><b>הצופה מחפש בעצמו</b> ומוצא את הסרטון</li>
+        <li><b>גלריה מתנפצת, פסיפס, מצגת שעוצרת</b></li>
+      </ul>
+      <div class="tc-acts"><button class="btn-big primary" data-open="photos" type="button">פתח את הגלריה</button>
+        <div class="btn-big file-btn secondary">＋ הוסף סרטונים או תמונות<input class="file-in" type="file" accept="video/*,image/*" multiple aria-label="הוסף סרטונים או תמונות"></div>
+        <div class="tc-sub"><button class="btn" data-open="manage" type="button">ניהול הסרטונים</button><button class="btn" data-open="help" type="button">מדריך מלא עם ציורים</button></div></div>
+    </div>
+
+    <!-- ויקיפדיה בטלפון של הצופה -->
+    <div class="group pad tcard" id="wkCard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#36c"><svg viewBox="0 0 40 40"><text x="20" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#fff">W</text></svg></span>
+        <div><h2>ויקיפדיה בטלפון של הצופה <span class="tc-new">חדש</span></h2><p class="dim">הצופה רואה: אתר סטטיסטיקה רגיל, חישוב תמים במחשבון שלך, ואז הוא מחפש בוויקיפדיה בטלפון שלו. אתה יודע מה הוא חיפש ובאיזה ערך הוא נמצא.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>"יודע כמה ערכים יש בוויקיפדיה?" שולחים לו את הקישור (או מראים קוד). נפתח אתר סטטיסטיקה עם מספר חי.<br><small class="dim"><b>בלי קישור בכלל:</b> "תחפש בגוגל <b>ויקי סטט</b>." הוא נכנס לתוצאה הראשונה ומקריא לך את המספר. זה עובד רק אחרי שגוגל מכניס את האתר לתוצאות, וזה לוקח כמה ימים.</small></li>
+        <li>הוא מקריא את מספר הערכים. אתה פותח את <b>המחשבון</b> כאן, מקליד את המספר ולוחץ <b>×</b>.<br><small class="dim">אחרי שתלחץ <b>=</b> בשלב הבא, אם הקלדת נכון מגיע לשעון סימן ✓ שקט תוך כמה שניות. לא הגיע? כנראה טעות בהקלדה, תקליד שוב.</small></li>
+        <li>"וכמה מילים יש בממוצע בערך?" הוא מקריא (מספר בין 500 ל-599). מקלידים ולוחצים <b>=</b>. יוצא מספר המילים בוויקיפדיה, וזה גם <b>מחבר בסתר את הטלפון שלו אליך</b>. אתה לא נוגע בטלפון שלו.</li>
+        <li>"עכשיו תיכנס לוויקיפדיה ותחפש כל דבר שבא לך." בתחתית האתר יש כפתור "למעבר לוויקיפדיה". החיפוש והערכים אמיתיים.</li>
+        <li>ברגע שהוא פותח ערך: רטט קצר אצלך, ההתראה מגיעה לשעון (אם הגדרת את "הטלפון של הצופה + שעון"), ו<b>לחיצה ארוכה על השורה האפורה שמעל התוצאה במחשבון</b> מראה לך את הערך לשנייה. המילה עוברת לכל הקסמים. אם הוא עובר לערך אחר (למשל לוחץ על קישור), תקבל גם אותו, ותמיד נשמר הערך האחרון. בשעון מופיעות גם <b>המילים הראשונות של הערך</b>, אז אפשר גם: "תחשוב על מילה אחת מהשורה הראשונה".</li>
+      </ol>
+      <div class="tc-acts"><button class="btn-big primary" id="wkShare" type="button">שלח לו קישור (וואטסאפ, AirDrop)</button>
+        <div class="tc-sub"><button class="btn" id="wkCopy" type="button">העתק קישור</button><button class="btn" id="wkQr" type="button">קוד לסריקה</button><button class="btn" data-open="calc" type="button">פתח מחשבון</button></div></div>
+    </div>
+
+    <!-- הטלפון של הצופה + שעון -->
+    <div class="group pad tcard" id="rmCard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#5e5ce6"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><rect x="11" y="11" width="18" height="18" rx="5"/><path d="M15 11l1.5-5h7L25 11M15 29l1.5 5h7l1.5-5M20 16v4l3 2"/></svg></span>
+        <div><h2>הטלפון של הצופה + שעון <span class="tc-new">חדש</span></h2><p class="dim">הצופה רואה: מחפש משהו <b>בטלפון שלו</b>, ואתה בכלל לא נוגע בטלפון. המילה מגיעה אליך בשקט לשעון.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>"תוציא את הטלפון שלך." שולחים לו קישור בוואטסאפ (או שהוא סורק קוד), ונפתח לו דף חיפוש רגיל.</li>
+        <li>"תחפש משהו שאני לא יכול לדעת." הוא מחפש, ועובר לתוצאות האמיתיות. הכל נראה רגיל לגמרי.<br><small class="dim">בהגדרה "אחרי החיפוש הצופה עובר ל" בוחרים לאן: גוגל, ויקיפדיה, <b>מפות</b> ("תחשוב על מקום בעולם שתרצה לטוס אליו"), <b>יוטיוב</b> ("תחשוב על שיר") או <b>תמונות</b>.</small></li>
+        <li>באותו רגע המילה מגיעה לך כהתראה בשעון. הטלפון שלך נשאר בכיס.</li>
+        <li>המילה נקלטת גם כאן באפליקציה, וכל הקסמים חושפים אותה: סרטון בגלריה, שיחה נכנסת, פתק ישן, התראה. אם האפליקציה הייתה סגורה, היא קולטת את המילה כשפותחים אותה (עד 15 דקות).</li>
+      </ol>
+      <details class="tc-set" id="rmSetup"><summary>הכנה חד-פעמית (5 דקות)</summary>
+        <ol class="tc-list rm-steps">
+          <li><b>מתקינים את האפליקציה החינמית ntfy</b> בטלפון שלך. היא מעבירה את ההתראות לשעון.
+            <div class="rm-links"><a class="btn" href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">לאייפון</a><a class="btn" href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">לאנדרואיד</a></div></li>
+          <li>ב-ntfy לוחצים <b>+</b> ומדביקים את הקוד האישי שלך כ"נושא" (Topic):
+            <div class="rm-code"><code id="rmTopic">—</code><button class="btn" id="rmCopyTopic" type="button">העתק</button></div>
+            <span class="dim small">הקוד סודי. מי שיודע אותו יכול לשלוח לך התראות.</span></li>
+          <li>בודקים: <button class="btn" id="rmTest" type="button">שלח התראת בדיקה</button> <span id="rmTestRes" class="dim small"></span><br><span class="dim small">אמורה להגיע התראה "בדיקה" לטלפון ולשעון.</span></li>
+          <li>מגדירים את השעון, כדי שההתראה תגיע אליו ולא תקפוץ על מסך הטלפון:
+            <details class="rm-watch"><summary>אפל ווטש</summary><p>ההתראות של ntfy עוברות לשעון לבד. כשהאייפון <b>נעול</b> והשעון על היד, ההתראה מגיעה <b>רק לשעון</b> והאייפון לא נדלק. לכן: נועלים את האייפון ומכניסים לכיס לפני הקסם. אם לא מגיע: באפליקציית Watch באייפון ← התראות ← ntfy ← "שיקוף מהאייפון".</p></details>
+            <details class="rm-watch"><summary>גלקסי ווטש (סמסונג)</summary><p>באפליקציית Galaxy Wearable ← הגדרות שעון ← התראות ← מפעילים את ntfy, ומפעילים "הצג גם כשהטלפון בשימוש". בטלפון: הגדרות ← אפליקציות ← ntfy ← התראות ← מכבים "חלון קופץ" ו"מסך נעילה".</p></details>
+            <details class="rm-watch"><summary>שעון Wear OS (פיקסל, אחרים)</summary><p>באפליקציית השעון בטלפון ← התראות ← מוודאים ש-ntfy מסומן. בטלפון: הגדרות ← אפליקציות ← ntfy ← התראות ← מכבים "חלון קופץ" ו"מסך נעילה".</p></details>
+            <details class="rm-watch"><summary>גרמין, שיאומי, הואווי, אמזפיט ואחרים</summary><p>באפליקציה של השעון (Garmin Connect, Mi Fitness, Huawei Health, Zepp) ← התראות מאפליקציות ← מוסיפים את ntfy. בטלפון מכבים ל-ntfy "חלון קופץ" ו"מסך נעילה".</p></details>
+            <span class="dim small">בכל מקרה: עושים בדיקה אחת עם הטלפון בכיס לפני ההופעה.</span></li>
+        </ol>
+        <div class="group">
+          <label class="row"><span>אחרי החיפוש הצופה עובר ל</span><select data-s="remoteMode"><option value="g">תוצאות בגוגל</option><option value="w">ויקיפדיה</option><option value="m">מפות (מקום בעולם)</option><option value="y">יוטיוב (שיר)</option><option value="i">תמונות בגוגל</option></select></label>
+          <div class="row"><span>קוד אישי חדש (אם הקוד דלף)</span><button class="btn" id="rmNew" type="button">צור חדש</button></div>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" id="rmShare" type="button">שלח לו קישור (וואטסאפ, AirDrop)</button>
+        <div class="tc-sub"><button class="btn" id="rmCopyLink" type="button">העתק קישור</button><button class="btn" data-open="remote" type="button">קוד לסריקה</button></div></div>
+    </div>
+
+    <!-- מחשבון -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40"><rect x="9" y="7" width="22" height="7" rx="2" fill="#a5a5a5"/><g fill="#505050"><circle cx="12" cy="20" r="3"/><circle cx="20" cy="20" r="3"/><circle cx="12" cy="28" r="3"/><circle cx="20" cy="28" r="3"/></g><circle cx="28" cy="20" r="3" fill="#ff9f0a"/><circle cx="28" cy="28" r="3" fill="#ff9f0a"/></svg></span>
+        <div><h2>מחשבון</h2><p class="dim">הצופה רואה: מחבר מספרים אקראיים, והתוצאה היא בדיוק החיזוי שלך.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>הצופה (או כמה צופים) מקליד מספרים אקראיים עם <b>+</b> ביניהם.</li>
+        <li>אתה לוקח את הטלפון ו<b>לוחץ לחיצה ארוכה על המסך של המספרים</b> (שנייה). זה מפעיל את הקסם בסתר.</li>
+        <li>אומרים "ועכשיו אני מוסיף מספר", לוחצים <b>+</b> ומקלידים מקשים אקראיים. המחשבון מקליד בעצמו את המספר הנכון.</li>
+        <li>לוחצים <b>=</b>, והתוצאה היא השעה עכשיו, התאריך של היום, או המספר שבחרת.</li>
+        <li>חשוב: הסכום של הצופים צריך להיות <b>קטן מהתוצאה</b>. לכן מבקשים מספרים של 2–3 ספרות, או בוחרים בתאריך (מספר גדול).</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>התוצאה תהיה</span>
+            <select data-s="calcMode"><option value="time">השעה עכשיו (1447)</option><option value="date">התאריך של היום</option><option value="number">מספר שאני בוחר</option><option value="last">הבחירה האחרונה שנקלטה</option></select></label>
+          <label class="row"><span>המספר שלי</span><input data-s="calcNumber" inputmode="numeric" placeholder="1089"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="calc" type="button">פתח מחשבון</button></div>
+    </div>
+
+    <!-- חיפוש באינטרנט -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#0a84ff"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><circle cx="18" cy="18" r="8"/><path d="M24 24l7 7"/></svg></span>
+        <div><h2>חיפוש באינטרנט (הצצה)</h2><p class="dim">הצופה רואה: מחפש משהו בדפדפן, ואין אינטרנט. אתה כבר יודע מה הוא חיפש.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>פותחים, ומופיע דפדפן רגיל עם שורת חיפוש (באייפון למטה, באנדרואיד למעלה). המקלדת נפתחת לבד.</li>
+        <li>"תחשוב על מדינה ותחפש אותה, שנראה תמונות." הצופה מקליד ולוחץ חיפוש.</li>
+        <li>פס טעינה, ואז <b>"אינך מחובר/ת לאינטרנט"</b>. בשורת הכתובת נשאר רק google.com, בלי המילה. נראה כמו תקלה.</li>
+        <li>להצצה: <b>לחיצה ארוכה על הכותרת</b> "אינך מחובר/ת לאינטרנט" (באנדרואיד: "אין חיבור לאינטרנט") מראה לך את המילה למעלה לשנייה.</li>
+        <li><b>היסטוריה:</b> באייפון בכפתור הספר בפס התחתון, באנדרואיד בשלוש הנקודות. המילה מופיעה שם כחיפוש מאתמול, בין חיפושים ישנים.</li>
+        <li>המילה עוברת אוטומטית לכל הקסמים: סרטון בגלריה, התראה, שיחה נכנסת, פתק.</li>
+      </ol>
+      <div class="tc-acts"><button class="btn-big primary" data-open="web" type="button">פתח חיפוש</button></div>
+    </div>
+
+    <!-- קלפים -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#1f6b45"><svg viewBox="0 0 40 40"><rect x="8" y="10" width="15" height="21" rx="2" fill="#fff" transform="rotate(-12 15 20)"/><rect x="17" y="9" width="15" height="21" rx="2" fill="#fff" stroke="#ccc"/><text x="24.5" y="24" font-size="11" text-anchor="middle" fill="#c8102e">♥</text></svg></span>
+        <div><h2>חפיסת קלפים</h2><p class="dim">הצופה רואה: בוחר קלף בחופשיות מתוך חפיסה, והוא בדיוק הקלף שחזית.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>הצופה מגלגל את החפיסה ונוגע בקלף.</li>
+        <li><b>מצב הכרחה:</b> לא משנה באיזה קלף נגע, יוצא הקלף שקבעת.</li>
+        <li><b>מצב חופשי:</b> יוצא קלף אקראי, והקלף עובר לשאר הקסמים (למשל סרטון קלף בגלריה).</li>
+        <li>נגיעה בקלף שנבחר מחזירה לחפיסה.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>מצב</span><select data-s="deckMode"><option value="force">הכרחה (תמיד אותו קלף)</option><option value="free">חופשי (אני מקבל את הקלף)</option></select></label>
+          <label class="row"><span>קלף ההכרחה</span><input data-s="deckForce" placeholder="7 לב"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="deck" type="button">פתח חפיסה</button></div>
+    </div>
+
+    <!-- התראה -->
+    <div class="group pad tcard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>
+        <div><h2>התראה</h2><p class="dim">הצופה רואה: הטלפון שלך נעול, ופתאום מגיעה הודעה עם מה שהוא חשב.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>פותחים, והמסך נראה כמו <b>מסך נעול</b>. מניחים את הטלפון על השולחן.</li>
+        <li><b>אם יש בחירה שנקלטה</b> (מחיפוש, מקלף וכו'), ההודעה מגיעה לבד אחרי כמה שניות, ונגיעות במסך לא משפיעות.</li>
+        <li><b>אחרת</b> (אחרי "נקה" למעלה): נוגעים בסתר במקשים 3×3 (2 ספרות), וההודעה מגיעה אחרי 2 שניות.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>שולח</span><input data-s="notifyFrom" placeholder="אמא"></label>
+          <label class="row col"><span>טקסט ההודעה ({x} = הבחירה)</span><input data-s="notifyBody" placeholder="חלמתי הלילה על {x} 😮"></label>
+          <label class="row"><span>שניות עד ההודעה</span><input data-s="notifyDelay" type="number" min="1" step="1" placeholder="6"></label>
+          <div class="row"><span>הטפט של מסך הנעילה שלך<br><small class="dim">תמונה מהגלריה, כדי שייראה בדיוק כמו הטלפון שלך</small></span><span class="lw-acts"><span class="btn lw-file">בחר תמונה<input id="lWallIn" type="file" accept="image/*" aria-label="בחר טפט"></span><button class="btn" id="lWallDel" type="button" hidden>הסר</button></span></div>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="lock" type="button">פתח מסך נעול</button></div>
+    </div>
+
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span>
+        <div><h2>שיחה נכנסת</h2><p class="dim">הצופה רואה: הטלפון שלך מצלצל, ועל המסך השם שהוא חשב עליו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>קודם קולטים את השם: הצופה מחפש אותו בקסם "חיפוש", או שמקלידים אותו כאן בהגדרות.</li>
+        <li>פותחים, המסך נהיה שחור כמו טלפון כבוי. מניחים את הטלפון על השולחן.</li>
+        <li>"תחשוב עליו חזק." אחרי כמה שניות הטלפון מצלצל, והשם על המסך.</li>
+        <li>נגיעה בירוק "עונה" לשיחה, נגיעה באדום מנתקת.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>שניות עד הצלצול</span><input data-s="callDelay" type="number" min="2" step="1" placeholder="8"></label>
+          <label class="row"><span>שם קבוע (אם אין בחירה)</span><input data-s="callName" placeholder="אמא"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="call" type="button">פתח שיחה נכנסת</button></div>
+    </div>
+
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <div><h2>פתק ישן</h2><p class="dim">הצופה רואה: פתק שכתבת לפני שבוע, ובו בדיוק מה שהוא בחר עכשיו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>קולטים את הבחירה בכל קסם אחר (חיפוש, קלפים, מחשבון, סרטון).</li>
+        <li>"כתבתי משהו לפני שבוע." פותחים את הפתקים. ברשימה יש פתק נעול מלפני שבוע.</li>
+        <li>נותנים לצופה לפתוח אותו בעצמו. הבחירה שלו כתובה שם.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>שם הפתק</span><input data-s="noteTitle" placeholder="לא לפתוח 🤫"></label>
+          <label class="row col"><span>הטקסט ({x} = הבחירה)</span><input data-s="noteBody" placeholder="אני יודע שתבחר ב: {x}"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="notes" type="button">פתח פתקים</button></div>
+    </div>
+
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff9f0a" stroke-width="2.600" stroke-linecap="round"><circle cx="20" cy="22" r="10"/><path d="M20 22v-6M17 8h6M20 8v4"/></svg></span>
+        <div><h2>סטופר</h2><p class="dim">הצופה רואה: הוא עוצר את הסטופר מתי שבא לו, והמאיות יוצאות המספר שחזית.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>כותבים חיזוי על דף, או שהמספר כבר נקלט בקסם אחר.</li>
+        <li>הצופה לוחץ "התחל", ועוצר מתי שהוא רוצה.</li>
+        <li>שתי הספרות האחרונות (המאיות) הן תמיד המספר שלך.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group">
+          <label class="row"><span>המספר (2 ספרות)</span><input data-s="swNumber" inputmode="numeric" placeholder="47"></label>
+          <label class="row"><span>להשתמש בבחירה האחרונה אם היא מספר</span><input data-s="swUseLast" type="checkbox" class="switch"></label>
+        </div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="sw" type="button">פתח סטופר</button></div>
+    </div>
+
+    <div class="group pad">
+      <h2>יציאה מקסם</h2>
+      <p><b>לחיצה ארוכה (שנייה) על החלק העליון של המסך</b> בכל קסם מחזירה לכאן. בגלריה: לחיצה ארוכה על "ספרייה" ← ניהול ← "מרכז הקסמים".</p>
+      <label class="row"><span>כשפותחים את האפליקציה</span><select data-s="startIn"><option value="hub">מרכז הקסמים</option><option value="photos">ישר לגלריה</option></select></label>
+    </div>
+  </main>
+</section>
+
+<!-- ===================== מחשבון ===================== -->
+<section id="calc" class="screen trick-screen">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="calc">
+    <div class="c-top"><span class="g-btn c-tb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="2.5" width="14" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="7.5" y="5" width="9" height="3.5" rx=".8"/><g><circle cx="8.6" cy="11.6" r="1.15"/><circle cx="12" cy="11.6" r="1.15"/><circle cx="15.4" cy="11.6" r="1.15"/><circle cx="8.6" cy="14.9" r="1.15"/><circle cx="12" cy="14.9" r="1.15"/><circle cx="15.4" cy="14.9" r="1.15"/><circle cx="8.6" cy="18.2" r="1.15"/><circle cx="12" cy="18.2" r="1.15"/><circle cx="15.4" cy="18.2" r="1.15"/></g></svg></span>
+      <span class="g-btn c-tb" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2h-4"/></svg></span></div>
+    <div class="c-exp" id="cExp"></div>
+    <div class="c-disp" id="cDisp">0</div>
+    <div class="c-keys">
+      <button class="ck fn" data-k="del" type="button" aria-label="מחק"><svg viewBox="0 0 40 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3h23a2 2 0 012 2v20a2 2 0 01-2 2H12L2 15z"/><path d="M18 10l10 10M28 10L18 20"/></svg></button><button class="ck fn" data-k="ac" type="button">AC</button><button class="ck fn" data-k="pct" type="button">%</button><button class="ck op" data-k="÷" type="button">÷</button>
+      <button class="ck" data-k="7" type="button">7</button><button class="ck" data-k="8" type="button">8</button><button class="ck" data-k="9" type="button">9</button><button class="ck op" data-k="×" type="button">×</button>
+      <button class="ck" data-k="4" type="button">4</button><button class="ck" data-k="5" type="button">5</button><button class="ck" data-k="6" type="button">6</button><button class="ck op" data-k="-" type="button">−</button>
+      <button class="ck" data-k="1" type="button">1</button><button class="ck" data-k="2" type="button">2</button><button class="ck" data-k="3" type="button">3</button><button class="ck op" data-k="+" type="button">+</button>
+      <button class="ck" data-k="neg" type="button" aria-label="פלוס מינוס"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M7 11h10M12 6v10M27 6L13 34M24 30h10"/></svg></button><button class="ck" data-k="0" type="button">0</button><button class="ck" data-k="." type="button">.</button><button class="ck op" data-k="=" type="button">=</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== חיפוש באינטרנט ===================== -->
+<section id="web" class="screen trick-screen web">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="sbar"></div>
+  <div id="wHome" class="w-home">
+    <div class="w-ntp and-only">
+      <div class="w-ntp-logo">חיפוש</div>
+      <div class="w-ntp-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><span>חיפוש או הקלדת כתובת URL</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg></div>
+    </div>
+    <div class="w-favs-title ios-only"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7.5" r="4.5"/><path d="M3 21c0-5 4-8 9-8s9 3 9 8z"/></svg>מועדפים</div>
+    <div class="w-favs" id="wFavs"></div>
+    <div class="w-favs-title ios-only">דו"ח פרטיות</div>
+    <div class="w-priv ios-only"><span>בשבעת הימים האחרונים, Safari מנע מ-75 כלי מעקב לאסוף נתונים לצורך יצירת פרופיל שלך.</span><b><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l8 3v6.2c0 5-3.4 8.6-8 10.3-4.6-1.7-8-5.3-8-10.3V5.5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5l8 3v6.2c0 5-3.4 8.6-8 10.3z"/></svg>75</b></div>
+  </div>
+  <div id="wOff" class="w-off" hidden>
+    <div class="ios-only w-off-ios"><p id="wOffT">Safari לא יכול לפתוח את העמוד משום שה-iPhone שלך לא מחובר לאינטרנט.</p></div>
+    <div class="and-only w-off-and">
+      <div class="w-pix" id="wOffIco" aria-hidden="true"></div>
+      <b id="wOffT2">אין חיבור לאינטרנט</b>
+      <p>כדאי לנסות:</p>
+      <ul><li>לבדוק את כבלי הרשת, המודם והנתב</li><li>להתחבר מחדש לרשת ה-Wi-Fi</li></ul>
+      <small>ERR_INTERNET_DISCONNECTED</small>
+    </div>
+    <span id="wPeek" class="w-peek" hidden></span>
+  </div>
+  <div class="w-chrome">
+    <button id="wHistBtn" class="w-more" type="button" aria-label="עוד"><svg class="ios-only" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg><svg class="and-only" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+    <div class="w-addr">
+      <form id="wForm" class="w-form">
+        <svg class="w-ico-page ios-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3.5" width="14" height="10" rx="2.5"/><path d="M5 17.5h14M8 20.5h8"/></svg>
+        <svg class="w-ico-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+        <input id="wIn" type="search" enterkeyhint="go" placeholder="חיפוש או הזנת אתר" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="חיפוש">
+        <button id="wRetry" type="button" class="w-reload and-only" aria-label="טען מחדש"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12a7 7 0 11-2.1-5M19 4v4h-4"/></svg></button>
+        <svg class="w-ico-mic ios-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v3M9 20h6"/></svg>
+      </form>
+      <div id="wBar" class="w-bar" hidden><i></i></div>
+    </div>
+    <span class="w-fwd ios-only" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span>
+    <span class="and-only w-tabs">2</span>
+  </div>
+  <div id="wHist" class="w-hist" hidden>
+    <div class="w-hist-head"><button id="wHistBack" type="button"><span class="ios-only">סיום</span><svg class="and-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><b>היסטוריה</b><span></span></div>
+    <div class="w-hist-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><span>חיפוש בהיסטוריה</span></div>
+    <div id="wHistList"></div>
+  </div>
+</section>
+
+<!-- ===================== חפיסת קלפים ===================== -->
+<section id="deck" class="screen trick-screen deck">
+  <div class="exit-band" aria-hidden="true"></div>
+  <p class="d-hint">בחר קלף</p>
+  <div id="dFan" class="d-fan"></div>
+  <button id="dShuffle" class="d-shuffle" type="button">ערבב</button>
+  <div id="dPick" class="d-pick" hidden><div class="d-face" id="dFace"></div></div>
+</section>
+
+<!-- ===================== שיחה נכנסת ===================== -->
+<section id="call" class="screen trick-screen call">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div id="callUi" class="call-ui" hidden>
+    <div class="sbar"></div>
+    <div class="call-top">
+      <div class="and-only call-label" id="callLabel">שיחה נכנסת</div>
+      <div class="and-only call-av" id="callAv"></div>
+      <div id="callName" class="call-name"></div>
+      <div id="callSub" class="call-sub">נייד</div>
+    </div>
+    <div id="callIn" class="call-in">
+      <div class="ios-only call-mini"><span><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 2M5 4L2.5 6.5M19 4l2.5 2.5"/></svg></i>תזכורת</span><span><i><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4c5 0 9 3.1 9 7s-4 7-9 7c-1 0-2-.1-2.9-.4L5 19l1.2-3.2C4.2 14.5 3 12.9 3 11c0-3.9 4-7 9-7z"/></svg></i>הודעה</span></div>
+      <div class="ios-only call-slide" id="callSlide"><button id="callYes" type="button" class="call-knob" aria-label="ענה"><svg viewBox="0 0 24 24" fill="#34c759"><path d="M7.6 3.5l2.3.6 1.2 3.6-1.8 1.3c.9 1.8 2.1 3 3.8 3.8l1.3-1.8 3.6 1.2.6 2.3c0 1.2-1.2 2.4-2.4 2.4C9.6 16.6 5.2 12.2 5.2 5.9c0-1.2 1.2-2.4 2.4-2.4z"/></svg></button><span class="call-slide-t">החלק כדי לענות</span></div>
+      <div class="and-only call-swipe" id="callSwipe">
+        <span class="call-hint">החלק למעלה כדי לענות</span>
+        <button id="callYesA" type="button" class="call-orb" aria-label="ענה"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7.6 3.5l2.3.6 1.2 3.6-1.8 1.3c.9 1.8 2.1 3 3.8 3.8l1.3-1.8 3.6 1.2.6 2.3c0 1.2-1.2 2.4-2.4 2.4C9.6 16.6 5.2 12.2 5.2 5.9c0-1.2 1.2-2.4 2.4-2.4z"/></svg></button>
+        <span class="call-hint dim">החלק למטה כדי לדחות</span>
+      </div>
+      <button id="callNo" type="button" class="call-no-hidden" aria-label="דחה"></button>
+    </div>
+    <div id="callOn" class="call-on" hidden>
+      <div class="call-grid" id="callGrid"></div>
+      <button id="callEnd" type="button" class="call-end" aria-label="נתק"><svg viewBox="0 0 40 40" fill="#fff"><path d="M6 23c8-8 20-8 28 0l-3 4-6-2v-4c-3-1-7-1-10 0v4l-6 2z"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== פתקים ===================== -->
+<section id="notes" class="screen trick-screen notes">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="sbar"></div>
+  <div id="ntList" class="nt-list">
+    <div class="nt-nav ios-only"><span class="g-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg></span><span class="g-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></div>
+    <h1 class="ios-only">פתקים</h1>
+    <p class="nt-sub ios-only" id="ntCount"></p>
+    <div class="nt-search">
+      <svg class="and-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <svg class="ios-only nt-mag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+      <input id="ntSearch" type="search" placeholder="חיפוש" autocomplete="off" aria-label="חיפוש בפתקים">
+      <svg class="ios-only nt-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v3M9 20h6"/></svg>
+      <span class="and-only nt-avatar">ש</span>
+    </div>
+    <div id="ntItems" class="nt-items"></div>
+  </div>
+  <span class="g-btn nt-newb ios-only" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6"/><path d="M17.5 2.5l4 4L13 15H9v-4z"/></svg></span>
+  <div class="nt-fabbar and-only"><span class="nt-tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20c4 0 4-4 8-4M15 4l5 5-8 8-5-5z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg></span><span class="nt-fab">+</span></div>
+  <div id="ntView" class="nt-view" hidden>
+    <div class="sbar"></div>
+    <div class="nt-vnav">
+      <span class="g-pill ios-only nt-vpill"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg><svg class="dimi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M7 10H6a2 2 0 00-2 2v7a2 2 0 002 2h12a2 2 0 002-2v-7a2 2 0 00-2-2h-1"/></svg><svg id="ntPad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="5.5" y="10.5" width="13" height="10" rx="2.2"/><path id="ntPadArc" d="M8.5 10.5V7.5a3.5 3.5 0 017 0v3"/></svg></span>
+      <button id="ntBack" type="button" class="nt-back"><span class="g-btn ios-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span><svg class="and-only" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <span class="nt-vicons and-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6l-1 6 3 3H7l3-3zM12 12v9"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4a6 6 0 016 6v4l2 3H4l2-3v-4a6 6 0 016-6zM10 20a2 2 0 004 0"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg></span>
+    </div>
+    <div id="ntLocked" class="nt-locked" hidden>
+      <svg viewBox="0 0 38 54" aria-hidden="true"><path d="M8 22v-7a11 11 0 0122 0v7" fill="none" stroke="currentColor" stroke-width="5.2"/><rect x="0" y="21" width="38" height="33" rx="6" fill="currentColor"/></svg>
+      <b>פתק זה נעול.</b>
+      <button id="ntUnlock" type="button">הצגת הפתק</button>
+    </div>
+    <div id="ntFace" class="nt-face" hidden><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V13a7 7 0 017-7h7M44 6h7a7 7 0 017 7v7M58 44v7a7 7 0 01-7 7h-7M20 58h-7a7 7 0 01-7-7v-7"/><g class="nt-face-eyes"><path d="M22 24v4M42 24v4M32 24v11h-2.5M24 42c5 4 11 4 16 0"/></g><path class="nt-face-ok" d="M20 33l8 8 16-17"/></svg></div>
+    <div id="ntContent" class="nt-content">
+      <p id="ntDate" class="nt-date"></p>
+      <h2 id="ntTitle"></h2>
+      <p id="ntBody" class="nt-body"></p>
+    </div>
+    <span class="g-btn nt-newb ios-only" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6"/><path d="M17.5 2.5l4 4L13 15H9v-4z"/></svg></span>
+    <span class="g-pill nt-tools3 ios-only" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 17l3-9 3 9M10 14h4"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M20 11l-8 8a5 5 0 01-7-7l8.5-8.5a3.5 3.5 0 015 5L10 17a2 2 0 01-3-3l7.5-7.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 8h9M4 16h9"/><circle cx="18" cy="16" r="2.4"/><circle cx="18" cy="8" r="2.6" fill="currentColor" stroke="none"/><path d="M16.9 8l.8.8 1.5-1.6" stroke="var(--bg)" stroke-width="1.2"/></svg></span>
+    <p id="ntEdited" class="nt-edited and-only"></p>
+  </div>
+</section>
+
+<!-- ===================== סטופר ===================== -->
+<section id="sw" class="screen trick-screen sw">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="sw-wrap">
+    <div id="swTime" class="sw-time">00:00.00</div>
+    <div class="sw-btns">
+      <button id="swRight" type="button" class="sw-b go">התחלה</button>
+      <span class="sw-dots ios-only" aria-hidden="true"><i></i><i></i></span>
+      <button id="swLeft" type="button" class="sw-b gray">הקפה</button>
+    </div>
+    <div id="swLaps" class="sw-laps"></div>
+  </div>
+  <nav class="sw-tabs ios-only" aria-hidden="true">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>שעון עולמי</span>
+    <span><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="13" r="8"/><path d="M4.5 6.5l3-3M19.5 6.5l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 9v4.5h-3" fill="none" stroke="#1c1c1e" stroke-width="1.8" stroke-linecap="round"/></svg>שעונים מעוררים</span>
+    <span class="on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="13.5" r="8"/><rect x="10.5" y="2.5" width="3" height="3" rx="1"/><path d="M12 10v4" stroke="#1c1c1e" stroke-width="1.9" stroke-linecap="round"/></svg>שעון עצר</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v3M12 12l-3.5-3.5"/></svg>ספירות לאחור</span>
+  </nav>
+</section>
+
+<!-- ===================== קוד לצופה ===================== -->
+<section id="remote" class="screen trick-screen remote">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="rm-qr-wrap">
+    <div id="rmQr" class="rm-qr" aria-label="קוד לסריקה"></div>
+    <p class="rm-cap">פותחים את המצלמה ומכוונים לקוד</p>
+    <button id="rmDone" class="rm-done" type="button">סיום</button>
+  </div>
+</section>
+
+<!-- ===================== מסך נעול + התראה ===================== -->
+<section id="lock" class="screen trick-screen lock">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="l-wall" id="lWall"></div>
+  <div class="sbar sbar-lock"></div>
+  <div class="l-top">
+    <div id="lDate" class="l-date"></div>
+    <div id="lTime" class="l-time"></div>
+    <div id="lWx" class="l-wx and-only"></div>
+  </div>
+  <div id="lNote" class="l-note" hidden>
+    <span class="l-ico"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4c5 0 9 3.1 9 7s-4 7-9 7c-1 0-2-.1-2.9-.4L5 19l1.2-3.2C4.2 14.5 3 12.9 3 11c0-3.9 4-7 9-7z"/></svg></span>
+    <div class="l-body"><div class="l-row"><span class="l-app">הודעות</span><span class="l-when">עכשיו</span></div><b id="lFrom"></b><div id="lText"></div></div>
+  </div>
+  <div class="l-bottom">
+    <button id="lCam" type="button" class="l-btn" aria-label="מצלמה"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.6 5.2L9.7 3.6h4.6l1.1 1.6H19a2.5 2.5 0 012.5 2.5v9.8A2.5 2.5 0 0119 20H5a2.5 2.5 0 01-2.5-2.5V7.7A2.5 2.5 0 015 5.2zM12 17.3a4.5 4.5 0 100-9 4.5 4.5 0 000 9zm0-1.9a2.6 2.6 0 110-5.2 2.6 2.6 0 010 5.2zM18.2 9.2a.9.9 0 100-1.8.9.9 0 000 1.8z" fill-rule="evenodd"/></svg></button>
+    <span class="l-fp and-only"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 8a8 8 0 0112 0M4.5 11a10 10 0 0115 0M8 20c1-2 1.5-4 1.5-7a2.5 2.5 0 015 0c0 3 .5 5 1.5 7M12 13c0 3-.5 6-2 8M7 17c.5-1.5.8-3 .8-4.5a4.2 4.2 0 018.4 0"/></svg></span>
+    <button id="lTorch" type="button" class="l-btn" aria-label="פנס"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 2.5h8a.8.8 0 01.8.8v2.2c0 .6-.2 1.2-.6 1.7L14.6 9.6v10.6a1.4 1.4 0 01-1.4 1.4h-2.4a1.4 1.4 0 01-1.4-1.4V9.6L7.8 7.2a2.8 2.8 0 01-.6-1.7V3.3a.8.8 0 01.8-.8zm4 9.3a.9.9 0 00-.9.9v1.8a.9.9 0 001.8 0v-1.8a.9.9 0 00-.9-.9z" fill-rule="evenodd"/></svg></button>
+  </div>
+  <div class="l-home ios-only"></div>
+  <input id="lCamIn" type="file" accept="image/*" capture="environment" hidden>
+  <div id="lTouch" class="l-touch"></div>
+</section>
+
+<!-- ===================== הגלריה (מסך הבית המוסווה) ===================== -->
+<section id="photos" class="screen">
+  <header class="pg-head">
+    <div class="pg-titles">
+      <h1 id="pgTitle">ספרייה</h1>
+      <p id="pgCount"></p>
+    </div>
+    <div class="pg-actions">
+      <button class="pg-pill" type="button" id="pgSelect">בחר</button>
+      <button class="pg-circle" id="pgSearch" type="button" aria-label="חיפוש"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></button>
+    </div>
+  </header>
+  <div id="pgGrid" class="pg-grid"></div>
+  <div id="shatter" class="fx-layer" hidden></div>
+  <canvas id="mosaic" class="fx-layer" hidden></canvas>
+</section>
+
+<!-- ===================== מצגת "זכרונות" ===================== -->
+<section id="memories" class="screen">
+  <canvas id="memCv"></canvas>
+  <div class="mem-top"><button id="memClose" class="ph-round" type="button" aria-label="סגירה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+</section>
+
+<!-- ===================== ניהול ===================== -->
+<section id="manage" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ גלריה</button>
+    <h1>ניהול</h1>
+    <button class="nav-act" id="mgHelp" type="button">מדריך</button>
+  </header>
+  <main class="page">
+    <div id="mgStore" class="banner"></div>
+
+    <div class="group-title">הסרטונים שלך</div>
+    <div id="mgList" class="group"></div>
+
+    <div class="btn-big primary file-btn">＋ הוסף סרטונים או תמונות<input id="fileIn" class="file-in" type="file" accept="video/*,image/*" multiple aria-label="הוסף סרטונים או תמונות"></div>
+    <p class="foot">כל מה שתוסיף יופיע בגלריה. אפשר לבחור כמה קבצים יחד. פריט עם "חשיפה" הוא טריק. תמונות וסרטונים רגילים מוסיפים אמינות לגלריה.</p>
+
+    <div class="group">
+      <button class="row-link" id="mgHub" type="button"><span>מרכז הקסמים (כל הקסמים)</span><span class="chev">‹</span></button>
+      <button class="row-link" id="mgSettings" type="button"><span>הגדרות</span><span class="chev">‹</span></button>
+      <button class="row-link" id="mgHelp2" type="button"><span>מדריך שימוש והמקשים הנסתרים</span><span class="chev">‹</span></button>
+    </div>
+  </main>
+</section>
+
+<!-- ===================== עריכת סרטון ===================== -->
+<section id="edit" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ ניהול</button>
+    <h1 id="edTitle">עריכה</h1>
+    <button class="nav-act" id="edDone" type="button">סיום</button>
+  </header>
+  <main class="page ed-page">
+    <!-- התצוגה נשארת למעלה בזמן גלילה, כדי לראות כל שינוי -->
+    <div class="ed-stage" id="edSticky">
+      <div class="preview">
+        <canvas id="edCanvas"></canvas>
+      </div>
+      <div class="transport" id="edTransport">
+        <button id="edPlay" type="button" class="round" aria-label="נגן">▶</button>
+        <input id="edScrub" type="range" min="0" max="10" step="0.01" value="0" aria-label="זמן בסרטון">
+        <span id="edTime" class="mono">0.00</span>
+      </div>
+      <div class="ed-tabs" id="edTabs" role="tablist">
+        <button type="button" role="tab" data-go="basic">בסיס</button>
+        <button type="button" role="tab" data-go="where">חשיפה</button>
+        <button type="button" role="tab" data-go="look">מראה</button>
+        <button type="button" role="tab" data-go="more">מתקדם</button>
+      </div>
+    </div>
+    <div id="edUnsaved" class="banner warn-banner" hidden><span class="dot" style="background:#ff9f0a"></span><span>הסרטון עדיין <b>לא נשמר בחשבון</b> (גדול מ-20MB). אם תסגור את הדף הוא יימחק.</span><button id="edUnsavedGo" class="btn" type="button">כווץ ושמור</button></div>
+    <p class="foot" data-tab="where">גרור על התמונה כדי לסמן איפה הבחירה תופיע. פינה צהובה משנה גודל.</p>
+
+    <div class="group-title" id="edG1" data-tab="basic">פרטי הסרטון</div>
+    <div class="group" data-tab="basic">
+      <label class="row"><span>שם (לניהול בלבד)</span><input id="edName" data-i="name"></label>
+      <label class="row"><span>תאריך הצילום בגלריה</span><input id="edShot" type="datetime-local"></label>
+      <label class="row"><span id="edTrickLbl">סרטון טריק (עם חשיפה)</span><input id="edTrick" type="checkbox" class="switch"></label>
+      <label class="row"><span>פריט ההכרחה במצגת</span><input id="edForce" type="checkbox" class="switch"></label>
+    </div>
+
+    <div id="edTrickWrap">
+      <div class="group-title" data-tab="basic">מה הצופה בוחר</div>
+      <div class="group" data-tab="basic">
+        <label class="row"><span>סוג</span>
+          <select data-i="content" id="edContent">
+            <option value="number">מספר</option>
+            <option value="word">מילה מרשימה</option>
+            <option value="drawing">ציור</option>
+            <option value="card">קלף משחק</option>
+          </select>
+        </label>
+        <label class="row" id="edDigitsRow"><span>כמה ספרות מזינים</span>
+          <select id="edDigits">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+            <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          </select>
+        </label>
+        <label class="row col" id="edWordsWrap"><span>רשימת מילים (שורה לכל מילה, מספר השורה הוא מספר המילה)</span>
+          <textarea id="edWords" rows="5"></textarea>
+        </label>
+      </div>
+      <p class="foot" id="edDigitsHelp" data-tab="basic"></p>
+
+      <div class="group-title" data-tab="basic">איך אתה מזין בסתר</div>
+      <div class="group" data-tab="basic">
+        <label class="row"><span>שיטה</span><select data-i="method" id="edMethod"></select></label>
+      </div>
+      <div class="group" id="edTapRow" data-tab="basic">
+        <label class="row"><span>נגיעה עוצרת וממשיכה את הסרטון (מומלץ)</span><input id="edTap" type="checkbox" class="switch"></label>
+      </div>
+      <details class="hint" data-tab="basic"><summary>איך זה עובד?</summary><p class="foot" id="edMethodHelp"></p></details>
+
+      <div class="group-title" data-tab="where">איפה ומתי זה מופיע</div>
+      <div class="group" data-tab="where">
+        <div class="row"><span>אזורים</span><div id="edRegions" class="chips"></div></div>
+        <div class="row">
+          <button id="rgAdd" class="btn" type="button">+ אזור נוסף</button>
+          <button id="rgDel" class="btn danger" type="button">מחק אזור</button>
+        </div>
+        <label class="row"><span id="rgTLabel">שנייה בסרטון שבה זה מופיע</span>
+          <span class="inline"><input data-r="t" type="number" step="0.05" min="0"><button id="rgNow" class="btn" type="button">הזמן הנוכחי</button></span>
+        </label>
+        <label class="row"><span>הצג חשיפה תמיד בתצוגה</span><input id="edShowAll" type="checkbox" class="switch" checked></label>
+        <label class="row"><span>טקסט לדוגמה</span><input id="edSample" placeholder="47"></label>
+      </div>
+
+      <div class="group-title" data-tab="where">חשיפה בפרטי הסרטון</div>
+      <div class="group" data-tab="where">
+        <label class="row"><span>הבחירה תופיע גם ב</span>
+          <select data-i="meta" id="edMeta">
+            <option value="none">לא בשימוש</option>
+            <option value="time">שעת הצילום</option>
+            <option value="date">תאריך הצילום</option>
+            <option value="place">שם המקום בכותרת</option>
+            <option value="caption">הכיתוב בחלון המידע</option>
+          </select>
+        </label>
+      </div>
+      <details class="hint" data-tab="where"><summary>איך זה עובד?</summary><p class="foot">שעה: 47 ← 17:47, ‏1447 ← 14:47. תאריך: 15 ← ה-15 בחודש, ‏1503 ← 15 במרץ. מקום: המילה מופיעה ככותרת. בסוף הסרטון הכותרת למעלה מראה את הבחירה, כאילו הסרטון צולם בשעה, בתאריך או במקום שהצופה בחר. אפשר להשתמש בזה גם בלי אזור חשיפה על התמונה.</p></details>
+
+      <details class="group-details" data-tab="look" open>
+        <summary>מראה החשיפה</summary>
+        <div class="group">
+          <label class="row"><span>אפקט</span>
+            <select data-r="effect">
+              <option value="fade">הופעה הדרגתית</option>
+              <option value="wipe">נכתב משמאל/ימין</option>
+              <option value="develop">מתפתח כמו פולרויד</option>
+              <option value="pop">קפיצה</option>
+              <option value="cut">מיידי</option>
+            </select>
+          </label>
+          <label class="row"><span>משך האפקט (שניות)</span><input data-r="fade" type="number" step="0.1" min="0"></label>
+          <label class="row"><span>גופן</span><select data-r="font" id="rgFont"></select></label>
+          <label class="row"><span>צבע</span><input data-r="color" type="color"></label>
+          <label class="row"><span>אטימות</span><input data-r="opacity" type="range" min="0.05" max="1" step="0.01"></label>
+          <label class="row"><span>סיבוב</span><input data-r="rot" type="range" min="-45" max="45" step="0.5"></label>
+          <label class="row"><span>הטיה</span><input data-r="skew" type="range" min="-30" max="30" step="0.5"></label>
+          <label class="row"><span>שילוב עם הרקע</span>
+            <select data-r="blend">
+              <option value="source-over">רגיל</option>
+              <option value="multiply">דיו על נייר</option>
+              <option value="screen">אור על מסך</option>
+              <option value="overlay">שכבה</option>
+              <option value="soft-light">אור רך</option>
+            </select>
+          </label>
+          <label class="row"><span>גרעיניות מצלמה</span><input data-r="grain" type="range" min="0" max="1" step="0.01"></label>
+          <label class="row"><span>רכות (כמו פוקוס של מצלמה)</span><input data-r="soft" type="range" min="0" max="1" step="0.01"></label>
+          <label class="row"><span>התאמת תאורה אוטומטית</span><input data-r="light" type="checkbox" class="switch"></label>
+          <label class="row"><span>מודגש</span><input data-r="bold" type="checkbox" class="switch"></label>
+          <label class="row"><span>צל</span><input data-r="shadow" type="checkbox" class="switch"></label>
+        </div>
+      </details>
+
+      <details class="group-details" data-tab="more" open>
+        <summary>מעקב תנועה (מצלמה ביד / משטח שזז)</summary>
+        <div class="group">
+          <label class="row"><span>הפעל מעקב</span><input data-r="trackOn" type="checkbox" class="switch"></label>
+          <div class="row col"><span class="help-inline">מזיזים את הסרגל לרגע אחר וגוררים את המסגרת למקום שבו המשטח נמצא באותו רגע. כל גרירה יוצרת נקודת מעקב, והחשיפה "נצמדת" לתנועה. כדאי לשים נקודה כל חצי שנייה עד שנייה.</span></div>
+          <div class="row"><span>נקודות</span><div id="rgKeys" class="chips"></div></div>
+          <div class="row"><button id="rgKeysClear" class="btn danger" type="button">נקה את כל הנקודות</button></div>
+        </div>
+      </details>
+
+      <details class="group-details" data-tab="more" open>
+        <summary>פרספקטיבה (משטח בזווית)</summary>
+        <div class="group">
+          <label class="row"><span>הפעל פרספקטיבה</span><input data-r="persp.on" type="checkbox" class="switch"></label>
+          <div class="row"><span class="help-inline">גרור את 4 הנקודות הכחולות לפינות המשטח בתמונה (לוח, דף, שלט).</span><button id="rgQuadReset" class="btn" type="button">אפס</button></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="group-title" data-tab="more">פעולות</div>
+    <div class="group" data-tab="more">
+      <button class="row-link" id="edStage" type="button"><span>הופעה על מסך גדול (מצב במה)</span><span class="chev">‹</span></button>
+      <button class="row-link" id="edHide" type="button"><span id="edHideLabel">הסתר מהגלריה</span><span class="chev">‹</span></button>
+      <div class="row-link file-btn"><span>החלף את קובץ הסרטון</span><span class="chev">‹</span><input id="edReplace" type="file" accept="video/*,image/*" aria-label="החלף את קובץ הסרטון"></div>
+      <button class="row-link" id="edDup" type="button"><span>שכפל</span><span class="chev">‹</span></button>
+      <button class="row-link danger" id="edDelete" type="button"><span>מחק סרטון</span></button>
+    </div>
+  </main>
+</section>
+
+<div class="ed-bar" id="edBar" hidden>
+  <span id="edStatus" class="ed-status">כל השינויים נשמרים</span>
+  <button id="edTry" class="ed-btn" type="button">נסה ▶</button>
+  <button id="edSave" class="ed-btn primary" type="button">שמור</button>
+</div>
+
+<!-- ===================== הגדרות ===================== -->
+<section id="settings" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ ניהול</button>
+    <h1>הגדרות</h1>
+    <span class="nav-act"></span>
+  </header>
+  <main class="page">
+    <div class="group-title">רישיון</div>
+    <div class="group">
+      <button class="row-link" id="stLic" type="button"><span id="stLicText"></span><span class="chev">‹</span></button>
+    </div>
+    <div class="group-title">הגלריה</div>
+    <div class="group">
+      <label class="row"><span>מראה</span>
+        <select data-s="phTheme"><option value="auto">לפי הטלפון</option><option value="light">בהיר</option><option value="dark">כהה</option></select>
+      </label>
+      <label class="row"><span>הקסמים נראים כמו</span>
+        <select data-s="phoneOS"><option value="auto">הטלפון שלי (אוטומטי)</option><option value="ios">אייפון</option><option value="android">אנדרואיד</option></select>
+      </label>
+      <label class="row"><span>כשהצופה מחפש בגלריה</span>
+        <select data-s="searchMode"><option value="result">מוצא את סרטון הטריק</option><option value="none">"אין תוצאות" (רק הצצה)</option></select>
+      </label>
+      <div class="row"><span>החיפוש האחרון של הצופה</span><b id="stPeek" class="peek-val">—</b></div>
+    </div>
+    <div class="group-title">בזמן הופעה</div>
+    <div class="group">
+      <label class="row"><span>רטט קטן על כל הקשה סודית (אנדרואיד)</span><input data-s="vibrate" type="checkbox" class="switch"></label>
+      <label class="row"><span>נקודות זעירות שמראות כמה הקשת</span><input data-s="indicator" type="checkbox" class="switch"></label>
+      <label class="row"><span>הקלט את ההופעה לשליחה לצופה</span><input data-s="record" type="checkbox" class="switch"></label>
+    </div>
+    <div class="group-title">כרטיס סיום בסרטון שנשלח לצופה</div>
+    <div class="group">
+      <label class="row"><span>שם</span><input data-s="contactName" placeholder="הקוסם ..."></label>
+      <label class="row"><span>אינסטגרם / אתר</span><input data-s="contactLink" placeholder="@my.magic" dir="ltr"></label>
+    </div>
+  </main>
+</section>
+
+<!-- ===================== מדריך ===================== -->
+<section id="help" class="screen ui">
+  <header class="nav">
+    <button class="nav-back" data-back type="button">‹ חזרה</button>
+    <h1>מדריך</h1>
+    <span class="nav-act"></span>
+  </header>
+  <main class="page help">
+    <div class="group pad">
+      <h2>מה האפליקציה עושה</h2>
+      <p>האפליקציה נראית כמו גלריית התמונות של הטלפון. אתה מראה לצופה סרטון "רגיל", הצופה חושב על מספר, מילה או ציור, והבחירה שלו מופיעה בתוך הסרטון.</p>
+      <nav class="toc" aria-label="תוכן המדריך">
+        <a href="#h-entry">כניסה נסתרת</a><a href="#h-setup">הכנת סרטון</a><a href="#h-keys">מקשים 3×3</a>
+        <a href="#h-scrub">גרירה ברצועה</a><a href="#h-bt">מקלדת / שלט</a><a href="#h-peek">הצופה מחפש</a><a href="#h-card">קלפים</a><a href="#h-shatter">גלריה מתנפצת</a><a href="#h-mosaic">פסיפס מילה</a><a href="#h-mem">מצגת והכרחה</a><a href="#h-pre">מסך חיפוש</a>
+        <a href="#h-draw">ציור נסתר</a><a href="#h-meta">חשיפה בפרטים</a><a href="#h-photo">תמונות</a>
+        <a href="#h-track">מעקב תנועה</a><a href="#h-persp">פרספקטיבה</a><a href="#h-real">מראה אמיתי</a>
+        <a href="#h-gest">מחוות בהופעה</a><a href="#h-film">איך לצלם</a><a href="#h-install">התקנה</a>
+      </nav>
+    </div>
+
+    <!-- כניסה נסתרת -->
+    <div class="group pad howto" id="h-entry">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <text class="f-title" x="76" y="30">ספרייה</text>
+          <g class="f-cells"><rect x="10" y="44" width="23" height="23"/><rect x="34" y="44" width="23" height="23"/><rect x="58" y="44" width="23" height="23"/>
+          <rect x="10" y="68" width="23" height="23"/><rect x="34" y="68" width="23" height="23"/><rect x="58" y="68" width="23" height="23"/>
+          <rect x="10" y="92" width="23" height="23"/><rect x="34" y="92" width="23" height="23"/><rect x="58" y="92" width="23" height="23"/></g>
+          <circle class="f-ring" cx="52" cy="26" r="9"/><circle class="f-touch" cx="52" cy="26" r="5" opacity=".45"/>
+          <text class="f-note" x="45" y="140">לחיצה ארוכה</text><text class="f-note" x="45" y="152">שנייה אחת</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>הכניסה הנסתרת</h2>
+        <p>במסך הגלריה <b>לוחצים לחיצה ארוכה (שנייה) על המילה "ספרייה"</b>. נפתח מסך הניהול, ושם מוסיפים, עורכים ומגדירים.</p>
+      </div>
+    </div>
+
+    <!-- הכנת סרטון -->
+    <div class="group pad howto" id="h-setup">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 124" aria-hidden="true">
+          <rect class="f-video" x="40" y="4" width="120" height="84" rx="6"/>
+          <rect class="f-board" x="78" y="22" width="44" height="40" rx="2"/>
+          <rect class="f-sel" x="74" y="18" width="52" height="48"/>
+          <rect class="f-handle" x="121" y="61" width="8" height="8"/>
+          <text class="f-num" x="100" y="51">47</text>
+          <line class="f-track" x1="40" y1="104" x2="160" y2="104"/>
+          <line class="f-fill" x1="40" y1="104" x2="124" y2="104"/>
+          <circle class="f-thumb" cx="124" cy="104" r="5"/>
+          <text class="f-note" x="124" y="120">רגע החשיפה</text>
+          <text class="f-note" x="22" y="44">גרור</text><text class="f-note" x="22" y="54">מלבן</text>
+          <path class="f-arrow" d="M34 48 L70 40" marker-end="url(#ah)"/>
+          <defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>הכנה, פעם אחת לכל סרטון</h2>
+        <ol>
+          <li>בניהול: <b>הוסף סרטונים או תמונות</b>.</li>
+          <li><b>מה הצופה בוחר</b>: מספר (וכמה ספרות), מילה מרשימה או ציור.</li>
+          <li><b>שיטה סודית</b> להזנה (בהמשך המדריך).</li>
+          <li>מזיזים את הסרגל לרגע החשיפה ולוחצים <b>הזמן הנוכחי</b>.</li>
+          <li><b>גוררים מלבן</b> על המשטח. פינה צהובה = שינוי גודל.</li>
+          <li>לוחצים <b>נסה</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- מקשים 3x3 -->
+    <div class="group pad howto" id="h-keys">
+      <div class="fig">
+        <div class="keypad-demo" aria-hidden="true">
+          <div class="phone"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+        </div>
+      </div>
+      <div class="txt">
+        <h2>מקשים נסתרים 3×3</h2>
+        <p>בזמן שהסרטון מתנגן, המסך הוא 9 מקשים בלתי נראים, כמו מקלדת טלפון.</p>
+        <ul>
+          <li>1 בפינה <b>השמאלית העליונה</b>, 9 בפינה <b>הימנית התחתונה</b>.</li>
+          <li>אחרי מספר הספרות שהגדרת, <b>שאר הנגיעות לא נחשבות</b>.</li>
+          <li>אין 0. כשצריך 0, משתמשים בגרירה ברצועה.</li>
+          <li>במילים: הספרה היא מספר המילה ברשימה.</li>
+          <li><b>עצירה והמשך:</b> בכל הסרטונים, נגיעה עוצרת את הסרטון ("רגע, תסתכל") והנגיעה הבאה ממשיכה. במקשים הנסתרים כל נגיעה גם נקלטת כספרה.</li>
+          <li><b>טעות:</b> הקשה בשתי אצבעות מוחקת ספרה.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- גרירה ברצועה -->
+    <div class="group pad howto" id="h-scrub">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-strip" x="10" y="30" width="180" height="26" rx="5"/>
+          <g class="f-seg"><line x1="28" y1="30" x2="28" y2="56"/><line x1="46" y1="30" x2="46" y2="56"/><line x1="64" y1="30" x2="64" y2="56"/><line x1="82" y1="30" x2="82" y2="56"/><line x1="100" y1="30" x2="100" y2="56"/><line x1="118" y1="30" x2="118" y2="56"/><line x1="136" y1="30" x2="136" y2="56"/><line x1="154" y1="30" x2="154" y2="56"/><line x1="172" y1="30" x2="172" y2="56"/></g>
+          <g class="f-digits"><text x="19" y="72">0</text><text x="37" y="72">1</text><text x="55" y="72">2</text><text x="73" y="72">3</text><text x="91" y="72">4</text><text x="109" y="72">5</text><text x="127" y="72">6</text><text x="145" y="72" class="on">7</text><text x="163" y="72">8</text><text x="181" y="72">9</text></g>
+          <rect class="f-head" x="143" y="25" width="4" height="36" rx="2"/>
+          <circle class="f-touch" cx="145" cy="14" r="5"/>
+          <path class="f-arrow" d="M60 14 H136" marker-end="url(#ah2)"/>
+          <defs><marker id="ah2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <text class="f-note" x="100" y="92">עוזבים כאן = ספרה 7</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>גרירה ברצועת הפריימים</h2>
+        <p>לפני שמנגנים, "מחפשים קטע" בסרטון. <b>כל פעם שעוזבים את הרצועה נרשמת ספרה</b> לפי המקום: קצה שמאל 0, קצה ימין 9. אחר כך לוחצים ▶.</p>
+        <p class="dim">תנועה טבעית לגמרי, ומאפשרת גם 0.</p>
+      </div>
+    </div>
+
+    <!-- מקלדת BT -->
+    <div class="group pad howto" id="h-bt">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-body" x="14" y="6" width="46" height="88" rx="9"/>
+          <rect class="f-screen-d" x="18" y="11" width="38" height="78" rx="5"/>
+          <rect class="f-kb" x="96" y="44" width="96" height="46" rx="6"/>
+          <g class="f-keys"><rect x="102" y="50" width="12" height="10" rx="2"/><rect x="117" y="50" width="12" height="10" rx="2"/><rect x="132" y="50" width="12" height="10" rx="2" class="on"/><rect x="147" y="50" width="12" height="10" rx="2"/><rect x="162" y="50" width="12" height="10" rx="2"/><rect x="177" y="50" width="10" height="10" rx="2"/>
+          <rect x="102" y="64" width="12" height="10" rx="2"/><rect x="117" y="64" width="12" height="10" rx="2" class="on"/><rect x="132" y="64" width="12" height="10" rx="2"/><rect x="147" y="64" width="12" height="10" rx="2"/><rect x="162" y="64" width="25" height="10" rx="2"/>
+          <rect x="117" y="78" width="55" height="8" rx="2"/></g>
+          <path class="f-wave" d="M70 50 q6 -8 0 -16 M78 54 q10 -12 0 -24 M86 58 q14 -16 0 -32"/>
+          <text class="f-note" x="144" y="34">בכיס / ביד</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>מקלדת Bluetooth או שלט</h2>
+        <p>מחברים מקלדת קטנה או שלט מצגות. מקלידים בסתר, והצופה יכול <b>להחזיק את הטלפון בעצמו</b>, כי נגיעות במסך לא עושות כלום.</p>
+        <ul><li>רווח או חץ מתחיל את הסרטון.</li><li>Enter נועל את הבחירה מיד.</li><li>Esc פותח את התפריט הסודי.</li></ul>
+      </div>
+    </div>
+
+    <!-- מסך חיפוש -->
+    <div class="group pad howto" id="h-peek">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <rect class="f-search" x="12" y="18" width="52" height="14" rx="5"/>
+          <text class="f-typed" x="58" y="28">יפן</text>
+          <text class="f-cancel" x="80" y="28">ביטול</text>
+          <text class="f-title" x="78" y="48">סרטון 1</text>
+          <rect class="f-video" x="12" y="54" width="30" height="30"/>
+          <text class="f-note" x="27" y="72" style="fill:#fff">0:20</text>
+          <circle class="f-ring" cx="27" cy="69" r="9"/>
+          <text class="f-note" x="45" y="120">הצופה מקליד</text><text class="f-note" x="45" y="132">ופותח בעצמו</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>הצופה מחפש בעצמו (חדש)</h2>
+        <p>אתה לא נוגע בטלפון. אומרים: "תחשוב על מדינה ותחפש אותה בגלריה שלי."</p>
+        <ol>
+          <li>בעורך בוחרים שיטה: <b>הצופה מחפש בעצמו</b>.</li>
+          <li>בגלריה נותנים לצופה את הטלפון, והוא לוחץ על <b>🔍 החיפוש</b> ומקליד.</li>
+          <li>נמצא <b>סרטון אחד</b>. הצופה פותח אותו, והבחירה שלו מופיעה בתוכו.</li>
+        </ol>
+        <p class="dim">אפשרות בהגדרות: "אין תוצאות". אז זו רק הצצה: אתה פותח את הסרטון בעצמך אחר כך, והבחירה כבר בפנים. החיפוש האחרון מוצג גם בהגדרות.</p>
+      </div>
+    </div>
+
+    <div class="group pad howto" id="h-card">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-video" x="6" y="6" width="188" height="88" rx="6"/>
+          <rect x="78" y="16" width="44" height="64" rx="5" fill="#fff" stroke="#ccc"/>
+          <text x="84" y="30" style="font:700 11px var(--font);fill:#d0021b">7</text><text x="84" y="40" style="font:700 9px var(--font);fill:#d0021b">♥</text>
+          <text x="100" y="58" style="font:700 22px var(--font);fill:#d0021b;text-anchor:middle">♥</text>
+          <text class="f-note-l" x="40" y="50">קוד: 27</text><text class="f-note-l" x="160" y="50">= 7 ♥</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>קלפים</h2>
+        <p>בעורך: סוג <b>קלף משחק</b>. החשיפה מציירת קלף אמיתי באזור.</p>
+        <ul>
+          <li><b>קוד במקשים:</b> ספרה ראשונה היא הצורה: 1♠ 2♥ 3♣ 4♦. אחריה הערך: 1 אס, 2–9, 11 נסיך, 12 מלכה, 13 מלך. למשל <b>27</b> = 7♥, <b>413</b> = מלך ♦.</li>
+          <li>10 צריך 0, אז מזינים אותו בגרירה ברצועה או בחיפוש.</li>
+          <li><b>בחיפוש או במקלדת</b> אפשר לכתוב גם "7 לב", "מלכה תלתן" או "A♠".</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="group pad howto" id="h-shatter">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <g class="f-cells"><rect x="14" y="8" width="26" height="26" transform="rotate(-14 27 21)" opacity=".35"/><rect x="44" y="40" width="26" height="26" transform="rotate(18 57 53)" opacity=".35"/><rect x="18" y="64" width="26" height="26" transform="rotate(8 31 77)" opacity=".35"/><rect x="150" y="12" width="26" height="26" transform="rotate(-20 163 25)" opacity=".35"/><rect x="160" y="60" width="26" height="26" transform="rotate(12 173 73)" opacity=".35"/></g>
+          <rect class="f-sky" x="78" y="18" width="54" height="64" rx="3"/><rect class="f-paper" x="92" y="40" width="26" height="26"/>
+          <g transform="translate(105 92)"><circle class="f-touch" cx="-6" r="4"/><circle class="f-touch" cx="6" r="4"/></g>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>הגלריה מתנפצת</h2>
+        <ol>
+          <li>נותנים לצופה לדפדף בגלריה ולפתוח תמונה <b>אחת</b> שהוא בוחר. אתה לא מסתכל. אחר כך הוא סוגר אותה.</li>
+          <li>"תתרכז בתמונה". <b>הקשה בשתי אצבעות על הגלריה</b>.</li>
+          <li>כל התמונות נופלות אחת אחת, ונשארת רק התמונה שהצופה בחר.</li>
+        </ol>
+        <p class="dim">נגיעה מחזירה את הגלריה. כדאי שיהיו בגלריה 12 פריטים או יותר.</p>
+      </div>
+    </div>
+
+    <div class="group pad howto" id="h-mosaic">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <g class="f-cells" opacity=".25"><rect x="20" y="10" width="160" height="80"/></g>
+          <g style="fill:var(--accent)"><rect x="70" y="22" width="8" height="8"/><rect x="80" y="22" width="8" height="8"/><rect x="90" y="22" width="8" height="8"/><rect x="90" y="32" width="8" height="8"/><rect x="80" y="42" width="8" height="8"/><rect x="90" y="52" width="8" height="8"/><rect x="70" y="62" width="8" height="8"/><rect x="80" y="62" width="8" height="8"/><rect x="90" y="62" width="8" height="8"/>
+          <rect x="110" y="22" width="8" height="8"/><rect x="120" y="22" width="8" height="8"/><rect x="130" y="22" width="8" height="8"/><rect x="110" y="32" width="8" height="8"/><rect x="130" y="32" width="8" height="8"/><rect x="110" y="42" width="8" height="8"/><rect x="120" y="42" width="8" height="8"/><rect x="130" y="42" width="8" height="8"/><rect x="110" y="52" width="8" height="8"/><rect x="130" y="52" width="8" height="8"/><rect x="110" y="62" width="8" height="8"/><rect x="120" y="62" width="8" height="8"/><rect x="130" y="62" width="8" height="8"/></g>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>פסיפס: התמונות יוצרות את המילה</h2>
+        <ol>
+          <li>הבחירה מגיעה מהחיפוש של הצופה, או מהחשיפה האחרונה בסרטון.</li>
+          <li><b>צביטה פנימה בשתי אצבעות על הגלריה</b> (כמו הקטנה). במחשב: Ctrl + גלגלת.</li>
+          <li>הגלריה "מתרחקת", והתמונות הבהירות יוצרות את המילה או המספר.</li>
+        </ol>
+        <p class="dim">נגיעה סוגרת. אם עוד לא נקלטה בחירה, לא קורה כלום.</p>
+      </div>
+    </div>
+
+    <div class="group pad howto" id="h-mem">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-video" x="6" y="6" width="188" height="88" rx="6"/>
+          <text class="f-hdr" x="100" y="46" style="font-size:16px">יפן</text>
+          <text class="f-hdr-sub" x="100" y="62">נובמבר 2026</text>
+          <text class="f-note-l" x="100" y="84">"תגיד עצור" ← נעצר על פריט ההכרחה</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>מצגת: כותרת עם הבחירה + הכרחה</h2>
+        <ul>
+          <li>בצפייה: <b>⋯ ← מצגת</b>. נפתחת מצגת בסגנון "זכרונות".</li>
+          <li><b>הכותרת</b> של המצגת היא הבחירה האחרונה של הצופה, כאילו הטלפון "יצר זכרון" בשמה.</li>
+          <li><b>הכרחה:</b> הצופה נוגע במסך כדי לעצור, והמצגת "מאטה" ועוצרת תמיד על <b>פריט ההכרחה</b> (מסמנים אותו בעורך).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="group pad howto" id="h-pre">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <rect class="f-search" x="12" y="18" width="52" height="14" rx="5"/>
+          <text class="f-typed" x="58" y="28">47</text>
+          <text class="f-cancel" x="80" y="28">ביטול</text>
+          <rect class="f-kbd" x="7" y="104" width="76" height="62" rx="0"/>
+          <g class="f-keys-s"><rect x="12" y="110" width="12" height="11" rx="2"/><rect x="26" y="110" width="12" height="11" rx="2"/><rect x="40" y="110" width="12" height="11" rx="2"/><rect x="54" y="110" width="12" height="11" rx="2"/><rect x="68" y="110" width="12" height="11" rx="2"/>
+          <rect x="12" y="125" width="12" height="11" rx="2"/><rect x="26" y="125" width="12" height="11" rx="2"/><rect x="40" y="125" width="12" height="11" rx="2"/><rect x="54" y="125" width="12" height="11" rx="2"/><rect x="68" y="125" width="12" height="11" rx="2"/>
+          <rect x="22" y="142" width="46" height="11" rx="2"/></g>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>לפני ההופעה (מסך חיפוש)</h2>
+        <p>נוגעים בסרטון בגלריה, ונפתח קודם <b>מסך חיפוש</b> רגיל של הגלריה. מקלידים את הבחירה ("כדי למצוא סרטון") ולוחצים חפש במקלדת, והסרטון נפתח.</p>
+        <p class="dim">מתאים כשהצופה אמר את הבחירה, או כשהצצת אליה בדרך אחרת.</p>
+      </div>
+    </div>
+
+    <!-- ציור נסתר -->
+    <div class="group pad howto" id="h-draw">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 110" aria-hidden="true">
+          <rect class="f-body" x="8" y="4" width="56" height="102" rx="10"/>
+          <rect class="f-screen-d" x="12" y="9" width="48" height="92" rx="6"/>
+          <path class="f-ghost" d="M36 30 L52 72 L20 72 Z"/>
+          <circle class="f-touch" cx="52" cy="72" r="4"/>
+          <path class="f-arrow" d="M72 55 H112" marker-end="url(#ah3)"/>
+          <defs><marker id="ah3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <rect class="f-frame" x="122" y="14" width="68" height="82" rx="3"/>
+          <rect class="f-paper" x="128" y="20" width="56" height="70"/>
+          <path class="f-ink" d="M156 32 L174 76 L138 76 Z"/>
+          <text class="f-note" x="36" y="22">בלתי נראה</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>ציור נסתר</h2>
+        <p>בזמן שהסרטון מתנגן <b>מציירים באצבע</b> את מה שהצופה צייר. הקווים לא נראים על המסך, והציור מופיע באזור החשיפה.</p>
+        <p class="dim">שתי אצבעות מבטלות את הקו האחרון.</p>
+      </div>
+    </div>
+
+    <!-- חשיפה בפרטים -->
+    <div class="group pad howto" id="h-meta">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 104" aria-hidden="true">
+          <rect class="f-video" x="10" y="4" width="180" height="96" rx="8"/>
+          <circle class="f-glass" cx="26" cy="20" r="9"/><circle class="f-glass" cx="174" cy="20" r="9"/>
+          <text class="f-hdr" x="100" y="19">היום</text>
+          <rect class="f-hl" x="80" y="23" width="40" height="13" rx="4"/>
+          <text class="f-hdr-sub" x="100" y="33">17:47</text>
+          <text class="f-note-l" x="100" y="62">שעה: 47 ← 17:47</text>
+          <text class="f-note-l" x="100" y="76">תאריך: 1503 ← 15 במרץ</text>
+          <text class="f-note-l" x="100" y="90">מקום: "יפן" ← כותרת</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>חשיפה בפרטי הסרטון</h2>
+        <p>בעורך: <b>"הבחירה תופיע גם ב…"</b>. בסוף הסרטון הכותרת שבראש המסך מראה את הבחירה כשעת הצילום, כתאריך הצילום או כשם המקום. אפשר גם בכיתוב שבחלון המידע ⓘ.</p>
+        <p class="dim">"תסתכל מתי הסרטון הזה צולם." אין שום דבר מודבק על התמונה.</p>
+      </div>
+    </div>
+
+    <!-- תמונות -->
+    <div class="group pad howto" id="h-photo">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-sky" x="8" y="10" width="76" height="80" rx="4"/><rect class="f-paper" x="28" y="34" width="36" height="36"/>
+          <path class="f-arrow" d="M90 50 H110" marker-end="url(#ah4)"/>
+          <defs><marker id="ah4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <rect class="f-sky" x="116" y="10" width="76" height="80" rx="4"/><rect class="f-paper" x="136" y="34" width="36" height="36"/>
+          <text class="f-num dev" x="154" y="60">37</text>
+          <text class="f-note" x="46" y="98">נגיעה + 2 ספרות</text><text class="f-note" x="154" y="98">"מתפתח"</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>תמונות</h2>
+        <ul>
+          <li><b>תמונות רגילות</b> גורמות לגלריה להיראות אמיתית. אפשר לבחור כמה קבצים יחד.</li>
+          <li><b>תמונת טריק:</b> פותחים את התמונה, נוגעים פעם אחת (הכפתורים נעלמים), ומזינים במקשים הנסתרים. אחרי רגע הבחירה "מתפתחת" על התמונה.</li>
+          <li>בעורך מסמנים אזור, וקובעים כמה שניות אחרי ההזנה זה יופיע.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- מעקב תנועה -->
+    <div class="group pad howto" id="h-track">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-video" x="6" y="6" width="188" height="88" rx="6"/>
+          <rect class="f-ghostcard" x="16" y="18" width="44" height="30"/><rect class="f-ghostcard" x="74" y="32" width="44" height="30"/>
+          <rect class="f-board" x="134" y="48" width="44" height="30"/><text class="f-num sm" x="156" y="69">47</text>
+          <polyline class="f-path" points="38,33 96,47 156,63"/>
+          <circle class="f-key" cx="38" cy="33" r="4"/><circle class="f-key" cx="96" cy="47" r="4"/><circle class="f-key" cx="156" cy="63" r="5"/>
+          <text class="f-note-w" x="38" y="60">0.5 שנ׳</text><text class="f-note-w" x="96" y="74">1.0 שנ׳</text><text class="f-note-w" x="156" y="90">1.5 שנ׳</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>מעקב תנועה</h2>
+        <p>כשהמצלמה ביד או שהמשטח זז: מפעילים <b>מעקב</b>, מזיזים את הסרגל לרגע אחר <b>וגוררים את המסגרת למקום של המשטח</b> באותו רגע. כל גרירה = נקודה כחולה. הכתב נצמד לתנועה.</p>
+        <p class="dim">נקודה כל חצי שנייה עד שנייה מספיקה.</p>
+      </div>
+    </div>
+
+    <!-- פרספקטיבה -->
+    <div class="group pad howto" id="h-persp">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 100" aria-hidden="true">
+          <rect class="f-video" x="6" y="6" width="188" height="88" rx="6"/>
+          <polygon class="f-board" points="58,22 150,14 140,84 64,78"/>
+          <text class="f-num" x="0" y="0" transform="matrix(0.95,-0.08,0.03,1,104,60)">47</text>
+          <polygon class="f-quad" points="58,22 150,14 140,84 64,78"/>
+          <circle class="f-key" cx="58" cy="22" r="5"/><circle class="f-key" cx="150" cy="14" r="5"/><circle class="f-key" cx="140" cy="84" r="5"/><circle class="f-key" cx="64" cy="78" r="5"/>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>פרספקטיבה</h2>
+        <p>כשהמשטח בזווית (לוח על קיר, דף על שולחן): מפעילים <b>פרספקטיבה</b> וגוררים את <b>4 הנקודות הכחולות</b> לפינות המשטח. הכתב נמתח עליו כמו במציאות.</p>
+      </div>
+    </div>
+
+    <!-- מראה אמיתי -->
+    <div class="group pad howto" id="h-real">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 92" aria-hidden="true">
+          <defs><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="1" result="n"/><feColorMatrix type="saturate" values="0"/><feComposite in2="SourceGraphic" operator="in" result="g"/><feBlend in="SourceGraphic" in2="g" mode="multiply"/><feGaussianBlur stdDeviation=".6"/></filter></defs>
+          <rect class="f-paper" x="10" y="10" width="84" height="62" rx="3"/>
+          <text class="f-crisp" x="52" y="54">47</text>
+          <rect class="f-paper" x="106" y="10" width="84" height="62" rx="3"/>
+          <text class="f-real" x="148" y="54" filter="url(#grain)">47</text>
+          <text class="f-note" x="52" y="86">מודבק</text><text class="f-note" x="148" y="86">מצולם</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>שיראה מצולם, לא מודבק</h2>
+        <ul>
+          <li><b>גרעיניות מצלמה</b> 10–20%.</li>
+          <li><b>רכות</b> קלה, כמו הפוקוס של המצלמה.</li>
+          <li><b>התאמת תאורה</b> פועלת לבד: כשהמשטח מתכהה, הכתב מתכהה איתו.</li>
+          <li>"דיו על נייר" על משטח בהיר, וצבע כהה (לא שחור מלא).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- מחוות -->
+    <div class="group pad howto" id="h-gest">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 84" aria-hidden="true">
+          <g transform="translate(25 30)"><circle class="f-ring" r="11"/><circle class="f-touch" r="5"/></g>
+          <g transform="translate(75 30)"><circle class="f-touch" cx="-6" r="5"/><circle class="f-touch" cx="6" r="5"/></g>
+          <g transform="translate(125 22)"><circle class="f-touch" r="5"/><path class="f-arrow" d="M0 8 V26" marker-end="url(#ah5)"/></g>
+          <g transform="translate(175 30)"><circle class="f-touch" r="5"/><path class="f-arrow" d="M-8 0 H-20 M8 0 H20" marker-end="url(#ah5)"/></g>
+          <defs><marker id="ah5" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" class="f-ahead"/></marker></defs>
+          <text class="f-note" x="25" y="66">ארוכה</text><text class="f-note" x="25" y="77">תפריט סודי</text>
+          <text class="f-note" x="75" y="66">2 אצבעות</text><text class="f-note" x="75" y="77">מחק ספרה</text>
+          <text class="f-note" x="125" y="66">למטה</text><text class="f-note" x="125" y="77">סגור סרטון</text>
+          <text class="f-note" x="175" y="66">לצדדים</text><text class="f-note" x="175" y="77">הפריט הבא</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>בזמן ההופעה</h2>
+        <ol>
+          <li>נוגעים בסרטון בגלריה ולוחצים ▶. הכפתורים נעלמים כמו בגלריה אמיתית.</li>
+          <li>בזמן הניגון: נגיעה עוצרת, נגיעה נוספת ממשיכה. ככה בכל סרטון.</li>
+          <li>מזינים בסתר <b>לפני רגע החשיפה</b>. גם קצת אחרי זה עובד, והחשיפה תתחיל ברגע שהזנת.</li>
+          <li>בסוף הכפתורים חוזרים, ואפשר לנגן שוב.</li>
+        </ol>
+        <p class="dim">בתפריט ⋯ יש "הצג מההתחלה", שמאפס את מה שהוזן.</p>
+      </div>
+    </div>
+
+    <!-- איך לצלם -->
+    <div class="group pad howto" id="h-film">
+      <div class="fig wide">
+        <svg viewBox="0 0 200 86" aria-hidden="true">
+          <rect class="f-video" x="4" y="8" width="58" height="56" rx="4"/><rect class="f-paper" x="18" y="20" width="30" height="32"/>
+          <rect class="f-video" x="71" y="8" width="58" height="56" rx="4"/><rect class="f-paper" x="113" y="20" width="16" height="32"/><text class="f-note-w" x="92" y="40">⚡</text>
+          <rect class="f-video" x="138" y="8" width="58" height="56" rx="4"/><rect class="f-paper" x="152" y="20" width="30" height="32"/><text class="f-num sm" x="167" y="42">47</text>
+          <text class="f-note" x="33" y="78">1. ריק</text><text class="f-note" x="100" y="78">2. חשיפה בחוץ</text><text class="f-note" x="167" y="78">3. "כבר היה"</text>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>איך לצלם סרטון שנראה אמיתי</h2>
+        <ol>
+          <li><b>משטח ברור</b>: לוח, דף, שלט או חולצה. מט, ישר וגדול בפריים.</li>
+          <li><b>אור אחיד</b> בלי השתקפויות על המשטח.</li>
+          <li><b>הטריק החזק ביותר:</b> המצלמה זזה מהמשטח וחוזרת. החשיפה ("מיידי") קורית כשהמשטח מחוץ לפריים.</li>
+          <li><b>סיבה לחשיפה:</b> "כותבים" עם טוש סגור ומתזמנים את "נכתב" ליד, הופכים דף, או מדליקים אור.</li>
+          <li><b>שום דבר לא עובר מעל הכתב</b> אחרי החשיפה.</li>
+          <li>15–30 שניות, חשיפה בערך ב-70% מהסרטון. מדברים אל הצופה.</li>
+          <li>מצלמים <b>באותו טלפון</b>, ומשאירים בגלריה תמונות רגילות מסביב.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- התקנה -->
+    <div class="group pad howto" id="h-install">
+      <div class="fig">
+        <svg viewBox="0 0 90 174" class="phone" aria-hidden="true">
+          <rect class="f-body" x="2" y="2" width="86" height="170" rx="14"/>
+          <rect class="f-screen-l" x="7" y="8" width="76" height="158" rx="9"/>
+          <rect class="f-sheet" x="7" y="96" width="76" height="70" rx="9"/>
+          <rect class="f-row" x="13" y="108" width="64" height="14" rx="4"/>
+          <rect class="f-row on" x="13" y="126" width="64" height="14" rx="4"/>
+          <text class="f-rowt" x="74" y="136">הוסף למסך הבית</text>
+          <path class="f-share" d="M45 66 v-16 M40 55 l5 -5 l5 5 M39 60 h-3 v12 h18 v-12 h-3"/>
+        </svg>
+      </div>
+      <div class="txt">
+        <h2>התקנה באייפון ושמירה לתמיד</h2>
+        <ol>
+          <li>פותחים ב-<b>Safari</b> את כתובת האפליקציה.</li>
+          <li>כפתור השיתוף ← <b>הוסף למסך הבית</b>.</li>
+          <li>האפליקציה נפתחת במסך מלא, ושומרת הכל במכשיר.</li>
+        </ol>
+        <p class="dim">בקישור של Claude הסרטונים נשמרים בחשבון שלך (עד 20MB לסרטון).</p>
+      </div>
+    </div>
+
+    <button class="btn-big primary" id="helpDone" type="button">הבנתי</button>
+  </main>
+</section>
+
+<!-- ===================== חיפוש בגלריה (הצופה מקליד בעצמו) ===================== -->
+<section id="search" class="screen pg">
+  <form id="srForm" class="pre">
+    <div class="pre-bar">
+      <label class="sr-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
+        <input id="srIn" type="search" enterkeyhint="search" placeholder="תמונות, אנשים, מקומות…" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="חיפוש">
+      </label>
+      <button type="button" class="pre-cancel" data-back>ביטול</button>
+    </div>
+    <button type="submit" hidden></button>
+  </form>
+  <div class="sr-body">
+    <div id="srSuggest">
+      <h3 class="sr-h">הצעות</h3>
+      <div class="sr-chips"><button type="button" class="sr-chip" data-q="סרטונים">סרטונים</button><button type="button" class="sr-chip" data-q="מועדפים">מועדפים</button><button type="button" class="sr-chip" data-q="סלפי">סלפי</button><button type="button" class="sr-chip" data-q="צילומי מסך">צילומי מסך</button></div>
+      <h3 class="sr-h">חיפושים אחרונים</h3>
+      <p class="sr-dim">אין חיפושים אחרונים</p>
+    </div>
+    <div id="srResults" hidden>
+      <h3 class="sr-h" id="srCount"></h3>
+      <div class="pg-grid" id="srGrid"></div>
+    </div>
+    <div id="srEmpty" class="sr-empty" hidden>
+      <b>אין תוצאות</b>
+      <p>לא נמצאו תוצאות עבור "<span id="srEmptyQ"></span>". נסו חיפוש חדש.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== הזנה לפני ההופעה (מוסווה כחיפוש) ===================== -->
+<section id="pre" class="screen pg">
+  <form id="preForm" class="pre">
+    <div class="pre-bar">
+      <input id="preIn" class="pre-in" placeholder="תמונות, אנשים, מקומות…" autocomplete="off">
+      <button type="button" class="pre-cancel" data-back>ביטול</button>
+    </div>
+    <button type="submit" hidden></button>
+  </form>
+</section>
+
+<!-- ===================== צפייה בסרטון ===================== -->
+<section id="perform" class="screen">
+  <canvas id="stage"></canvas>
+  <div id="touch"></div>
+  <button id="pBack" class="stage-back" type="button">‹ חזרה</button>
+  <div id="pLoad" class="p-load" hidden><span class="spin" aria-label="טוען"></span></div>
+
+  <div id="ph" hidden>
+    <div class="ph-top">
+      <button id="phBack" class="ph-round" type="button" aria-label="חזרה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      <div class="ph-title"><b id="phDay"></b><span id="phTime"></span></div>
+      <button id="phMore" class="ph-round" type="button" aria-label="עוד"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg></button>
+    </div>
+    <div class="ph-bottom">
+      <div class="ph-scrub-row">
+        <button id="phPlay" class="ph-round sm" type="button" aria-label="נגן"></button>
+        <div class="ph-strip" id="phStripBox"><canvas id="phStrip"></canvas><div id="phHead"></div></div>
+        <button id="phMute" class="ph-round sm" type="button" aria-label="שמע"></button>
+      </div>
+      <div class="ph-tools">
+        <button id="phShare" type="button" aria-label="שיתוף"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11M8.2 7.2L12 3.5l3.8 3.7"/><path d="M8.5 10.5H7a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1.5"/></svg></button>
+        <button id="phHeart" type="button" aria-label="מועדף"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0112 7.3a4.2 4.2 0 017.5 2.5C19.5 15.4 12 20 12 20z"/></svg></button>
+        <button id="phInfo" type="button" aria-label="מידע"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg></button>
+        <button id="phEdit" type="button" aria-label="עריכה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M18 7h2M4 17h3M12 17h8"/><circle cx="15.5" cy="7" r="2.3"/><circle cx="9.5" cy="17" r="2.3"/></svg></button>
+        <button id="phTrash" type="button" aria-label="מחיקה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13a1.5 1.5 0 001.5 1.4h6a1.5 1.5 0 001.5-1.4l1-13M10 10.5v6.5M14 10.5v6.5"/></svg></button>
+      </div>
+    </div>
+
+    <!-- מסך עריכה (כמו בגלריה) -->
+    <div id="phEditor" class="ph-editor" hidden>
+      <div class="pe-top"><button id="peCancel" type="button" class="pe-pill">ביטול</button><button id="peDone" type="button" class="pe-pill done">סיום</button></div>
+      <div class="pe-bottom">
+        <div class="pe-val" id="peVal">0</div>
+        <input id="peRange" type="range" min="-100" max="100" step="1" value="0" aria-label="עוצמה">
+        <div class="pe-tools" id="peTools">
+          <button type="button" data-t="bright" class="on">בהירות</button><button type="button" data-t="contrast">ניגודיות</button><button type="button" data-t="sat">רוויה</button>
+        </div>
+        <div class="pe-tabs"><span class="on">התאמה</span><span>מסננים</span><span>חיתוך</span></div>
+      </div>
+    </div>
+
+    <!-- תפריט ⋯ -->
+    <div id="phMenu" class="ph-pop" hidden>
+      <button type="button" data-pm="copy"><span>העתק</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="11" height="12" rx="2"/><path d="M5 15V6a2 2 0 012-2h8"/></svg></button>
+      <button type="button" data-pm="dup"><span>שכפל</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="11" height="11" rx="2"/><rect x="9" y="9" width="11" height="11" rx="2"/></svg></button>
+      <button type="button" data-pm="hide"><span>הסתר</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="12" cy="12" r="2.5"/><path d="M4 4l16 16"/></svg></button>
+      <button type="button" data-pm="memories"><span>מצגת</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4-2.5z" fill="currentColor"/></svg></button>
+      <button type="button" data-pm="replay"><span>הצג מההתחלה</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12a8 8 0 108-8H8M8 4L5 7l3 3"/></svg></button>
+    </div>
+
+    <!-- גיליון מידע -->
+    <div id="phSheet" class="ph-sheet" hidden>
+      <div class="grab"></div>
+      <input class="ph-caption" placeholder="הוספת כיתוב" aria-label="כיתוב">
+      <p id="phiDate" class="ph-sheet-date"></p>
+      <div class="ph-sheet-card">
+        <div class="ph-sheet-row"><b id="phiDevice">מצלמה ראשית</b><span class="ph-tag">HEVC</span></div>
+        <div class="ph-sheet-row dim" id="phiName"></div>
+        <div class="ph-sheet-row dim" id="phiSpec"></div>
+        <div class="ph-sheet-row" id="phiPlace" hidden></div>
+      </div>
+    </div>
+
+    <!-- אישור מחיקה -->
+    <div id="phAction" class="ph-action" hidden>
+      <div class="ph-action-box">
+        <p>הסרטון יועבר לתיקייה "נמחקו לאחרונה" ויימחק לצמיתות בעוד 30 יום.</p>
+        <button type="button" class="ph-del" id="phDelOk">מחק סרטון</button>
+      </div>
+      <button type="button" class="ph-cancel" id="phDelCancel">ביטול</button>
+    </div>
+  </div>
+
+  <!-- תפריט סודי (לחיצה ארוכה) -->
+  <div id="pmenu" hidden>
+    <button data-m="resume" type="button">המשך</button>
+    <button data-m="restart" type="button">התחל מחדש (מחק את מה שהוזן)</button>
+    <button data-m="share" type="button">שתף את ההקלטה</button>
+    <button data-m="exit" type="button" class="danger">יציאה</button>
+  </div>
+</section>
+
+<div id="vhost" aria-hidden="true"></div>
+<div id="pay" class="modal" hidden>
+  <div class="modal-box pay-box" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+    <button id="payClose" class="pay-x" type="button" aria-label="סגירה">✕</button>
+    <b id="payTitle">הגרסה המלאה</b>
+    <p id="payWhy">בגרסת הניסיון אפשר לנסות את סרטון ההדגמה. הגרסה המלאה פותחת הכל:</p>
+    <ul class="pay-list">
+      <li>הסרטונים והתמונות שלך, בלי הגבלה</li>
+      <li>מחשבון, חיפוש, קלפים, התראה, שיחה נכנסת, פתק וסטופר</li>
+      <li>גלריה מתנפצת, פסיפס ומצגת</li>
+      <li>כל העדכונים. תשלום אחד, בלי מנוי</li>
+    </ul>
+    <a id="payBuy" class="btn-big primary" target="_blank" rel="noopener"></a>
+    <form id="payForm" class="pay-form">
+      <label for="payCode">יש לך קוד רישיון?</label>
+      <div class="pay-row"><input id="payCode" placeholder="GK-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" dir="ltr"><button class="ed-btn" type="submit">הפעל</button></div>
+      <p id="payErr" class="pay-err" hidden>הקוד לא נכון. בדוק שהקלדת אותו כמו בהודעה.</p>
+    </form>
+  </div>
+</div>
+<div id="cmp" class="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cmpTitle">
+    <b id="cmpTitle"></b>
+    <p id="cmpText"></p>
+    <div id="cmpProg" class="prog" hidden><i id="cmpBar"></i></div>
+    <div class="modal-acts"><button id="cmpLater" class="btn" type="button">אחר כך</button><button id="cmpGo" class="ed-btn primary" type="button">כווץ ושמור</button></div>
+  </div>
+</div>
+<div id="toast" hidden></div>
+<script src="config.js"></script>
+<script src="qrcode.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

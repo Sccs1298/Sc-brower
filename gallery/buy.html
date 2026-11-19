@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>גלריית הקסם · הטלפון שלך קורא מחשבות</title>
+<meta name="description" content="אפליקציית מנטליזם שנראית כמו גלריית התמונות. הצופה חושב על מספר, מילה או קלף, והבחירה שלו מופיעה בתוך סרטון. 99 ₪, תשלום אחד.">
+<meta property="og:title" content="גלריית הקסם · הטלפון שלך קורא מחשבות">
+<meta property="og:description" content="הצופה חושב על מספר. אתה פותח סרטון ישן בגלריה, והמספר שלו כבר שם. 99 ₪, תשלום אחד.">
+<meta name="theme-color" content="#0b0b12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 34 34%27%3E%3Crect width=%2734%27 height=%2734%27 rx=%279%27 fill=%27%23f2c14e%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&family=Amatic+SC:wght@700&display=swap">
+<style>
+/* Layout: dark stage, one gold accent; a live phone demo carries the hero. */
+:root { --bg: #0b0b12; --panel: #14141f; --line: #26263a; --fg: #f3f1ea; --dim: #a9a7b8; --gold: #f2c14e; --gold-ink: #1c1503; --ok: #4cd964;
+  --font: "Heebo", system-ui, -apple-system, "Segoe UI", sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 var(--font); -webkit-text-size-adjust: 100%; }
+a { color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+h1, h2, h3 { line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(38px, 7.2vw, 68px); font-weight: 900; letter-spacing: -.5px; }
+h2 { font-size: clamp(28px, 4.6vw, 42px); font-weight: 900; }
+h3 { font-size: 20px; font-weight: 700; }
+p { margin: 0; }
+.dim { color: var(--dim); }
+.gold { color: var(--gold); }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 19px; text-decoration: none; }
+.brand img { width: 34px; height: 34px; border-radius: 9px; }
+.top a.try { font-size: 15px; color: var(--dim); text-decoration: none; border: 1px solid var(--line); border-radius: 99px; padding: 7px 14px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 40px; align-items: center; padding-block: 28px 64px; }
+.hero p.lead { font-size: clamp(18px, 2.4vw, 21px); color: var(--dim); margin-top: 16px; max-width: 34em; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; align-items: center; }
+.cta { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-height: 58px; padding: 10px 28px; border-radius: 16px; border: 0; cursor: pointer;
+  background: var(--gold); color: var(--gold-ink); font: 900 20px/1.2 var(--font); text-decoration: none; box-shadow: 0 10px 30px rgba(242,193,78,.25); }
+.cta small { font-weight: 500; font-size: 13px; opacity: .8; }
+.cta:hover { filter: brightness(1.06); }
+.cta:focus-visible, .ghost:focus-visible, summary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.ghost { display: inline-flex; align-items: center; min-height: 58px; padding: 10px 22px; border-radius: 16px; border: 1px solid var(--line); text-decoration: none; font-weight: 700; }
+.trust { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font-size: 14px; color: var(--dim); }
+.trust span::before { content: "✓ "; color: var(--ok); }
+
+/* הדגמה חיה: טלפון עם "סרטון" שבו המספר מופיע */
+.phone { justify-self: center; width: min(100%, 290px); aspect-ratio: 9/19; border-radius: 42px; background: #000; border: 8px solid #2a2a36; position: relative; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px #3a3a4a; }
+.phone .isl { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 84px; height: 24px; border-radius: 14px; background: #000; z-index: 3; }
+.ph-head { position: absolute; top: 44px; left: 0; right: 0; text-align: center; font-size: 13px; line-height: 1.25; z-index: 2; }
+.ph-head b { display: block; font-size: 14px; }
+.ph-head span { color: #9a9aa6; font-size: 11.5px; }
+.ph-head span i { font-style: normal; animation: timeflip 9s infinite; }
+.scene { position: absolute; inset: 86px 0 96px; background: linear-gradient(#3a332c 0 62%, #4a3b2c 62% 100%); display: grid; place-items: center; }
+.scene::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, rgba(255,236,200,.28), transparent 60%); }
+.frame { width: 56%; aspect-ratio: 4/5; background: linear-gradient(135deg, #b8893a, #e8c77a 50%, #8a6224); padding: 9px; box-shadow: 8px 10px 0 rgba(0,0,0,.35); position: relative; }
+.canvas { width: 100%; height: 100%; background: #efe4cc; display: grid; place-items: center; }
+.canvas b { font: 700 74px "Amatic SC", cursive; color: #2a1d12; transform: rotate(-4deg); animation: reveal 9s infinite; }
+.ph-strip { position: absolute; left: 14px; right: 14px; bottom: 52px; height: 26px; border-radius: 7px; background: repeating-linear-gradient(90deg, #4a3f34 0 18px, #3a312a 18px 20px); }
+.ph-strip::after { content: ""; position: absolute; top: -3px; bottom: -3px; width: 3px; border-radius: 2px; background: #fff; animation: head 9s linear infinite; }
+.ph-tools { position: absolute; left: 0; right: 0; bottom: 16px; display: flex; justify-content: space-around; color: #fff; font-size: 15px; opacity: .85; }
+.say { position: absolute; left: 10px; right: 10px; top: 92px; text-align: center; font-weight: 700; font-size: 13.5px; z-index: 2; text-shadow: 0 1px 4px #000; animation: say 9s infinite; }
+@keyframes reveal { 0%, 58% { opacity: 0; filter: blur(3px); } 72%, 96% { opacity: .92; filter: none; } 100% { opacity: 0; } }
+@keyframes head { from { left: 0; } to { left: 100%; } }
+@keyframes say { 0%, 4% { opacity: 0; } 10%, 52% { opacity: 1; } 60%, 100% { opacity: 0; } }
+@keyframes timeflip { 0%, 58% { opacity: .0; } 72%, 96% { opacity: 1; } 100% { opacity: 0; } }
+
+section { padding-block: 56px; border-top: 1px solid var(--line); }
+.kicker { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .5px; margin-bottom: 8px; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 28px; counter-reset: s; }
+.steps li { list-style: none; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; counter-increment: s; }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: var(--gold-ink); font-weight: 900; margin-bottom: 12px; }
+.steps p { color: var(--dim); margin-top: 6px; font-size: 16px; }
+ul.steps, ol.steps { padding: 0; margin-block: 28px 0; }
+
+.tricks { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 28px; }
+.trick { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: grid; gap: 6px; align-content: start; }
+.trick .ico { font-size: 28px; }
+.trick p { color: var(--dim); font-size: 15.5px; }
+
+.why { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; margin-top: 24px; padding: 0; }
+.why li { list-style: none; padding-inline-start: 30px; position: relative; }
+.why li::before { content: "✓"; position: absolute; inset-inline-start: 0; color: var(--ok); font-weight: 900; }
+.why b { display: block; }
+.why span { color: var(--dim); font-size: 15.5px; }
+
+.price { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 32px; align-items: center; background: linear-gradient(160deg, #1b1a12, #14141f 55%); border: 1px solid #4a3f1c; border-radius: 26px; padding: 32px; margin-top: 8px; }
+.price .num { font-size: 76px; font-weight: 900; line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+.price .num small { font-size: 26px; }
+.price ul { margin: 14px 0 0; padding-inline-start: 20px; color: var(--dim); display: grid; gap: 4px; }
+.price .box { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
+.price .cta { width: 100%; }
+.how { color: var(--dim); font-size: 14.5px; }
+
+details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+summary { cursor: pointer; font-weight: 700; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--gold); font-weight: 900; }
+details[open] summary::after { content: "–"; }
+details p { color: var(--dim); margin-top: 8px; max-width: 46em; }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px calc(env(safe-area-inset-bottom) + 90px); color: var(--dim); font-size: 14px; display: grid; gap: 8px; }
+footer a { color: var(--fg); }
+.sticky { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: none; padding: 10px max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 10px) max(16px, env(safe-area-inset-left));
+  background: rgba(11,11,18,.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--line); }
+.sticky .cta { width: 100%; min-height: 52px; flex-direction: row; gap: 8px; font-size: 18px; }
+
+@media (max-width: 760px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 34px; padding-block: 12px 48px; }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .why { grid-template-columns: minmax(0, 1fr); }
+  .price { grid-template-columns: minmax(0, 1fr); padding: 24px; }
+  .sticky { display: block; }
+  section { padding-block: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .canvas b, .say, .ph-head span i { animation: none; opacity: 1; filter: none; } .ph-strip::after { animation: none; left: 80%; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top"><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#f2c14e"/><rect x="9" y="7" width="16" height="20" rx="2" fill="none" stroke="#1c1503" stroke-width="2.4"/><path d="M17 12.5l1.3 3 3.2.3-2.4 2.1.7 3.1-2.8-1.7-2.8 1.7.7-3.1-2.4-2.1 3.2-.3z" fill="#1c1503"/></svg>גלריית הקסם</a>
+    <a class="try" href="./">לנסות בחינם ›</a>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <h1>הטלפון שלך <span class="gold">קורא מחשבות.</span></h1>
+        <p class="lead">הצופה חושב על מספר. אתה פותח סרטון ישן בגלריה שלך, והמספר שלו כבר כתוב שם. אפליקציית מנטליזם שנראית בדיוק כמו גלריית התמונות של הטלפון.</p>
+        <div class="cta-row">
+          <a class="cta" data-buy href="#buy">קנה עכשיו · 99 ₪<small>תשלום אחד, בלי מנוי</small></a>
+          <a class="ghost" href="./">לנסות בחינם</a>
+        </div>
+        <div class="trust"><span>אייפון ואנדרואיד</span><span>עובד בלי אינטרנט</span><span>14 יום החזר כספי</span></div>
+      </div>
+      <div class="phone" aria-label="הדגמה: מספר מופיע בתוך סרטון בגלריה" role="img">
+        <div class="isl"></div>
+        <div class="ph-head"><b>היום</b><span>17:<i>47</i></span></div>
+        <div class="say">"תחשוב על מספר בין 10 ל-99"</div>
+        <div class="scene"><div class="frame"><div class="canvas"><b>47</b></div></div></div>
+        <div class="ph-strip"></div>
+        <div class="ph-tools"><span>⇪</span><span>♡</span><span>ⓘ</span><span>☰</span><span>🗑</span></div>
+      </div>
+    </div>
+
+    <section>
+      <p class="kicker">מה הצופה רואה</p>
+      <h2>סרטון רגיל בגלריה. בלי אפליקציה "חשודה".</h2>
+      <ol class="steps">
+        <li><h3>"תחשוב על מספר"</h3><p>הצופה בוחר מספר, מילה, קלף או ציור. חופשי לגמרי.</p></li>
+        <li><h3>פותחים סרטון בגלריה</h3><p>סרטון שצילמת מראש. נוגעים במסך כדי לעצור ולהמשיך, כמו בכל צפייה. ככה אתה מזין את הבחירה בסתר.</p></li>
+        <li><h3>הבחירה כבר בפנים</h3><p>המספר מופיע על הלוח שבסרטון, או בשעה שבה הסרטון "צולם". הטלפון הוא ההוכחה.</p></li>
+      </ol>
+    </section>
+
+    <section>
+      <p class="kicker">מה מקבלים</p>
+      <h2>תשעה קסמים באפליקציה אחת</h2>
+      <div class="tricks">
+        <div class="trick"><span class="ico">🖼️</span><h3>קסמי גלריה</h3><p>מספר, מילה, ציור או קלף בתוך סרטון או תמונה שלך. גם בשעה, בתאריך ובמקום הצילום.</p></div>
+        <div class="trick"><span class="ico">🔍</span><h3>הצופה מחפש בעצמו</h3><p>הצופה מקליד את המילה שלו בחיפוש, מוצא סרטון, והיא מופיעה בתוכו. אתה לא נוגע בטלפון.</p></div>
+        <div class="trick"><span class="ico">🧮</span><h3>מחשבון</h3><p>כמה צופים מחברים מספרים אקראיים. התוצאה יוצאת השעה עכשיו, התאריך, או החיזוי שלך.</p></div>
+        <div class="trick"><span class="ico">🃏</span><h3>קלפים</h3><p>הצופה בוחר קלף מחפיסה, והוא תמיד הקלף שחזית. או שהקלף שבחר מופיע בסרטון.</p></div>
+        <div class="trick"><span class="ico">🔔</span><h3>התראה</h3><p>הטלפון נעול על השולחן, ופתאום מגיעה הודעה עם מה שהצופה חשב.</p></div>
+        <div class="trick"><span class="ico">📞</span><h3>שיחה נכנסת</h3><p>הצופה חושב על מישהו. הטלפון שלך מצלצל, והשם שלו על המסך.</p></div>
+        <div class="trick"><span class="ico">📝</span><h3>פתק ישן</h3><p>פתק שכתבת "לפני שבוע", ובו בדיוק מה שהצופה בחר עכשיו.</p></div>
+        <div class="trick"><span class="ico">⏱️</span><h3>סטופר</h3><p>הצופה עוצר את הסטופר מתי שבא לו. המאיות יוצאות המספר שחזית.</p></div>
+        <div class="trick"><span class="ico">💥</span><h3>גלריה מתנפצת ועוד</h3><p>כל התמונות נופלות ונשארת רק זו שהצופה בחר. פסיפס שיוצר את המילה. מצגת שעוצרת איפה שקבעת.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <p class="kicker">למה דווקא זו</p>
+      <h2>נבנתה כדי שלא יחשדו</h2>
+      <ul class="why">
+        <li><b>נראית כמו הגלריה של הטלפון</b><span>רשת תמונות, חיפוש, מידע, עריכה ומחיקה. כל כפתור מגיב.</span></li>
+        <li><b>החשיפה נראית מצולמת</b><span>מעקב תנועה, פרספקטיבה, תאורה וגרעיניות. הכתב יושב על המשטח.</span></li>
+        <li><b>תשלום אחד, בלי מנוי</b><span>אפליקציות מנטליזם מובילות נמכרות ב-40 עד 300 דולר, חלקן במנוי.</span></li>
+        <li><b>עובדת בלי אינטרנט ובלי שרת</b><span>הכל על המכשיר שלך. אין שרת שיכול ליפול באמצע הופעה.</span></li>
+        <li><b>מדריך מצויר בעברית</b><span>ציור והסבר לכל קסם, ומדריך איך לצלם סרטון שנראה אמיתי.</span></li>
+        <li><b>אייפון, אנדרואיד ומחשב</b><span>מתקינים למסך הבית בלחיצה. הסרטונים נשמרים במכשיר.</span></li>
+      </ul>
+    </section>
+
+    <section id="buy">
+      <div class="price">
+        <div>
+          <p class="kicker">הגרסה המלאה</p>
+          <h2>כל הקסמים. תשלום אחד.</h2>
+          <ul>
+            <li>כל סוגי הקסמים, עם הסרטונים והתמונות שלך</li>
+            <li>כל העדכונים והקסמים החדשים</li>
+            <li>מדריך מצויר ומדריך צילום</li>
+            <li>תמיכה בוואטסאפ</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="num">99<small> ₪</small></div>
+          <a class="cta" data-buy href="#buy">קנה עכשיו<small>תשלום מאובטח</small></a>
+          <p class="how">אחרי התשלום מקבלים בוואטסאפ קוד רישיון אישי. מזינים אותו באפליקציה, והכל נפתח.</p>
+          <p class="how">לא מרוצה? החזר כספי מלא תוך 14 יום.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="kicker">שאלות נפוצות</p>
+      <h2>לפני שקונים</h2>
+      <details><summary>אפשר לנסות לפני שקונים?</summary><p>כן. גרסת הניסיון חינם וכוללת סרטון הדגמה שבו אפשר לבצע את הקסם המלא ולקרוא את המדריך. הגרסה המלאה פותחת את הסרטונים שלך ואת שאר הקסמים.</p></details>
+      <details><summary>איך מקבלים את האפליקציה אחרי התשלום?</summary><p>מקבלים בוואטסאפ קוד רישיון אישי, לכל המאוחר תוך 24 שעות. פותחים את האפליקציה, לוחצים על "גרסת ניסיון" ומזינים את הקוד.</p></details>
+      <details><summary>על אילו טלפונים זה עובד?</summary><p>אייפון (ב-Safari) ואנדרואיד (ב-Chrome). מוסיפים את האפליקציה למסך הבית, והיא נפתחת במסך מלא ועובדת גם בלי אינטרנט.</p></details>
+      <details><summary>צריך ניסיון בקסמים?</summary><p>לא. לכל קסם יש באפליקציה הסבר מצויר, צעד אחרי צעד. רוב האנשים מבצעים את הקסם הראשון עם סרטון ההדגמה תוך כמה דקות.</p></details>
+      <details><summary>הסרטונים שלי נשלחים למקום כלשהו?</summary><p>לא. הסרטונים והתמונות נשמרים רק על המכשיר שלך. אין שרת ואין העלאה.</p></details>
+      <details><summary>מה אם אחליף טלפון?</summary><p>הקוד שלך אישי ועובד גם בטלפון החדש שלך. הסרטונים נשמרים על המכשיר, אז מוסיפים אותם מחדש.</p></details>
+    </section>
+  </main>
+
+  <footer>
+    <p>gynohide · עוסק פטור 328277025 · דליות 5, קצרין · <a href="mailto:nullbyteacademy1@gmail.com">nullbyteacademy1@gmail.com</a> · וואטסאפ <a href="https://wa.me/972559397892">055-939-7892</a></p>
+    <p><a href="terms.html">תקנון ותנאי רכישה</a> · <a href="privacy.html">מדיניות פרטיות</a></p>
+    <p>האפליקציה מיועדת לבידור והופעות קסמים. אייפון ואפל הם סימני מסחר של Apple Inc. המוצר אינו קשור לאפל ואינו מטעמה.</p>
+  </footer>
+</div>
+<div class="sticky"><a class="cta" data-buy href="#buy">קנה עכשיו · 99 ₪</a></div>
+
+<script src="config.js"></script>
+<script>
+// כפתורי הקנייה: קישור תשלום אם הוגדר, אחרת הזמנה בוואטסאפ
+(function () {
+  var g = window.GK || {};
+  var wa = 'https://wa.me/' + (g.WHATSAPP || '972559397892') + '?text=' + encodeURIComponent('היי, אני רוצה לקנות את ' + (g.NAME || 'גלריית הקסם') + ' (' + (g.PRICE || 99) + ' ₪)');
+  var url = g.PAY_URL || wa;
+  document.querySelectorAll('[data-buy]').forEach(function (a) {
+    // הכפתורים שבראש הדף גוללים קודם לתיבת המחיר; הכפתור שבתיבה ובסרגל התחתון מוביל לתשלום
+    if (a.closest('.price') || a.closest('.sticky')) { a.href = url; a.target = '_blank'; a.rel = 'noopener'; }
+  });
+  if (!g.PAY_URL) document.querySelectorAll('.price .cta small').forEach(function (s) { s.textContent = 'הזמנה ותשלום בוואטסאפ'; });
+})();
+</script>
+</body>
+</html>
