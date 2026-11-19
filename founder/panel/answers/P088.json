@@ -1,0 +1,13 @@
+{
+  "id": "P088",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not putting my card into some website I've never heard of to install an app from the browser instead of the App Store. I might try the free tricks at Friday dinner, but there are free magic apps that do similar stuff already.",
+  "objection": "Paying 99 shekels by card on an unknown site, for an app that isn't in the App Store or Google Play, feels risky, and I'm not sure it beats the free apps.",
+  "would_change_my_mind": "If it were sold through the App Store or Google Play so I pay with my normal account, and the free tricks actually wowed my family on Friday.",
+  "price_too_cheap": 10,
+  "price_cheap": 25,
+  "price_expensive": 50,
+  "price_too_expensive": 90
+}

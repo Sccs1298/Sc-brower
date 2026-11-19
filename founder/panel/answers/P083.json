@@ -1,0 +1,13 @@
+{
+  "id": "P083",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "It sounds fun, and the free tricks are a nice touch, but I don't know who is behind it, there are no reviews or real videos, and I'm not putting my card into some website for an app that isn't even on the App Store. Even if it works, I'd probably do it at two parties and forget about it.",
+  "objection": "Who made this, and does it really work on my iPhone? Without real reviews or videos of real people doing it, I'm not paying 99 shekels, and I suspect I'll get bored after using it twice anyway.",
+  "would_change_my_mind": "Seeing real, unedited videos of ordinary people doing the tricks on friends, along with genuine reviews and a clear name behind the app. If the free tricks really fooled my friends at a party, I might pay.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 70,
+  "price_too_expensive": 130
+}

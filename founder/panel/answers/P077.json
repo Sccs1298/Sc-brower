@@ -1,0 +1,13 @@
+{
+  "id": "P077",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The free tricks sound fun and 99 ₪ is nothing for me, but I'm not typing my card into a website I've never heard of that installs from the browser instead of the App Store. I'd try the free tricks and look for real videos and reviews first.",
+  "objection": "Paying by card on an unknown website for an app that isn't in the App Store, with no reviews or name behind it that I can check.",
+  "would_change_my_mind": "Real videos of the tricks working on regular people, Hebrew reviews from actual buyers, and a known magician or company behind it with a trusted payment option like Apple Pay, Bit or PayPal.",
+  "price_too_cheap": 15,
+  "price_cheap": 40,
+  "price_expensive": 150,
+  "price_too_expensive": 250
+}

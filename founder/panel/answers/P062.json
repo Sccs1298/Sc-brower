@@ -1,0 +1,13 @@
+{
+  "id": "P062",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already own a few mind-reading apps, but none of them are in Hebrew, and 99 ₪ one time is less than most gimmicks I've bought. If the free tricks fool my family at Friday dinner, I'll pay for the full version that same weekend.",
+  "objection": "How long does it take to learn and set up, and does an app installed from the browser instead of the App Store really hold up, like the fake call and the search peek, or is it a cheaper copy of tools I already have?",
+  "would_change_my_mind": "If the free tricks need a long setup or look fake on my phone, or the browser install feels sketchy for paying by card, I won't buy.",
+  "price_too_cheap": 20,
+  "price_cheap": 50,
+  "price_expensive": 149,
+  "price_too_expensive": 250
+}

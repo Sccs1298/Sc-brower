@@ -1,0 +1,13 @@
+{
+  "id": "P066",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I'd totally grab the free tricks after a cool Reel and show the kids, but 99 ₪ is way past my impulse zone for an app. I buy stuff in the 15-30 ₪ range without thinking; at 99 I stop and decide the free ones are enough.",
+  "objection": "99 ₪ for an app installed from a website, not the App Store, paid with my card on some site I don't know. Feels like a lot of money and a bit sketchy.",
+  "would_change_my_mind": "A launch price around 39 ₪, or seeing a video of the incoming-call trick that blows my mind so hard I need it right now.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 45,
+  "price_too_expensive": 80
+}

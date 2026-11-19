@@ -1,0 +1,13 @@
+{
+  "id": "P093",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd mess around with the free tricks at a party, sure, but I'm not putting my card into some website that isn't even in the App Store. I basically never pay for apps anyway.",
+  "objection": "It's a website, not a real App Store app, so typing my card details there feels like it could be a scam.",
+  "would_change_my_mind": "If it was a normal app in the App Store or Google Play and a friend showed me a trick working for real, maybe I'd pay.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 35,
+  "price_too_expensive": 60
+}

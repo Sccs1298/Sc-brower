@@ -1,0 +1,13 @@
+{
+  "id": "P070",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm a working magician, the gallery and calculator reveals already exist in free or store-bought apps I trust. I'm not typing my card into some unknown website for an app that skips the App Store.",
+  "objection": "Installed from the browser, paid by card on the app's own site - if it breaks mid-show or the site disappears, my lifetime access is worth nothing and I have no store to get a refund from.",
+  "would_change_my_mind": "Selling it through the App Store or Google Play, plus seeing a performer I respect use the search-reveal live on Reels and it fooling people.",
+  "price_too_cheap": 15,
+  "price_cheap": 40,
+  "price_expensive": 90,
+  "price_too_expensive": 180
+}

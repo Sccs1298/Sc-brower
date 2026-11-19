@@ -1,0 +1,13 @@
+{
+  "id": "P064",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "It's a fun idea and I'd definitely try the free tricks before a party, but I'd probably get one or two laughs out of them and then forget the app. There are free magic apps that do this kind of thing, so I don't see why I'd pay 99 for the full version when the free part covers a night out.",
+  "objection": "There are free magic apps that do the same, and a trick I'd do once at a dinner isn't worth 99 shekels. Also I'm not sure about paying by card on some website for an app that isn't in the App Store.",
+  "would_change_my_mind": "If I tried the free tricks at a birthday and people completely lost it, and the paid version clearly had tricks the free apps can't do, I'd pay for it before the next event, especially if it were closer to 49.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 70,
+  "price_too_expensive": 120
+}

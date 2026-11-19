@@ -1,0 +1,13 @@
+{
+  "id": "P081",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd maybe try the free tricks from a TikTok video, but typing my card into some app's website instead of the App Store or Google Play? No. If it's not in the store, I don't pay for it.",
+  "objection": "Paying by card on an unknown website for an app installed from the browser feels sketchy, and I'm not sure my friends won't see right through the trick anyway.",
+  "would_change_my_mind": "If it were in the App Store or Google Play with real reviews, and the free tricks actually fooled my friends at a party.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 70,
+  "price_too_expensive": 130
+}

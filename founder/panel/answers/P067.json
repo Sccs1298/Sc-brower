@@ -1,0 +1,13 @@
+{
+  "id": "P067",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I'd try the free tricks first, and if the gallery or the search reveal actually fools my friends at a party on the weekend, I'd pay the 99 the same night. Real magic apps I've bought cost more than that, so for a working set of phone reveals it's fair, even if it stings next to normal apps.",
+  "objection": "It's a web app paid by card on their own site, not the App Store, so I worry it'll feel clunky, break on my phone after an update, or that I'm handing my card to some unknown site.",
+  "would_change_my_mind": "If the free tricks feel fake or laggy on my phone, I'm out.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 120,
+  "price_too_expensive": 200
+}

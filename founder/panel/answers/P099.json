@@ -1,0 +1,13 @@
+{
+  "id": "P099",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "The kids at home would lose their minds over a word showing up in my gallery or calculator, and 99 shekels once is nothing for me. I'd try the free tricks first, and if one works on my family I'd pay for the full version that same evening.",
+  "objection": "I'm not a magician. If the trick fails or I fumble the setup in front of everyone, I look silly, and installing from a browser instead of the App Store makes me a bit nervous that it's sketchy.",
+  "would_change_my_mind": "If the free tricks are confusing or one of them flops the first time I try it on someone, I wouldn't pay.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 249
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P082",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I'd grab the free tricks and do them at the next birthday, but I basically never pay for apps, and 99 shekels for a party gimmick from some website isn't how I spend money.",
+  "objection": "If my friends catch on that it's a setup on my phone, I look silly, and I'm not paying 99 shekels by card on an unknown site to find out.",
+  "would_change_my_mind": "If the free tricks actually fooled my friends at a party and the full version dropped to around 30 shekels.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 45,
+  "price_too_expensive": 80
+}
