@@ -2587,7 +2587,7 @@ function wkGot(raw) {
   WK.got = word; setChoice(word); // הצופה עבר לערך אחר: תמיד הערך האחרון שהוא פתח
   if (navigator.vibrate) navigator.vibrate([25, 60, 25]);
   if (S.remoteTopic) { // מעביר גם לשעון, דרך ההתראות של "הטלפון של הצופה + שעון"
-    const body = d.q && d.t && d.q !== d.t ? `${d.t} (חיפש: ${d.q})` : word;
+    const body = (d.q && d.t && d.q !== d.t ? `${d.t} (חיפש: ${d.q})` : word) + (d.f ? `\n${d.f}…` : '');
     fetch(`https://ntfy.sh/${S.remoteTopic}?title=${encodeURIComponent('תזכורת')}`, { method: 'POST', body }).catch(() => {});
   }
 }

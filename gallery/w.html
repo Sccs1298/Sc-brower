@@ -86,9 +86,9 @@
   var lastQ = '';
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   // שולח לקוסם את מה שחיפשו ואת הערך שנפתח
-  function tell(q, title) {
+  function tell(q, title, first) {
     if (!code) return;
-    try { fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: JSON.stringify({ q: q, t: title }), keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {}
+    try { fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: JSON.stringify({ q: q, t: title, f: first || '' }), keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {}
   }
   function loading(on) { var l = $('ld'); l.style.transition = on ? 'width .8s ease' : 'none'; l.style.width = on ? '70%' : '0'; }
   function openSearch(v) { $('ov').hidden = false; $('oq').value = v || ''; setTimeout(function () { $('oq').focus(); }, 30); suggest(); }
@@ -116,12 +116,12 @@
     var findTitle = title ? Promise.resolve(title) : fetch(API + 'action=query&list=search&srlimit=1&srsearch=' + encodeURIComponent(q))
       .then(function (r) { return r.json(); }).then(function (j) { var s = j.query && j.query.search; return s && s[0] ? s[0].title : ''; });
     findTitle.then(function (t) {
-      tell(lastQ, t || '');
+      if (!t) { tell(lastQ, ''); }
       if (!t) { loading(false); $('main').innerHTML = '<p class="msg">לא נמצאו תוצאות עבור "' + esc(q) + '".</p>'; return; }
       return fetch(API + 'action=parse&prop=text|displaytitle|description&mobileformat=1&redirects=1&disableeditsection=1&page=' + encodeURIComponent(t))
         .then(function (r) { return r.json(); }).then(function (j) {
           loading(false);
-          var p = j.parse; if (!p) throw 0;
+          var p = j.parse; if (!p) { tell(lastQ, t); throw 0; }
           var d = document.createElement('div'); d.innerHTML = p.text;
           d.querySelectorAll('script,style,link').forEach(function (n) { n.remove(); });
           $('main').innerHTML = '<h1 class="at"></h1>' + (p.description ? '<div class="desc"></div>' : '') +
@@ -130,6 +130,10 @@
           $('main').querySelector('h1').textContent = p.title;
           if (p.description) $('main').querySelector('.desc').textContent = p.description;
           $('art').appendChild(d);
+          // שולח לקוסם את הערך ואת תחילת השורה הראשונה (לקסם "תחשוב על מילה בשורה הראשונה")
+          var first = '';
+          d.querySelectorAll('p').forEach(function (x) { if (!first) { var s = x.textContent.replace(/\[[^\]]*\]/g, '').replace(/\s+/g, ' ').trim(); if (s.length > 20) first = s.split(' ').slice(0, 12).join(' '); } });
+          tell(lastQ, p.title || t, first);
           window.scrollTo(0, 0);
         });
     }).catch(function () { loading(false); $('main').innerHTML = '<p class="msg">לא ניתן לטעון את הדף כרגע. נסו שוב.</p>'; });
