@@ -22,6 +22,11 @@
   input::-webkit-search-cancel-button { display: none; }
   .bar { position: fixed; top: env(safe-area-inset-top); left: 0; height: 3px; width: 0; background: #4285f4; transition: width 1.2s cubic-bezier(.2,.6,.3,1); }
   .bar.go { width: 80%; }
+  .sg { width: 100%; max-width: 584px; margin: -14px 0 0; padding: 0; list-style: none; }
+  .sg li { display: flex; align-items: center; gap: 14px; padding: 11px 16px; font-size: 17px; cursor: pointer; }
+  .sg li svg { width: 18px; height: 18px; }
+  .sg li:active { background: var(--box); }
+  .chips span { cursor: pointer; }
   .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 584px; }
   .chips span { font-size: 14px; color: var(--dim); background: var(--box); border-radius: 16px; padding: 6px 12px; }
 </style>
@@ -34,12 +39,17 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>
     <input id="q" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="חיפוש" aria-label="חיפוש">
   </form>
+  <ul class="sg" id="sg"></ul>
   <div class="chips" aria-hidden="true"><span>מזג אוויר</span><span>חדשות</span><span>תוצאות משחקים</span><span>מתכונים</span></div>
 </main>
 <script>
 (function () {
   // הקישור: go.html#<קוד אישי>~<g|w|m|y|i>  (גוגל, ויקיפדיה, מפות, יוטיוב, תמונות)
-  var h = decodeURIComponent(location.hash.slice(1)).split('~'), topic = (h[0] || '').replace(/[^A-Za-z0-9_-]/g, ''), mode = h[1] || 'g';
+  var raw = location.hash.slice(1);
+  try { if (raw) sessionStorage.setItem('go-h', raw); else raw = sessionStorage.getItem('go-h') || ''; } catch (e) {}
+  // מוריד את הקוד משורת הכתובת, כדי שהצופה יראה כתובת נקייה
+  try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
+  var h = decodeURIComponent(raw).split('~'), topic = (h[0] || '').replace(/[^A-Za-z0-9_-]/g, ''), mode = h[1] || 'g';
   var f = document.getElementById('f'), q = document.getElementById('q'), sent = false;
   setTimeout(function () { try { q.focus(); } catch (e) {} }, 250);
   var Q = encodeURIComponent;
@@ -54,20 +64,40 @@
   q.placeholder = M[0]; document.title = M[0];
   document.querySelector('.chips').innerHTML = M[1].map(function (c) { return '<span>' + c + '</span>'; }).join('');
   function target(t) { return M[2](t); }
-  f.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var t = q.value.trim(); if (!t || sent) return; sent = true; q.blur();
+  function send(t) {
+    if (!topic) return;
+    // שולח לקוסם ברקע ועובר מיד לתוצאות, בלי שום המתנה
+    var url = 'https://ntfy.sh/' + topic + '?title=' + Q('תזכורת') + '&tags=memo';
+    var ok = false;
+    try { ok = navigator.sendBeacon && navigator.sendBeacon(url, new Blob([t], { type: 'text/plain' })); } catch (e) {}
+    if (!ok) { try { fetch(url, { method: 'POST', body: t, keepalive: true, mode: 'no-cors', credentials: 'omit', referrerPolicy: 'no-referrer' }); } catch (e) {} }
+  }
+  function search(t) {
+    t = String(t || '').trim(); if (!t || sent) return; sent = true; q.blur();
     document.getElementById('bar').className = 'bar go';
-    var go = function () { location.replace(target(t)); };
-    if (!topic) { go(); return; }
-    // שולח את המילה להתראה בטלפון ובשעון של הקוסם, ואז עובר לתוצאות האמיתיות
-    var url = 'https://ntfy.sh/' + topic + '?title=' + encodeURIComponent('תזכורת') + '&tags=' + encodeURIComponent('memo');
-    var done = false, finish = function () { if (!done) { done = true; go(); } };
-    try {
-      fetch(url, { method: 'POST', body: t, keepalive: true, mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer' }).then(finish, finish);
-    } catch (err) { finish(); }
-    setTimeout(finish, 1500);
+    send(t);
+    setTimeout(function () { location.replace(target(t)); }, 120);
+  }
+  f.addEventListener('submit', function (e) { e.preventDefault(); search(q.value); });
+  // הצעות תוך כדי הקלדה, כמו בכל מנוע חיפוש
+  var sg = document.getElementById('sg'), tm = 0, seq = 0;
+  var MAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>';
+  q.addEventListener('input', function () {
+    clearTimeout(tm); var v = q.value.trim();
+    document.querySelector('.chips').style.display = v ? 'none' : '';
+    if (!v) { sg.innerHTML = ''; return; }
+    tm = setTimeout(function () {
+      var my = ++seq;
+      fetch('https://he.wikipedia.org/w/api.php?action=opensearch&limit=6&namespace=0&format=json&origin=*&search=' + Q(v))
+        .then(function (r) { return r.json(); }).then(function (j) {
+          if (my !== seq) return;
+          var list = [v].concat((j[1] || []).filter(function (x) { return x !== v; })).slice(0, 6);
+          sg.innerHTML = '';
+          list.forEach(function (x) { var li = document.createElement('li'); li.innerHTML = MAG; li.appendChild(document.createTextNode(x)); li.onclick = function () { q.value = x; search(x); }; sg.appendChild(li); });
+        }).catch(function () {});
+    }, 150);
   });
+  document.querySelector('.chips').addEventListener('click', function (e) { var c = e.target.closest('span'); if (c) { q.value = c.textContent; q.dispatchEvent(new Event('input')); q.focus(); } });
 })();
 </script>
 </body>
