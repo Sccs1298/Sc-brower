@@ -2531,9 +2531,15 @@ async function remCopy(text, btn) {
   catch (e) { prompt('העתק:', text); }
   setTimeout(() => { btn.textContent = old; }, 1600);
 }
+// שליחת קישור בלי סריקה: חלון השיתוף של הטלפון (וואטסאפ, AirDrop, הודעה). אם אין, מעתיק
+async function remShare(url, btn) {
+  if (navigator.share) { try { await navigator.share({ url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  remCopy(url, btn);
+}
 function remFill() { $('#rmTopic').textContent = remTopic(); }
 $('#rmSetup').addEventListener('toggle', () => { if ($('#rmSetup').open) remFill(); });
 $('#rmCopyTopic').onclick = e => remCopy(remTopic(), e.currentTarget);
+$('#rmShare').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remListen(); remShare(remLink(), e.currentTarget); };
 $('#rmCopyLink').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remListen(); remCopy(remLink(), e.currentTarget); };
 $('#rmNew').onclick = () => { S.remoteTopic = remNew(); saveSettings(); remFill(); remListen(); toast('נוצר קוד חדש. צריך להחליף אותו גם באפליקציית ntfy'); };
 $('#rmTest').onclick = async () => {
@@ -2588,6 +2594,7 @@ function wkGot(raw) {
 // הצצה במחשבון: לחיצה ארוכה על השורה האפורה שמעל התוצאה
 longPress($('#cExp'), 600, () => { const el = $('#cExp'), old = el.textContent; el.textContent = LAST.text || '—'; setTimeout(() => { el.textContent = old; }, 1500); });
 $('#wkQr').onclick = () => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; REM.qr = wkLink(); go('remote'); };
+$('#wkShare').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remShare(wkLink(), e.currentTarget); };
 $('#wkCopy').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remCopy(wkLink(), e.currentTarget); };
 
 /* ===================== סטופר (כמו iOS 26) ===================== */
