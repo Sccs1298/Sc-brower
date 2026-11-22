@@ -1,0 +1,12 @@
+{
+  "name": "suunto-utm-nav",
+  "private": true,
+  "description": "SuuntoPlus sports app: enter a UTM coordinate on the watch and navigate to it",
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "devDependencies": {
+    "acorn": "8.14.0",
+    "proj4": "2.15.0"
+  }
+}

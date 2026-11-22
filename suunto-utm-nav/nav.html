@@ -1,0 +1,364 @@
+<!--
+  UTM Nav - enter a UTM coordinate on the watch and navigate to it.
+
+  All logic lives here because the Suunto 5 Peak does not support the main.js
+  onEvent callback. JavaScript inside the attributes must use single quotes only
+  and must never contain two opening curly braces in a row (template token).
+
+  Buttons
+    Edit mode:  UP = digit +1   UP hold = digit -1
+                DOWN = next digit (after the last digit: save and navigate)
+                DOWN hold = previous digit (on the first digit: cancel)
+    Nav mode:   DOWN hold = enter a new target
+                UP = show target coordinates / show hint
+-->
+<uiView
+  onLoad="
+    /*MATH-START*/
+    var U_A = 6378137.0;
+    var U_F = 1 / 298.257223563;
+    var U_K0 = 0.9996;
+    var U_N = U_F / (2 - U_F);
+    var U_N2 = U_N * U_N;
+    var U_N3 = U_N2 * U_N;
+    var U_AA = U_A / (1 + U_N) * (1 + U_N2 / 4 + U_N2 * U_N2 / 64);
+    var U_ALPHA = [U_N / 2 - 2 * U_N2 / 3 + 5 * U_N3 / 16, 13 * U_N2 / 48 - 3 * U_N3 / 5, 61 * U_N3 / 240];
+    var U_BETA = [U_N / 2 - 2 * U_N2 / 3 + 37 * U_N3 / 96, U_N2 / 48 + U_N3 / 15, 17 * U_N3 / 480];
+    var U_DELTA = [2 * U_N - 2 * U_N2 / 3 - 2 * U_N3, 7 * U_N2 / 3 - 8 * U_N3 / 5, 56 * U_N3 / 15];
+    var U_C = 2 * Math.sqrt(U_N) / (1 + U_N);
+
+    var mSinh = function(x) { var e = Math.exp(x); return (e - 1 / e) / 2; };
+    var mCosh = function(x) { var e = Math.exp(x); return (e + 1 / e) / 2; };
+    var mAtanh = function(x) { return 0.5 * Math.log((1 + x) / (1 - x)); };
+    var mRad = function(d) { return d * Math.PI / 180; };
+    var mDeg = function(r) { return r * 180 / Math.PI; };
+
+    var zoneOfLon = function(lonDeg) {
+      var z = Math.floor((lonDeg + 180) / 6) + 1;
+      return z > 60 ? 60 : (z < 1 ? 1 : z);
+    };
+
+    // UTM (northern hemisphere) to latitude/longitude in degrees, Krueger series
+    var utmToLatLon = function(zone, easting, northing) {
+      var xi = northing / (U_K0 * U_AA);
+      var eta = (easting - 500000) / (U_K0 * U_AA);
+      var xi1 = xi;
+      var eta1 = eta;
+      for (var j = 1; j <= 3; j++) {
+        xi1 -= U_BETA[j - 1] * Math.sin(2 * j * xi) * mCosh(2 * j * eta);
+        eta1 -= U_BETA[j - 1] * Math.cos(2 * j * xi) * mSinh(2 * j * eta);
+      }
+      var chi = Math.asin(Math.sin(xi1) / mCosh(eta1));
+      var phi = chi;
+      for (var k = 1; k <= 3; k++) {
+        phi += U_DELTA[k - 1] * Math.sin(2 * k * chi);
+      }
+      var lon0 = (zone - 1) * 6 - 180 + 3;
+      var lam = Math.atan2(mSinh(eta1), Math.cos(xi1));
+      return [mDeg(phi), lon0 + mDeg(lam)];
+    };
+
+    // Latitude/longitude in degrees to UTM easting/northing in the given zone (northern hemisphere)
+    var latLonToUtm = function(latDeg, lonDeg, zone) {
+      var phi = mRad(latDeg);
+      var lon0 = (zone - 1) * 6 - 180 + 3;
+      var lam = mRad(lonDeg - lon0);
+      var s = Math.sin(phi);
+      var t = mSinh(mAtanh(s) - U_C * mAtanh(U_C * s));
+      var xi1 = Math.atan2(t, Math.cos(lam));
+      var eta1 = mAtanh(Math.sin(lam) / Math.sqrt(1 + t * t));
+      var e = eta1;
+      var n = xi1;
+      for (var j = 1; j <= 3; j++) {
+        e += U_ALPHA[j - 1] * Math.cos(2 * j * xi1) * mSinh(2 * j * eta1);
+        n += U_ALPHA[j - 1] * Math.sin(2 * j * xi1) * mCosh(2 * j * eta1);
+      }
+      return [500000 + U_K0 * U_AA * e, U_K0 * U_AA * n];
+    };
+
+    // Distance in metres and initial true bearing in degrees
+    var distBearing = function(lat1, lon1, lat2, lon2) {
+      var p1 = mRad(lat1);
+      var p2 = mRad(lat2);
+      var dp = p2 - p1;
+      var dl = mRad(lon2 - lon1);
+      var h = Math.sin(dp / 2) * Math.sin(dp / 2) +
+        Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
+      var d = 2 * 6371008.8 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+      var y = Math.sin(dl) * Math.cos(p2);
+      var x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
+      return [d, (mDeg(Math.atan2(y, x)) + 360) % 360];
+    };
+    /*MATH-END*/
+
+    var STORE_KEY = 'utmTarget';
+    var ARRIVE_M = 15;
+    var AHEAD_DEG = 15;
+    var NDIGITS = 15;            // zone (2) + easting (6) + northing (7)
+    var DEFAULT_TARGET = [36, 700000, 3500000];
+
+    var mode = 0;                // 0 = navigate, 1 = edit
+    var digits = [];
+    var cursor = 0;
+    var target = null;           // [zone, easting, northing, lat, lon]
+    var errorText = '';
+    var showTarget = 0;
+    var loaded = 0;
+
+    var gpsReady = 0;
+    var myLat = null;
+    var myLon = null;
+    var compass = null;          // degrees, from the compass, null if not available
+    var cog = -1;                // degrees, direction of travel from GPS, -1 if not moving
+
+    var subs = [];
+    var shown = {};
+
+    var show = function(id, text) {
+      if (shown[id] !== text) {
+        shown[id] = text;
+        setText(id, text);
+      }
+    };
+
+    var pad = function(v, len) {
+      var s = '' + Math.floor(v);
+      while (s.length < len) { s = '0' + s; }
+      return s;
+    };
+
+    var setDigits = function(zone, easting, northing) {
+      var s = pad(zone, 2) + pad(easting, 6) + pad(northing, 7);
+      digits = [];
+      for (var i = 0; i < NDIGITS; i++) { digits.push(s.charCodeAt(i) - 48); }
+    };
+
+    var digitsValue = function(start, len) {
+      var v = 0;
+      for (var i = start; i < start + len; i++) { v = v * 10 + digits[i]; }
+      return v;
+    };
+
+    var rowText = function(start, len) {
+      var s = '';
+      for (var i = start; i < start + len; i++) {
+        s += (i == cursor) ? ('[' + digits[i] + ']') : ('' + digits[i]);
+      }
+      return s;
+    };
+
+    var setTarget = function(zone, easting, northing) {
+      var ll = utmToLatLon(zone, easting, northing);
+      target = [zone, easting, northing, ll[0], ll[1]];
+    };
+
+    var loadTarget = function() {
+      try {
+        var s = localStorage.getItem(STORE_KEY);
+        if (s) {
+          var p = s.split(',');
+          if (p.length == 3) { setTarget(parseInt(p[0], 10), parseInt(p[1], 10), parseInt(p[2], 10)); }
+        }
+      } catch (e) { target = null; }
+    };
+
+    var saveTarget = function() {
+      try { localStorage.setItem(STORE_KEY, target[0] + ',' + target[1] + ',' + target[2]); } catch (e) { }
+    };
+
+    var hasFix = function() {
+      return gpsReady >= 100 && myLat !== null && myLon !== null;
+    };
+
+    var startEdit = function() {
+      var zone = target ? target[0] : DEFAULT_TARGET[0];
+      if (hasFix()) {
+        // Prefill with the current position so a nearby point needs only a few digit changes
+        if (!target) { zone = zoneOfLon(myLon); }
+        var en = latLonToUtm(myLat, myLon, zone);
+        setDigits(zone, Math.round(en[0]), Math.round(en[1]));
+      } else if (target) {
+        setDigits(target[0], target[1], target[2]);
+      } else {
+        setDigits(DEFAULT_TARGET[0], DEFAULT_TARGET[1], DEFAULT_TARGET[2]);
+      }
+      cursor = 0;
+      errorText = '';
+      mode = 1;
+    };
+
+    var finishEdit = function() {
+      var zone = digitsValue(0, 2);
+      var easting = digitsValue(2, 6);
+      var northing = digitsValue(8, 7);
+      if (zone < 1 || zone > 60) { errorText = 'BAD ZONE'; cursor = 0; return; }
+      if (easting < 100000 || easting > 900000) { errorText = 'BAD EASTING'; cursor = 2; return; }
+      if (northing > 9400000) { errorText = 'BAD NORTHING'; cursor = 8; return; }
+      setTarget(zone, easting, northing);
+      saveTarget();
+      errorText = '';
+      showTarget = 0;
+      mode = 0;
+    };
+
+    var fmtDist = function(d) {
+      if (d < 1000) { return Math.round(d) + ' m'; }
+      if (d < 10000) { return (d / 1000).toFixed(2) + ' km'; }
+      return (d / 1000).toFixed(1) + ' km';
+    };
+
+    var render = function() {
+      if (mode == 1) {
+        show('#l0', errorText ? errorText : 'SET TARGET UTM');
+        show('#l1', 'Z ' + rowText(0, 2) + ' N');
+        show('#l2', 'E ' + rowText(2, 6));
+        show('#l3', 'N ' + rowText(8, 7));
+        show('#l4', 'UP +1  DN next');
+        return;
+      }
+
+      if (!target) {
+        show('#l0', 'UTM NAV');
+        show('#l1', 'NO TARGET');
+        show('#l2', '');
+        show('#l3', '');
+        show('#l4', 'Hold DN to enter');
+        return;
+      }
+
+      show('#l4', 'Hold DN = new');
+
+      var db = hasFix() ? distBearing(myLat, myLon, target[3], target[4]) : null;
+
+      // UP toggles a screen that shows the saved target coordinates
+      if (showTarget) {
+        show('#l0', 'TARGET Z' + target[0]);
+        show('#l1', db ? fmtDist(db[0]) : 'WAIT GPS');
+        show('#l2', 'E ' + pad(target[1], 6));
+        show('#l3', 'N ' + pad(target[2], 7));
+        return;
+      }
+
+      if (!db) {
+        show('#l0', 'GPS ' + gpsReady + '%');
+        show('#l1', 'WAIT GPS');
+        show('#l2', '');
+        show('#l3', '');
+        return;
+      }
+
+      show('#l0', 'BRG ' + pad(Math.round(db[1]) % 360, 3));
+      show('#l1', fmtDist(db[0]));
+
+      if (db[0] < ARRIVE_M) {
+        show('#l2', 'ARRIVED');
+        show('#l3', '');
+        return;
+      }
+
+      var hdg = compass !== null ? compass : (cog >= 0 ? cog : null);
+      if (hdg === null) {
+        show('#l2', 'NO HEADING');
+        show('#l3', 'walk on');
+        return;
+      }
+
+      var rel = (db[1] - hdg + 720) % 360;
+      if (rel <= AHEAD_DEG || rel >= 360 - AHEAD_DEG) {
+        show('#l2', '^ AHEAD ^');
+      } else if (rel <= 180) {
+        show('#l2', 'RIGHT ' + Math.round(rel));
+      } else {
+        show('#l2', 'LEFT ' + Math.round(360 - rel));
+      }
+      show('#l3', compass !== null ? 'compass' : 'by track');
+    };
+
+    var btnUp = function() {
+      if (mode == 1) {
+        digits[cursor] = (digits[cursor] + 1) % 10;
+      } else {
+        showTarget = showTarget ? 0 : 1;
+      }
+      render();
+    };
+
+    var btnUpHold = function() {
+      if (mode == 1) {
+        digits[cursor] = (digits[cursor] + 9) % 10;
+        render();
+      }
+    };
+
+    var btnDown = function() {
+      if (mode == 1) {
+        if (cursor < NDIGITS - 1) {
+          cursor++;
+          errorText = '';
+        } else {
+          finishEdit();
+        }
+        render();
+      }
+    };
+
+    var btnDownHold = function() {
+      if (mode == 1) {
+        if (cursor > 0) {
+          cursor--;
+        } else {
+          mode = 0;
+        }
+      } else {
+        startEdit();
+      }
+      render();
+    };
+  "
+  onActivate="
+    shown = {};
+    if (!loaded) {
+      loaded = 1;
+      loadTarget();
+    }
+    render();
+
+    subs = [];
+    subs.push($.subscribe('/Zapp/{zapp_index}/Output/ready', function(v) {
+      gpsReady = typeof v === 'number' ? v : 0;
+      render();
+    }, false));
+    subs.push($.subscribe('/Zapp/{zapp_index}/Output/lat', function(v) {
+      if (typeof v === 'number' && v !== 0) { myLat = v / 10000000; render(); }
+    }, false));
+    subs.push($.subscribe('/Zapp/{zapp_index}/Output/lon', function(v) {
+      if (typeof v === 'number' && v !== 0) { myLon = v / 10000000; render(); }
+    }, false));
+    subs.push($.subscribe('/Zapp/{zapp_index}/Output/cog', function(v) {
+      cog = typeof v === 'number' ? v : -1;
+      render();
+    }, false));
+    // Not documented for every watch: if it never reports, the direction of travel is used instead
+    subs.push($.subscribe('/Fusion/Compass/Heading', function(v) {
+      compass = (typeof v === 'number' && v === v) ? (mDeg(v) + 360) % 360 : null;
+      render();
+    }, false));
+  "
+  onDeactivate="
+    for (var i = 0; i < subs.length; i++) { $.unsubscribe(subs[i]); }
+    subs = [];
+  ">
+
+  <div id="suuntoplus">
+    <div id="l0" class="sp-t-m p-hc cm-mid" style="top:calc(14% - 50%e);">UTM NAV</div>
+    <div id="l1" class="sp-d-xs f-num p-hc" style="top:calc(34% - 50%e);">--</div>
+    <div id="l2" class="sp-d-xs f-num p-hc" style="top:calc(52% - 50%e);"></div>
+    <div id="l3" class="sp-d-xs f-num p-hc" style="top:calc(70% - 50%e);"></div>
+    <div id="l4" class="sp-t-m p-hc cm-mid" style="top:calc(87% - 50%e);"></div>
+
+    <userInput>
+      <pushButton name="up" onClick="btnUp();" onLongPressStart="btnUpHold();" />
+      <pushButton name="down" onClick="btnDown();" onLongPressStart="btnDownHold();" />
+    </userInput>
+  </div>
+</uiView>

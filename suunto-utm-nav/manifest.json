@@ -1,0 +1,23 @@
+{
+  "name": "UTM Nav",
+  "version": "0.1",
+  "author": "Sc",
+  "description": "Enter a UTM coordinate on the watch and navigate to it",
+  "type": "feature",
+  "usage": "workout",
+  "modificationTime": 1795392000,
+  "in": [
+    { "name": "gpsReadiness", "source": "/Fusion/Location/Readiness", "type": "subscribe" },
+    { "name": "latitude", "source": "/Fusion/Location/GeoCoordinates.latitude", "type": "subscribe" },
+    { "name": "longitude", "source": "/Fusion/Location/GeoCoordinates.longitude", "type": "subscribe" }
+  ],
+  "out": [
+    { "name": "ready" },
+    { "name": "lat" },
+    { "name": "lon" },
+    { "name": "cog" }
+  ],
+  "template": [
+    { "name": "nav.html" }
+  ]
+}
