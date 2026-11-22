@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Drone3D</string>
+    <string name="server_hint">כתובת שרת, למשל 192.168.1.20:8080</string>
+    <string name="connect">התחבר לשרת</string>
+    <string name="disconnect">נתק</string>
+    <string name="stream_on">שידור למידול: פעיל</string>
+    <string name="stream_off">שידור למידול: כבוי</string>
+    <string name="reset_model">מודל חדש</string>
+    <string name="finish">סיים ושמור</string>
+    <string name="fps">פריימים/שנייה</string>
+</resources>

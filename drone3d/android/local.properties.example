@@ -1,0 +1,4 @@
+# Copy to local.properties (never commit it).
+sdk.dir=/path/to/Android/Sdk
+# App key from https://developer.dji.com/user/apps  (package name must be com.drone3d.app)
+DJI_API_KEY=put-your-dji-app-key-here
