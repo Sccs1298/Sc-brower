@@ -1,9 +1,10 @@
 /* הגדרות מכירה – קובץ אחד לעריכה.
-   PAY_URL: קישור התשלום (Grow / PayBox / Bit לעסקים). ריק = כפתור הקנייה פותח וואטסאפ. */
+   PAY_URL: קישור התשלום (Grow / PayBox / Bit לעסקים). ריק = כפתור הקנייה פותח חלון תשלום בביט. */
 window.GK = {
   NAME: 'גלריית הקסם',
   PRICE: 99,
   PAY_URL: '',
+  BIT_PHONE: '', // הטלפון שמקבל את התשלום בביט. ריק = אותו מספר כמו הוואטסאפ
   WHATSAPP: '972559397892',
   EMAIL: 'nullbyteacademy1@gmail.com',
   SITE: 'https://sccs1298.github.io/Sc-brower/gallery/',
