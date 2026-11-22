@@ -104,6 +104,20 @@ details p { color: var(--dim); margin-top: 8px; max-width: 46em; }
 
 footer { border-top: 1px solid var(--line); padding-block: 28px calc(env(safe-area-inset-bottom) + 90px); color: var(--dim); font-size: 14px; display: grid; gap: 8px; }
 footer a { color: var(--fg); }
+/* תשלום בביט */
+.bit-bg { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.7); display: grid; place-items: center; padding: 16px; }
+.bit-bg[hidden] { display: none; }
+.bit { width: 100%; max-width: 420px; max-height: calc(100dvh - 32px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px; display: grid; gap: 14px; position: relative; }
+.bit h3 { font-size: 22px; }
+.bit ol { margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: b; }
+.bit li { list-style: none; counter-increment: b; display: grid; gap: 6px; padding-inline-start: 38px; position: relative; }
+.bit li::before { content: counter(b); position: absolute; inset-inline-start: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: var(--gold-ink); font-weight: 900; display: grid; place-items: center; font-size: 15px; }
+.bit .val { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-weight: 800; font-size: 19px; direction: ltr; }
+.bit .val button { direction: rtl; font: inherit; font-size: 14px; font-weight: 700; background: none; color: var(--gold); border: 1px solid var(--line); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.bit input { font: inherit; width: 100%; box-sizing: border-box; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.bit .x { position: absolute; top: 12px; inset-inline-end: 12px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--bg); color: var(--fg); font-size: 20px; cursor: pointer; }
+.bit .cta { width: 100%; box-sizing: border-box; }
+.bit small.dim { font-size: 14px; }
 .sticky { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: none; padding: 10px max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 10px) max(16px, env(safe-area-inset-left));
   background: rgba(11,11,18,.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--line); }
 .sticky .cta { width: 100%; min-height: 52px; flex-direction: row; gap: 8px; font-size: 18px; }
@@ -211,6 +225,7 @@ footer a { color: var(--fg); }
       <p class="kicker">שאלות נפוצות</p>
       <h2>לפני שקונים</h2>
       <details><summary>אפשר לנסות לפני שקונים?</summary><p>כן. גרסת הניסיון חינם וכוללת סרטון הדגמה שבו אפשר לבצע את הקסם המלא ולקרוא את המדריך. הגרסה המלאה פותחת את הסרטונים שלך ואת שאר הקסמים.</p></details>
+      <details><summary>איך משלמים?</summary><p>בביט: שולחים 99 ₪ לטלפון שמופיע בחלון התשלום, עם מספר ההזמנה בהערה, ולוחצים "שילמתי". הקוד מגיע אליך בוואטסאפ.</p></details>
       <details><summary>איך מקבלים את האפליקציה אחרי התשלום?</summary><p>מקבלים בוואטסאפ קוד רישיון אישי, לכל המאוחר תוך 24 שעות. פותחים את האפליקציה, לוחצים על "גרסת ניסיון" ומזינים את הקוד.</p></details>
       <details><summary>על אילו טלפונים זה עובד?</summary><p>אייפון (ב-Safari) ואנדרואיד (ב-Chrome). מוסיפים את האפליקציה למסך הבית, והיא נפתחת במסך מלא ועובדת גם בלי אינטרנט.</p></details>
       <details><summary>צריך ניסיון בקסמים?</summary><p>לא. לכל קסם יש באפליקציה הסבר מצויר, צעד אחרי צעד. רוב האנשים מבצעים את הקסם הראשון עם סרטון ההדגמה תוך כמה דקות.</p></details>
@@ -227,18 +242,60 @@ footer a { color: var(--fg); }
 </div>
 <div class="sticky"><a class="cta" data-buy href="#buy">קנה עכשיו · 99 ₪</a></div>
 
+<div class="bit-bg" id="bitBg" hidden>
+  <div class="bit" role="dialog" aria-modal="true" aria-labelledby="bitT">
+    <button class="x" type="button" id="bitX" aria-label="סגירה">×</button>
+    <h3 id="bitT">תשלום בביט</h3>
+    <ol>
+      <li><b>שולחים בביט לטלפון:</b><div class="val"><span id="bitPhone"></span><button type="button" data-copy="phone">העתק</button></div></li>
+      <li><b>סכום:</b><div class="val"><span id="bitSum"></span><button type="button" data-copy="sum">העתק</button></div></li>
+      <li><b>בהערה בביט כותבים את מספר ההזמנה:</b><div class="val"><span id="bitOrder"></span><button type="button" data-copy="order">העתק</button></div><small class="dim">ככה אני יודע שהתשלום שלך.</small></li>
+      <li><b>אחרי התשלום</b> לוחצים על הכפתור למטה, ומקבלים בוואטסאפ את קוד הרישיון.<input id="bitName" type="text" autocomplete="name" placeholder="השם שלך (לא חובה)" aria-label="השם שלך"></li>
+    </ol>
+    <a class="cta" id="bitDone" href="#" target="_blank" rel="noopener">שילמתי, שלחו לי את הקוד<small>נפתח וואטסאפ עם הודעה מוכנה</small></a>
+    <small class="dim">הקוד נשלח בדרך כלל תוך שעה, ולכל המאוחר תוך 24 שעות. לא מרוצה? החזר כספי מלא תוך 14 יום.</small>
+  </div>
+</div>
+
 <script src="config.js"></script>
 <script>
-// כפתורי הקנייה: קישור תשלום אם הוגדר, אחרת הזמנה בוואטסאפ
+// כפתורי הקנייה: קישור תשלום אם הוגדר, אחרת תשלום בביט והקוד נשלח בוואטסאפ
 (function () {
   var g = window.GK || {};
-  var wa = 'https://wa.me/' + (g.WHATSAPP || '972559397892') + '?text=' + encodeURIComponent('היי, אני רוצה לקנות את ' + (g.NAME || 'גלריית הקסם') + ' (' + (g.PRICE || 99) + ' ₪)');
-  var url = g.PAY_URL || wa;
-  document.querySelectorAll('[data-buy]').forEach(function (a) {
-    // הכפתורים שבראש הדף גוללים קודם לתיבת המחיר; הכפתור שבתיבה ובסרגל התחתון מוביל לתשלום
-    if (a.closest('.price') || a.closest('.sticky')) { a.href = url; a.target = '_blank'; a.rel = 'noopener'; }
+  var wa = g.WHATSAPP || '972559397892', price = g.PRICE || 99, name = g.NAME || 'גלריית הקסם';
+  var local = String(g.BIT_PHONE || wa).replace(/^972/, '0'), phone = local.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1-$2-$3');
+  var order = '';
+  try { order = sessionStorage.getItem('gk-order') || ''; } catch (e) {}
+  if (!order) { order = 'GK' + String(Math.floor(1000 + Math.random() * 9000)); try { sessionStorage.setItem('gk-order', order); } catch (e) {} }
+  var $ = function (id) { return document.getElementById(id); };
+  $('bitPhone').textContent = phone; $('bitSum').textContent = price + ' ₪'; $('bitOrder').textContent = order;
+  var vals = { phone: local, sum: String(price), order: order };
+  document.querySelectorAll('.bit [data-copy]').forEach(function (b) {
+    b.onclick = function () {
+      var t = vals[b.dataset.copy], old = b.textContent;
+      var ok = function () { b.textContent = 'הועתק ✓'; setTimeout(function () { b.textContent = old; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(t).then(ok, function () { prompt('העתק:', t); }); else prompt('העתק:', t);
+    };
   });
-  if (!g.PAY_URL) document.querySelectorAll('.price .cta small').forEach(function (s) { s.textContent = 'הזמנה ותשלום בוואטסאפ'; });
+  function doneLink() {
+    var n = $('bitName').value.trim();
+    var msg = 'היי, שילמתי ' + price + ' ₪ בביט על ' + name + '. מספר הזמנה: ' + order + (n ? '. השם שלי: ' + n : '') + '. אשמח לקוד הרישיון 🙏';
+    $('bitDone').href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent(msg);
+  }
+  $('bitName').addEventListener('input', doneLink); doneLink();
+  var bg = $('bitBg');
+  function open(e) { e.preventDefault(); bg.hidden = false; document.body.style.overflow = 'hidden'; }
+  function close() { bg.hidden = true; document.body.style.overflow = ''; }
+  $('bitX').onclick = close;
+  bg.addEventListener('click', function (e) { if (e.target === bg) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !bg.hidden) close(); });
+  document.querySelectorAll('[data-buy]').forEach(function (a) {
+    // הכפתורים שבראש הדף גוללים קודם לתיבת המחיר; הכפתור שבתיבה ובסרגל התחתון פותחים את התשלום
+    if (!(a.closest('.price') || a.closest('.sticky'))) return;
+    if (g.PAY_URL) { a.href = g.PAY_URL; a.target = '_blank'; a.rel = 'noopener'; }
+    else a.addEventListener('click', open);
+  });
+  if (!g.PAY_URL) document.querySelectorAll('.price .cta small').forEach(function (s) { s.textContent = 'תשלום בביט'; });
 })();
 </script>
 </body>
