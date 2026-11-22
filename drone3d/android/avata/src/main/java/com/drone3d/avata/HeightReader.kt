@@ -19,7 +19,9 @@ class HeightReader {
     private var lastTry = 0L
     @Volatile var height: Double? = null
         private set
-    @Volatile private var at = 0L
+    /** Capture time of the frame the current height was read from (sent as alt_osd_t). */
+    @Volatile var at = 0L
+        private set
     @Volatile var rawText: String = ""
         private set
 

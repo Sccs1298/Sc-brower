@@ -52,12 +52,13 @@ DEFAULTS = dict(
 
 class Keyframe:
     __slots__ = ("id", "gray", "color", "kps", "des", "pids", "R_wc", "C", "median_depth", "tracked",
-                 "R_tel", "C_tel", "tel_src", "mask", "alt")
+                 "R_tel", "C_tel", "tel_src", "mask", "alt", "t")
 
     def __init__(self, kid, gray, color, kps, des, R_wc, C, tel=(None, None, "none")):
         self.R_tel, self.C_tel, self.tel_src = tel
         self.mask = None
         self.alt = None      # height read from the DJI Fly screen (OCR), metres
+        self.t = None        # frame timestamp (ms)
         self.id = kid
         self.gray, self.color = gray, color
         self.kps, self.des = kps, des
@@ -167,6 +168,8 @@ class Mapper:
         self.height_scale_result = None
         self.boot_reason = None
         self._alt = None
+        self._frame_t = None
+        self.alt_readings = []          # (frame time ms, H metres) from on-screen OCR
 
     # ---------------------------------------------------------------- helpers
     def _prepare(self, img, tm):
@@ -236,7 +239,8 @@ class Mapper:
                 R0 = R_tel if R_tel is not None else np.eye(3)
                 C0 = C_tel if C_tel is not None else np.zeros(3)
             self.ref = dict(gray=gray, color=color, kps=kps, des=des, R_wc=R0, C=C0,
-                            C_tel=C_tel, tel=self._tel, frames=0, mask=self.mask, alt=self._alt)
+                            C_tel=C_tel, tel=self._tel, frames=0, mask=self.mask, alt=self._alt,
+                            t=self._frame_t)
             return False
         ref = self.ref
         ref["frames"] += 1
@@ -308,10 +312,12 @@ class Mapper:
         kf0 = Keyframe(len(self.kfs), ref["gray"], ref["color"], ref["kps"], ref["des"], R_wc0, C0, ref["tel"])
         kf0.mask = ref.get("mask")
         kf0.alt = ref.get("alt")
+        kf0.t = ref.get("t")
         self.kfs.append(kf0)
         kf1 = Keyframe(len(self.kfs), gray, color, kps, des, R_wc1, C1, self._tel)
         kf1.mask = self.mask
         kf1.alt = self._alt
+        kf1.t = self._frame_t
         self.kfs.append(kf1)
         idx0 = m[inl][good, 0]
         idx1 = m[inl][good, 1]
@@ -507,6 +513,7 @@ class Mapper:
             kf = Keyframe(len(self.kfs), gray, color, kps, des, R_wc, C, self._tel)
             kf.mask = self.mask
             kf.alt = self._alt
+            kf.t = self._frame_t
             kf.pids[fidx] = pids
             kf.median_depth = float(np.median(depth))
             kf.tracked = len(fidx)
@@ -648,6 +655,23 @@ class Mapper:
         self.gravity_quality = "floor"
         return nrm
 
+    def _alt_at(self, kf, max_gap_ms=2500):
+        """On-screen height at a keyframe's time: interpolated between the OCR readings just before
+        and after it (OCR is slow and misses frames; height changes smoothly)."""
+        if kf.t is None or not self.alt_readings:
+            return kf.alt
+        t = np.array([r[0] for r in self.alt_readings])
+        hv = np.array([r[1] for r in self.alt_readings])
+        i = int(np.searchsorted(t, kf.t))
+        if i < len(t) and abs(t[i] - kf.t) <= 150:
+            return float(hv[i])
+        if i > 0 and abs(t[i - 1] - kf.t) <= 150:
+            return float(hv[i - 1])
+        if 0 < i < len(t) and t[i] - t[i - 1] <= max_gap_ms:
+            w = (kf.t - t[i - 1]) / (t[i] - t[i - 1])
+            return float(hv[i - 1] + w * (hv[i] - hv[i - 1]))
+        return None
+
     def _osd_height_scale(self):
         """Continuous metric scale from the height H that DJI Fly prints on screen (read by OCR).
 
@@ -656,11 +680,16 @@ class Mapper:
         flight where a 2 deg tilt would leak horizontal distance into the heights."""
         if not self.gravity_aligned or any(k.R_tel is not None for k in self.kfs):
             return
-        ks = [k for k in self.kfs[-self.cfg["osd_scale_window"]:] if k.alt is not None]
+        ks, h = [], []
+        for k in self.kfs[-self.cfg["osd_scale_window"]:]:
+            a = self._alt_at(k)
+            if a is not None:
+                ks.append(k)
+                h.append(a)
         if len(ks) < 4:
             return
         X = np.array([k.C for k in ks])
-        h = np.array([k.alt for k in ks])
+        h = np.array(h)
         num = den = 0.0
         used_dh = 0.0
         for i in range(len(ks)):
@@ -896,8 +925,16 @@ class Mapper:
         color, gray = self._prepare(img, tm)
         R_tel, C_tel, src = self.tel.update(tm)
         self._tel = (R_tel, C_tel, src)
-        alt = (tm or {}).get("alt_osd")
+        tm_ = tm or {}
+        self._frame_t = tm_.get("t")
+        alt = tm_.get("alt_osd")
         self._alt = float(alt) if alt is not None else None
+        if alt is not None and tm_.get("alt_osd_t") is not None:
+            # OCR readings arrive late: keep them with the time of the frame they were read from
+            at = float(tm_["alt_osd_t"])
+            if not self.alt_readings or self.alt_readings[-1][0] < at:
+                self.alt_readings.append((at, float(alt)))
+                self.alt_readings = self.alt_readings[-2000:]
         kps, des = self._features(gray)
         n_kf = len(self.kfs)
         if self.state == "init":

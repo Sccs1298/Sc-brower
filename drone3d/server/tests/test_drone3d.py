@@ -218,3 +218,33 @@ def test_height_marks_need_vertical_motion():
     m.last_pose = (np.eye(3), np.array([0.05, 0.0, 0.75]))       # straight climb: 1.5 m == 0.75 units
     r = m.mark_height(2.5)
     assert r["ok"] and r["factor"] == pytest.approx(2.0, rel=0.01)
+
+
+# ------------------------------------------------- iPhone: AirPlay mirroring grabbed on the computer
+def test_parse_height_formats():
+    from drone3d.capture import parse_height
+    assert parse_height("< N  In Flight\nH 12.3m   D 40m") == pytest.approx(12.3)
+    assert parse_height("ALT: 3,5 m") == pytest.approx(3.5)
+    assert parse_height("H 40 ft") == pytest.approx(12.192)
+    assert parse_height("HDR 4K  D 10m") is None
+
+
+def test_letterbox_crop_finds_mirrored_picture():
+    from drone3d.capture import LetterboxCropper
+    screen = np.zeros((800, 1280, 3), np.uint8)
+    screen[130:670, :] = np.random.default_rng(0).integers(30, 255, (540, 1280, 3))   # 16:9 picture
+    out = LetterboxCropper()(screen)
+    assert abs(out.shape[0] - 540) <= 8 and out.shape[1] == 1280
+
+
+@pytest.mark.skipif(not __import__("shutil").which("tesseract"), reason="tesseract not installed")
+def test_ocr_reads_dji_fly_height():
+    import cv2
+    pytesseract = pytest.importorskip("pytesseract")
+    from drone3d.capture import HeightOCR
+    from synth import draw_hud
+    rng = np.random.default_rng(2)
+    img = cv2.GaussianBlur(rng.integers(0, 255, (360, 640, 3), dtype=np.uint8), (0, 0), 3)
+    img = cv2.resize(draw_hud(img, 3, np.array([5.0, 9.0, 7.4])), (1280, 720))
+    reader = HeightOCR.__new__(HeightOCR)
+    assert reader.read(img, pytesseract) == pytest.approx(7.4)

@@ -87,6 +87,9 @@
   <div class="line"><input id="f-in" type="number" step="0.01" placeholder="פקטור">
     <button id="b-factor">הכפל ידנית</button></div>
   <div id="scale-msg" class="hint"></div>
+  <h2 style="margin-top:10px">כיול עדשה (פעם אחת לכל רחפן)</h2>
+  <p class="hint">מציגים את <a href="chessboard_9x6.png" target="_blank">לוח הכיול</a> מודפס או במסך אחר, ומזיזים את הרחפן ביד (בלי להמריא) מול הלוח מכמה זוויות, עד 12 תצוגות.</p>
+  <div class="line"><button id="b-cal-start">התחל כיול</button><button id="b-cal-done">סיים כיול</button></div>
 </div>
 
 <div id="struct" class="panel"></div>
@@ -347,6 +350,14 @@ document.getElementById("b-factor").onclick = async () => {
   const f = parseFloat(document.getElementById("f-in").value);
   if (!(f > 0)) return;
   say(await command({ cmd: "scale", factor: f }), () => `המודל הוכפל ב־${f}`);
+};
+document.getElementById("b-cal-start").onclick = async () => {
+  await command({ cmd: "calibrate_start" });
+  scaleMsg.textContent = "כיול פעיל – כוון את הרחפן אל הלוח מזוויות שונות";
+};
+document.getElementById("b-cal-done").onclick = async () => {
+  const r = await command({ cmd: "calibrate_finish" });
+  scaleMsg.textContent = r.ok ? `העדשה כוילה ✓ (שגיאה ${r.rms} px) – אפשר להמריא` : `עוד לא: ${r.reason || ""}`;
 };
 if (bridge) document.getElementById("b-export").onclick = (e) => { e.preventDefault(); bridge.share(); };
 

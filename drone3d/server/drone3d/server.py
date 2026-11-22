@@ -201,6 +201,7 @@ def make_app(record_root=None, mapper_cfg=None, calib_path=None):
     app = web.Application(client_max_size=32 * 1024 * 1024)
     app.add_routes([
         web.get("/", index),
+        web.get("/chessboard_9x6.png", lambda r: web.FileResponse(os.path.join(VIEWER_DIR, "chessboard_9x6.png"))),
         web.get("/ws/drone", drone_ws),
         web.get("/ws/viewer", viewer_ws),
         web.get("/api/state", api_state),
@@ -235,6 +236,12 @@ def main():
     ap.add_argument("--screen", action="store_true",
                     help="frames are screen recordings of DJI Fly (mask the on-screen display)")
     ap.add_argument("--calib", help="lens calibration json (created by the calibration mode)")
+    ap.add_argument("--airplay", action="store_true",
+                    help="iPhone mode: grab this computer's screen where the iPhone (DJI Fly) is mirrored by AirPlay")
+    ap.add_argument("--window", help="with --airplay: title of the AirPlay receiver window (e.g. UxPlay)")
+    ap.add_argument("--monitor", type=int, default=1, help="with --airplay: monitor to grab (1 = main)")
+    ap.add_argument("--region", help="with --airplay: grab only x,y,w,h of the screen")
+    ap.add_argument("--no-ocr", action="store_true", help="with --airplay: do not read the height H from the screen")
     ap.add_argument("--no-dense", action="store_true")
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -243,15 +250,28 @@ def main():
         cfg["dense"] = False
     if a.hfov:
         cfg["hfov"] = a.hfov
-    if a.screen:
+    if a.screen or a.airplay:
         cfg["auto_overlay_mask"] = True
-    app = make_app(a.record or None, cfg, a.calib)
+    calib = a.calib or ("calibration.json" if (a.airplay or a.screen) else None)   # calibration mode saves here
+    app = make_app(a.record or None, cfg, calib)
     if a.source:
         async def start_src(app):
             loop = asyncio.get_running_loop()
             threading.Thread(target=video_source_thread, args=(app["session"], loop, a.source, a.fps, a.hfov),
                              daemon=True).start()
         app.on_startup.append(start_src)
+    if a.airplay:
+        from .capture import screen_source_thread
+
+        async def start_grab(app):
+            loop = asyncio.get_running_loop()
+            sess = app["session"]
+            region = tuple(int(v) for v in a.region.split(",")) if a.region else None
+            threading.Thread(target=screen_source_thread, daemon=True, kwargs=dict(
+                submit=lambda tm, jpg: loop.call_soon_threadsafe(sess.submit, tm, jpg),
+                fps=a.fps if a.fps != 4.0 else 3.0, monitor=a.monitor, region=region, window=a.window,
+                ocr=not a.no_ocr)).start()
+        app.on_startup.append(start_grab)
     print(f"Drone3D server: open http://<this-computer-ip>:{a.port}/ in a browser; phone app -> ws://<ip>:{a.port}/ws/drone")
     web.run_app(app, host=a.host, port=a.port, print=None)
 

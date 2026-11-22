@@ -1,0 +1,5 @@
+# extra packages for the iPhone / AirPlay mode (python -m drone3d.server --airplay)
+-r requirements.txt
+mss>=9                                   # screen grabbing
+pytesseract>=0.3                         # reads the height H from DJI Fly (needs the tesseract program)
+pygetwindow>=0.0.9; sys_platform != "linux"   # optional: grab one window by title (--window)

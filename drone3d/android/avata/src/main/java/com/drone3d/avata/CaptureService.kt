@@ -144,7 +144,7 @@ class CaptureService : Service() {
             // the height H printed by DJI Fly -> metric scale (OCR, ~1x per second)
             if (!calibrating && prefs.getBoolean("ocr_height", true)) {
                 heightReader.maybeRead(bytes, img.width, img.height, plane.rowStride, now)
-                heightReader.current(now)?.let { tm.put("alt_osd", it) }
+                heightReader.current(now)?.let { tm.put("alt_osd", it).put("alt_osd_t", heightReader.at) }
             }
             if (Engine.submitRgba(bytes, img.width, img.height, plane.rowStride, tm)) lastFrame = now
             overlay?.setStatus(status())
