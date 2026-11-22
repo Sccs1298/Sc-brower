@@ -47,26 +47,25 @@ p { margin: 0; }
 .trust span::before { content: "✓ "; color: var(--ok); }
 
 /* הדגמה חיה: טלפון עם "סרטון" שבו המספר מופיע */
-.phone { justify-self: center; width: min(100%, 290px); aspect-ratio: 9/19; border-radius: 42px; background: #000; border: 8px solid #2a2a36; position: relative; overflow: hidden;
+.phone { width: min(78vw, 290px); aspect-ratio: 9/19; border-radius: 42px; background: #000; border: 8px solid #2a2a36; position: relative; overflow: hidden;
   box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px #3a3a4a; }
+.stage { justify-self: center; display: grid; justify-items: center; gap: 12px; position: relative; }
+.stage::before { content: ""; position: absolute; inset: 8% -18% 14%; background: radial-gradient(closest-side, rgba(242,193,78,.32), transparent); filter: blur(30px); z-index: -1; animation: breathe 5s ease-in-out infinite; }
+.phone video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cap { font-size: 13px; color: var(--dim); }
+.cap::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ff3b30; margin-inline-end: 7px; vertical-align: 1px; animation: rec 1.6s infinite; }
+@keyframes rec { 50% { opacity: .25; } }
+@keyframes breathe { 50% { opacity: .55; transform: scale(.94); } }
+h1 .gold { background: linear-gradient(100deg, #f2c14e 20%, #fff3c4 40%, #f2c14e 60%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 4.5s linear infinite; }
+@keyframes shine { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+.rv { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.rv.in { opacity: 1; transform: none; }
+.wa { position: fixed; z-index: 30; inset-inline-start: max(16px, env(safe-area-inset-left)); bottom: calc(env(safe-area-inset-bottom) + 18px); width: 58px; height: 58px; border-radius: 50%; background: #25d366; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
+.wa svg { width: 32px; height: 32px; }
+.wa:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.wa-line { display: inline-flex; align-items: center; gap: 8px; color: #25d366; font-weight: 700; text-decoration: none; }
+.wa-line svg { width: 22px; height: 22px; }
 .phone .isl { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 84px; height: 24px; border-radius: 14px; background: #000; z-index: 3; }
-.ph-head { position: absolute; top: 44px; left: 0; right: 0; text-align: center; font-size: 13px; line-height: 1.25; z-index: 2; }
-.ph-head b { display: block; font-size: 14px; }
-.ph-head span { color: #9a9aa6; font-size: 11.5px; }
-.ph-head span i { font-style: normal; animation: timeflip 9s infinite; }
-.scene { position: absolute; inset: 86px 0 96px; background: linear-gradient(#3a332c 0 62%, #4a3b2c 62% 100%); display: grid; place-items: center; }
-.scene::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, rgba(255,236,200,.28), transparent 60%); }
-.frame { width: 56%; aspect-ratio: 4/5; background: linear-gradient(135deg, #b8893a, #e8c77a 50%, #8a6224); padding: 9px; box-shadow: 8px 10px 0 rgba(0,0,0,.35); position: relative; }
-.canvas { width: 100%; height: 100%; background: #efe4cc; display: grid; place-items: center; }
-.canvas b { font: 700 74px "Amatic SC", cursive; color: #2a1d12; transform: rotate(-4deg); animation: reveal 9s infinite; }
-.ph-strip { position: absolute; left: 14px; right: 14px; bottom: 52px; height: 26px; border-radius: 7px; background: repeating-linear-gradient(90deg, #4a3f34 0 18px, #3a312a 18px 20px); }
-.ph-strip::after { content: ""; position: absolute; top: -3px; bottom: -3px; width: 3px; border-radius: 2px; background: #fff; animation: head 9s linear infinite; }
-.ph-tools { position: absolute; left: 0; right: 0; bottom: 16px; display: flex; justify-content: space-around; color: #fff; font-size: 15px; opacity: .85; }
-.say { position: absolute; left: 10px; right: 10px; top: 92px; text-align: center; font-weight: 700; font-size: 13.5px; z-index: 2; text-shadow: 0 1px 4px #000; animation: say 9s infinite; }
-@keyframes reveal { 0%, 58% { opacity: 0; filter: blur(3px); } 72%, 96% { opacity: .92; filter: none; } 100% { opacity: 0; } }
-@keyframes head { from { left: 0; } to { left: 100%; } }
-@keyframes say { 0%, 4% { opacity: 0; } 10%, 52% { opacity: 1; } 60%, 100% { opacity: 0; } }
-@keyframes timeflip { 0%, 58% { opacity: .0; } 72%, 96% { opacity: 1; } 100% { opacity: 0; } }
 
 section { padding-block: 56px; border-top: 1px solid var(--line); }
 .kicker { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .5px; margin-bottom: 8px; }
@@ -123,14 +122,24 @@ footer a { color: var(--fg); }
 .sticky .cta { width: 100%; min-height: 52px; flex-direction: row; gap: 8px; font-size: 18px; }
 
 @media (max-width: 760px) {
-  .hero { grid-template-columns: minmax(0, 1fr); gap: 34px; padding-block: 12px 48px; }
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 4px 44px; }
+  .hero > div:first-child { display: contents; }
+  .hero h1 { order: 1; text-align: center; }
+  .stage { order: 2; }
+  .hero p.lead { order: 3; margin-top: 4px; text-align: center; }
+  .cta-row { order: 4; margin-top: 4px; justify-content: center; }
+  .cta-row .cta { flex: 1 1 100%; }
+  .cta-row .ghost { display: none; }
+  .trust { order: 5; margin-top: 0; justify-content: center; }
+  .phone { width: min(58vw, 230px); border-radius: 34px; border-width: 6px; }
   .steps { grid-template-columns: minmax(0, 1fr); }
   .why { grid-template-columns: minmax(0, 1fr); }
   .price { grid-template-columns: minmax(0, 1fr); padding: 24px; }
   .sticky { display: block; }
+  .wa { bottom: calc(env(safe-area-inset-bottom) + 86px); width: 54px; height: 54px; }
   section { padding-block: 44px; }
 }
-@media (prefers-reduced-motion: reduce) { .canvas b, .say, .ph-head span i { animation: none; opacity: 1; filter: none; } .ph-strip::after { animation: none; left: 80%; } html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } h1 .gold { animation: none; color: var(--gold); } .stage::before, .cap::before { animation: none; } html { scroll-behavior: auto; } }
 </style>
 </head>
 <body>
@@ -151,17 +160,16 @@ footer a { color: var(--fg); }
         </div>
         <div class="trust"><span>אייפון ואנדרואיד</span><span>עובד בלי אינטרנט</span><span>תשלום אחד, בלי מנוי</span></div>
       </div>
-      <div class="phone" aria-label="הדגמה: מספר מופיע בתוך סרטון בגלריה" role="img">
-        <div class="isl"></div>
-        <div class="ph-head"><b>היום</b><span>17:<i>47</i></span></div>
-        <div class="say">"תחשוב על מספר בין 10 ל-99"</div>
-        <div class="scene"><div class="frame"><div class="canvas"><b>47</b></div></div></div>
-        <div class="ph-strip"></div>
-        <div class="ph-tools"><span>⇪</span><span>♡</span><span>ⓘ</span><span>☰</span><span>🗑</span></div>
+      <div class="stage">
+        <div class="phone">
+          <div class="isl"></div>
+          <video id="heroVid" src="media/hero.mp4" poster="media/hero.jpg" autoplay muted loop playsinline preload="auto" aria-label="הדגמה: הצופה חושב על מספר, והמספר 47 מופיע בתוך התמונה בגלריה"></video>
+        </div>
+        <p class="cap">צילום מסך אמיתי מהאפליקציה</p>
       </div>
     </div>
 
-    <section>
+    <section class="rv">
       <p class="kicker">מה הצופה רואה</p>
       <h2>סרטון רגיל בגלריה. בלי אפליקציה "חשודה".</h2>
       <ol class="steps">
@@ -171,7 +179,7 @@ footer a { color: var(--fg); }
       </ol>
     </section>
 
-    <section>
+    <section class="rv">
       <p class="kicker">מה אפשר לחשוף</p>
       <h2>כל מה שהצופה בוחר. בתוך סרטון שלך.</h2>
       <div class="tricks">
@@ -184,7 +192,7 @@ footer a { color: var(--fg); }
       </div>
     </section>
 
-    <section>
+    <section class="rv">
       <p class="kicker">למה דווקא זו</p>
       <h2>נבנתה כדי שלא יחשדו</h2>
       <ul class="why">
@@ -197,11 +205,11 @@ footer a { color: var(--fg); }
       </ul>
     </section>
 
-    <section id="buy">
+    <section id="buy" class="rv">
       <div class="price">
         <div>
           <p class="kicker">הגרסה המלאה</p>
-          <h2>כל הקסמים. תשלום אחד.</h2>
+          <h2>כל אפקטי הגלריה. תשלום אחד.</h2>
           <ul>
             <li>כל אפקטי הגלריה, עם הסרטונים והתמונות שלך</li>
             <li>כל העדכונים, בלי תשלום נוסף</li>
@@ -217,7 +225,7 @@ footer a { color: var(--fg); }
       </div>
     </section>
 
-    <section>
+    <section class="rv">
       <p class="kicker">שאלות נפוצות</p>
       <h2>לפני שקונים</h2>
       <details><summary>אפשר לנסות לפני שקונים?</summary><p>כן. גרסת הניסיון חינם וכוללת סרטון הדגמה שבו אפשר לבצע את הקסם המלא ולקרוא את המדריך. הגרסה המלאה פותחת את הסרטונים שלך ואת שאר הקסמים.</p></details>
@@ -227,6 +235,7 @@ footer a { color: var(--fg); }
       <details><summary>צריך ניסיון בקסמים?</summary><p>לא. יש באפליקציה הסבר צעד אחרי צעד וסרטון הדגמה מוכן. רוב האנשים מבצעים את הקסם הראשון תוך כמה דקות.</p></details>
       <details><summary>הסרטונים שלי נשלחים למקום כלשהו?</summary><p>לא. הסרטונים והתמונות נשמרים רק על המכשיר שלך. אין שרת ואין העלאה.</p></details>
       <details><summary>מה אם אחליף טלפון?</summary><p>הקוד שלך אישי ועובד גם בטלפון החדש שלך. הסרטונים נשמרים על המכשיר, אז מוסיפים אותם מחדש.</p></details>
+      <p style="margin-top:22px"><a class="wa-line" data-wa href="#"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#25d366" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-1-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c0-.2-.3-.3-.6-.5z"/></svg>יש עוד שאלה? כתבו לי בוואטסאפ</a></p>
     </section>
   </main>
 
@@ -236,6 +245,7 @@ footer a { color: var(--fg); }
     <p>האפליקציה מיועדת לבידור והופעות קסמים. אייפון ואפל הם סימני מסחר של Apple Inc. המוצר אינו קשור לאפל ואינו מטעמה.</p>
   </footer>
 </div>
+<a class="wa" data-wa href="#" target="_blank" rel="noopener" aria-label="שאלה? כתבו לי בוואטסאפ"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-1-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c0-.2-.3-.3-.6-.5z"/></svg></a>
 <div class="sticky"><a class="cta" data-buy href="#buy">קנה עכשיו · 99 ₪</a></div>
 
 <div class="bit-bg" id="bitBg" hidden>
@@ -250,6 +260,7 @@ footer a { color: var(--fg); }
     </ol>
     <a class="cta" id="bitDone" href="#" target="_blank" rel="noopener">שילמתי, שלחו לי את הקוד<small>נפתח וואטסאפ עם הודעה מוכנה</small></a>
     <small class="dim">הקוד נשלח בדרך כלל תוך שעה, ולכל המאוחר תוך 24 שעות.</small>
+    <a class="wa-line" data-wa href="#" target="_blank" rel="noopener"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#25d366" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-1-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c0-.2-.3-.3-.6-.5z"/></svg>שאלה לפני שמשלמים? כתבו לי</a>
   </div>
 </div>
 
@@ -286,11 +297,17 @@ footer a { color: var(--fg); }
   bg.addEventListener('click', function (e) { if (e.target === bg) close(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !bg.hidden) close(); });
   document.querySelectorAll('[data-buy]').forEach(function (a) {
-    // הכפתורים שבראש הדף גוללים קודם לתיבת המחיר; הכפתור שבתיבה ובסרגל התחתון פותחים את התשלום
-    if (!(a.closest('.price') || a.closest('.sticky'))) return;
     if (g.PAY_URL) { a.href = g.PAY_URL; a.target = '_blank'; a.rel = 'noopener'; }
     else a.addEventListener('click', open);
   });
+  var waHref = 'https://wa.me/' + wa + '?text=' + encodeURIComponent('היי, יש לי שאלה על ' + name);
+  document.querySelectorAll('[data-wa]').forEach(function (a) { a.href = waHref; a.target = '_blank'; a.rel = 'noopener'; });
+  var rv = document.querySelectorAll('.rv');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+    rv.forEach(function (el) { io.observe(el); });
+  } else rv.forEach(function (el) { el.classList.add('in'); });
+  var v = $('heroVid'); if (v) { var pl = v.play(); if (pl && pl.catch) pl.catch(function () {}); }
   if (!g.PAY_URL) document.querySelectorAll('.price .cta small').forEach(function (s) { s.textContent = 'תשלום בביט'; });
 })();
 </script>
