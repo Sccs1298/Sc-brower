@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Drone3D Avata</string>
+    <string name="title">מידול תלת־ממדי חי ל־DJI Avata</string>
+    <string name="drone">רחפן</string>
+    <string name="step_overlay">1. הרשאה להצגה מעל אפליקציות אחרות</string>
+    <string name="grant">הענק הרשאה</string>
+    <string name="step_calib">2. כיול עדשה (פעם אחת לכל רחפן)</string>
+    <string name="calib_help">מציגים את לוח השחמט (הדפסה או מסך מחשב), מחברים את הטלפון למשקפות, ומזיזים את הרחפן ביד (בלי להמריא, עם מגני מדחפים) מול הלוח מכמה זוויות ומרחקים עד שנאספות 12 תצוגות.</string>
+    <string name="share_board">שתף את לוח הכיול להדפסה</string>
+    <string name="calibrate">התחל כיול</string>
+    <string name="step_fly">3. טיסה ומידול</string>
+    <string name="fly_help">לוחצים \"התחל\", מאשרים צילום מסך, ו־DJI Fly נפתחת עם חלון מודל צף. האפליקציה קוראת לבד את הגובה H שמופיע ב־DJI Fly (זיהוי טקסט) וממנו קובעת מידות אמיתיות – לכן מיד אחרי ההמראה טפסו ישר למעלה 2–3 מ\', ומדי פעם עלו או רדו. אם הגובה לא נקרא (בחלון הצף רשום \"H לא נקרא\"), לחצו 📏 וסמנו את H ידנית פעמיים בטיפוס ישר. טסים במצב Normal (אופק ישר), לאט, ומסתובבים מדי פעם.</string>
+    <string name="start">התחל – פתח את DJI Fly</string>
+    <string name="stop">עצור</string>
+    <string name="fps">פריימים לשנייה לעיבוד</string>
+    <string name="view_model">הצג את המודל האחרון</string>
+    <string name="share_model">שתף מודל (PLY)</string>
+    <string name="notif_channel">מידול חי</string>
+    <string name="notif_text">ממדל את מה ש־DJI Fly מציגה</string>
+</resources>

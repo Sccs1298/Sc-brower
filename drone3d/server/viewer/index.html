@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Drone3D Live</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: rgba(22, 27, 34, 0.88); --text: #e6edf3; --muted: #8b949e;
+    --accent: #2f81f7; --ok: #3fb950; --warn: #d29922; --bad: #f85149; --border: #30363d;
+    --grid-major: #444c56; --grid-minor: #2d333b;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f6f8fa; --panel: rgba(255, 255, 255, 0.92); --text: #1f2328; --muted: #59636e;
+      --accent: #0969da; --ok: #1a7f37; --warn: #9a6700; --bad: #cf222e; --border: #d0d7de;
+      --grid-major: #afb8c1; --grid-minor: #d8dee4;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1117; --panel: rgba(22, 27, 34, 0.88); --text: #e6edf3; --muted: #8b949e;
+    --accent: #2f81f7; --ok: #3fb950; --warn: #d29922; --bad: #f85149; --border: #30363d;
+    --grid-major: #444c56; --grid-minor: #2d333b;
+  }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+  #c { position: fixed; inset: 0; }
+  .panel { position: fixed; background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; backdrop-filter: blur(6px); }
+  #hud { top: 12px; right: 12px; min-width: 220px; max-width: calc(100vw - 48px); }
+  #hud h1 { font-size: 15px; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); display: inline-block; }
+  .row { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); }
+  .row b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; direction: ltr; }
+  #struct { top: 12px; left: 12px; max-width: min(320px, calc(100vw - 48px)); max-height: 45vh; overflow: auto; display: none; }
+  #struct h2 { font-size: 14px; margin: 0 0 6px; }
+  #struct ul { margin: 4px 0; padding-inline-start: 18px; }
+  #bar { bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; flex-wrap: wrap;
+    justify-content: center; max-width: calc(100vw - 48px); }
+  button, .btn { background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; font: inherit; cursor: pointer; text-decoration: none; }
+  button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:hover, .btn:hover { border-color: var(--accent); }
+  label.sz { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .warn { color: var(--warn); font-weight: 600; margin-top: 4px; max-width: 260px; }
+  .warn:empty { display: none; }
+  #scale { left: 50%; bottom: 76px; transform: translateX(-50%); width: min(360px, calc(100vw - 48px)); display: none; }
+  #scale h2 { font-size: 14px; margin: 0 0 4px; }
+  .hint { color: var(--muted); font-size: 12px; margin: 4px 0; }
+  .line { display: flex; gap: 6px; margin: 6px 0; }
+  .line input { flex: 1; min-width: 0; background: transparent; color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 8px; font: inherit; direction: ltr; }
+  body.compact #bar, body.compact #struct, body.compact #scale { display: none !important; }
+  body.compact #hud { top: 4px; right: 4px; padding: 4px 6px; font-size: 11px; min-width: 0; }
+  body.compact #hud .row:nth-of-type(n+4) { display: none; }
+  body.compact #hud h1 { font-size: 12px; margin: 0 0 2px; }
+  @media (max-width: 600px) {
+    #hud { top: 8px; right: 8px; padding: 8px; font-size: 12px; min-width: 0; }
+    #struct { top: auto; bottom: 62px; left: 8px; right: 8px; max-width: none; max-height: 28vh; }
+    #bar { bottom: 8px; left: 8px; right: 8px; transform: none; max-width: none; flex-wrap: nowrap;
+      overflow-x: auto; justify-content: flex-start; padding: 6px; }
+    #bar > * { flex: none; }
+    button, .btn { padding: 6px 8px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" class="panel">
+  <h1><span id="dot" class="dot"></span><span id="title">Drone3D – מידול חי</span></h1>
+  <div class="row"><span>מצב</span><b id="s-state">ממתין לרחפן…</b></div>
+  <div class="row"><span>נקודות במודל</span><b id="s-pts">0</b></div>
+  <div class="row"><span>פריימים מפתח</span><b id="s-kf">0</b></div>
+  <div class="row"><span>מיקום מ־</span><b id="s-src">–</b></div>
+  <div class="row"><span>קנה מידה</span><b id="s-metric">–</b></div>
+  <div class="row"><span>זמן עיבוד</span><b id="s-ms">–</b></div>
+  <div id="warn" class="warn"></div>
+</div>
+
+<div id="scale" class="panel">
+  <h2>קנה מידה (רחפן בלי טלמטריה, למשל Avata)</h2>
+  <p class="hint">רשום את הגובה <b>H</b> שמוצג ב־DJI Fly ולחץ "סמן". עלה או רד לפחות מטר אחד, ושוב "סמן".</p>
+  <div class="line"><input id="h-in" type="number" step="0.1" inputmode="decimal" placeholder="H במטרים">
+    <button id="b-mark">סמן גובה</button></div>
+  <div class="line"><button id="b-door">לפי דלת שזוהתה (2.05 מ')</button></div>
+  <div class="line"><input id="f-in" type="number" step="0.01" placeholder="פקטור">
+    <button id="b-factor">הכפל ידנית</button></div>
+  <div id="scale-msg" class="hint"></div>
+  <h2 style="margin-top:10px">כיול עדשה (פעם אחת לכל רחפן)</h2>
+  <p class="hint">מציגים את <a href="chessboard_9x6.png" target="_blank">לוח הכיול</a> מודפס או במסך אחר, ומזיזים את הרחפן ביד (בלי להמריא) מול הלוח מכמה זוויות, עד 12 תצוגות.</p>
+  <div class="line"><button id="b-cal-start">התחל כיול</button><button id="b-cal-done">סיים כיול</button></div>
+</div>
+
+<div id="struct" class="panel"></div>
+
+<div id="bar" class="panel">
+  <button id="b-follow" class="on">עקוב אחרי הרחפן</button>
+  <button id="b-top">מבט על</button>
+  <button id="b-struct" class="on">מבנה</button>
+  <label class="sz">גודל נקודה <input id="psize" type="range" min="1" max="8" value="3"></label>
+  <button id="b-scale">קנה מידה</button>
+  <a id="b-export" class="btn" href="api/export.ply" download>הורד PLY</a>
+  <button id="b-reset">איפוס</button>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three.module.js",
+  "three/addons/": "./vendor/addons/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let grid = null, groundZ = 0;
+const canvas = document.getElementById("c");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const scene = new THREE.Scene();
+const setBg = () => { scene.background = new THREE.Color(css("--bg")); if (grid) makeGrid(groundZ); };
+setBg();
+matchMedia("(prefers-color-scheme: light)").addEventListener("change", setBg);
+const cam = new THREE.PerspectiveCamera(60, 1, 0.05, 2000);
+cam.position.set(-15, 12, 20);
+const controls = new OrbitControls(cam, canvas);
+controls.enableDamping = true;
+// ground grid: placed at the detected ground level once the structure analysis finds it
+function makeGrid(z) {
+  if (grid) scene.remove(grid);
+  grid = new THREE.GridHelper(60, 30, new THREE.Color(css("--grid-major")), new THREE.Color(css("--grid-minor")));
+  grid.position.y = z;
+  scene.add(grid);
+}
+makeGrid(groundZ);
+scene.add(new THREE.AxesHelper(1));
+
+// ENU (x east, y north, z up) -> three.js (x, y up, -z north)
+const enu = (p) => new THREE.Vector3(p[0], p[2], -p[1]);
+
+// ---------------------------------------------------------------- points
+let cap = 1 << 20, count = 0;
+let pos = new Float32Array(cap * 3), col = new Float32Array(cap * 3);
+const geom = new THREE.BufferGeometry();
+const mat = new THREE.PointsMaterial({ size: 0.04, vertexColors: true, sizeAttenuation: true });
+const cloud = new THREE.Points(geom, mat);
+cloud.frustumCulled = false;
+scene.add(cloud);
+function bindAttrs() {
+  geom.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geom.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  geom.setDrawRange(0, count);
+}
+bindAttrs();
+function addPoints(buf) {
+  const dv = new DataView(buf);
+  const n = dv.getUint32(4, true);
+  const xyz = new Float32Array(buf, 8, n * 3);
+  const rgb = new Uint8Array(buf, 8 + n * 12, n * 3);
+  if (count + n > cap) {
+    while (count + n > cap) cap *= 2;
+    const p2 = new Float32Array(cap * 3); p2.set(pos.subarray(0, count * 3)); pos = p2;
+    const c2 = new Float32Array(cap * 3); c2.set(col.subarray(0, count * 3)); col = c2;
+    bindAttrs();
+  }
+  for (let i = 0; i < n; i++) {
+    const o = (count + i) * 3;
+    pos[o] = xyz[i * 3]; pos[o + 1] = xyz[i * 3 + 2]; pos[o + 2] = -xyz[i * 3 + 1];
+    col[o] = rgb[i * 3] / 255; col[o + 1] = rgb[i * 3 + 1] / 255; col[o + 2] = rgb[i * 3 + 2] / 255;
+  }
+  const a = geom.getAttribute("position"), c = geom.getAttribute("color");
+  a.addUpdateRange ? a.addUpdateRange(count * 3, n * 3) : null;
+  c.addUpdateRange ? c.addUpdateRange(count * 3, n * 3) : null;
+  a.needsUpdate = c.needsUpdate = true;
+  count += n;
+  geom.setDrawRange(0, count);
+  document.getElementById("s-pts").textContent = count.toLocaleString();
+}
+function clearPoints() { count = 0; geom.setDrawRange(0, 0); trail.length = 0; updateTrail();
+  document.getElementById("s-pts").textContent = "0"; structGroup.clear(); }
+
+// ------------------------------------------------------- drone + trajectory
+const trail = [];
+const trailGeom = new THREE.BufferGeometry();
+const trailLine = new THREE.Line(trailGeom, new THREE.LineBasicMaterial({ color: 0xf0883e }));
+trailLine.frustumCulled = false;
+scene.add(trailLine);
+function updateTrail() {
+  trailGeom.setFromPoints(trail);
+}
+const frustum = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0x2f81f7 }));
+frustum.frustumCulled = false;
+scene.add(frustum);
+let dronePos = null;
+function setDrone(R, C) {
+  const s = 0.6, w = 0.5 * s * 1.6, h = 0.5 * s * 0.9;
+  const local = [[0, 0, 0], [-w, -h, s], [w, -h, s], [w, h, s], [-w, h, s]];
+  const P = local.map((p) => enu([
+    R[0][0] * p[0] + R[0][1] * p[1] + R[0][2] * p[2] + C[0],
+    R[1][0] * p[0] + R[1][1] * p[1] + R[1][2] * p[2] + C[1],
+    R[2][0] * p[0] + R[2][1] * p[1] + R[2][2] * p[2] + C[2]]));
+  const segs = [0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 2, 3, 3, 4, 4, 1].map((i) => P[i]);
+  frustum.geometry.setFromPoints(segs);
+  dronePos = P[0];
+  trail.push(P[0].clone());
+  if (trail.length > 20000) trail.shift();
+  updateTrail();
+}
+
+// -------------------------------------------------------------- structure
+const structGroup = new THREE.Group();
+scene.add(structGroup);
+let showStruct = true;
+function showStructure(st) {
+  structGroup.clear();
+  const el = document.getElementById("struct");
+  const ops = st.openings || [];
+  for (const o of ops) {
+    const g = new THREE.BoxGeometry(o.width, o.height, 0.1);
+    const box = new THREE.LineSegments(new THREE.EdgesGeometry(g),
+      new THREE.LineBasicMaterial({ color: o.kind === "door" ? 0xf0883e : 0x58a6ff }));
+    box.position.copy(enu(o.center));
+    if (o.normal) {  // face the box along the wall normal (ENU -> three: x, z, -y)
+      box.rotation.y = Math.atan2(o.normal[0], -o.normal[1]);
+    }
+    structGroup.add(box);
+  }
+  for (const p of st.planes || []) {
+    if (p.kind !== "horizontal" || p.area_m2 < 4) continue;
+    const ring = new THREE.Mesh(new THREE.PlaneGeometry(Math.max(1, p.extent[0]), Math.max(1, p.extent[1])),
+      new THREE.MeshBasicMaterial({ color: 0x3fb950, transparent: true, opacity: 0.08, side: THREE.DoubleSide }));
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.copy(enu(p.point));
+    structGroup.add(ring);
+  }
+  structGroup.visible = showStruct;
+  if (st.ground_z != null && Math.abs(st.ground_z - groundZ) > 0.05) { groundZ = st.ground_z; makeGrid(groundZ); }
+  const s = st.storeys || {};
+  const win = ops.filter((o) => o.kind === "window").length, door = ops.length - win;
+  const levels = (s.horizontal_levels_m || []).map((z) => z.toFixed(2)).join(" , ");
+  el.innerHTML = `<h2>ניתוח מבנה</h2>
+    <div class="row"><span>קומות (הערכה)</span><b>${s.estimate ?? "–"}</b></div>
+    <div class="row"><span>גובה מבנה</span><b>${s.building_height_m != null ? s.building_height_m + " מ'" : "–"}</b></div>
+    <div class="row"><span>שורות חלונות</span><b>${s.window_rows ?? "–"}</b></div>
+    <div class="row"><span>חלונות / דלתות</span><b>${win} / ${door}</b></div>
+    <div class="row"><span>קירות</span><b>${(st.planes || []).filter((p) => p.kind === "vertical").length}</b></div>
+    <div class="row"><span>מפלסים אופקיים</span><b>${levels || "–"}</b></div>`;
+  el.style.display = showStruct ? "block" : "none";
+}
+
+// ---------------------------------------------------------------- HUD / ws
+const STATE_HE = { init: "מאתחל – הזז את הרחפן הצידה", tracking: "ממדל ✓", lost: "איבוד מעקב – חזור לאזור מוכר" };
+const SRC_HE = { gps: "GPS", velocity: "חיישני מהירות (בפנים)", none: "ראייה בלבד" };
+function onPose(m) {
+  const dot = document.getElementById("dot");
+  dot.style.background = m.state === "tracking" ? css("--ok") : m.state === "lost" ? css("--bad") : css("--warn");
+  document.getElementById("s-state").textContent = STATE_HE[m.state] || m.state;
+  const st = m.stats || {};
+  document.getElementById("s-kf").textContent = st.keyframes ?? 0;
+  document.getElementById("s-src").textContent = SRC_HE[st.position_source] || "–";
+  document.getElementById("s-metric").textContent = st.metric ? "מטרי (מטרים)" : "יחסי";
+  document.getElementById("s-ms").textContent = st.frame_ms != null ? `${st.frame_ms} ms` : "–";
+  if (st.scale_source) document.getElementById("s-metric").textContent =
+    { telemetry: "מטרי (טלמטריה)", height: "מטרי (סימוני גובה H)", osd_height: "מטרי (H מהמסך)", door: "משוער (לפי דלת)", manual: "ידני" }[st.scale_source];
+  const w = [];
+  if (st.black_screen) w.push("המסך שחור – ייתכן ש־DJI Fly חוסמת צילום מסך, או שאין שידור מהמשקפות.");
+  if (!st.metric && st.keyframes > 8) w.push("אין עדיין קנה מידה אמיתי – לחץ 'קנה מידה'.");
+  if (st.position_source === "none" && st.keyframes > 8 && !st.gravity_aligned) w.push("עדיין לא זוהה כיוון 'למטה' – סובב את הרחפן קצת.");
+  document.getElementById("warn").textContent = w.join(" ");
+  if (m.R && m.C) setDrone(m.R, m.C);
+}
+function onMessage(m) {
+  if (m.type === "reset") clearPoints();
+  else if (m.type === "pose") onPose(m);
+  else if (m.type === "trajectory") { trail.length = 0; m.points.forEach((p) => trail.push(enu(p))); updateTrail(); }
+  else if (m.type === "structure") showStructure(m);
+  else if (m.type === "calibration") onCalibration(m);
+  else if (m.type === "points_b64") {
+    const bin = atob(m.data), buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    addPoints(buf.buffer);
+  } else if (m.type === "reply") { const r = replies.shift(); if (r) r(m); }
+}
+function onCalibration(m) {
+  const el = document.getElementById("s-state");
+  if (m.done) el.textContent = m.ok ? `כיול עדשה הושלם ✓ (שגיאה ${m.rms} px)` : "כיול נכשל";
+  else el.textContent = `כיול עדשה: ${m.views}/${m.needed} תצוגות${m.found ? " ✓ לוח זוהה" : " – כוון אל לוח השחמט"}`;
+}
+
+// transport: Android bridge (plugin on the phone) or WebSocket (desktop server)
+const bridge = window.Drone3D;
+const replies = [];
+let ws = null;
+function command(cmd) {
+  if (bridge) return Promise.resolve(JSON.parse(bridge.command(JSON.stringify(cmd))));
+  return new Promise((res) => { replies.push(res); ws.send(JSON.stringify(cmd)); });
+}
+function connect() {
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, "")}ws/viewer`);
+  ws.binaryType = "arraybuffer";
+  ws.onmessage = (ev) => {
+    if (typeof ev.data !== "string") { addPoints(ev.data); return; }
+    onMessage(JSON.parse(ev.data));
+  };
+  ws.onclose = () => { document.getElementById("s-state").textContent = "מתחבר מחדש…"; setTimeout(connect, 1500); };
+}
+if (bridge) {
+  bridge.snapshot();
+  setInterval(() => { for (const m of JSON.parse(bridge.poll(60))) onMessage(m); }, 100);
+} else connect();
+window.setCompact = (on) => { document.body.classList.toggle("compact", !!on); setTimeout(resize, 50); };
+if (new URLSearchParams(location.search).get("compact") === "1") document.body.classList.add("compact");
+
+// --------------------------------------------------------------- controls
+let follow = true;
+const bf = document.getElementById("b-follow");
+bf.onclick = () => { follow = !follow; bf.classList.toggle("on", follow); };
+controls.addEventListener("start", () => { if (follow) { follow = false; bf.classList.remove("on"); } });
+document.getElementById("b-top").onclick = () => {
+  const t = dronePos || new THREE.Vector3();
+  controls.target.copy(t); cam.position.set(t.x, t.y + 30, t.z + 0.01);
+  follow = false; bf.classList.remove("on");
+};
+const bs = document.getElementById("b-struct");
+bs.onclick = () => { showStruct = !showStruct; bs.classList.toggle("on", showStruct);
+  structGroup.visible = showStruct;
+  document.getElementById("struct").style.display = showStruct && structGroup.children.length ? "block" : "none"; };
+document.getElementById("psize").oninput = (e) => { mat.size = 0.015 * e.target.value; };
+mat.size = 0.045;
+document.getElementById("b-reset").onclick = async () => {
+  if (confirm("למחוק את המודל ולהתחיל מחדש?")) await command({ cmd: "reset" });
+};
+const scaleEl = document.getElementById("scale"), scaleMsg = document.getElementById("scale-msg");
+document.getElementById("b-scale").onclick = () => {
+  scaleEl.style.display = scaleEl.style.display === "block" ? "none" : "block";
+};
+const say = (r, ok) => { scaleMsg.textContent = r.ok ? ok(r) : `לא הצליח: ${r.reason || ""}`; };
+document.getElementById("b-mark").onclick = async () => {
+  const h = parseFloat(document.getElementById("h-in").value);
+  if (isNaN(h)) { scaleMsg.textContent = "הקלד את הגובה H מהמסך"; return; }
+  say(await command({ cmd: "mark_height", meters: h }),
+    (r) => r.factor ? `קנה מידה נקבע ✓ (×${r.factor})` : "נקודה ראשונה נשמרה – שנה גובה בלפחות מטר ולחץ שוב");
+};
+document.getElementById("b-door").onclick = async () =>
+  say(await command({ cmd: "scale_door" }), (r) => `קנה מידה לפי דלת ✓ (×${r.factor})`);
+document.getElementById("b-factor").onclick = async () => {
+  const f = parseFloat(document.getElementById("f-in").value);
+  if (!(f > 0)) return;
+  say(await command({ cmd: "scale", factor: f }), () => `המודל הוכפל ב־${f}`);
+};
+document.getElementById("b-cal-start").onclick = async () => {
+  await command({ cmd: "calibrate_start" });
+  scaleMsg.textContent = "כיול פעיל – כוון את הרחפן אל הלוח מזוויות שונות";
+};
+document.getElementById("b-cal-done").onclick = async () => {
+  const r = await command({ cmd: "calibrate_finish" });
+  scaleMsg.textContent = r.ok ? `העדשה כוילה ✓ (שגיאה ${r.rms} px) – אפשר להמריא` : `עוד לא: ${r.reason || ""}`;
+};
+if (bridge) document.getElementById("b-export").onclick = (e) => { e.preventDefault(); bridge.share(); };
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+}
+addEventListener("resize", resize); resize();
+const tmp = new THREE.Vector3();
+renderer.setAnimationLoop(() => {
+  if (follow && dronePos) {
+    tmp.copy(dronePos).sub(controls.target).multiplyScalar(0.08);
+    controls.target.add(tmp); cam.position.add(tmp);
+  }
+  controls.update();
+  renderer.render(scene, cam);
+});
+</script>
+</body>
+</html>
