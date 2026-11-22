@@ -20,6 +20,7 @@ from .geo import intrinsics, rotation_angle_deg
 from .telemetry import TelemetryPose
 from .voxelmap import VoxelMap
 from .ba import local_ba
+from .screen import FramePrep
 
 
 DEFAULTS = dict(
@@ -38,6 +39,9 @@ DEFAULTS = dict(
     local_kfs=6,
     ba_window=8,
     scale_min_spread_m=2.0,
+    assume_level_horizon=True,
+    osd_scale_window=25,          # keyframes used to fit the on-screen height H
+    osd_min_height_span_m=1.2,   # no telemetry: estimate gravity from a level horizon
     gyro_guard_deg=1.5,           # max disagreement between visual and gyro rotation per frame
     ba_sigma_gravity_deg=1.0,    # gimbal IMU pitch/roll accuracy
     ba_sigma_rel_rot_deg=0.3,    # gyro relative rotation between keyframes
@@ -48,10 +52,12 @@ DEFAULTS = dict(
 
 class Keyframe:
     __slots__ = ("id", "gray", "color", "kps", "des", "pids", "R_wc", "C", "median_depth", "tracked",
-                 "R_tel", "C_tel", "tel_src")
+                 "R_tel", "C_tel", "tel_src", "mask", "alt")
 
     def __init__(self, kid, gray, color, kps, des, R_wc, C, tel=(None, None, "none")):
         self.R_tel, self.C_tel, self.tel_src = tel
+        self.mask = None
+        self.alt = None      # height read from the DJI Fly screen (OCR), metres
         self.id = kid
         self.gray, self.color = gray, color
         self.kps, self.des = kps, des
@@ -59,6 +65,11 @@ class Keyframe:
         self.R_wc, self.C = R_wc, C
         self.median_depth = 1.0
         self.tracked = 0
+
+
+def _c(a):
+    """Contiguous float64 copy - OpenCV 4.5 (the version on Android) rejects strided views."""
+    return np.ascontiguousarray(a, np.float64)
 
 
 def _proj_mat(K, R_wc, C):
@@ -113,11 +124,14 @@ class Mapper:
         self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
         self.bfx = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         self.dis = cv2.DISOpticalFlow_create(cv2.DISOPTICAL_FLOW_PRESET_MEDIUM)
+        self.prep = FramePrep(self.cfg)
         self.reset()
 
     # ------------------------------------------------------------------ state
     def reset(self):
         self.tel = TelemetryPose()
+        self.prep.reset()
+        self.mask = None
         self.K = None
         self.size = None
         self.state = "init"
@@ -145,23 +159,44 @@ class Mapper:
         self.scale_corrections = []
         self._scale_from = 0
         self._last_rescale_kf = 0
+        self._last_gravity_kf = 0
+        self.gravity_aligned = False
+        self.gravity_quality = None
+        self.scale_source = None
+        self.height_marks = []
+        self.height_scale_result = None
+        self.boot_reason = None
+        self._alt = None
 
     # ---------------------------------------------------------------- helpers
     def _prepare(self, img, tm):
+        mask, Kc = None, None
+        if self.prep.active or (tm or {}).get("mask") or (tm or {}).get("crop"):
+            img, mask, Kc = self.prep(img, tm)
         h, w = img.shape[:2]
+        s = 1.0
         if w > self.cfg["max_width"]:
             s = self.cfg["max_width"] / w
             img = cv2.resize(img, (int(round(w * s)), int(round(h * s))), interpolation=cv2.INTER_AREA)
+            if mask is not None:
+                mask = cv2.resize(mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
             h, w = img.shape[:2]
-        hfov = (tm or {}).get("hfov") or self.cfg["hfov"]
-        if self.K is None or self.size != (w, h):
-            self.K = intrinsics(w, h, hfov)
-            self.size = (w, h)
+        if Kc is not None:
+            K = Kc.copy()
+            K[:2] *= s
+            if self.K is None or self.size != (w, h) or not np.allclose(K, self.K):
+                self.K, self.size = K, (w, h)
+        else:
+            hfov = (tm or {}).get("hfov") or self.cfg["hfov"]
+            if self.K is None or self.size != (w, h):
+                self.K = intrinsics(w, h, hfov)
+                self.size = (w, h)
+        self.mask = mask
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         return img, gray
 
     def _features(self, gray):
-        kp, des = self.orb.detectAndCompute(gray, None)
+        kp, des = self.orb.detectAndCompute(gray, self.mask)
         if des is None:
             return np.zeros((0, 2), np.float32), np.zeros((0, 32), np.uint8)
         return np.array([k.pt for k in kp], np.float32), des
@@ -188,6 +223,10 @@ class Mapper:
 
     # -------------------------------------------------------------- bootstrap
     def _bootstrap(self, gray, color, kps, des, R_tel, C_tel):
+        if not self.prep.ready:          # screen capture: learn the DJI Fly overlay first
+            self.ref = None
+            self.boot_reason = "learning_overlay"
+            return False
         if self.ref is None or len(self.ref["kps"]) < 100:
             if self.anchor is not None:
                 R0, C0 = self.anchor
@@ -197,17 +236,20 @@ class Mapper:
                 R0 = R_tel if R_tel is not None else np.eye(3)
                 C0 = C_tel if C_tel is not None else np.zeros(3)
             self.ref = dict(gray=gray, color=color, kps=kps, des=des, R_wc=R0, C=C0,
-                            C_tel=C_tel, tel=self._tel, frames=0)
+                            C_tel=C_tel, tel=self._tel, frames=0, mask=self.mask, alt=self._alt)
             return False
         ref = self.ref
         ref["frames"] += 1
         m = self._ratio_match(ref["des"], des, 0.75)
-        if len(m) < 80:
-            if ref["frames"] > 15:
+        min_matches = 50 if self.size[0] < 600 else 70
+        if len(m) < min_matches:
+            self.boot_reason = "few_matches"
+            if ref["frames"] >= 3:      # reference too old: start again from this frame
                 self.ref = None
             return False
         p0, p1 = ref["kps"][m[:, 0]].astype(np.float64), kps[m[:, 1]].astype(np.float64)
-        if np.median(np.linalg.norm(p1 - p0, axis=1)) < 0.02 * self.size[0]:
+        if np.median(np.linalg.norm(p1 - p0, axis=1)) < 0.014 * self.size[0]:
+            self.boot_reason = "move_more"
             return False
         R_tel_rel = None
         if ref["tel"][0] is not None and R_tel is not None:
@@ -222,13 +264,15 @@ class Mapper:
             # essential matrix ambiguous (planar scene) -> trust gyro rotation, solve translation
             sol = self._translation_2pt(p0, p1, R_tel_rel)
         if sol is None:
+            self.boot_reason = "no_geometry"
             return False
         R, t, inl = sol
         if inl.sum() < 60:
+            self.boot_reason = "few_inliers"
             return False
         P0 = self.K @ np.hstack([np.eye(3), np.zeros((3, 1))])
         P1 = self.K @ np.hstack([R, t[:, None]])
-        Xh = cv2.triangulatePoints(P0, P1, p0[inl].T, p1[inl].T)
+        Xh = cv2.triangulatePoints(P0, P1, _c(p0[inl].T), _c(p1[inl].T))
         X0 = (Xh[:3] / Xh[3]).T
         # parallax check
         c1 = -R.T @ t
@@ -238,6 +282,7 @@ class Mapper:
         X1 = X0 @ R.T + t
         good = (X0[:, 2] > 0) & (X1[:, 2] > 0) & (par > self.cfg["sparse_min_parallax_deg"])
         if good.sum() < 50 or np.median(par[good]) < 1.5:
+            self.boot_reason = f"low_parallax {good.sum()} {np.median(par[good]) if good.any() else 0:.2f}"
             return False
 
         # metric scale from telemetry baseline (if we have it)
@@ -261,8 +306,12 @@ class Mapper:
             self.voxels = VoxelMap(base_size=0.02 * unit)
 
         kf0 = Keyframe(len(self.kfs), ref["gray"], ref["color"], ref["kps"], ref["des"], R_wc0, C0, ref["tel"])
+        kf0.mask = ref.get("mask")
+        kf0.alt = ref.get("alt")
         self.kfs.append(kf0)
         kf1 = Keyframe(len(self.kfs), gray, color, kps, des, R_wc1, C1, self._tel)
+        kf1.mask = self.mask
+        kf1.alt = self._alt
         self.kfs.append(kf1)
         idx0 = m[inl][good, 0]
         idx1 = m[inl][good, 1]
@@ -312,7 +361,7 @@ class Mapper:
             tt = sgn * t
             P0 = self.K @ np.hstack([np.eye(3), np.zeros((3, 1))])
             P1 = self.K @ np.hstack([R, tt[:, None]])
-            Xh = cv2.triangulatePoints(P0, P1, p0[best].T, p1[best].T)
+            Xh = cv2.triangulatePoints(P0, P1, _c(p0[best].T), _c(p1[best].T))
             X0 = (Xh[:3] / Xh[3]).T
             X1 = X0 @ R.T + tt
             if np.mean((X0[:, 2] > 0) & (X1[:, 2] > 0)) > 0.7:
@@ -456,6 +505,8 @@ class Mapper:
                    or rot > self.cfg["kf_rot_deg"])
         if need_kf and baseline / max(last.median_depth, 1e-6) > 0.01:
             kf = Keyframe(len(self.kfs), gray, color, kps, des, R_wc, C, self._tel)
+            kf.mask = self.mask
+            kf.alt = self._alt
             kf.pids[fidx] = pids
             kf.median_depth = float(np.median(depth))
             kf.tracked = len(fidx)
@@ -464,6 +515,8 @@ class Mapper:
             if C_tel is not None and len(self.kfs) > 1:
                 self._telemetry_check(C_tel)
             self._scale_check()
+            self._gravity_check()
+            self._osd_height_scale()
             # free image memory of old keyframes
             if len(self.kfs) > 12:
                 old = self.kfs[-13]
@@ -495,21 +548,31 @@ class Mapper:
             self.metric = True
 
     def _rescale(self, s):
-        a = self.kfs[0].C.copy()
-        self.mp_xyz = a + s * (self.mp_xyz - a)
+        self._transform(s, np.eye(3))
+        self.scale_corrections.append(round(s, 4))
+
+    def _transform(self, s, R, keep_voxel_size=False):
+        """Similarity transform of the whole map about the first keyframe: X' = a + s R (X - a)."""
+        a = self.kfs[0].C.copy() if self.kfs else np.zeros(3)
+        T = lambda X: a + s * (np.asarray(X) - a) @ R.T  # noqa: E731
+        self.mp_xyz = T(self.mp_xyz)
         for k in self.kfs:
-            k.C = a + s * (k.C - a)
+            k.C = T(k.C)
+            k.R_wc = R @ k.R_wc
             k.median_depth *= s
-        self.trajectory = [a + s * (c - a) for c in self.trajectory]
+        self.trajectory = [T(c) for c in self.trajectory]
         if self.last_pose is not None:
-            self.last_pose = (self.last_pose[0], a + s * (self.last_pose[1] - a))
+            self.last_pose = (R @ self.last_pose[0], T(self.last_pose[1]))
         if self.prev_pose is not None:
-            self.prev_pose = (self.prev_pose[0], a + s * (self.prev_pose[1] - a))
+            self.prev_pose = (R @ self.prev_pose[0], T(self.prev_pose[1]))
+        if self.anchor is not None:
+            self.anchor = (R @ self.anchor[0], T(self.anchor[1]))
         if self.voxels is not None:
             xyz, rgb = self.voxels.points()
             old = self.voxels
-            self.voxels = VoxelMap(base_size=old.sizes[0], levels=len(old.sizes), min_obs=old.min_obs)
-            X = a + s * (xyz.astype(np.float64) - a)
+            base = old.sizes[0] * (1.0 if keep_voxel_size else s)
+            self.voxels = VoxelMap(base_size=base, levels=len(old.sizes), min_obs=old.min_obs)
+            X = T(xyz.astype(np.float64))
             # depth proxy for voxel level: distance to the nearest recent keyframe centre
             Cs = np.array([k.C for k in self.kfs[-20:]])
             d = np.full(len(X), np.inf)
@@ -518,7 +581,167 @@ class Mapper:
             self.voxels.insert(X, rgb, d, float(old.min_obs))
             self.voxels.emitted[: self.voxels.n] = True
         self.rescaled = True
-        self.scale_corrections.append(round(s, 4))
+
+    # ------------------------------------------- no telemetry (screen capture, e.g. DJI Avata)
+    def _gravity_check(self):
+        """Estimate "up" assuming the horizon is kept level (DJI Avata Normal/Sport mode):
+        every keyframe's camera x-axis is then horizontal, so up is orthogonal to all of them."""
+        if not self.cfg["assume_level_horizon"] or any(k.R_tel is not None for k in self.kfs):
+            return
+        n = len(self.kfs)
+        if n < 6 or n - self._last_gravity_kf < 4:
+            return
+        X = np.array([k.R_wc[:, 0] for k in self.kfs[-60:]])
+        Y = -np.array([k.R_wc[:, 1] for k in self.kfs[-60:]]).mean(0)
+        _, S, Vt = np.linalg.svd(X, full_matrices=False)
+        if S[1] / max(S[0], 1e-9) > 0.2:        # enough heading change to pin it down
+            up = Vt[2] * np.sign(Vt[2] @ Y)
+            self.gravity_quality = "good"
+        else:                                    # flew in one direction only: camera up as proxy
+            up = Y / np.linalg.norm(Y)
+            self.gravity_quality = "rough"
+        up = self._refine_up_with_floor(up)
+        z = np.array([0, 0, 1.0])
+        ang = math.degrees(math.acos(np.clip(up @ z, -1, 1)))
+        self._last_gravity_kf = n
+        if ang < 1.0 and self.gravity_aligned:
+            return
+        axis = np.cross(up, z)
+        if np.linalg.norm(axis) < 1e-9:
+            R = np.eye(3)
+        else:
+            axis /= np.linalg.norm(axis)
+            R = cv2.Rodrigues(axis * math.radians(ang))[0]
+        self._transform(1.0, R)
+        self.gravity_aligned = True
+        if len(self.height_marks) == 2:
+            self.height_scale_result = self._try_height_scale()
+
+    def _refine_up_with_floor(self, up, max_dev_deg=15.0):
+        """The ground / floor is the largest level surface: snap 'up' to its normal if it is close."""
+        if self.voxels is None or len(self.voxels) < 3000:
+            return up
+        xyz, _ = self.voxels.points()
+        rng = np.random.default_rng(len(self.kfs))
+        P = xyz[rng.choice(len(xyz), min(len(xyz), 20000), replace=False)].astype(np.float64)
+        diag = float(np.linalg.norm(np.percentile(P, 95, 0) - np.percentile(P, 5, 0)))
+        thr = 0.004 * diag
+        best_n, best_cnt = None, 0
+        cos_lim = math.cos(math.radians(max_dev_deg))
+        for _ in range(300):
+            a, b, c = P[rng.choice(len(P), 3, replace=False)]
+            nrm = np.cross(b - a, c - a)
+            nn = np.linalg.norm(nrm)
+            if nn < 1e-12:
+                continue
+            nrm /= nn
+            if abs(nrm @ up) < cos_lim:
+                continue
+            cnt = int((np.abs((P - a) @ nrm) < thr).sum())
+            if cnt > best_cnt:
+                best_n, best_cnt, best_a = nrm, cnt, a
+        if best_n is None or best_cnt < 0.08 * len(P):
+            return up
+        inl = P[np.abs((P - best_a) @ best_n) < thr]
+        _, _, Vt = np.linalg.svd(inl - inl.mean(0), full_matrices=False)
+        nrm = Vt[2] * np.sign(Vt[2] @ up)
+        self.gravity_quality = "floor"
+        return nrm
+
+    def _osd_height_scale(self):
+        """Continuous metric scale from the height H that DJI Fly prints on screen (read by OCR).
+
+        Uses pairs of keyframes between which the drone moved mostly vertically (climbs/descents):
+        there the map's height change is barely affected by a small error in 'up', unlike level
+        flight where a 2 deg tilt would leak horizontal distance into the heights."""
+        if not self.gravity_aligned or any(k.R_tel is not None for k in self.kfs):
+            return
+        ks = [k for k in self.kfs[-self.cfg["osd_scale_window"]:] if k.alt is not None]
+        if len(ks) < 4:
+            return
+        X = np.array([k.C for k in ks])
+        h = np.array([k.alt for k in ks])
+        num = den = 0.0
+        used_dh = 0.0
+        for i in range(len(ks)):
+            for j in range(i + 1, len(ks)):
+                dh = h[j] - h[i]
+                d = X[j] - X[i]
+                if abs(dh) < 0.6 or abs(d[2]) < 1e-9:
+                    continue
+                vert = abs(d[2]) / (np.linalg.norm(d) + 1e-12)
+                if vert < 0.8:                       # mostly vertical pairs only
+                    continue
+                w = vert ** 4
+                num += w * d[2] * dh
+                den += w * d[2] * d[2]
+                used_dh = max(used_dh, abs(dh))
+        if den <= 0 or used_dh < self.cfg["osd_min_height_span_m"]:
+            return
+        f = num / den
+        if f <= 0:
+            return
+        n_since = len(self.kfs) - self._last_rescale_kf
+        if n_since < 3 or (self.metric and abs(f - 1) < 0.04):
+            return
+        self.apply_scale(f, "osd_height")
+        self._last_rescale_kf = len(self.kfs)
+
+    def apply_scale(self, factor, source="manual"):
+        if not self.kfs or not 0.01 < factor < 100:
+            return False
+        self._transform(float(factor), np.eye(3))
+        self.metric = True
+        self.scale_source = source
+        self.scale_corrections.append(round(float(factor), 4))
+        return True
+
+    def _anchor_current(self):
+        """Current drone position expressed relative to the latest keyframe, so it follows
+        every later map correction (BA, gravity levelling, rescaling)."""
+        kf = self.kfs[-1]
+        return kf, kf.R_wc.T @ (self.last_pose[1] - kf.C) / max(kf.median_depth, 1e-9)
+
+    @staticmethod
+    def _anchored_pos(anchor):
+        kf, v = anchor
+        return kf.C + kf.R_wc @ (v * kf.median_depth)
+
+    def mark_height(self, meters):
+        """Pair the drone's displayed height (DJI Fly 'H') with the current map position.
+        Two marks >= 1 m apart, taken while climbing/descending straight up, fix the metric scale.
+        If the map is not levelled yet the pair is kept and applied automatically later."""
+        if self.last_pose is None or not self.kfs or self.state != "tracking":
+            return dict(ok=False, reason="not tracking yet")
+        mark = (self._anchor_current(), float(meters))
+        if not self.height_marks:
+            self.height_marks = [mark]
+            return dict(ok=True, marks=1)
+        if abs(mark[1] - self.height_marks[0][1]) < 1.0:
+            return dict(ok=False, marks=1, reason="change height by at least 1 m between the two marks")
+        self.height_marks = [self.height_marks[0], mark]
+        return self._try_height_scale()
+
+    def _try_height_scale(self):
+        if len(self.height_marks) < 2:
+            return dict(ok=True, marks=len(self.height_marks))
+        if not (self.gravity_aligned or any(k.R_tel is not None for k in self.kfs)):
+            return dict(ok=True, marks=2, pending=True,
+                        reason="saved - scale is applied automatically once the map is levelled")
+        (a0, h0), (a1, h1) = self.height_marks
+        d = self._anchored_pos(a1) - self._anchored_pos(a0)
+        dz = d[2]
+        if np.hypot(d[0], d[1]) > 0.5 * abs(dz):
+            self.height_marks = []
+            return dict(ok=False, marks=0, reason="climb or descend straight up/down between the marks, "
+                        "without flying sideways (e.g. right after take-off)")
+        f = (h1 - h0) / dz if abs(dz) > 1e-9 else -1
+        if f <= 0:
+            self.height_marks = []
+            return dict(ok=False, marks=0, reason="height change not visible in the map - try again")
+        self.apply_scale(f, "height")
+        self.height_marks = []
+        return dict(ok=True, factor=round(float(f), 4))
 
     # ---------------------------------------------------------------- mapping
     def _map_new_kf(self, kf):
@@ -586,9 +809,11 @@ class Mapper:
         self._new_pts.append((X, self._colors(kf.color, kf.kps[sel]), _to_cam(kf.R_wc, kf.C, X)[:, 2], 1.0))  # sparse points also need confirmation from another view pair
 
     def _triangulate(self, ka, kb, p0, p1, min_par, max_err):
+        if len(p0) == 0:                 # OpenCV 4.5 raises on empty input
+            return np.zeros((0, 3))
         Pa = _proj_mat(self.K, ka.R_wc, ka.C)
         Pb = _proj_mat(self.K, kb.R_wc, kb.C)
-        Xh = cv2.triangulatePoints(Pa, Pb, p0.T, p1.T)
+        Xh = cv2.triangulatePoints(Pa, Pb, _c(p0.T), _c(p1.T))
         X = (Xh[:3] / np.where(np.abs(Xh[3]) < 1e-12, 1e-12, Xh[3])).T
         uva, za = _project(self.K, ka.R_wc, ka.C, X)
         uvb, zb = _project(self.K, kb.R_wc, kb.C, X)
@@ -635,6 +860,8 @@ class Mapper:
         gy = cv2.Sobel(g0, cv2.CV_32F, 0, 1, ksize=3)
         grad = np.hypot(gx, gy)[ys, xs]
         sel = grad > 40
+        if ka.mask is not None:   # no depth from OSD / overlay pixels
+            sel &= cv2.resize(ka.mask, (ww, hh), interpolation=cv2.INTER_NEAREST)[ys, xs] > 0
         xs, ys = xs[sel], ys[sel]
         fl = f01[ys, xs]
         x1, y1 = xs + fl[:, 0], ys + fl[:, 1]
@@ -669,6 +896,8 @@ class Mapper:
         color, gray = self._prepare(img, tm)
         R_tel, C_tel, src = self.tel.update(tm)
         self._tel = (R_tel, C_tel, src)
+        alt = (tm or {}).get("alt_osd")
+        self._alt = float(alt) if alt is not None else None
         kps, des = self._features(gray)
         n_kf = len(self.kfs)
         if self.state == "init":
@@ -709,5 +938,9 @@ class Mapper:
         return dict(frame=self.frame_id, keyframes=len(self.kfs), map_points=int(len(self.mp_xyz)),
                     voxels=0 if self.voxels is None else len(self.voxels), metric=self.metric,
                     position_source=src, telemetry_vs_vo_scale=sc, scale_corrections=self.scale_corrections[-5:],
-                    gyro_guard_hits=self.gyro_guard_hits,
+                    gyro_guard_hits=self.gyro_guard_hits, gravity_aligned=self.gravity_aligned,
+                    gravity_quality=self.gravity_quality,
+                    scale_source=self.scale_source or ("telemetry" if self.metric else None),
+                    overlay_masked=None if self.mask is None else round(float((self.mask == 0).mean()), 3),
+                    black_screen=self.prep.black_frames > 10, init_reason=self.boot_reason if self.state == "init" else None,
                     **self.timing)

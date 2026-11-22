@@ -108,3 +108,113 @@ def test_pipeline_on_short_synthetic_flight(tmp_path):
     assert abs(s - 1) < 0.1                 # metric scale from DJI telemetry
     assert np.median(err) < 0.3
     assert len(m.voxels) > 1000
+
+
+# ---------------------------------------------------------------- DJI Avata / screen-capture mode
+def test_calibrator_recovers_lens_distortion(tmp_path):
+    import cv2
+    from drone3d.geo import intrinsics
+    from drone3d.screen import Calibrator
+    from synth import Distorter, render_chessboard_views
+
+    K = intrinsics(640, 360, 95)
+    dist = Distorter(K, [-0.28, 0.07, 0, 0, 0], 640, 360)
+    render_chessboard_views(str(tmp_path), dist.K_big, dist.big, dist, 18, np.random.default_rng(3))
+    cal = Calibrator((9, 6))
+    for fn in sorted(os.listdir(tmp_path)):
+        cal.add(cv2.imread(str(tmp_path / fn)))
+    c = cal.solve()
+    assert c["rms"] < 1.0
+    assert c["K"][0][0] == pytest.approx(K[0, 0], rel=0.03)
+    assert c["dist"][0] == pytest.approx(-0.28, abs=0.03)
+
+
+def test_overlay_detector_masks_static_osd():
+    import cv2
+    from drone3d.screen import FramePrep
+
+    rng = np.random.default_rng(0)
+    world = cv2.GaussianBlur((rng.random((800, 1400)) * 255).astype(np.uint8), (0, 0), 2)
+    prep = FramePrep(dict(auto_overlay_mask=True))
+    for i in range(30):
+        frame = cv2.cvtColor(world[100:460, 20 * i:20 * i + 640].copy(), cv2.COLOR_GRAY2BGR)
+        cv2.putText(frame, f"H {i * 0.1:.1f}m", (10, 340), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        cv2.rectangle(frame, (580, 40), (620, 200), (255, 255, 255), 2)
+        _, mask, _ = prep(frame, {})
+    assert prep.ready
+    assert (mask[45:195, 577:584] == 0).mean() > 0.8        # outline of the static gauge masked
+    assert (mask[100:260, 200:440] > 0).mean() > 0.9        # moving scene kept
+
+
+def test_mobile_bridge_roundtrip(tmp_path):
+    import json
+    from drone3d import mobile
+
+    mobile.init(str(tmp_path), json.dumps({"record": True}))
+    rng = np.random.default_rng(1)
+    w, h, stride = 320, 180, 320 * 4 + 64          # Android rows are padded
+    buf = rng.integers(0, 255, h * stride, dtype=np.uint8).tobytes()
+    assert mobile.process_rgba(buf, w, h, stride, json.dumps({"t": 0})) >= 1
+    msgs = json.loads(mobile.poll(100))
+    assert any(m["type"] == "pose" for m in msgs)
+    assert json.loads(mobile.command('{"cmd": "state"}'))["processed"] == 1
+    assert json.loads(mobile.command('{"cmd": "mark_height", "meters": 2}'))["ok"] is False   # not tracking
+    assert json.loads(mobile.command('{"cmd": "reset"}'))["ok"] is True
+    assert os.path.exists(mobile.export_ply(str(tmp_path / "m.ply")))
+
+
+@pytest.mark.slow
+def test_avata_flight_without_telemetry(tmp_path):
+    """Screen capture of DJI Fly: OSD overlay + barrel distortion + no telemetry.
+    Lens from chessboard views, gravity from the level horizon, metric scale from the
+    on-screen height H (as read by the app's OCR, 0.1 m resolution)."""
+    import json
+    import subprocess
+
+    import cv2
+    from drone3d.screen import Calibrator
+    from drone3d.slam import Mapper
+    from evaluate import umeyama
+
+    out = tmp_path / "av"
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "synth.py"), str(out), "--frames", "60",
+                    "--takeoff", "50", "--width", "480", "--hud", "--distort=-0.28,0.07", "--hfov", "95",
+                    "--chessboard", "18"], check=True, capture_output=True)
+    cal = Calibrator((9, 6))
+    for fn in sorted(os.listdir(out / "calib")):
+        cal.add(cv2.imread(str(out / "calib" / fn)))
+    m = Mapper(auto_overlay_mask=True, calib=cal.solve())
+    gt = {g["frame"]: g for g in json.load(open(out / "groundtruth.json"))["gt"]}
+    lines = [json.loads(l) for l in open(out / "telemetry.jsonl")]
+    kf_frame = []
+    for tm in lines:
+        H = round(gt[tm["frame"]]["C"][2], 1)
+        m.process(cv2.imread(str(out / "frames" / tm["frame"])), {"alt_osd": H})
+        if len(m.kfs) and (not kf_frame or kf_frame[-1][0] is not m.kfs[-1]):
+            kf_frame.append((m.kfs[-1], tm["frame"]))
+    assert m.gravity_aligned and m.metric and m.scale_source == "osd_height"
+    E = np.array([k.C for k, _ in kf_frame])
+    G = np.array([gt[f]["C"] for _, f in kf_frame])
+    s, R, t = umeyama(E, G)
+    assert abs(s - 1) < 0.2
+    tilt = np.degrees(np.arccos(np.clip((R @ [0, 0, 1.0])[2], -1, 1)))
+    assert tilt < 4
+    assert np.median(np.linalg.norm(s * E @ R.T + t - G, axis=1)) < 0.4
+
+
+def test_height_marks_need_vertical_motion():
+    from drone3d.slam import Mapper, Keyframe
+
+    m = Mapper()
+    kf = Keyframe(0, None, None, np.zeros((1, 2)), np.zeros((1, 32), np.uint8), np.eye(3), np.zeros(3))
+    kf.median_depth = 1.0
+    m.kfs, m.state, m.gravity_aligned = [kf], "tracking", True
+    m.last_pose = (np.eye(3), np.array([0.0, 0.0, 0.0]))
+    assert m.mark_height(1.0)["marks"] == 1
+    m.last_pose = (np.eye(3), np.array([3.0, 0.0, 0.5]))         # flew sideways
+    assert m.mark_height(2.5)["ok"] is False
+    m.last_pose = (np.eye(3), np.array([0.0, 0.0, 0.0]))         # start again, then climb straight up
+    assert m.mark_height(1.0)["marks"] == 1
+    m.last_pose = (np.eye(3), np.array([0.05, 0.0, 0.75]))       # straight climb: 1.5 m == 0.75 units
+    r = m.mark_height(2.5)
+    assert r["ok"] and r["factor"] == pytest.approx(2.0, rel=0.01)

@@ -8,6 +8,7 @@
 """
 import numpy as np
 import cv2
+from scipy import ndimage
 
 FLOOR_HEIGHT = 3.0
 
@@ -78,11 +79,15 @@ def _openings(g, lo, cell, to_world, ground_z, uv=None):
         return []
     closed = cv2.morphologyEx(g, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
     empty = (closed == 0).astype(np.uint8)
-    n, lab, st, _ = cv2.connectedComponentsWithStats(empty, connectivity=4)
+    # scipy instead of cv2.connectedComponentsWithStats(connectivity=4): that crashes in OpenCV 4.5.x,
+    # the version available on Android
+    lab, n = ndimage.label(empty)
     H, W = g.shape
     out = []
-    for k in range(1, n):
-        x, y, w, h, area = st[k]
+    for k, sl in enumerate(ndimage.find_objects(lab), start=1):
+        y, x = sl[0].start, sl[1].start
+        h, w = sl[0].stop - y, sl[1].stop - x
+        area = int((lab[sl] == k).sum())
         touches_side = x == 0 or x + w >= W or y + h >= H
         touches_bottom = y == 0
         if touches_side:

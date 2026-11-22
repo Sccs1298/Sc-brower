@@ -49,6 +49,11 @@ def main():
     ap.add_argument("dataset")
     ap.add_argument("--out")
     ap.add_argument("--no-telemetry", action="store_true")
+    ap.add_argument("--screen", action="store_true", help="screen-capture mode: mask the on-screen display")
+    ap.add_argument("--calib-dir", help="folder of chessboard images: calibrate the lens first")
+    ap.add_argument("--height-marks", help="i,j: at frames i and j 'type' the true height H (simulates the user)")
+    ap.add_argument("--osd-height", action="store_true",
+                    help="pass the on-screen height H (0.1 m resolution) with every frame, as the app's OCR does")
     a = ap.parse_args()
 
     lines = [json.loads(l) for l in open(os.path.join(a.dataset, "telemetry.jsonl"))]
@@ -56,17 +61,40 @@ def main():
     gpath = os.path.join(a.dataset, "groundtruth.json")
     if os.path.exists(gpath):
         gt = json.load(open(gpath))
-    m = Mapper()
-    est = {}
+    cfg = {}
+    if a.screen:
+        cfg["auto_overlay_mask"] = True
+    if a.calib_dir:
+        from drone3d.screen import Calibrator
+        cal = Calibrator((9, 6))
+        for fn in sorted(os.listdir(a.calib_dir)):
+            cal.add(cv2.imread(os.path.join(a.calib_dir, fn)))
+        cfg["calib"] = cal.solve()
+        c = cfg["calib"]
+        print(f"calibration: model={c['model']} rms={c['rms']:.3f}px views={c['views']} "
+              f"f={c['K'][0][0]:.1f} dist={np.round(c['dist'][:5], 3).tolist()}")
+    marks = [int(x) for x in a.height_marks.split(",")] if a.height_marks else []
+    m = Mapper(**cfg)
+    kf_frame = []
     t0 = time.time()
     states = {}
     for tm in lines:
         img = cv2.imread(os.path.join(a.dataset, "frames", tm["frame"]))
-        r = m.process(img, None if a.no_telemetry else tm)
+        ftm = None if a.no_telemetry else tm
+        if a.osd_height and gt:
+            H = [g for g in gt["gt"] if g["frame"] == tm["frame"]][0]["C"][2]
+            ftm = dict(ftm or {}, alt_osd=round(H, 1))
+        r = m.process(img, ftm)
+        fi = lines.index(tm)
+        if fi in marks and gt:
+            H = [g for g in gt["gt"] if g["frame"] == tm["frame"]][0]["C"][2]
+            print(f"  frame {fi}: user marks H={H:.2f} m ->", m.mark_height(H))
         states[r["state"]] = states.get(r["state"], 0) + 1
-        if r["pose"] is not None:
-            est[tm["frame"]] = r["pose"][1]
+        if r["keyframe"]:
+            kf_frame.append((m.kfs[-1], tm["frame"]))
     dt = time.time() - t0
+    # final (optimised, rescaled, levelled) keyframe positions, not the live per-frame estimates
+    est = {name: kf.C for kf, name in kf_frame}
     xyz, rgb = m.voxels.points() if m.voxels else (np.zeros((0, 3)), np.zeros((0, 3)))
     print(f"frames={len(lines)} time={dt:.1f}s ({1000 * dt / len(lines):.0f} ms/frame) states={states}")
     print("stats:", m.stats())
@@ -80,8 +108,11 @@ def main():
         off = G[0] - E[0]
         raw = np.linalg.norm(E + off - G, axis=1)
         c, R, t = umeyama(E, G, scale=True)
+        tilt = np.degrees(np.arccos(np.clip((R @ [0, 0, 1.0])[2], -1, 1)))
+        print(f"gravity: model 'up' vs true up = {tilt:.2f} deg | scale model->true = {c:.3f}"
+              f" (metric={m.metric}, source={m.scale_source})")
         al = np.linalg.norm((c * E @ R.T + t) - G, axis=1)
-        print(f"trajectory: {len(names)} tracked poses | raw(ENU, shifted) median {np.median(raw):.3f} m "
+        print(f"trajectory: {len(names)} keyframes | raw(ENU, shifted) median {np.median(raw):.3f} m "
               f"max {raw.max():.3f} | aligned(sim3) median {np.median(al):.3f} max {al.max():.3f} scale={c:.3f}")
         P = c * xyz.astype(np.float64) @ R.T + t
         d = surface_distance(P, gt["scene"])
@@ -105,7 +136,7 @@ def main():
             tr = np.linalg.norm((c2 * E[ii] @ R2.T + t2) - G[ii], axis=1)
             print(f"indoor, offset re-fitted on indoor poses: traj median {100 * np.median(tr):.1f} cm | points n={in2.sum()} "
                   f"median err {100 * np.median(d2):.1f} cm, 90% {100 * np.percentile(d2, 90):.1f} cm")
-    rep = analyse(xyz, gravity=not a.no_telemetry)
+    rep = analyse(xyz, gravity=not a.no_telemetry or m.gravity_aligned)
     print("structure:", json.dumps(rep, ensure_ascii=False)[:1500])
     if a.out:
         write_ply(a.out, xyz, rgb)

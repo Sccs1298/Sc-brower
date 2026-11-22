@@ -145,6 +145,85 @@ class Renderer:
         return img, best.reshape(h, w)
 
 
+class Distorter:
+    """Makes a pinhole render look like a wide-angle lens with barrel distortion (OpenCV radial model).
+
+    The scene is rendered with a padded pinhole camera K_big, then resampled so the output image
+    has intrinsics K and distortion D."""
+
+    def __init__(self, K, D, w, h, pad=1.5):
+        self.K, self.D = K, np.asarray(D, float)
+        W, H = int(w * pad) // 2 * 2, int(h * pad) // 2 * 2
+        self.K_big = K.copy()
+        self.K_big[0, 2] += (W - w) / 2
+        self.K_big[1, 2] += (H - h) / 2
+        self.big = (W, H)
+        u, v = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
+        pts = np.stack([u.ravel(), v.ravel()], 1).reshape(-1, 1, 2)
+        und = cv2.undistortPoints(pts, K, self.D, P=self.K_big).reshape(h, w, 2)
+        self.mx, self.my = und[..., 0].astype(np.float32), und[..., 1].astype(np.float32)
+
+    def __call__(self, img_big):
+        return cv2.remap(img_big, self.mx, self.my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+
+
+def draw_hud(img, i, C):
+    """Imitation of the DJI Fly on-screen display: static icons/text plus changing numbers."""
+    h, w = img.shape[:2]
+    s = w / 640.0
+    font = cv2.FONT_HERSHEY_SIMPLEX
+
+    def txt(t, x, y, sc=0.45):
+        cv2.putText(img, t, (int(x * s), int(y * s)), font, sc * s, (20, 20, 20), int(3 * s) + 1, cv2.LINE_AA)
+        cv2.putText(img, t, (int(x * s), int(y * s)), font, sc * s, (255, 255, 255), max(1, int(s)), cv2.LINE_AA)
+
+    cv2.rectangle(img, (0, 0), (w, int(22 * s)), (30, 30, 30), -1)
+    txt("< N  In Flight (GPS)   18 sats   87%  23:41", 8, 15, 0.42)
+    txt(f"H {C[2]:.1f}m", 12, 330)
+    txt(f"D {np.hypot(C[0], C[1]):.0f}m", 90, 330)
+    txt(f"{(i % 7) * 0.3:.1f} m/s", 560, 330)
+    cx, cy = w // 2, h // 2
+    cv2.line(img, (cx - int(14 * s), cy), (cx - int(4 * s), cy), (255, 255, 255), max(1, int(s)))
+    cv2.line(img, (cx + int(4 * s), cy), (cx + int(14 * s), cy), (255, 255, 255), max(1, int(s)))
+    cv2.circle(img, (int(600 * s), int(60 * s)), int(14 * s), (255, 255, 255), max(1, int(s)))
+    cv2.rectangle(img, (int(586 * s), int(90 * s)), (int(614 * s), int(240 * s)), (255, 255, 255), max(1, int(s)))
+    return img
+
+
+def render_chessboard_views(out_dir, K_big, big, distort, n, rng, pattern=(9, 6), square=0.05):
+    """Views of a printed chessboard, as the calibration mode would capture them."""
+    cols, rows = pattern[0] + 1, pattern[1] + 1
+    px = 60
+    board = np.full(((rows + 2) * px, (cols + 2) * px), 255, np.uint8)
+    for r in range(rows):
+        for c in range(cols):
+            if (r + c) % 2 == 0:
+                board[(r + 1) * px:(r + 2) * px, (c + 1) * px:(c + 2) * px] = 0
+    bh, bw = board.shape
+    m_per_px = square / px
+    os.makedirs(out_dir, exist_ok=True)
+    k = 0
+    while k < n:
+        # board plane in camera coordinates: random distance, tilt and position in view
+        z = rng.uniform(0.35, 0.75)
+        rv = rng.normal(0, [0.35, 0.35, 0.3])
+        Rb = cv2.Rodrigues(rv)[0]
+        ctr = np.array([rng.uniform(-0.45, 0.45) * z, rng.uniform(-0.3, 0.3) * z, z])
+        corners = np.array([[0, 0], [bw, 0], [bw, bh], [0, bh]], float)
+        P = (corners - [bw / 2, bh / 2]) * m_per_px
+        X = (np.c_[P, np.zeros(4)] @ Rb.T) + ctr
+        if (X[:, 2] < 0.1).any():
+            continue
+        uv = (X[:, :2] / X[:, 2:]) * [K_big[0, 0], K_big[1, 1]] + K_big[:2, 2]
+        Hm = cv2.getPerspectiveTransform(corners.astype(np.float32), uv.astype(np.float32))
+        bg = np.full((big[1], big[0]), 120, np.uint8)
+        warped = cv2.warpPerspective(board, Hm, big, borderValue=120)
+        bgr = cv2.cvtColor(warped, cv2.COLOR_GRAY2BGR)
+        img = distort(bgr)
+        cv2.imwrite(os.path.join(out_dir, f"{k:03d}.jpg"), img, [cv2.IMWRITE_JPEG_QUALITY, 92])
+        k += 1
+
+
 def look_at(C, target):
     f = np.asarray(target, float) - C
     f /= np.linalg.norm(f)
@@ -154,12 +233,18 @@ def look_at(C, target):
     return np.stack([r, dn, f], 1)
 
 
-def trajectory(n):
-    """Outside arc -> approach door -> enter -> scan the room."""
+def trajectory(n, takeoff=0):
+    """[vertical take-off] -> outside arc -> approach door -> enter -> scan the room."""
     n_a, n_b = int(n * 0.3), int(n * 0.25)
     n_c = n - n_a - n_b
     poses = []
     ctr = np.array([5.0, 4.0, 3.0])
+    if takeoff:   # climb straight up from 0.6 m to the start of the arc, camera on the house
+        ang = math.radians(-125)
+        top = np.array([5 + 16 * math.cos(ang), 4 + 16 * math.sin(ang), 5.0])
+        for i in range(takeoff):
+            C = top + np.array([0, 0, -4.4 * (1 - i / takeoff)])
+            poses.append((look_at(C, ctr + np.array([0, 0, C[2] - 3.0]) * 0.5), C, True))
     for i in range(n_a):  # arc in front of the house
         ang = math.radians(-125 + 70 * i / max(n_a - 1, 1))
         C = np.array([5 + 16 * math.cos(ang), 4 + 16 * math.sin(ang), 5.0 - 2.0 * i / n_a])
@@ -190,21 +275,38 @@ def main():
     ap.add_argument("--hfov", type=float, default=73.7)
     ap.add_argument("--fps", type=float, default=4.0)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--hud", action="store_true", help="draw a DJI Fly-like on-screen display")
+    ap.add_argument("--distort", help="lens distortion k1,k2 (e.g. -0.28,0.07)")
+    ap.add_argument("--chessboard", type=int, default=0, help="also write N chessboard calibration views")
+    ap.add_argument("--takeoff", type=int, default=0, help="prepend N frames of vertical take-off")
     a = ap.parse_args()
     rng = np.random.default_rng(a.seed)
     w, h = a.width, a.width * 9 // 16
     K = intrinsics(w, h, a.hfov)
     scene = build_scene()
-    rend = Renderer(scene, K, w, h)
+    distort = None
+    if a.distort:
+        k1, k2 = (float(x) for x in a.distort.split(","))
+        distort = Distorter(K, [k1, k2, 0, 0, 0], w, h)
+        rend = Renderer(scene, distort.K_big, *distort.big)
+        if a.chessboard:
+            render_chessboard_views(os.path.join(a.out, "calib"), distort.K_big, distort.big, distort,
+                                    a.chessboard, rng)
+    else:
+        rend = Renderer(scene, K, w, h)
     os.makedirs(os.path.join(a.out, "frames"), exist_ok=True)
-    poses = trajectory(a.frames)
+    poses = trajectory(a.frames, a.takeoff)
     gt = []
     prevC = None
     bias = np.array([rng.normal(0, 1.5), rng.normal(0, 0.3), rng.normal(0, 0.3)])
     with open(os.path.join(a.out, "telemetry.jsonl"), "w") as f:
         for i, (R, C, gps) in enumerate(poses):
             img, _ = rend.render(R, C)
+            if distort is not None:
+                img = distort(img)
             img = np.clip(img.astype(np.int16) + rng.normal(0, 2, img.shape).astype(np.int16), 0, 255).astype(np.uint8)
+            if a.hud:
+                img = draw_hud(img, i, C)
             name = f"{i:06d}.jpg"
             cv2.imwrite(os.path.join(a.out, "frames", name), img, [cv2.IMWRITE_JPEG_QUALITY, 90])
             t_ms = int(i * 1000 / a.fps)

@@ -13,4 +13,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Drone3D"
-include(":app")
+include(":app")      // DJI Mobile SDK app (Mini 3/4 Pro, Enterprise...) + desktop server
+include(":avata")    // phone-only plugin for DJI Avata 1/2 (screen capture of DJI Fly)

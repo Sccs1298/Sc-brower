@@ -42,6 +42,18 @@
   button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   button:hover, .btn:hover { border-color: var(--accent); }
   label.sz { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .warn { color: var(--warn); font-weight: 600; margin-top: 4px; max-width: 260px; }
+  .warn:empty { display: none; }
+  #scale { left: 50%; bottom: 76px; transform: translateX(-50%); width: min(360px, calc(100vw - 48px)); display: none; }
+  #scale h2 { font-size: 14px; margin: 0 0 4px; }
+  .hint { color: var(--muted); font-size: 12px; margin: 4px 0; }
+  .line { display: flex; gap: 6px; margin: 6px 0; }
+  .line input { flex: 1; min-width: 0; background: transparent; color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 8px; font: inherit; direction: ltr; }
+  body.compact #bar, body.compact #struct, body.compact #scale { display: none !important; }
+  body.compact #hud { top: 4px; right: 4px; padding: 4px 6px; font-size: 11px; min-width: 0; }
+  body.compact #hud .row:nth-of-type(n+4) { display: none; }
+  body.compact #hud h1 { font-size: 12px; margin: 0 0 2px; }
   @media (max-width: 600px) {
     #hud { top: 8px; right: 8px; padding: 8px; font-size: 12px; min-width: 0; }
     #struct { top: auto; bottom: 62px; left: 8px; right: 8px; max-width: none; max-height: 28vh; }
@@ -63,6 +75,18 @@
   <div class="row"><span>מיקום מ־</span><b id="s-src">–</b></div>
   <div class="row"><span>קנה מידה</span><b id="s-metric">–</b></div>
   <div class="row"><span>זמן עיבוד</span><b id="s-ms">–</b></div>
+  <div id="warn" class="warn"></div>
+</div>
+
+<div id="scale" class="panel">
+  <h2>קנה מידה (רחפן בלי טלמטריה, למשל Avata)</h2>
+  <p class="hint">רשום את הגובה <b>H</b> שמוצג ב־DJI Fly ולחץ "סמן". עלה או רד לפחות מטר אחד, ושוב "סמן".</p>
+  <div class="line"><input id="h-in" type="number" step="0.1" inputmode="decimal" placeholder="H במטרים">
+    <button id="b-mark">סמן גובה</button></div>
+  <div class="line"><button id="b-door">לפי דלת שזוהתה (2.05 מ')</button></div>
+  <div class="line"><input id="f-in" type="number" step="0.01" placeholder="פקטור">
+    <button id="b-factor">הכפל ידנית</button></div>
+  <div id="scale-msg" class="hint"></div>
 </div>
 
 <div id="struct" class="panel"></div>
@@ -72,14 +96,15 @@
   <button id="b-top">מבט על</button>
   <button id="b-struct" class="on">מבנה</button>
   <label class="sz">גודל נקודה <input id="psize" type="range" min="1" max="8" value="3"></label>
-  <a class="btn" href="api/export.ply" download>הורד PLY</a>
+  <button id="b-scale">קנה מידה</button>
+  <a id="b-export" class="btn" href="api/export.ply" download>הורד PLY</a>
   <button id="b-reset">איפוס</button>
 </div>
 
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  "three": "./vendor/three.module.js",
+  "three/addons/": "./vendor/addons/"
 } }
 </script>
 <script type="module">
@@ -234,23 +259,57 @@ function onPose(m) {
   document.getElementById("s-src").textContent = SRC_HE[st.position_source] || "–";
   document.getElementById("s-metric").textContent = st.metric ? "מטרי (מטרים)" : "יחסי";
   document.getElementById("s-ms").textContent = st.frame_ms != null ? `${st.frame_ms} ms` : "–";
+  if (st.scale_source) document.getElementById("s-metric").textContent =
+    { telemetry: "מטרי (טלמטריה)", height: "מטרי (סימוני גובה H)", osd_height: "מטרי (H מהמסך)", door: "משוער (לפי דלת)", manual: "ידני" }[st.scale_source];
+  const w = [];
+  if (st.black_screen) w.push("המסך שחור – ייתכן ש־DJI Fly חוסמת צילום מסך, או שאין שידור מהמשקפות.");
+  if (!st.metric && st.keyframes > 8) w.push("אין עדיין קנה מידה אמיתי – לחץ 'קנה מידה'.");
+  if (st.position_source === "none" && st.keyframes > 8 && !st.gravity_aligned) w.push("עדיין לא זוהה כיוון 'למטה' – סובב את הרחפן קצת.");
+  document.getElementById("warn").textContent = w.join(" ");
   if (m.R && m.C) setDrone(m.R, m.C);
+}
+function onMessage(m) {
+  if (m.type === "reset") clearPoints();
+  else if (m.type === "pose") onPose(m);
+  else if (m.type === "trajectory") { trail.length = 0; m.points.forEach((p) => trail.push(enu(p))); updateTrail(); }
+  else if (m.type === "structure") showStructure(m);
+  else if (m.type === "calibration") onCalibration(m);
+  else if (m.type === "points_b64") {
+    const bin = atob(m.data), buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    addPoints(buf.buffer);
+  } else if (m.type === "reply") { const r = replies.shift(); if (r) r(m); }
+}
+function onCalibration(m) {
+  const el = document.getElementById("s-state");
+  if (m.done) el.textContent = m.ok ? `כיול עדשה הושלם ✓ (שגיאה ${m.rms} px)` : "כיול נכשל";
+  else el.textContent = `כיול עדשה: ${m.views}/${m.needed} תצוגות${m.found ? " ✓ לוח זוהה" : " – כוון אל לוח השחמט"}`;
+}
+
+// transport: Android bridge (plugin on the phone) or WebSocket (desktop server)
+const bridge = window.Drone3D;
+const replies = [];
+let ws = null;
+function command(cmd) {
+  if (bridge) return Promise.resolve(JSON.parse(bridge.command(JSON.stringify(cmd))));
+  return new Promise((res) => { replies.push(res); ws.send(JSON.stringify(cmd)); });
 }
 function connect() {
   const proto = location.protocol === "https:" ? "wss" : "ws";
-  const ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, "")}ws/viewer`);
+  ws = new WebSocket(`${proto}://${location.host}${location.pathname.replace(/[^/]*$/, "")}ws/viewer`);
   ws.binaryType = "arraybuffer";
   ws.onmessage = (ev) => {
     if (typeof ev.data !== "string") { addPoints(ev.data); return; }
-    const m = JSON.parse(ev.data);
-    if (m.type === "reset") clearPoints();
-    else if (m.type === "pose") onPose(m);
-    else if (m.type === "trajectory") { trail.length = 0; m.points.forEach((p) => trail.push(enu(p))); updateTrail(); }
-    else if (m.type === "structure") showStructure(m);
+    onMessage(JSON.parse(ev.data));
   };
   ws.onclose = () => { document.getElementById("s-state").textContent = "מתחבר מחדש…"; setTimeout(connect, 1500); };
 }
-connect();
+if (bridge) {
+  bridge.snapshot();
+  setInterval(() => { for (const m of JSON.parse(bridge.poll(60))) onMessage(m); }, 100);
+} else connect();
+window.setCompact = (on) => { document.body.classList.toggle("compact", !!on); setTimeout(resize, 50); };
+if (new URLSearchParams(location.search).get("compact") === "1") document.body.classList.add("compact");
 
 // --------------------------------------------------------------- controls
 let follow = true;
@@ -269,8 +328,27 @@ bs.onclick = () => { showStruct = !showStruct; bs.classList.toggle("on", showStr
 document.getElementById("psize").oninput = (e) => { mat.size = 0.015 * e.target.value; };
 mat.size = 0.045;
 document.getElementById("b-reset").onclick = async () => {
-  if (confirm("למחוק את המודל ולהתחיל מחדש?")) await fetch("api/reset", { method: "POST" });
+  if (confirm("למחוק את המודל ולהתחיל מחדש?")) await command({ cmd: "reset" });
 };
+const scaleEl = document.getElementById("scale"), scaleMsg = document.getElementById("scale-msg");
+document.getElementById("b-scale").onclick = () => {
+  scaleEl.style.display = scaleEl.style.display === "block" ? "none" : "block";
+};
+const say = (r, ok) => { scaleMsg.textContent = r.ok ? ok(r) : `לא הצליח: ${r.reason || ""}`; };
+document.getElementById("b-mark").onclick = async () => {
+  const h = parseFloat(document.getElementById("h-in").value);
+  if (isNaN(h)) { scaleMsg.textContent = "הקלד את הגובה H מהמסך"; return; }
+  say(await command({ cmd: "mark_height", meters: h }),
+    (r) => r.factor ? `קנה מידה נקבע ✓ (×${r.factor})` : "נקודה ראשונה נשמרה – שנה גובה בלפחות מטר ולחץ שוב");
+};
+document.getElementById("b-door").onclick = async () =>
+  say(await command({ cmd: "scale_door" }), (r) => `קנה מידה לפי דלת ✓ (×${r.factor})`);
+document.getElementById("b-factor").onclick = async () => {
+  const f = parseFloat(document.getElementById("f-in").value);
+  if (!(f > 0)) return;
+  say(await command({ cmd: "scale", factor: f }), () => `המודל הוכפל ב־${f}`);
+};
+if (bridge) document.getElementById("b-export").onclick = (e) => { e.preventDefault(); bridge.share(); };
 
 function resize() {
   const w = innerWidth, h = innerHeight;
