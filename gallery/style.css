@@ -901,7 +901,7 @@ html[data-os="ios"] .w-favs-title svg { width: 26px; height: 26px; }
 html[data-os="ios"] .w-favs { grid-template-columns: repeat(4, 1fr); gap: 16px 12px; margin-bottom: 18px; }
 html[data-os="ios"] .w-fav { font-size: 14px; font-weight: 600; gap: 8px; }
 html[data-os="ios"] .w-fav i { width: 72px; height: 72px; border-radius: 17px; background: #fff !important; color: #6e6e73; font: 600 34px -apple-system, system-ui, sans-serif; }
-html[data-os="ios"] .w-priv { display: flex; justify-content: space-between; align-items: center; gap: 16px; background: var(--sf-card); border-radius: 26px; padding: 22px 22px; font-size: 17px; line-height: 1.4; }
+html[data-os="ios"] .w-priv { display: flex; justify-content: space-between; align-items: center; gap: 16px; background: var(--sf-card); border-radius: 26px; padding: 22px 22px; font-size: 16px; line-height: 1.4; }
 html[data-os="ios"] .w-priv b { display: flex; align-items: center; gap: 4px; font-size: 22px; font-weight: 500; flex: none; order: 2; }
 html[data-os="ios"] .w-priv b svg { width: 22px; height: 22px; }
 html[data-os="ios"] .w-off { place-content: start center; padding: calc(env(safe-area-inset-top) + 150px) 52px 160px; }
@@ -989,3 +989,29 @@ html[data-os="ios"] .l-home { height: 5px; width: 140px; margin-left: -70px; }
 .ck[data-k="neg"] svg { width: 50%; }
 .c-disp { font-size: 78px; }
 @media (max-width: 360px) { .c-disp { font-size: 68px; } }
+
+/* ספארי של iOS 26: כרטיס הרחבות, לוגואים, דו"ח פרטיות, "עריכה" */
+html[data-os="ios"] .w-fav i { background: #fff !important; }
+html[data-os="ios"] .w-fav i svg { width: 64%; height: 64%; }
+html[data-os="ios"] .w-fav i.sf-apple { background: #efeff1 !important; }
+html[data-os="ios"] .w-fav i.sf-apple svg { width: 80%; height: 80%; }
+html[data-os="ios"] .w-priv b { order: -1; flex-direction: row; }
+.sf-ext { position: relative; background: var(--sf-card); border-radius: 26px; padding: 16px 18px 18px; text-align: center; margin: 12px 0 30px; }
+.sf-ext[hidden] { display: none; }
+.sf-ext-t { display: block; font-size: 17px; font-weight: 600; margin-top: 4px; }
+.sf-x { position: absolute; top: 14px; left: 16px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: #636366; color: #1c1c1e; display: grid; place-items: center; padding: 0; cursor: pointer; }
+.sf-x svg { width: 15px; height: 15px; }
+.sf-ext p { margin: 4px 6px 14px; font-size: 15px; line-height: 1.35; color: #98989f; }
+.sf-btn { display: block; background: #3e8bf7; color: #fff; font-size: 17px; font-weight: 600; border-radius: 22px; padding: 9px 0; }
+.sf-icons { position: relative; height: 128px; margin: 14px auto 10px; width: 330px; max-width: 100%; direction: ltr; }
+.si { position: absolute; display: grid; place-items: center; border-radius: 22%; font-style: normal; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+.si svg { width: 72%; height: 72%; }
+.si1 { left: 0; top: 14px; width: 62px; height: 62px; background: linear-gradient(160deg, #22e0a8, #0fb98a); color: #fff; font: 600 36px -apple-system, system-ui, sans-serif; }
+.si2 { left: 50px; top: 44px; width: 76px; height: 76px; background: linear-gradient(160deg, #3a4648, #222b2d); }
+.si3 { left: 104px; top: 0; width: 88px; height: 88px; background: linear-gradient(160deg, #eef1f6, #c3c9d4); }
+.si4 { left: 166px; top: 36px; width: 88px; height: 88px; background: linear-gradient(160deg, #ff5a78, #e3264b); z-index: 3; }
+.si5 { left: 230px; top: 6px; width: 76px; height: 76px; background: #fff; }
+.si6 { left: 262px; top: 52px; width: 62px; height: 62px; background: linear-gradient(160deg, #9b3cf5, #6417c8); }
+.sf-edit { display: none; }
+html[data-os="ios"] .web:not(.is-off) .sf-edit { display: block; position: absolute; z-index: 4; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 50px); background: var(--sf-card); color: var(--pg-fg); font-size: 17px; font-weight: 600; line-height: 1; padding: 8px 24px 22px; border-radius: 18px; pointer-events: none; }
+@media (max-width: 370px) { .sf-icons { transform: scale(.88); transform-origin: center top; } }
