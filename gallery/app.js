@@ -41,7 +41,7 @@ const METHODS = {
 
 /* ---------- הגדרות ---------- */
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
-  startIn: 'hub', flyName: '', findName: 'דני', pinCode: '', chatName: 'אמא', chatBody: 'חלמתי עליך הלילה. מישהו אמר לך {x} ואתה היית בהלם 😮', chatDays: '3', aiText: 'אתה חושב על {x}.', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
+  startIn: 'hub', memoText: 'תזכורת לעצמי. מחר מישהו יבחר {x}.', flyName: '', findName: 'דני', pinCode: '', chatName: 'אמא', chatBody: 'חלמתי עליך הלילה. מישהו אמר לך {x} ואתה היית בהלם 😮', chatDays: '3', aiText: 'אתה חושב על {x}.', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
   notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '',
   callDelay: '8', callName: 'אמא', phoneOS: 'auto', remoteTopic: '', remoteMode: 'g', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
   histFill: 'מזג אוויר מחר\nמתכון לפנקייקים\nכמה זה 30 דולר בשקלים\nשעות פתיחה סופר\nתרגום מאנגלית לעברית' };
@@ -2130,7 +2130,7 @@ async function goHome() {
   paint('hub'); ENTER.hub();
 }
 ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); try { $('#lWallDel').hidden = !localStorage.getItem('gk-lockwall'); } catch (e) { /* ignore */ } };
-const PAID_SCREENS = { fly: 'כרטיס הטיסה', find: 'האיתור', pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
+const PAID_SCREENS = { lie: 'גלאי השקר', memo: 'ההקלטה מאתמול', fly: 'כרטיס הטיסה', find: 'האיתור', pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
 $('#hub').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (!b) return;
   const t = b.dataset.open;
@@ -2620,6 +2620,121 @@ ENTER.fly = async () => {
   flyQr(dst.code + q);
 };
 LEAVE.fly = () => { FLY.run++; };
+
+
+/* ===================== ההקלטה מאתמול =====================
+   רשימת הקלטות רגילה. ההקלטה העליונה (מאתמול בלילה) "מתנגנת": הגל זז והטלפון אומר את הבחירה בקול. */
+const VM = { t: 0, raf: 0, t0: 0, dur: 9, playing: false };
+const VM_ITEMS = [ // [שם, לפני כמה ימים, שעה, אורך בשניות]
+  ['הקלטה חדשה 23', 1, '23:48', 9], ['רחוב הרצל', 4, '18:02', 47], ['הקלטה חדשה 22', 9, '08:15', 12], ['חזרה לפני ההופעה', 15, '21:30', 154], ['הקלטה חדשה 21', 23, '13:44', 6],
+];
+const vmFmt = sec => Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
+function vmDay(n) { if (n === 1) return 'אתמול'; const d = new Date(Date.now() - n * 864e5); return n < 7 ? d.toLocaleDateString('he-IL', { weekday: 'long' }) : d.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric', year: '2-digit' }); }
+function vmBuild() {
+  const list = $('#vmList'); list.innerHTML = '';
+  VM_ITEMS.forEach(([name, days, , dur], i) => {
+    const it = document.createElement('div'); it.className = 'vm-it' + (i === 0 ? '' : '');
+    it.innerHTML = `<b></b><div class="vm-meta"><span>${vmDay(days)}</span><span>${vmFmt(dur)}</span></div>`;
+    it.querySelector('b').textContent = name;
+    if (i === 0) {
+      let bars = ''; let h = 7; for (let k = 0; k < 70; k++) { h = (h * 1103515245 + 12345) >>> 0; const env = k < 8 || k > 62 ? .25 : 1; bars += `<i style="height:${Math.round((8 + (h % 70)) * env)}%"></i>`; }
+      it.insertAdjacentHTML('beforeend', `<div class="vm-open"><div class="vm-wave" id="vmWave">${bars}<span class="vm-head" id="vmHead"></span></div>
+        <div class="vm-times"><span id="vmCur">0:00</span><span id="vmLeft">-${vmFmt(dur)}</span></div>
+        <div class="vm-ctl"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5a7 7 0 107 7"/><path d="M12 2l3 3-3 3"/><text x="12" y="15" font-size="6" text-anchor="middle" fill="currentColor" stroke="none">15</text></svg></span><span class="vm-play" id="vmPlay"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5a7 7 0 11-7 7"/><path d="M12 2L9 5l3 3"/><text x="12" y="15" font-size="6" text-anchor="middle" fill="currentColor" stroke="none">15</text></svg></span></div></div>`);
+    }
+    it.addEventListener('click', e => {
+      if (e.target.closest('#vmPlay')) { vmToggle(); return; }
+      if (i !== 0 || e.target.closest('.vm-open')) return;
+      it.classList.toggle('on');
+    });
+    list.appendChild(it);
+  });
+}
+function vmDraw(t) {
+  const bars = $$('#vmWave i'), k = Math.min(1, t / VM.dur);
+  bars.forEach((b, j) => b.classList.toggle('p', j / bars.length < k));
+  $('#vmHead').style.left = (k * 100) + '%'; $('#vmCur').textContent = vmFmt(t); $('#vmLeft').textContent = '-' + vmFmt(Math.max(0, VM.dur - t));
+}
+function vmToggle() {
+  if (VM.playing) return vmStop();
+  VM.playing = true; VM.t0 = performance.now();
+  $('#vmPlay').innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+  const x = LAST.text || '';
+  const txt = x ? (S.memoText || '{x}').split('{x}').join(x) : 'בדיקה, בדיקה. אחת, שתיים.';
+  VM.t = setTimeout(() => aiSpeak(txt), 1400); // נשימה קצרה לפני שהקול מתחיל, כמו בהקלטה אמיתית
+  const step = () => { const t = (performance.now() - VM.t0) / 1000; vmDraw(Math.min(t, VM.dur)); if (t >= VM.dur) return vmStop(true); VM.raf = requestAnimationFrame(step); };
+  step();
+}
+function vmStop(end) {
+  VM.playing = false; clearTimeout(VM.t); cancelAnimationFrame(VM.raf); if (!end) { try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
+  const p = $('#vmPlay'); if (p) p.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>';
+  if (end) setTimeout(() => vmDraw(0), 400);
+}
+ENTER.memo = () => { vmStop(); vmBuild(); };
+LEAVE.memo = () => vmStop();
+
+
+/* ===================== גלאי השקר =====================
+   המצלמה האחורית קוראת את הבהירות של האצבע (זה הדופק האמיתי שמשנה את צבע העור),
+   והגרף מצויר ממנה. כשאין מצלמה, הגרף מדומה. על הבחירה של הצופה הדופק "קופץ". */
+const LD = { raf: 0, stream: null, cv: null, ctx: null, buf: [], bpm: 74, target: 74, busy: false, phase: 0, cam: false };
+function ldOptions(x) {
+  const n = String(x).replace(/\D/g, ''), isNum = n && n.length === String(x).trim().length;
+  let pool;
+  if (isNum) { const v = +n, set = new Set([v]); while (set.size < 6) { const d = Math.max(1, v + Math.round((Math.random() - .5) * Math.max(20, v * .6))); set.add(d); } pool = [...set].map(String); }
+  else { pool = [String(x)]; const src = (DEFAULT_WORDS || []).filter(w => w !== x); while (pool.length < 6 && src.length) pool.push(src.splice(Math.floor(Math.random() * src.length), 1)[0]); }
+  return pool.sort(() => Math.random() - .5);
+}
+async function ldCam(on) {
+  if (!on) { if (LD.stream) LD.stream.getTracks().forEach(t => t.stop()); LD.stream = null; LD.cam = false; return; }
+  try {
+    LD.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: 160, height: 120 }, audio: false });
+    const v = $('#ldCam'); v.srcObject = LD.stream; await v.play();
+    try { const t = LD.stream.getVideoTracks()[0]; if (t.getCapabilities && t.getCapabilities().torch) await t.applyConstraints({ advanced: [{ torch: true }] }); } catch (e) { /* בלי פנס */ }
+    LD.cam = true; $('#ldState').textContent = 'מודד…';
+  } catch (e) { LD.cam = false; $('#ldState').textContent = 'מודד…'; }
+}
+function ldLoop() {
+  const c = $('#ldWave'), w = c.clientWidth, h = c.clientHeight, dpr = devicePixelRatio || 1;
+  if (c.width !== w * dpr) { c.width = w * dpr; c.height = h * dpr; }
+  const x = c.getContext('2d');
+  // דגימה: מהמצלמה אם יש, אחרת גל דופק מדומה
+  LD.bpm += (LD.target - LD.bpm) * .02;
+  LD.phase += (LD.bpm / 60) / 60 * Math.PI * 2;
+  let v = Math.pow(Math.max(0, Math.sin(LD.phase)), 8) * .9 + Math.sin(LD.phase * 2 + 1) * .08 + (Math.random() - .5) * .04;
+  if (LD.cam) {
+    try {
+      const vid = $('#ldCam'); if (!LD.cv) { LD.cv = document.createElement('canvas'); LD.cv.width = 16; LD.cv.height = 12; LD.ctx = LD.cv.getContext('2d', { willReadFrequently: true }); }
+      LD.ctx.drawImage(vid, 0, 0, 16, 12); const d = LD.ctx.getImageData(0, 0, 16, 12).data; let sum = 0; for (let i = 0; i < d.length; i += 4) sum += d[i];
+      LD.raw = (LD.raw || sum) * .9 + sum * .1; v = v * .7 + Math.max(-1, Math.min(1, (sum - LD.raw) / 400)) * .3; // מערבב את הדופק האמיתי לגרף
+    } catch (e) { /* ignore */ }
+  }
+  LD.buf.push(v); if (LD.buf.length > 240) LD.buf.shift();
+  x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h);
+  x.strokeStyle = 'rgba(255,255,255,.06)'; x.lineWidth = 1; for (let gy = 0; gy < h; gy += 26) { x.beginPath(); x.moveTo(0, gy); x.lineTo(w, gy); x.stroke(); }
+  x.strokeStyle = LD.target > 95 ? '#ff375f' : '#30d158'; x.lineWidth = 2.2; x.lineJoin = 'round'; x.beginPath();
+  LD.buf.forEach((y, i) => { const px = w - (LD.buf.length - 1 - i) * (w / 240), py = h * .72 - y * h * .55; i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.stroke();
+  $('#ldBpm').textContent = Math.round(LD.bpm); $('.ld-bpm').classList.toggle('hot', LD.target > 95);
+  LD.raf = requestAnimationFrame(ldLoop);
+}
+ENTER.lie = () => {
+  const x = LAST.text || '47';
+  $('#ldRes').hidden = true; LD.busy = false; LD.target = 72 + Math.random() * 6; LD.bpm = LD.target; LD.buf = [];
+  const box = $('#ldOpts'); box.innerHTML = '';
+  ldOptions(x).forEach(o => { const b = document.createElement('button'); b.type = 'button'; b.textContent = o; b.dataset.hit = o === String(x) ? '1' : ''; box.appendChild(b); });
+  $('#ldState').textContent = 'הנח אצבע על המצלמה'; ldCam(true); cancelAnimationFrame(LD.raf); ldLoop(); keepAwake(true);
+};
+LEAVE.lie = () => { cancelAnimationFrame(LD.raf); ldCam(false); keepAwake(false); };
+$('#ldOpts').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || LD.busy || b.classList.contains('ok') || b.classList.contains('bad')) return;
+  LD.busy = true; b.classList.add('wait'); $('#ldState').textContent = 'מנתח…';
+  if (b.dataset.hit) { LD.target = 112 + Math.random() * 10; if (navigator.vibrate) navigator.vibrate([40, 80, 40, 80, 40]); }
+  setTimeout(() => {
+    b.classList.remove('wait'); LD.busy = false; $('#ldState').textContent = 'מודד…';
+    if (b.dataset.hit) { b.classList.add('bad'); $('#ldRes').textContent = `שקר. בחרת ${b.textContent}.`; $('#ldRes').hidden = false; }
+    else { b.classList.add('ok'); LD.target = 72 + Math.random() * 6; }
+  }, 2600);
+});
 
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };

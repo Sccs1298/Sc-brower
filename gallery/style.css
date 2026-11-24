@@ -1177,3 +1177,52 @@ html[data-os="android"] .hs-dock { background: none; -webkit-backdrop-filter: no
 .bp-grid b { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bp-qr { margin: 22px auto 8px; width: 186px; height: 186px; background: #fff; border-radius: 10px; display: grid; place-items: center; }
 .bp-foot { text-align: center; font-size: 12px; color: #9fc0ef; }
+
+/* ===================== הקלטות קוליות ===================== */
+.memo { background: var(--pg-bg); color: var(--pg-fg); font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; }
+.vm-top { display: flex; justify-content: flex-end; padding: calc(env(safe-area-inset-top) + 10px) 18px 0; }
+.vm-edit { color: #0a84ff; font-size: 17px; padding: 8px 14px; border-radius: 99px; background: var(--gl); border: 1px solid var(--gl-b); }
+.vm-h { font-size: 34px; font-weight: 700; margin: 10px 18px 10px; }
+.vm-search { margin: 0 18px 10px; height: 38px; border-radius: 12px; background: rgba(118,118,128,.18); display: flex; align-items: center; gap: 6px; padding: 0 10px; color: #8e8e93; font-size: 17px; }
+.vm-search svg { width: 17px; height: 17px; }
+.vm-list { padding: 0 18px 140px; }
+.vm-it { border-bottom: .5px solid rgba(127,127,127,.3); padding: 12px 0; cursor: pointer; }
+.vm-it b { display: block; font-size: 17px; font-weight: 600; }
+.vm-meta { display: flex; justify-content: space-between; color: #8e8e93; font-size: 15px; margin-top: 2px; }
+.vm-meta span:last-child { direction: ltr; }
+.vm-open { display: none; margin-top: 12px; }
+.vm-it.on .vm-open { display: block; }
+.vm-wave { position: relative; height: 54px; display: flex; align-items: center; gap: 2px; direction: ltr; overflow: hidden; }
+.vm-wave i { flex: 1; min-width: 2px; border-radius: 2px; background: #8e8e93; }
+.vm-wave i.p { background: var(--pg-fg); }
+.vm-head { position: absolute; top: 0; bottom: 0; width: 2px; background: #0a84ff; left: 0; }
+.vm-times { display: flex; justify-content: space-between; color: #8e8e93; font-size: 12px; direction: ltr; margin: 4px 0 6px; font-variant-numeric: tabular-nums; }
+.vm-ctl { display: flex; justify-content: center; align-items: center; gap: 46px; direction: ltr; color: var(--pg-fg); }
+.vm-ctl svg { width: 28px; height: 28px; }
+.vm-play svg { width: 34px; height: 34px; }
+.vm-ctl span { display: grid; place-items: center; cursor: pointer; }
+.vm-rec { position: absolute; left: 0; right: 0; bottom: 0; height: calc(env(safe-area-inset-bottom) + 112px); display: grid; place-items: start center; padding-top: 18px; background: color-mix(in srgb, var(--pg-bg) 85%, #888 15%); }
+.vm-rec i { width: 64px; height: 64px; border-radius: 50%; border: 4px solid #d1d1d6; display: grid; place-items: center; }
+.vm-rec i::after { content: ""; width: 50px; height: 50px; border-radius: 50%; background: #ff3b30; }
+
+/* ===================== גלאי שקר ===================== */
+.lie { background: #000; color: #fff; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; padding: calc(env(safe-area-inset-top) + 18px) 18px 0; }
+.lie.active { display: block; }
+.ld-h { display: flex; justify-content: space-between; align-items: baseline; direction: ltr; }
+.ld-h b { font-size: 30px; font-weight: 700; }
+.ld-h span { color: #8e8e93; font-size: 14px; direction: rtl; }
+.ld-bpm { display: flex; align-items: baseline; gap: 8px; margin: 18px 0 4px; direction: ltr; }
+.ld-bpm svg { width: 30px; height: 30px; align-self: center; animation: beat 1s infinite; }
+@keyframes beat { 15% { transform: scale(1.18); } 30% { transform: scale(1); } }
+.ld-bpm b { font-size: 64px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; transition: color .3s; }
+.ld-bpm small { color: #8e8e93; font-size: 16px; font-weight: 600; }
+.ld-bpm.hot b { color: #ff375f; }
+.ld-wave { width: 100%; height: 130px; display: block; border-radius: 16px; background: #111; }
+.ld-q { color: #c7c7cc; font-size: 15px; margin: 16px 2px 12px; line-height: 1.4; }
+.ld-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ld-opts button { font: 600 19px -apple-system, system-ui, sans-serif; color: #fff; background: #1c1c1e; border: 1px solid #2c2c2e; border-radius: 16px; padding: 16px 10px; cursor: pointer; transition: background .25s, border-color .25s; }
+.ld-opts button.ok { background: #0f2e19; border-color: #30d158; color: #30d158; }
+.ld-opts button.bad { background: #3a0d16; border-color: #ff375f; color: #ff375f; }
+.ld-opts button.wait { opacity: .6; }
+.ld-res { margin-top: 18px; text-align: center; font-size: 24px; font-weight: 700; color: #ff375f; animation: pIn .4s ease; }
+.ld-res[hidden] { display: none; }

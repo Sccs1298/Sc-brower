@@ -42,6 +42,8 @@
         <button type="button" data-open="pin" data-home="1"><span class="tc-ico" style="background:conic-gradient(#ff6ec4,#7873f5,#4ade80,#facc15,#fb7185,#38bdf8,#ff6ec4)"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="9" fill="#111"/><path d="M14 20h2M18 16v8M22 13v14M26 17v6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>עוזר קולי</button>
         <button type="button" data-open="find"><span class="tc-ico" style="background:linear-gradient(#5ee05a,#2fb74a)"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" fill="none" stroke="#fff" stroke-width="3"/><circle cx="20" cy="20" r="4.5" fill="#fff"/></svg></span>איתור</button>
         <button type="button" data-open="fly"><span class="tc-ico" style="background:#000"><svg viewBox="0 0 40 40"><rect x="8" y="9" width="24" height="22" rx="3" fill="#1e6fd9"/><rect x="8" y="14" width="24" height="17" rx="3" fill="#ff9f0a"/><rect x="8" y="19" width="24" height="12" rx="3" fill="#34c759"/></svg></span>טיסה</button>
+        <button type="button" data-open="memo"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40"><g stroke="#ff453a" stroke-width="2.6" stroke-linecap="round"><path d="M8 20v0M12 16v8M16 11v18M20 14v12M24 9v22M28 15v10M32 19v2"/></g></svg></span>הקלטה</button>
+        <button type="button" data-open="lie"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff375f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21h7l3-7 5 14 3-9 2 2h10"/></svg></span>גלאי שקר</button>
         <button type="button" data-open="lock"><span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>התראה</button>
         <button type="button" data-open="call"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span> שיחה</button>
         <button type="button" data-open="notes"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span> פתק</button>
@@ -262,6 +264,37 @@
         <div class="group"><label class="row"><span>השם שלך על הכרטיס</span><input data-s="flyName" placeholder="ישראל ישראלי"></label></div>
       </details>
       <div class="tc-acts"><button class="btn-big primary" data-open="fly" type="button">פתח ארנק</button></div>
+    </div>
+
+    <!-- הקלטה קולית -->
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40"><g stroke="#ff453a" stroke-width="2.6" stroke-linecap="round"><path d="M8 20v0M12 16v8M16 11v18M20 14v12M24 9v22M28 15v10M32 19v2"/></g></svg></span>
+        <div><h2>ההקלטה מאתמול <span class="tc-new">חדש</span></h2><p class="dim">הצופה רואה: באפליקציית ההקלטות יש הקלטה מאתמול בלילה. הוא לוחץ נגן, ושומע את הבחירה שלו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>הצופה בוחר משהו באחד הקסמים.</li>
+        <li>"אתמול בלילה הקלטתי לעצמי משהו. אני לא זוכר בדיוק מה." פותחים "הקלטה".</li>
+        <li>נותנים לו ללחוץ על ההקלטה העליונה (מאתמול, 23:48) ועל ▶. הגל זז, והקול אומר את הבחירה שלו. כדאי להגביר את הווליום.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group"><label class="row col"><span>מה נאמר בהקלטה ({x} = הבחירה)</span><input data-s="memoText" placeholder="תזכורת לעצמי. מחר מישהו יבחר {x}."></label></div>
+        <p class="dim small" style="margin:8px 4px 0">הקול הוא הקול העברי המובנה של הטלפון.</p>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="memo" type="button">פתח הקלטות</button></div>
+    </div>
+
+    <!-- גלאי שקר -->
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff375f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21h7l3-7 5 14 3-9 2 2h10"/></svg></span>
+        <div><h2>גלאי השקר <span class="tc-new">חדש</span></h2><p class="dim">הצופה רואה: הוא שם אצבע על המצלמה, והדופק שלו נמדד בזמן אמת. על כל אפשרות הוא אומר "לא". כשהוא משקר, הדופק קופץ והטלפון תופס אותו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>הצופה בוחר משהו באחד הקסמים (מספר, מילה, מקום).</li>
+        <li>פותחים "גלאי שקר" ונותנים לו את הטלפון. הוא שם אצבע על המצלמה האחורית, ומופיע גרף דופק חי.</li>
+        <li>על המסך 6 אפשרויות, ואחת מהן היא הבחירה שלו. הוא נוגע בכל אחת ואומר "לא".</li>
+        <li>על כל השאר: "אמת". על הבחירה שלו הדופק קופץ, והמסך: "שקר. בחרת 47."</li>
+      </ol>
+      <div class="tc-acts"><button class="btn-big primary" data-open="lie" type="button">פתח גלאי שקר</button></div>
     </div>
 
     <!-- התראה -->
@@ -634,6 +667,30 @@
     <div class="bp-qr"><canvas id="bpQr" width="170" height="170"></canvas></div>
     <div class="bp-foot" id="bpFoot">נקנה ב-—</div>
   </div>
+</section>
+
+
+<!-- ===================== הקלטה קולית מאתמול ===================== -->
+<section id="memo" class="screen trick-screen memo">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="vm-top"><span class="vm-edit">עריכה</span></div>
+  <h1 class="vm-h">כל ההקלטות</h1>
+  <div class="vm-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg>חיפוש</div>
+  <div class="vm-list" id="vmList"></div>
+  <div class="vm-rec"><i></i></div>
+</section>
+
+
+<!-- ===================== גלאי השקר ===================== -->
+<section id="lie" class="screen trick-screen lie">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="ld-h"><b>Pulse</b><span id="ldState">הנח אצבע על המצלמה</span></div>
+  <div class="ld-bpm"><svg viewBox="0 0 24 24" fill="#ff375f"><path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/></svg><b id="ldBpm">--</b><small>BPM</small></div>
+  <canvas id="ldWave" class="ld-wave"></canvas>
+  <p class="ld-q" id="ldQ">על כל אחד, תגיד בקול "לא" ותיגע בו. הדופק שלך יגיד את האמת.</p>
+  <div class="ld-opts" id="ldOpts"></div>
+  <div class="ld-res" id="ldRes" hidden></div>
+  <video id="ldCam" playsinline muted hidden></video>
 </section>
 
 <!-- ===================== הגלריה (מסך הבית המוסווה) ===================== -->
