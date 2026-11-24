@@ -41,7 +41,7 @@ const METHODS = {
 
 /* ---------- הגדרות ---------- */
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
-  startIn: 'hub', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
+  startIn: 'hub', pinCode: '', chatName: 'אמא', chatBody: 'חלמתי עליך הלילה. מישהו אמר לך {x} ואתה היית בהלם 😮', chatDays: '3', aiText: 'אתה חושב על {x}.', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
   notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '',
   callDelay: '8', callName: 'אמא', phoneOS: 'auto', remoteTopic: '', remoteMode: 'g', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
   histFill: 'מזג אוויר מחר\nמתכון לפנקייקים\nכמה זה 30 דולר בשקלים\nשעות פתיחה סופר\nתרגום מאנגלית לעברית' };
@@ -2130,11 +2130,12 @@ async function goHome() {
   paint('hub'); ENTER.hub();
 }
 ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); try { $('#lWallDel').hidden = !localStorage.getItem('gk-lockwall'); } catch (e) { /* ignore */ } };
-const PAID_SCREENS = { remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
+const PAID_SCREENS = { pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
 $('#hub').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (!b) return;
   const t = b.dataset.open;
   if (PAID_SCREENS[t] && !needFull(`${PAID_SCREENS[t]} הוא חלק מהגרסה המלאה.`)) return;
+  if (t === 'pin') PIN.home = !!b.dataset.home;
   go(t);
 });
 $('#mgHub').onclick = () => goHome();
@@ -2212,7 +2213,7 @@ function calcKey(k) {
       b = Math.round(b * 1e6) / 1e6;
       const shown = C.expr.slice(0, -1) + OPS[op] + calcFmt(b); // התרגיל האפור מסתדר כך שהחשבון נכון
       C.acc = T; C.op = null; C.cur = String(T); C.fresh = true; C.expr = ''; C.done = true;
-      calcShow(calcFmt(T), shown); return;
+      calcShow(calcFmt(T), shown); setChoice(String(T)); return;
     }
     if (C.op) { C.acc = calcApply(C.acc, C.op, parseFloat(C.cur)); C.op = null; }
     else C.acc = parseFloat(C.cur);
@@ -2386,6 +2387,124 @@ $('#lTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כ
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor(e.clientY / innerHeight * 3), 0, 2);
   L.buf += String(row * 3 + col + 1); buzz();
   if (L.buf.length >= 2) { clearTimeout(L.t); const v = L.buf; L.t = setTimeout(() => { setChoice(v); fireNote(v); }, 2000); }
+});
+
+
+/* ===================== קוד הנעילה + מסך הבית + העוזר הקולי =====================
+   הטלפון נפתח רק עם המספר שהצופה בחר (4–6 ספרות). אחרי הפתיחה מופיע מסך בית רגיל,
+   וממנו פותחים את שאר הקסמים. לחיצה ארוכה על מקום ריק במסך הבית מפעילה את "העוזר הקולי". */
+const PIN = { buf: '', tick: 0, sy: null, home: false, ai: 0 };
+function pinCode() {
+  const d = String(LAST.text || '').replace(/\D/g, '');
+  if (d.length >= 4 && d.length <= 6) return d;
+  const c = String(S.pinCode || '').replace(/\D/g, '');
+  return c.length >= 4 && c.length <= 6 ? c : '1089';
+}
+function pinClock() {
+  const d = new Date(), hh = String(d.getHours()).padStart(2, '0'), mm = String(d.getMinutes()).padStart(2, '0');
+  $('#pTime').textContent = isAndroid() ? hh + '\n' + mm : hh + ':' + mm;
+  $('#pDate').textContent = d.toLocaleDateString('he-IL', isAndroid() ? { weekday: 'short', day: 'numeric', month: 'short' } : { weekday: 'long', day: 'numeric', month: 'long' });
+}
+function pinDots() {
+  const n = pinCode().length, box = $('#pDots'); box.innerHTML = '';
+  for (let i = 0; i < n; i++) { const d = document.createElement('i'); if (i < PIN.buf.length) d.className = 'on'; box.appendChild(d); }
+  $('#pDel').textContent = PIN.buf ? 'מחק' : 'ביטול';
+}
+function pinView(v) { // 'lock' | 'code' | 'home'
+  const sc = $('#pin');
+  sc.classList.toggle('p-blur', v === 'code');
+  $('#pLock').classList.toggle('up', v !== 'lock'); $('#pLock').hidden = v === 'home';
+  $('#pCode').hidden = v !== 'code'; $('#pHome').hidden = v !== 'home';
+  if (v === 'code') { PIN.buf = ''; pinDots(); }
+  if (v !== 'home') aiStop();
+}
+ENTER.pin = () => {
+  let w = ''; try { w = localStorage.getItem('gk-lockwall') || ''; } catch (e) { /* ignore */ }
+  const el = $('#pWall'); el.classList.toggle('own', !!w); el.style.backgroundImage = w ? `url("${w}")` : '';
+  pinClock(); clearInterval(PIN.tick); PIN.tick = setInterval(pinClock, 15000);
+  const now = new Date(); $('#hsCalNum').textContent = now.getDate(); $('#hsCalDay').textContent = now.toLocaleDateString('he-IL', { weekday: 'short' });
+  pinView(PIN.home ? 'home' : 'lock'); PIN.home = false; keepAwake(true);
+};
+LEAVE.pin = () => { clearInterval(PIN.tick); aiStop(); keepAwake(false); };
+(() => { // החלקה למעלה (או נגיעה) פותחת את מסך הקוד
+  const el = $('#pLock');
+  el.addEventListener('pointerdown', e => { PIN.sy = e.clientY; });
+  el.addEventListener('pointerup', e => { if (PIN.sy !== null && (PIN.sy - e.clientY > 30 || e.clientY > innerHeight * .75)) pinView('code'); PIN.sy = null; });
+})();
+$('#pKeys').addEventListener('click', e => {
+  const k = e.target.closest('[data-d]'); if (!k) return;
+  const code = pinCode(); if (PIN.buf.length >= code.length) return;
+  PIN.buf += k.dataset.d; pinDots();
+  if (PIN.buf.length < code.length) return;
+  if (PIN.buf === code) { if (navigator.vibrate) navigator.vibrate(15); setTimeout(() => pinView('home'), 160); return; }
+  const dots = $('#pDots'); dots.classList.remove('bad'); void dots.offsetWidth; dots.classList.add('bad');
+  if (navigator.vibrate) navigator.vibrate([70, 50, 70]);
+  setTimeout(() => { PIN.buf = ''; pinDots(); dots.classList.remove('bad'); }, 480);
+});
+$('#pDel').onclick = () => { if (PIN.buf) { PIN.buf = PIN.buf.slice(0, -1); pinDots(); } else pinView('lock'); };
+$('#pHome').addEventListener('click', e => {
+  if (Date.now() - (PIN.lpAt || 0) < 700) return; // שחרור של לחיצה ארוכה
+  if (PIN.ai) { aiStop(); return; }
+  const a = e.target.closest('[data-app]'); if (!a) return;
+  if (a.dataset.app === '-') { a.animate([{ transform: 'scale(1)' }, { transform: 'scale(.86)' }, { transform: 'scale(1)' }], { duration: 260 }); return; }
+  go(a.dataset.app);
+});
+$('#pHome').addEventListener('pointerdown', e => { PIN.onApp = !!e.target.closest('[data-app], .hs-dock'); });
+longPress($('#pHome'), 650, () => { if (!PIN.ai && !PIN.onApp) { PIN.lpAt = Date.now(); aiStart(); } });
+function aiSpeak(text) {
+  try {
+    const ss = window.speechSynthesis; if (!ss) return;
+    ss.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'he-IL'; u.rate = .95; u.pitch = 1;
+    const v = ss.getVoices().find(x => /^he/i.test(x.lang)); if (v) u.voice = v;
+    ss.speak(u);
+  } catch (e) { /* בלי קול */ }
+}
+function aiStart() {
+  const x = LAST.text || '';
+  $('#aiGlow').hidden = false; $('#aiSay').hidden = true; if (navigator.vibrate) navigator.vibrate(25);
+  PIN.ai = setTimeout(() => {
+    const t = x ? (S.aiText || 'אתה חושב על {x}.').split('{x}').join(x) : 'לא שמעתי. תחשוב על זה שוב, חזק יותר.';
+    $('#aiSay').textContent = t; $('#aiSay').hidden = false; aiSpeak(t);
+    PIN.ai = setTimeout(() => { $('#aiGlow').hidden = true; PIN.ai = -1; }, 4200);
+  }, 2200);
+}
+function aiStop() { if (PIN.ai > 0) clearTimeout(PIN.ai); PIN.ai = 0; $('#aiGlow').hidden = true; $('#aiSay').hidden = true; try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } }
+try { speechSynthesis.getVoices(); } catch (e) { /* ignore */ }
+
+/* ===================== הודעה מלפני כמה ימים =====================
+   שיחה רגילה עם "אמא". לפני כמה ימים, באמצע הלילה, היא כתבה בדיוק את מה שהצופה בחר עכשיו. */
+const CH = { buf: '' };
+function chatWhen(daysAgo, h, m) {
+  const d = new Date(Date.now() - daysAgo * 864e5); d.setHours(h, m, 0, 0);
+  const t = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  if (daysAgo === 0) return `<b>היום</b> ${t}`;
+  if (daysAgo === 1) return `<b>אתמול</b> ${t}`;
+  if (daysAgo < 7) return `<b>${d.toLocaleDateString('he-IL', { weekday: 'long' })}</b> ${t}`;
+  return `<b>${d.toLocaleDateString('he-IL', { weekday: 'short', day: 'numeric', month: 'short' })}</b> ${t}`;
+}
+function chatBuild() {
+  const name = S.chatName || 'אמא', x = LAST.text || '', D = clamp(parseInt(S.chatDays, 10) || 3, 2, 6);
+  $('#chName').textContent = name; $('#chAva').textContent = [...name.trim()][0] || '?';
+  const L2 = [];
+  const time = (d, h, m) => L2.push(`<div class="ch-time">${chatWhen(d, h, m)}</div>`);
+  const b = (dir, t, tail = true) => { const e = document.createElement('div'); e.className = `bub ${dir}${tail ? ' tail' : ''}`; e.textContent = t; L2.push(e.outerHTML); };
+  time(D + 6, 19, 2); b('in', 'קנית חלב?'); b('out', 'כן, ולחם'); b('in', '👍');
+  time(D + 3, 12, 40); b('out', 'אגיע מאוחר היום', false); b('out', 'אל תחכי לי לאוכל'); b('in', 'בסדר. יש אורז במקרר ❤️');
+  if (x) {
+    time(D, 23, 14); b('in', (S.chatBody || '{x}').split('{x}').join(x));
+    time(D - 1, 8, 3); b('out', 'מה?? 😂'); b('in', 'לא יודעת, זה היה חלום מוזר. רק תזכור את זה', false); b('in', 'אוהבת');
+  }
+  time(1, 18, 20); b('out', 'אתקשר אלייך אחר כך'); b('in', '👍');
+  L2.push('<div class="ch-read">נקרא אתמול</div>');
+  const list = $('#chList'); list.innerHTML = L2.join(''); list.scrollTop = list.scrollHeight;
+  $('#chTouch').classList.toggle('on', !x); CH.buf = '';
+}
+ENTER.chat = () => { chatBuild(); };
+$('#chBack').onclick = () => uiBack();
+$('#chTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כשאין בחירה: שתי נגיעות = מספר
+  const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor((e.clientY - innerHeight * .3) / (innerHeight * .5) * 3), 0, 2);
+  CH.buf += String(row * 3 + col + 1); buzz();
+  if (CH.buf.length >= 2) { setChoice(CH.buf); chatBuild(); }
 });
 
 /* ===================== שיחה נכנסת ===================== */
