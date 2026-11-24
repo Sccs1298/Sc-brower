@@ -700,7 +700,7 @@ function fillSbars() {
 }
 setInterval(fillSbars, 30000);
 /* צבע הפס העליון האמיתי של הטלפון מתאים את עצמו למסך הקסם (במקום פס לבן מעל מסך נעול) */
-const BAR_COLORS = { web: () => isAndroid() ? '' : (matchMedia('(prefers-color-scheme: dark)').matches && S.phTheme !== 'light') || S.phTheme === 'dark' ? '#1e1e20' : '#f2f2f7', lock: () => isAndroid() ? '#22302a' : '#1d2a5c', call: () => '#000000', deck: () => '#1b5e3c', calc: () => '#000000', sw: () => '#000000' };
+const BAR_COLORS = { webf: () => isAndroid() ? '' : (matchMedia('(prefers-color-scheme: dark)').matches && S.phTheme !== 'light') || S.phTheme === 'dark' ? '#000000' : '#ffffff', web: () => isAndroid() ? '' : (matchMedia('(prefers-color-scheme: dark)').matches && S.phTheme !== 'light') || S.phTheme === 'dark' ? '#1e1e20' : '#f2f2f7', lock: () => isAndroid() ? '#22302a' : '#1d2a5c', call: () => '#000000', deck: () => '#1b5e3c', calc: () => '#000000', sw: () => '#000000' };
 function setBarColor(id) {
   $$('meta[name="theme-color"]').forEach(m => {
     if (!m.dataset.orig) m.dataset.orig = m.content;
@@ -2258,6 +2258,12 @@ ENTER.web = () => {
   $('#web').classList.remove('is-off'); $('#wIn').placeholder = isAndroid() ? 'חיפוש או הקלדת כתובת URL' : 'חיפוש או הזנת אתר';
   clearTimeout(W.t); setTimeout(() => $('#wIn').focus(), 80);
 };
+/* ספארי: כשנוגעים בשורת החיפוש, הדף מתחלף ל"החיפושים האחרונים שלך יופיעו כאן" */
+const sfFocus = on => { if (isAndroid()) return; const f = on && !$('#web').classList.contains('is-off'); $('#web').classList.toggle('w-focus', f); if (curScreen() === 'web') setBarColor(f ? 'webf' : 'web'); };
+$('#wIn').addEventListener('focus', () => sfFocus(true));
+$('#wIn').addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== $('#wIn')) sfFocus(false); }, 120));
+$('#wX').addEventListener('pointerdown', e => e.preventDefault());
+$('#wX').onclick = () => { $('#wIn').value = ''; $('#wIn').blur(); sfFocus(false); };
 $('#wForm').addEventListener('submit', e => {
   e.preventDefault(); const q = $('#wIn').value.trim(); if (!q || q === W.host) return;
   setChoice(q); W.at = Date.now(); $('#wIn').blur();
