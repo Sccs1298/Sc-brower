@@ -158,6 +158,19 @@ function demoItem() {
       track: { on: false, t2: 18, ...rect } })],
   };
 }
+/* סרטונים מוכנים (צילומי "טלפון" עם משטח ריק שעליו נכתבת הבחירה) */
+/* STOCK-BEGIN */
+const STOCK = [{"id":"stk1","v":1795524330,"name":"לוח במשרד","fileName":"IMG_5203.MOV","src":"media/stk1.mp4","thumb":"media/stk1.jpg","strip":"media/stk1-strip.jpg","dur":16.0,"style":{"font":"hand","color":"#1e3277","opacity":0.9,"blend":"multiply","shadow":false,"bold":true,"fade":1.8,"grain":0.06,"soft":0.12,"light":false},"region":{"t":10.5,"x":0.2088,"y":0.3632,"w":0.57,"h":0.169,"q":[[0.0,0.0699],[0.9984,0.0],[1.0,0.9936],[0.0036,1.0]],"keys":[{"t":10.75,"x":0.2036,"y":0.3619,"w":0.5705,"h":0.1693},{"t":11.0,"x":0.1996,"y":0.3603,"w":0.5709,"h":0.1694},{"t":11.25,"x":0.1983,"y":0.359,"w":0.571,"h":0.1693},{"t":11.5,"x":0.1976,"y":0.3577,"w":0.5709,"h":0.169},{"t":11.75,"x":0.1997,"y":0.3582,"w":0.5706,"h":0.1684},{"t":12.0,"x":0.2013,"y":0.359,"w":0.5709,"h":0.1684},{"t":12.25,"x":0.2058,"y":0.3605,"w":0.5713,"h":0.1685},{"t":12.5,"x":0.2058,"y":0.3615,"w":0.5722,"h":0.1685},{"t":12.75,"x":0.2066,"y":0.3612,"w":0.5728,"h":0.1686},{"t":13.0,"x":0.206,"y":0.3608,"w":0.5733,"h":0.1687},{"t":13.25,"x":0.2062,"y":0.3602,"w":0.5735,"h":0.1688},{"t":13.5,"x":0.2059,"y":0.3593,"w":0.5736,"h":0.1689},{"t":13.75,"x":0.2072,"y":0.358,"w":0.5735,"h":0.169},{"t":14.0,"x":0.2104,"y":0.3582,"w":0.5733,"h":0.169},{"t":14.25,"x":0.2135,"y":0.3581,"w":0.5735,"h":0.1691},{"t":14.5,"x":0.2151,"y":0.3593,"w":0.5738,"h":0.1692},{"t":14.75,"x":0.2172,"y":0.3602,"w":0.574,"h":0.1693},{"t":15.0,"x":0.2166,"y":0.3617,"w":0.5743,"h":0.1694},{"t":15.25,"x":0.2148,"y":0.3621,"w":0.5746,"h":0.1695},{"t":15.5,"x":0.2105,"y":0.363,"w":0.5749,"h":0.1696},{"t":15.75,"x":0.2081,"y":0.3614,"w":0.5752,"h":0.1696},{"t":16.0,"x":0.2059,"y":0.3597,"w":0.5755,"h":0.1697}]}}];
+/* STOCK-END */
+function stockItem(s, i) {
+  const day = 864e5, r = s.region;
+  return {
+    id: s.id, stock: s.id, kind: 'video', name: s.name, fileName: s.fileName, assetUrl: s.src, thumb: s.thumb, strip: s.strip,
+    w: 720, h: 1280, duration: s.dur, created: 1, shotAt: Date.now() - (1 + i * 1.7) * day - (3 + i * 2.3) * 3600e3,
+    content: 'number', method: 'grid', digits: 2, trick: true, words: DEFAULT_WORDS.slice(),
+    regions: [newRegion(r.t, { x: r.x, y: r.y, w: r.w, h: r.h, ...s.style, persp: { on: true, q: r.q }, trackOn: true, keys: r.keys })],
+  };
+}
 /* התאמת סרטונים שנשמרו בגרסאות קודמות */
 function normalize(it) {
   if (it.method === 'list') { it.method = 'grid'; it.digits = 1; }
@@ -1245,7 +1258,7 @@ function syncEditorForm() {
   $('#edTrickWrap').hidden = it.trick === false;
   $('#edTrick').checked = it.trick !== false;
   $('#edHideLabel').textContent = it.hidden ? 'הצג בגלריה' : 'הסתר מהגלריה';
-  $('#edDelete').hidden = it.id === 'demo';
+  $('#edDelete').hidden = it.id === 'demo' || (!!it.stock && it.id === it.stock);
   $('#edMeta').value = it.meta || 'none';
   const photo = it.kind === 'photo';
   $('#edTransport').hidden = photo;
@@ -1537,6 +1550,7 @@ const photosMode = () => !P.stage;
 /* פתיחת סרטון מהגלריה או מהעורך */
 function openViewer(id, opts = {}) {
   const item = byId(id); if (!item) return;
+  if (item.stock && !licensed()) { paywall('הסרטונים המוכנים הם חלק מהגרסה המלאה.'); return; }
   P.req = { id, stage: !!opts.stage, from: opts.from || 'photos', preText: '' };
   if (P.req.from === 'photos') LASTVIEW = id;
   if (item.trick !== false && item.method === 'pre' && item.content !== 'drawing') go('pre');
@@ -2666,6 +2680,14 @@ const zoomAllowed = () => P.isPhoto && (!P.hasTrick || !!P.frozen);
   remListen();
   try { ITEMS = (await Store.all()).map(normalize); } catch (e) { ITEMS = []; }
   if (!ITEMS.some(i => i.id === 'demo')) { const d = normalize(demoItem()); ITEMS.push(d); persist(d); }
+  STOCK.forEach((s, i) => {
+    const old = ITEMS.find(x => x.id === s.id);
+    if (old && old.stockV === s.v) return;
+    const d = normalize(stockItem(s, i)); d.stockV = s.v;
+    if (old) { d.shotAt = old.shotAt; d.content = old.content; d.method = old.method; d.digits = old.digits; d.words = old.words; ITEMS[ITEMS.indexOf(old)] = d; }
+    else ITEMS.push(d);
+    persist(d);
+  });
   try { history.replaceState({ g: 1 }, ''); } catch (e) { /* ignore */ }
   const root = S.startIn === 'photos' ? 'photos' : 'hub';
   NAV.stack = [root]; paint(root); ENTER[root]();
