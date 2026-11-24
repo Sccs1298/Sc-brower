@@ -980,3 +980,5 @@ html[data-os="ios"] .l-home { height: 5px; width: 140px; margin-left: -70px; }
 .sw-tabs svg { width: 26px; height: 26px; }
 .sw-tabs .on { background: #3a3a3c; color: #f19a37; }
 @media (max-height: 560px) { #sw .sw-wrap { padding-top: calc(env(safe-area-inset-top) + 40px); padding-bottom: 10px; } #sw .sw-btns { margin-top: 12px; } #sw .sw-b { width: 64px; height: 64px; font-size: 15px; } #sw .sw-time { font-size: 52px; } .sw-tabs, #sw .sw-laps { display: none; } }
+
+.wk-num { display: block; width: 100%; box-sizing: border-box; margin: 8px 0 4px; font: inherit; font-size: 20px; direction: ltr; text-align: center; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(128,128,128,.35); background: rgba(128,128,128,.08); color: inherit; }
