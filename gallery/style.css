@@ -1151,3 +1151,29 @@ html[data-os="android"] .hs-dock { background: none; -webkit-backdrop-filter: no
 .rm-ghost p { margin: 6px 0 10px; }
 .rm-ghost-row { display: flex; gap: 8px; }
 .rm-ghost-row input { flex: 1; min-width: 0; font: inherit; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(127,127,127,.35); background: transparent; color: inherit; }
+
+/* ===================== כרטיס טיסה (Wallet) ===================== */
+.fly { background: #000; color: #fff; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; }
+.wl-top { display: flex; justify-content: space-between; align-items: center; padding: calc(env(safe-area-inset-top) + 14px) 20px 10px; direction: ltr; }
+.wl-top b { font-size: 34px; font-weight: 700; }
+.wl-plus { width: 34px; height: 34px; border-radius: 50%; background: #1c1c1e; display: grid; place-items: center; font-size: 24px; color: #fff; }
+.wl-stack { position: relative; height: 70px; margin: 6px 14px 0; }
+.wl-stack i { position: absolute; left: 0; right: 0; height: 60px; border-radius: 14px; }
+.wl-stack i:nth-child(1) { top: 0; } .wl-stack i:nth-child(2) { top: 26px; }
+.bp { position: relative; margin: -14px 14px 0; border-radius: 16px; background: linear-gradient(170deg, #0d3b7a, #0a2a57); padding: 16px 18px 18px; direction: rtl; box-shadow: 0 -6px 20px rgba(0,0,0,.4); animation: bpIn .5s cubic-bezier(.2,.8,.2,1); }
+@keyframes bpIn { from { transform: translateY(40px); opacity: 0; } }
+.bp small { display: block; font-size: 11px; font-weight: 600; letter-spacing: .3px; color: #9fc0ef; text-transform: uppercase; }
+.bp b { font-weight: 600; }
+.bp-h { display: flex; justify-content: space-between; align-items: center; }
+.bp-air { display: flex; align-items: center; gap: 6px; font-weight: 800; letter-spacing: 2px; font-size: 15px; direction: ltr; }
+.bp-air svg { width: 20px; height: 20px; }
+.bp-lbl { text-align: left; font-size: 11px; color: #9fc0ef; font-weight: 600; }
+.bp-lbl b { display: block; font-size: 19px; color: #fff; }
+.bp-route { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 12px; direction: rtl; }
+.bp-route b { font-size: 42px; font-weight: 500; letter-spacing: 1px; line-height: 1.05; direction: ltr; display: block; }
+.bp-route div:last-child { text-align: left; }
+.bp-route svg { width: 30px; height: 30px; opacity: .9; }
+.bp-grid { display: grid; grid-template-columns: 1.6fr 1fr .8fr .8fr; gap: 6px; margin-top: 12px; }
+.bp-grid b { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bp-qr { margin: 22px auto 8px; width: 186px; height: 186px; background: #fff; border-radius: 10px; display: grid; place-items: center; }
+.bp-foot { text-align: center; font-size: 12px; color: #9fc0ef; }
