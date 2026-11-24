@@ -81,7 +81,7 @@
 <script>
 (function () {
   var API = 'https://he.wikipedia.org/w/api.php?format=json&formatversion=2&origin=*&';
-  var h = location.hash.slice(1), topic = (h.match(/^gk[a-z0-9]{14}$/) || [''])[0], code = topic ? '' : (h.match(/\d{6}/) || [''])[0];
+  var h = location.hash.slice(1), topic = (h.match(/^gk[a-z0-9]{14}$/) || [''])[0], code = topic ? '' : (h.match(/\d{5,6}/) || [''])[0];
   try { if (topic || code) sessionStorage.setItem('w-h', topic || code); else { h = sessionStorage.getItem('w-h') || ''; topic = /^gk/.test(h) ? h : ''; code = topic ? '' : h; } } catch (e) {}
   try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
   // קוד אישי: התראה רגילה לטלפון ולשעון של הקוסם ("✓" = הצופה מחובר, פעם אחת)

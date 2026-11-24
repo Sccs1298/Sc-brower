@@ -77,19 +77,19 @@
   var topic = (location.hash.slice(1).match(/^gk[a-z0-9]{14}$/) || [''])[0];
   try { if (topic) sessionStorage.setItem('ws-t', topic); else topic = sessionStorage.getItem('ws-t') || ''; } catch (e) {}
   try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
-  // בלי קישור (הגיע מגוגל): קוד שיוך אקראי, 4 ספרות במספר הערכים + 2 ספרות בממוצע המילים
+  // בלי קישור (הגיע מגוגל): קוד שיוך אקראי = 5 הספרות האחרונות של מספר הערכים
   var code = '';
   try { code = sessionStorage.getItem('ws-code') || ''; } catch (e) {}
-  if (!/^\d{6}$/.test(code)) { var r = new Uint32Array(1); crypto.getRandomValues(r); code = String(r[0] % 1000000).padStart(6, '0'); try { sessionStorage.setItem('ws-code', code); } catch (e) {} }
-  var c4 = +code.slice(0, 4), c2 = +code.slice(4);
+  if (!/^\d{5}$/.test(code)) { var r = new Uint32Array(1); crypto.getRandomValues(r); code = String(r[0] % 100000).padStart(5, '0'); try { sessionStorage.setItem('ws-code', code); } catch (e) {} }
+  var c5 = +code;
   var fmt = function (n) { return Number(n).toLocaleString('en-US'); };
   function show(real, edits, active) {
-    var pages = Math.floor(real / 10000) * 10000 + c4;
+    var pages = Math.floor(real / 100000) * 100000 + c5;
     document.getElementById('pages').textContent = fmt(pages);
-    document.getElementById('words').textContent = String(500 + c2);
+    document.getElementById('words').textContent = String(500 + (c5 % 97));
     document.getElementById('edits').textContent = edits ? fmt(Math.round(edits / 1e5) / 10) + 'M' : '43.6M';
     document.getElementById('active').textContent = active ? fmt(active) : '2,914';
-    document.getElementById('today').textContent = String(180 + (c4 % 70));
+    document.getElementById('today').textContent = String(180 + (c5 % 70));
     var d = new Date();
     document.getElementById('asof').textContent = 'עודכן היום בשעה ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   }

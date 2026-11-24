@@ -2582,11 +2582,12 @@ $('#rmDone').onclick = () => uiBack();
    כשהקוסם מכפיל את שני המספרים במחשבון, האפליקציה מזהה את הקוד ומאזינה לחיפושים של הצופה (w.html). */
 const WK = { es: null, code: '', got: false, t: 0 };
 const wkLink = () => { const t = remTopic(); if (!REM.es) remListen(); return new URL('wikistat.html', location.href).href + '#' + t; };
-function wkPairFrom(expr) {
-  const e = String(expr), m = e.match(/^([\d,]{6,9})×(5\d\d)$/), r = e.match(/^(5\d\d)×([\d,]{6,9})$/); if (!m && !r) return;
-  const pages = +(m ? m[1] : r[2]).replace(/,/g, ''), words = +(m ? m[2] : r[1]);
-  if (pages < 100000) return;
-  wkPair(String(pages % 10000).padStart(4, '0') + String(words - 500).padStart(2, '0'));
+function wkPairFrom(expr) { // מהמחשבון: מספר הערכים × משהו
+  const e = String(expr), m = e.match(/^([\d,]{6,9})×/) || e.match(/×([\d,]{6,9})$/); if (m) wkPairNum(m[1]);
+}
+function wkPairNum(v) { // מספר הערכים שהצופה הקריא: 5 הספרות האחרונות הן הקוד
+  const n = String(v).replace(/\D/g, ''); if (n.length < 6) return false;
+  wkPair(n.slice(-5)); return true;
 }
 function wkPair(code) {
   if (WK.es) { try { WK.es.close(); } catch (e) { /* ignore */ } }
@@ -2602,6 +2603,7 @@ function wkGot(raw) {
   let d = {}; try { d = JSON.parse(raw); } catch (e) { d = { t: String(raw) }; }
   if (d.hello) { // הטלפון של הצופה מחובר: אישור שקט לשעון, כדי שתדע שהקלדת נכון
     if (WK.hello) return; WK.hello = true;
+    const st = $('#wkStat'); if (st) st.textContent = 'מחובר ✓ עכשיו שיחפש בוויקיפדיה';
     if (navigator.vibrate) navigator.vibrate(20);
     if (S.remoteTopic) fetch(`https://ntfy.sh/${S.remoteTopic}?title=${encodeURIComponent('תזכורת')}`, { method: 'POST', body: '✓' }).catch(() => {});
     return;
@@ -2616,6 +2618,13 @@ function wkGot(raw) {
 }
 // הצצה במחשבון: לחיצה ארוכה על השורה האפורה שמעל התוצאה
 longPress($('#cExp'), 600, () => { const el = $('#cExp'), old = el.textContent; el.textContent = LAST.text || '—'; setTimeout(() => { el.textContent = old; }, 1500); });
+$('#wkNum').addEventListener('input', e => {
+  const n = e.target.value.replace(/\D/g, '');
+  if (n.length < 6) { $('#wkStat').textContent = ''; return; }
+  if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) { e.target.value = ''; return; }
+  if (n.slice(-5) === WK.code) return;
+  wkPairNum(n); $('#wkStat').textContent = 'ממתין לצופה…'; e.target.blur();
+});
 $('#wkQr').onclick = () => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; REM.qr = wkLink(); go('remote'); };
 $('#wkShare').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remShare(wkLink(), e.currentTarget); };
 $('#wkCopy').onclick = e => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; remCopy(wkLink(), e.currentTarget); };
