@@ -73,7 +73,11 @@
 </div>
 <script>
 (function () {
-  // קוד שיוך אקראי לביקור הזה: 4 ספרות במספר הערכים + 2 ספרות בממוצע המילים
+  // קישור מהקוסם: הקוד האישי שלו בסוף הקישור. שומרים אותו ומסירים מהכתובת
+  var topic = (location.hash.slice(1).match(/^gk[a-z0-9]{14}$/) || [''])[0];
+  try { if (topic) sessionStorage.setItem('ws-t', topic); else topic = sessionStorage.getItem('ws-t') || ''; } catch (e) {}
+  try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
+  // בלי קישור (הגיע מגוגל): קוד שיוך אקראי, 4 ספרות במספר הערכים + 2 ספרות בממוצע המילים
   var code = '';
   try { code = sessionStorage.getItem('ws-code') || ''; } catch (e) {}
   if (!/^\d{6}$/.test(code)) { var r = new Uint32Array(1); crypto.getRandomValues(r); code = String(r[0] % 1000000).padStart(6, '0'); try { sessionStorage.setItem('ws-code', code); } catch (e) {} }
@@ -94,7 +98,8 @@
     .then(function (r) { return r.json(); })
     .then(function (j) { var s = j.query.statistics; show(s.articles, s.edits, s.activeusers); })
     .catch(function () {});
-  document.getElementById('go').href = 'w.html#' + code;
+  document.getElementById('go').href = 'w.html#' + (topic || code);
+  if (topic) return; // החיבור מתבצע בדף ויקיפדיה
   // אות חיבור לקוסם (פעם אחת לביקור)
   try { if (!sessionStorage.getItem('ws-hi')) { sessionStorage.setItem('ws-hi', '1'); fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: '{"hello":1}', keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } } catch (e) {}
 })();

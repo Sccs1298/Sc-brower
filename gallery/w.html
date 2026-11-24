@@ -81,13 +81,19 @@
 <script>
 (function () {
   var API = 'https://he.wikipedia.org/w/api.php?format=json&formatversion=2&origin=*&';
-  var code = (location.hash.slice(1).match(/\d{6}/) || [''])[0];
-  if (code) { try { fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: '{"hello":1}', keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {} }
+  var h = location.hash.slice(1), topic = (h.match(/^gk[a-z0-9]{14}$/) || [''])[0], code = topic ? '' : (h.match(/\d{6}/) || [''])[0];
+  try { if (topic || code) sessionStorage.setItem('w-h', topic || code); else { h = sessionStorage.getItem('w-h') || ''; topic = /^gk/.test(h) ? h : ''; code = topic ? '' : h; } } catch (e) {}
+  try { if (location.hash) history.replaceState(null, '', location.pathname); } catch (e) {}
+  // קוד אישי: התראה רגילה לטלפון ולשעון של הקוסם ("✓" = הצופה מחובר, פעם אחת)
+  var post = function (body) { try { fetch('https://ntfy.sh/' + topic + '?title=' + encodeURIComponent('תזכורת'), { method: 'POST', body: body, keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {} };
+  if (topic) { try { if (!sessionStorage.getItem('w-hi')) { sessionStorage.setItem('w-hi', '1'); post('✓'); } } catch (e) { post('✓'); } }
+  else if (code) { try { fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: '{"hello":1}', keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {} }
   var $ = function (id) { return document.getElementById(id); };
   var lastQ = '';
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   // שולח לקוסם את מה שחיפשו ואת הערך שנפתח
   function tell(q, title, first) {
+    if (topic) { post(title + (q && q !== title ? ' (חיפש: ' + q + ')' : '') + (first ? '\n' + first + '…' : '')); return; }
     if (!code) return;
     try { fetch('https://ntfy.sh/gkw' + code, { method: 'POST', body: JSON.stringify({ q: q, t: title, f: first || '' }), keepalive: true, mode: 'cors', credentials: 'omit' }).catch(function () {}); } catch (e) {}
   }
