@@ -41,7 +41,7 @@ const METHODS = {
 
 /* ---------- הגדרות ---------- */
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
-  startIn: 'hub', pinCode: '', chatName: 'אמא', chatBody: 'חלמתי עליך הלילה. מישהו אמר לך {x} ואתה היית בהלם 😮', chatDays: '3', aiText: 'אתה חושב על {x}.', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
+  startIn: 'hub', findName: 'דני', pinCode: '', chatName: 'אמא', chatBody: 'חלמתי עליך הלילה. מישהו אמר לך {x} ואתה היית בהלם 😮', chatDays: '3', aiText: 'אתה חושב על {x}.', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
   notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '',
   callDelay: '8', callName: 'אמא', phoneOS: 'auto', remoteTopic: '', remoteMode: 'g', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
   histFill: 'מזג אוויר מחר\nמתכון לפנקייקים\nכמה זה 30 דולר בשקלים\nשעות פתיחה סופר\nתרגום מאנגלית לעברית' };
@@ -2130,7 +2130,7 @@ async function goHome() {
   paint('hub'); ENTER.hub();
 }
 ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); try { $('#lWallDel').hidden = !localStorage.getItem('gk-lockwall'); } catch (e) { /* ignore */ } };
-const PAID_SCREENS = { pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
+const PAID_SCREENS = { find: 'האיתור', pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
 $('#hub').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (!b) return;
   const t = b.dataset.open;
@@ -2506,6 +2506,70 @@ $('#chTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 �
   CH.buf += String(row * 3 + col + 1); buzz();
   if (CH.buf.length >= 2) { setChoice(CH.buf); chatBuild(); }
 });
+
+
+/* ===================== איתור: החבר נמצא במקום שהצופה בחר =====================
+   הבחירה האחרונה (שם של מקום) עוברת המרה למיקום דרך OpenStreetMap, והמפה "עפה" לשם. */
+const FM = { cache: {}, run: 0 };
+const FM_HOME = { lat: 32.0809, lon: 34.7806, label: 'תל אביב-יפו, ישראל' };
+function fmTile(lat, lon, z) {
+  const n = 2 ** z, x = (lon + 180) / 360 * n, r = lat * Math.PI / 180;
+  return { x, y: (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * n };
+}
+function fmDraw(lat, lon, z, animate) {
+  const box = $('#fmTiles'), W = innerWidth, H = innerHeight, c = fmTile(lat, lon, z), px = c.x * 256, py = c.y * 256;
+  const cx = W / 2, cy = H * .36; // נקודת המרכז: מעל הגיליון התחתון
+  const x0 = Math.floor((px - cx) / 256) - 1, x1 = Math.floor((px + W - cx) / 256) + 1, y0 = Math.floor((py - cy) / 256) - 1, y1 = Math.floor((py + H - cy) / 256) + 1;
+  const n = 2 ** z, frag = document.createDocumentFragment();
+  for (let tx = x0; tx <= x1; tx++) for (let ty = y0; ty <= y1; ty++) {
+    if (ty < 0 || ty >= n) continue;
+    const im = new Image(); im.alt = ''; im.decoding = 'async';
+    im.src = `https://tile.openstreetmap.org/${z}/${((tx % n) + n) % n}/${ty}.png`;
+    im.style.left = (tx * 256) + 'px'; im.style.top = (ty * 256) + 'px'; frag.appendChild(im);
+  }
+  box.style.transition = 'none'; box.style.transformOrigin = `${px}px ${py}px`;
+  box.replaceChildren(frag);
+  const T = `translate(${cx - px}px, ${cy - py}px)`;
+  if (!animate) { box.style.transform = T; box.style.opacity = 1; return; }
+  box.style.transform = T + ' scale(.18)'; box.style.opacity = .2; void box.offsetWidth; // "מעוף" אל המקום
+  box.style.transition = 'transform 1.4s cubic-bezier(.2,.7,.2,1), opacity .5s'; box.style.transform = T; box.style.opacity = 1;
+}
+function fmKm(a, b) {
+  const R = 6371, t = x => x * Math.PI / 180, dl = t(b.lat - a.lat), dn = t(b.lon - a.lon);
+  const h = Math.sin(dl / 2) ** 2 + Math.cos(t(a.lat)) * Math.cos(t(b.lat)) * Math.sin(dn / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+async function fmFind(q) {
+  if (FM.cache[q]) return FM.cache[q];
+  const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&accept-language=he&q=${encodeURIComponent(q)}`);
+  const j = await r.json(); if (!j[0]) return null;
+  const a = j[0].address || {}, name = a.city || a.town || a.village || a.municipality || a.state || j[0].name || q;
+  const place = a.country && a.country !== name ? `${name}, ${a.country}` : name;
+  const type = j[0].addresstype || j[0].type || '';
+  const z = /country/.test(type) ? 5 : /state|region|province/.test(type) ? 7 : /city|town|municipality/.test(type) ? 12 : 14;
+  return (FM.cache[q] = { lat: +j[0].lat, lon: +j[0].lon, label: place, z });
+}
+ENTER.find = async () => {
+  const name = S.findName || 'דני', ini = [...name.trim()][0] || '?', run = ++FM.run;
+  $('#fmName').textContent = name; $('#fmAva').textContent = ini; $('#fmAva2').textContent = ini;
+  $('.fm-me small').textContent = 'משתף/ת עם ' + name;
+  $('#fmPlace').textContent = 'מאתר…'; $('#fmDist').textContent = ''; $('#fmPin').classList.remove('on');
+  fmDraw(31.4, 35.0, 7, false); // מתחילים ממפת ישראל
+  const q = String(LAST.text || '').trim();
+  let loc = null;
+  try { if (q) loc = await fmFind(q); } catch (e) { /* בלי אינטרנט */ }
+  await new Promise(res => setTimeout(res, 1800)); // "מאתר…" כמו באמת
+  if (run !== FM.run) return;
+  if (!loc) loc = { ...FM_HOME, z: 12 };
+  fmDraw(loc.lat, loc.lon, loc.z, true);
+  setTimeout(() => {
+    if (run !== FM.run) return;
+    $('#fmPin').classList.add('on'); $('#fmPlace').textContent = `${loc.label} · עכשיו`;
+    const km = fmKm(FM_HOME, loc); $('#fmDist').textContent = km < 1 ? '' : Math.round(km).toLocaleString('he-IL') + ' ק״מ';
+    if (navigator.vibrate) navigator.vibrate(15);
+  }, 900);
+};
+LEAVE.find = () => { FM.run++; };
 
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };

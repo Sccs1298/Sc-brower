@@ -40,6 +40,7 @@
         <button type="button" data-open="pin"><span class="tc-ico" style="background:linear-gradient(#3b4b8a,#7a5aa8)"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 18v-3a7 7 0 0114 0v3h1a2 2 0 012 2v10a2 2 0 01-2 2H12a2 2 0 01-2-2V20a2 2 0 012-2zm3 0h8v-3a4 4 0 00-8 0z"/></svg></span>קוד נעילה</button>
         <button type="button" data-open="chat"><span class="tc-ico" style="background:linear-gradient(#6ef58a,#1fc243)"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 9c7 0 12.500 4.400 12.500 9.800S27 28.500 20 28.500c-1.500 0-2.900-.2-4.100-.6L10 30.500l1.800-4.500C9.100 24.300 7.500 21.700 7.500 18.800 7.500 13.400 13 9 20 9z"/></svg></span>הודעה</button>
         <button type="button" data-open="pin" data-home="1"><span class="tc-ico" style="background:conic-gradient(#ff6ec4,#7873f5,#4ade80,#facc15,#fb7185,#38bdf8,#ff6ec4)"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="9" fill="#111"/><path d="M14 20h2M18 16v8M22 13v14M26 17v6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>עוזר קולי</button>
+        <button type="button" data-open="find"><span class="tc-ico" style="background:linear-gradient(#5ee05a,#2fb74a)"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" fill="none" stroke="#fff" stroke-width="3"/><circle cx="20" cy="20" r="4.5" fill="#fff"/></svg></span>איתור</button>
         <button type="button" data-open="lock"><span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>התראה</button>
         <button type="button" data-open="call"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span> שיחה</button>
         <button type="button" data-open="notes"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span> פתק</button>
@@ -222,6 +223,23 @@
         <div class="group"><label class="row col"><span>מה הטלפון אומר ({x} = הבחירה)</span><input data-s="aiText" placeholder="אתה חושב על {x}."></label></div>
       </details>
       <div class="tc-acts"><button class="btn-big primary" data-open="pin" data-home="1" type="button">פתח מסך בית</button></div>
+    </div>
+
+    <!-- איתור -->
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:linear-gradient(#5ee05a,#2fb74a)"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" fill="none" stroke="#fff" stroke-width="3"/><circle cx="20" cy="20" r="4.5" fill="#fff"/></svg></span>
+        <div><h2>איפה החבר שלי <span class="tc-new">חדש</span></h2><p class="dim">הצופה רואה: הוא חושב על מקום כלשהו בעולם. אתה פותח את אפליקציית האיתור, והחבר שלך נמצא שם ממש עכשיו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>"תחשוב על מקום בעולם שהיית רוצה להיות בו עכשיו." הוא מחפש אותו בטלפון שלו (בקסם "הטלפון של הצופה" במצב <b>מפות</b>, או בוויקיפדיה).</li>
+        <li>"יש לי חבר שמטייל המון. בוא נראה איפה הוא." פותחים "איתור".</li>
+        <li>כמה שניות של "מאתר…", והמפה עפה למקום שהוא בחר: התמונה של החבר על המפה, "פריז, צרפת · עכשיו", והמרחק בקילומטרים.</li>
+        <li>צריך אינטרנט (בשביל המפה). עובד עם עיר, מדינה, אתר מפורסם או כל מקום.</li>
+      </ol>
+      <details class="tc-set"><summary>הגדרות</summary>
+        <div class="group"><label class="row"><span>שם החבר</span><input data-s="findName" placeholder="דני"></label></div>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" data-open="find" type="button">פתח איתור</button></div>
     </div>
 
     <!-- התראה -->
@@ -560,6 +578,24 @@
   <div class="ch-list" id="chList"></div>
   <div class="ch-bar"><span class="ch-plus">+</span><span class="ch-in">iMessage<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v3"/></svg></span></div>
   <div id="chTouch" class="ch-touch"></div>
+</section>
+
+
+<!-- ===================== איתור: החבר נמצא במקום שהצופה בחר ===================== -->
+<section id="find" class="screen trick-screen find">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="fm-map" id="fmMap"><div class="fm-tiles" id="fmTiles"></div>
+    <div class="fm-pin" id="fmPin"><i id="fmAva"></i></div>
+    <span class="fm-legal">© OpenStreetMap</span>
+  </div>
+  <div class="fm-top"><span class="fm-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></span><span class="fm-btn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5L3 11l7.5 2.5L13 21z"/></svg></span></div>
+  <div class="fm-sheet">
+    <i class="fm-grab"></i>
+    <div class="fm-h"><b>אנשים</b><span class="fm-plus">+</span></div>
+    <div class="fm-row"><i id="fmAva2"></i><div><b id="fmName"></b><small id="fmPlace">מאתר…</small></div><span id="fmDist"></span></div>
+    <div class="fm-row fm-me"><i>אני</i><div><b>אני</b><small>משתף/ת עם דני</small></div><span></span></div>
+    <nav class="fm-tabs"><span class="on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 19c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6z"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 13.3c3.3-.6 6 1.5 6 5.7h-4.2"/></svg>אנשים</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="13" height="10" rx="1.5"/><rect x="15" y="9" width="6" height="11" rx="1.5"/><path d="M6 19h7"/></svg>מכשירים</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>פריטים</span><span><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>אני</span></nav>
+  </div>
 </section>
 
 <!-- ===================== הגלריה (מסך הבית המוסווה) ===================== -->
