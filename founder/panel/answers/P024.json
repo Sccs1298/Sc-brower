@@ -1,0 +1,13 @@
+{
+  "id": "P024",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already pay for English mind-reading apps, but a Hebrew one I can hand to an Israeli spectator at a birthday is something I actually lack, and 99 ₪ once is nothing next to what one gig pays me. I'd try the free tricks first and buy the same evening if they hold up.",
+  "objection": "How long does it take to learn and set up, and will a browser-installed app that isn't from the App Store work every time in front of an audience, with no glitch or giveaway on the spectator's own phone search?",
+  "would_change_my_mind": "If the free tricks lag, look fake, or take more than about 20 minutes to get performance-ready, I'd drop it and stick with the apps I already own.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 199,
+  "price_too_expensive": 349
+}

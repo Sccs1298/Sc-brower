@@ -1,0 +1,13 @@
+{
+  "id": "P058",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The tricks sound fun for the kids, but an 'app' I install from a website and pay for by card on that same site feels like exactly the kind of thing my WhatsApp groups warn about. I might try the free tricks, but I'm not typing my card into an unknown site for 99 ₪.",
+  "objection": "It's not in the App Store or Google Play, so who stands behind it? Paying by card on a website I've never heard of, for something that wants to get into my gallery, notes and calls, sounds like a scam or a privacy risk.",
+  "would_change_my_mind": "Being able to pay through the App Store or Google Play (or at least Bit/PayPal with a refund guarantee), plus a friend in one of my groups showing me it really works.",
+  "price_too_cheap": 15,
+  "price_cheap": 30,
+  "price_expensive": 70,
+  "price_too_expensive": 120
+}

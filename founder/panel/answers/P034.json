@@ -1,0 +1,13 @@
+{
+  "id": "P034",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "An app that's not in the App Store, that I pay for by card on some website I've never heard of, and that claims to know what my friend searched on their own phone? That sounds like a scam or worse until I see real reviews and who's behind it. I might try the free tricks, but I'm not putting my card in yet.",
+  "objection": "It installs from the browser instead of the App Store, so there's no Apple or Google review and no store refunds, and I don't know who the developer is. The claim about knowing what someone searched on their own phone makes me worry about privacy too.",
+  "would_change_my_mind": "Real unedited videos of the tricks working with Hebrew reviews from people I can verify, a named, known magician or company behind it, and a clear refund guarantee. Being able to pay through a trusted method like PayPal or Bit would help too.",
+  "price_too_cheap": 15,
+  "price_cheap": 39,
+  "price_expensive": 79,
+  "price_too_expensive": 150
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P035",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I do magic for a living and a mentalism effect in Hebrew that works on any phone, including the spectator searching on their own phone, is exactly what plays at Israeli birthdays and events. 99 shekels is nothing next to one gig, so if the free tricks fool me I buy it on the spot.",
+  "objection": "It installs from a website, not the App Store, and I pay by card on that site, so I worry it's a scam or will break on the next iOS update right before a show. I also already know the English apps that do this, so it has to be at least as reliable as those.",
+  "would_change_my_mind": "If the free tricks felt clunky or failed even once when I tested them, or if the payment page looked sketchy, I would not pay.",
+  "price_too_cheap": 20,
+  "price_cheap": 60,
+  "price_expensive": 250,
+  "price_too_expensive": 450
+}

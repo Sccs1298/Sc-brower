@@ -1,0 +1,265 @@
+{
+ "business": "גלריית הקסם (The Magic Gallery), a Hebrew phone-magic app",
+ "seed": 895392,
+ "dealt": 100,
+ "answered": 100,
+ "skipped": [],
+ "buys": 28,
+ "passes": 72,
+ "buy_rate": 0.28,
+ "by_segment": [
+  [
+   "Working magician (performs at events and birthdays for money)",
+   10,
+   0.6
+  ],
+  [
+   "Hobby magician (practises card and phone tricks, has bought magic products before)",
+   25,
+   0.44
+  ],
+  [
+   "Parent or teacher who wants to amaze kids and family",
+   25,
+   0.2
+  ],
+  [
+   "Regular person who loves impressing friends at parties, no magic background",
+   40,
+   0.15
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Collector of magic tools",
+   12,
+   0.8333333333333334
+  ],
+  [
+   "Impulse buyer from short videos",
+   22,
+   0.6818181818181818
+  ],
+  [
+   "Gift and occasion buyer",
+   12,
+   0.16666666666666666
+  ],
+  [
+   "Reads every review",
+   16,
+   0.0625
+  ],
+  [
+   "Suspicious of web purchases",
+   20,
+   0.0
+  ],
+  [
+   "Free-only",
+   18,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$170,000 and up",
+   34,
+   0.4411764705882353
+  ],
+  [
+   "under $115,000",
+   33,
+   0.24242424242424243
+  ],
+  [
+   "$115,000 to $170,000",
+   33,
+   0.15151515151515152
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   48,
+   [
+    "I'd probably try the free tricks at Friday dinner, but I'm not typing my card into some website for an app that isn't even in the App Store. If it's not on the store, I don't know who's behind it or how to get my money back.",
+    "It's not in the App Store, so I can't find any reviews, and I have no idea who made it. I'm not putting my card into some website for an app I install from the browser. On top of that I'm not a magician, and I'd probably mess it up at Friday dinner in front of the whole family."
+   ],
+   [
+    "P001",
+    "P002"
+   ]
+  ],
+  [
+   "price",
+   10,
+   [
+    "I'd happily play with the free tricks and show my nephews, but I don't pay for apps, and 99 ₪ for something I'd use at a few family dinners feels like a lot when there are free magic apps already.",
+    "I'd happily play with the free tricks at Friday dinner and wow the kids, but 99 shekels for an app is way past what I ever pay for software. The free ones will probably be enough for me."
+   ],
+   [
+    "P010",
+    "P021"
+   ]
+  ],
+  [
+   "habit",
+   7,
+   [
+    "I'd grab the free tricks and probably show my kids one or two of them, but I don't pay for apps. 99 shekels for something I'd use a handful of times isn't happening, and I'm not typing my card into some site that isn't in the App Store.",
+    "I'd totally try the free tricks at a party, but I basically never pay for apps, and 99 shekels for something I'd use a few times feels like a lot. Plus I'm not a magician, I'd probably mess it up in front of everyone."
+   ],
+   [
+    "P013",
+    "P016"
+   ]
+  ],
+  [
+   "timing",
+   4,
+   [
+    "It sounds fun and I'd probably try the free tricks, but I don't have a party or birthday coming up this week, so I'm not paying 99 ₪ now. If something's coming up I might come back to it, but most likely I'll just forget.",
+    "It looks fun and I'd definitely play with the free tricks, but there's no party or family dinner coming up this week, so I wouldn't pay 99 ₪ now. Honestly I'll do the trick twice, everyone will gasp, and then it sits on my phone forever."
+   ],
+   [
+    "P015",
+    "P020"
+   ]
+  ],
+  [
+   "need",
+   2,
+   [
+    "It's a fun idea and I'd definitely try the free tricks before a party, but I'd probably get one or two laughs out of them and then forget the app. There are free magic apps that do this kind of thing, so I don't see why I'd pay 99 for the full version when the free part covers a night out.",
+    "I already own paid apps that do the photo reveal, the fake call and the search peek, and they work fine on Hebrew-speaking friends. I'd play with the free tricks, but I don't see what 99 ₪ gets me that I don't already have."
+   ],
+   [
+    "P064",
+    "P095"
+   ]
+  ],
+  [
+   "quality",
+   1,
+   [
+    "I already own a couple of paid apps that do the gallery, calculator and fake-call reveals, so Hebrew alone isn't worth 99 ₪ to me. I'd play with the free tricks, but I wouldn't pay until I knew the search trick is actually better than what I have."
+   ],
+   [
+    "P044"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "need",
+   22,
+   [
+    "I'm at a party almost every weekend and I already do phone tricks, so a word showing up in my own gallery or calculator is exactly what I'd show off. I'd try the free tricks first, and if one fools my husband I'd pay the 99 that same night.",
+    "I already pay for mentalism apps like this, and a Hebrew one I can use at Israeli birthdays and events is something I don't have. 99 shekels once is less than what I charge for ten minutes of a show, so if the free tricks hold up I'll buy it to compare with what I own."
+   ],
+   [
+    "P012",
+    "P014"
+   ]
+  ],
+  [
+   "quality",
+   5,
+   [
+    "I already own a few paid mind-reading apps, and 99 ₪ one time is nothing for me. A Hebrew version that puts the word in the Photos gallery, the calculator or a fake call fills a real gap in my kit, but I'd only pay after the free tricks fool my own family.",
+    "I already pay for magic stuff, and a phone mind-reading kit in Hebrew with gallery, notes, calculator and search reveals is the kind of thing I'd love to show my WhatsApp groups. If the free tricks actually fool my partner, I'd pay the 99 ₪ that same evening."
+   ],
+   [
+    "P004",
+    "P009"
+   ]
+  ],
+  [
+   "other",
+   1,
+   [
+    "If the free tricks actually fool my friends at the next party, 99 shekels for lifetime is nothing to me, I'd pay that night just to have more tricks for the WhatsApp crowd. But I only pay after a free trick works, not before."
+   ],
+   [
+    "P041"
+   ]
+  ]
+ ],
+ "flip": [
+  "If it were sold through the App Store or Google Play with real reviews, and the free tricks actually fooled my family at dinner.",
+  "Real videos of regular Israeli people with no magic background pulling off the trick, plus reviews I can trust. Trying the free tricks first and seeing that they actually work and are easy for me would help too.",
+  "Real unedited videos of regular people (not magicians) doing the tricks on friends, plus Israeli user reviews and a clear name or company behind it, with a refund if it doesn't work on my phone.",
+  "Being able to buy it through the App Store or Google Play, or paying with Apple Pay/Bit, so I'm not typing my card into an unknown site.",
+  "If I could buy it through the App Store or Google Play, or pay with PayPal/Bit so my card never touches their site.",
+  "A short video of a regular person like me pulling it off at a party, and the free tricks working for me on the first try so I know I won't fail.",
+  "If it were sold through the App Store or Google Play, so I pay the way I always do and can get a refund if it doesn't work.",
+  "If the free tricks absolutely blew the kids away and the full version was a one-time 20-30 ₪, I might break my rule once.",
+  "If the free tricks actually fooled my family on Friday and I saw real Israeli magicians vouching for it, I might pay, and only with a refund guarantee or through Bit/PayPal instead of my card.",
+  "If the free tricks actually worked on my kids and friends without me fumbling, and someone in my WhatsApp group vouched for it, I might pay a much lower price, something around 30.",
+  "A party or birthday coming up and seeing a free trick actually fool someone after five minutes of setup.",
+  "If the free tricks worked so well that my friends freaked out and I wanted more, and the full version cost around 30 shekels.",
+  "If it were on the App Store or Google Play and I could pay through the store, after the free tricks actually fooled my family.",
+  "If the free tricks were so easy that I actually pulled one off and the kids went wild, I might pay, but only at a much lower price, like 30 or 40 shekels.",
+  "If I had a birthday or a big Friday dinner coming up and the free tricks already worked well enough that I knew I'd nail it in front of people.",
+  "If the kids go crazy over the free tricks and the full version drops to around 20-30 ₪, I might pay once.",
+  "If the free tricks blew me and my friends away and the full version was around 30 ₪, I might pay once.",
+  "Having it on the App Store or Google Play so I pay through Apple, with real reviews.",
+  "If the free tricks really blew my kids' or my students' minds and the full version were around 30 shekels, I might pay once.",
+  "Trying a free trick on my friends and seeing it really work, plus a party coming up soon.",
+  "If the free tricks genuinely blew my kids or students away and nothing free came close, maybe I'd pay a small one-off amount like 20-30 shekels.",
+  "Seeing it on the App Store or Google Play, or a friend in my WhatsApp group actually doing the trick on me and saying they paid and it works.",
+  "Seeing it listed on the App Store or Google Play with real reviews, or a friend in my WhatsApp group showing me it works after buying it without problems.",
+  "Paying through Apple Pay, Google Pay or Bit instead of typing my card, plus a real video of the trick fooling someone, would get me to buy on the spot.",
+  "If the free tricks were so strong that friends kept begging for more, and the full version was more like 29-39 shekels through the App Store or Google Play.",
+  "Real unedited videos of the tricks working with Hebrew reviews from people I can verify, a named, known magician or company behind it, and a clear refund guarantee. Being able to pay through a trusted method like PayPal or Bit would help too.",
+  "If it were on the App Store or Google Play at around 30-40 shekels, so I could pay the normal way and trust the refund.",
+  "If it were in the App Store or Google Play, so I pay through Apple or Google and can get a refund if it doesn't work.",
+  "Real unedited videos of Israelis doing the tricks on their friends, plus reviews I can check and a named person or company behind it. Then I'd buy after a free trick works for me at a party.",
+  "Selling it through the App Store or Google Play, or at least paying with Apple Pay / Google Pay / PayPal, so I'm covered if it's a scam.",
+  "A real video of the search trick working on a stranger's own phone, plus a refund if it doesn't work on my phone.",
+  "Being able to pay with Bit, Apple Pay or PayPal instead of typing my card, or a friend showing me the full version working at a party.",
+  "If a friend in my WhatsApp group bought it and showed me the full tricks working, and I could pay with Bit or through Google Play instead of typing my card on their site.",
+  "If the free tricks genuinely fooled my family and the full version dropped to around 30 shekels, I might pay once.",
+  "If it were sold through the App Store or Google Play, and the free tricks actually fooled my family at dinner.",
+  "Selling it through the App Store or Google Play, plus a live performance test of the search-reveal trick that holds up in front of a paying crowd.",
+  "Seeing a Hebrew TikTok or Reel of a real person pulling off the gallery or incoming-call trick on a friend, plus a known payment option like Apple Pay, Google Pay or Bit with a clear refund policy.",
+  "If it were on the App Store or Google Play so I could pay through them, and the free tricks actually got a big reaction from my family.",
+  "If it were sold in the App Store or Google Play so I pay through them and can get a refund.",
+  "If the free tricks actually fool my friends at a party and the full version drops to around 40-50 shekels.",
+  "If the free tricks absolutely killed at a party and the full version was around 20-30 shekels.",
+  "If the free tricks really floor the whole table at Friday dinner and the kids beg for more, I'd pay, especially if it were closer to 50 ₪.",
+  "Being able to pay through the App Store or Google Play (or at least Bit/PayPal with a refund guarantee), plus a friend in one of my groups showing me it really works.",
+  "Real unedited videos of Israeli people actually getting fooled, plus lots of honest reviews and a known name behind the app.",
+  "Real unedited videos of the tricks fooling people, plus reviews from Israelis I can check and a known magician or company standing behind it.",
+  "A short Reel of a regular non-magician person doing the gallery or incoming-call trick at a party and the friends freaking out, plus the free trick actually working smoothly for me the first time.",
+  "If I tried the free tricks at a birthday and people completely lost it, and the paid version clearly had tricks the free apps can't do, I'd pay for it before the next event, especially if it were closer to 49.",
+  "A launch price around 39 ₪, or seeing a video of the incoming-call trick that blows my mind so hard I need it right now.",
+  "If the free tricks work on my phone in five minutes and I get a real reaction from my WhatsApp group, and there's a party coming up, I'd pay for the full version.",
+  "Selling it through the App Store or Google Play, plus seeing a performer I respect use the search-reveal live on Reels and it fooling people.",
+  "If it were sold through the App Store or Google Play, or a friend in one of my WhatsApp groups showed me a trick that really fooled everyone.",
+  "Real unedited videos of the tricks working on spectators, plus reviews from Israeli magicians I recognise, and a trusted payment option like Bit, PayPal or Apple/Google Pay with a refund if it doesn't work on my phone.",
+  "Real Hebrew videos of the tricks working on actual people, plus reviews from real users and a known magician or a named company standing behind it, with payment through a trusted processor like Bit or PayPal.",
+  "Nailing one of the free tricks on a friend without getting caught, and then having a birthday or dinner coming up.",
+  "Real videos of the tricks working on regular people, Hebrew reviews from actual buyers, and a known magician or company behind it with a trusted payment option like Apple Pay, Bit or PayPal.",
+  "Uncut videos of the tricks fooling real people, plus reviews from Israeli magicians I recognise and a named creator, and the free tricks actually fooling my family on Friday.",
+  "If it were in the App Store or Google Play with real reviews, and the free tricks actually fooled my friends at a party.",
+  "If the free tricks actually fooled my friends at a party and the full version dropped to around 30 shekels.",
+  "Seeing real, unedited videos of ordinary people doing the tricks on friends, along with genuine reviews and a clear name behind the app. If the free tricks really fooled my friends at a party, I might pay.",
+  "A free trick that actually fools my family at dinner, plus a birthday or show coming up soon.",
+  "Being able to buy it through the App Store or Google Play (or a trusted payment like PayPal/Bit with a clear refund guarantee).",
+  "If it were sold through the App Store or Google Play so I pay with my normal account, and the free tricks actually wowed my family on Friday.",
+  "If the free tricks really blew everyone away at dinner and the full version were around 30-40 shekels, I'd probably buy it on the spot.",
+  "Real unedited videos of people doing these tricks on regular phones, plus reviews from Israeli magicians or magic forums I recognise. If the free tricks also work perfectly on my phone a few times, I'd buy.",
+  "Real unedited videos of Israelis doing the trick on friends at a party, plus reviews from people I can check, and the free tricks actually fooling my WhatsApp group.",
+  "If it was a normal app in the App Store or Google Play and a friend showed me a trick working for real, maybe I'd pay.",
+  "If it were in the App Store with real reviews, or a friend showed me it working and said they paid and it was legit.",
+  "If a free trick fooled the magicians in my WhatsApp group, or if they showed a reveal or search-peek method my current apps can't do",
+  "A friend in one of my WhatsApp groups doing the trick on me and vouching for it, plus payment through a known option like Bit, PayPal or Apple Pay instead of typing my card.",
+  "If the free tricks absolutely floored a room full of adults and kids at a party, so everyone asked how I did it, and the full version dropped to around 30 shekels, I might give in once.",
+  "Real uncut videos of the search reveal fooling people, plus reviews from Israeli magicians I know, with the creator's name on them",
+  "Being able to pay through Apple Pay, Google Pay or Bit instead of typing my card in, plus seeing a TikTok of someone like me actually fooling friends with it right before a party."
+ ],
+ "purchases_first_month_per_buyer": 1.0,
+ "price_answers": 100
+}

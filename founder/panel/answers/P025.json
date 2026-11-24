@@ -1,0 +1,13 @@
+{
+  "id": "P025",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The tricks sound fun for Friday dinner, but I'm not typing my card into some website for an app that isn't even on the App Store. If it were a real app with reviews I'd probably just buy it.",
+  "objection": "It installs from the browser and takes payment on its own site, which is exactly how scams look. Also, how does it know what my friend searched on their own phone? That sounds sketchy.",
+  "would_change_my_mind": "Having it on the App Store or Google Play so I pay through Apple, with real reviews.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 80,
+  "price_too_expensive": 150
+}

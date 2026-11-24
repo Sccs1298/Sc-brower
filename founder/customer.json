@@ -1,0 +1,37 @@
+{
+  "business": "גלריית הקסם (The Magic Gallery), a Hebrew phone-magic app",
+  "target": "Hebrew-speaking Israelis aged 16 to 50 who would like to amaze friends, family or audiences with magic on their phone. All money in this brief is Israeli shekels (₪); the yearly income is in ₪ even if shown with a $ sign, and give your price answers in ₪",
+  "where": "Israel, online (Instagram, TikTok, WhatsApp groups, magic-shop communities)",
+  "age": [16, 50],
+  "segments": [
+    {"name": "Hobby magician (practises card and phone tricks, has bought magic products before)", "share": 0.25, "income": [60000, 180000]},
+    {"name": "Working magician (performs at events and birthdays for money)", "share": 0.10, "income": [90000, 260000]},
+    {"name": "Regular person who loves impressing friends at parties, no magic background", "share": 0.40, "income": [40000, 200000]},
+    {"name": "Parent or teacher who wants to amaze kids and family", "share": 0.25, "income": [80000, 240000]}
+  ],
+  "behaviours": [
+    {"name": "Impulse buyer from short videos", "share": 0.22, "how": "Buys small apps and gadgets right after a TikTok or Reel that wows them."},
+    {"name": "Reads every review", "share": 0.16, "how": "Looks for real videos, reviews and who is behind a product before paying."},
+    {"name": "Free-only", "share": 0.18, "how": "Downloads free apps and rarely pays for software."},
+    {"name": "Collector of magic tools", "share": 0.12, "how": "Owns several paid magic apps and gimmicks and compares them."},
+    {"name": "Gift and occasion buyer", "share": 0.12, "how": "Pays for something when there is an event coming: a birthday, a family dinner, a show."},
+    {"name": "Suspicious of web purchases", "share": 0.20, "how": "Distrusts paying on unknown websites and prefers the App Store or Google Play."}
+  ],
+  "objections": [
+    "99 ₪ is a lot for an app, most apps are free or cost a few shekels",
+    "It's a website, not a real app from the App Store, is this a scam?",
+    "Will people really be fooled, or will they see it's fake?",
+    "I'm not a magician, I'll fail in front of everyone",
+    "I'll use it twice and get bored",
+    "There are free magic apps that do the same",
+    "Paying on an unknown website with my card feels risky",
+    "How long does it take to learn and set up?"
+  ],
+  "habits": [
+    "you scroll TikTok and Instagram Reels every evening",
+    "you have a big family dinner every Friday",
+    "you go to parties and birthdays most weekends",
+    "you are active in a few WhatsApp groups with friends",
+    "you watch magic videos on YouTube sometimes"
+  ]
+}

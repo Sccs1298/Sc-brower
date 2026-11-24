@@ -1,0 +1,13 @@
+{
+  "id": "P033",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I perform for a living, and a phone mind-reading effect in Hebrew is something I could actually use at gigs. Pro apps like this usually cost far more, so once the free tricks hold up I'd pay 99 ₪ without much pain.",
+  "objection": "It installs from a browser, not the App Store, and I don't know who's behind it. If it glitches mid-show in front of a paying client, it costs me far more than 99 ₪. I'd need to see real performance videos and reviews from other magicians first.",
+  "would_change_my_mind": "If the free tricks are flaky or I can't find any real reviews or a named creator, I wouldn't buy.",
+  "price_too_cheap": 20,
+  "price_cheap": 60,
+  "price_expensive": 250,
+  "price_too_expensive": 450
+}

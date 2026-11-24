@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd try the free tricks at a party maybe, but I'm not putting my card into some website for an app that isn't even on the App Store when I can't find real reviews or know who made it. And honestly I suspect I'd do it twice and get bored.",
+  "objection": "It's installed from a browser and paid on their own site, so I have no idea who is behind it or whether the 'they search on their own phone' trick actually works without looking fake. Plus I'll probably stop using it after a couple of parties.",
+  "would_change_my_mind": "Real unedited videos of regular people (not magicians) doing the tricks on friends, plus Israeli user reviews and a clear name or company behind it, with a refund if it doesn't work on my phone.",
+  "price_too_cheap": 15,
+  "price_cheap": 35,
+  "price_expensive": 79,
+  "price_too_expensive": 149
+}

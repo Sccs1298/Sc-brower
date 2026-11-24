@@ -1,0 +1,13 @@
+{
+  "id": "P095",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already own paid apps that do the photo reveal, the fake call and the search peek, and they work fine on Hebrew-speaking friends. I'd play with the free tricks, but I don't see what 99 ₪ gets me that I don't already have.",
+  "objection": "It's a browser-installed app from a site I don't know, not the App Store, and I'm asked to put my card in. There are also free apps that do most of this, so I'd need proof that the method is better than what's already on my phone.",
+  "would_change_my_mind": "If a free trick fooled the magicians in my WhatsApp group, or if they showed a reveal or search-peek method my current apps can't do",
+  "price_too_cheap": 15,
+  "price_cheap": 39,
+  "price_expensive": 89,
+  "price_too_expensive": 149
+}

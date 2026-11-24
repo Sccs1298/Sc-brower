@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I'd grab the free tricks and probably show my kids one or two of them, but I don't pay for apps. 99 shekels for something I'd use a handful of times isn't happening, and I'm not typing my card into some site that isn't in the App Store.",
+  "objection": "I'm not a magician. I'll mess up the setup in front of the family and look silly, and then I've paid 99 for nothing.",
+  "would_change_my_mind": "If the free tricks actually worked on my kids and friends without me fumbling, and someone in my WhatsApp group vouched for it, I might pay a much lower price, something around 30.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 39,
+  "price_too_expensive": 70
+}

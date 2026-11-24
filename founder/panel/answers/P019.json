@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I'd try the free tricks on my kids, maybe, but I basically never pay for apps, and 99 shekels for something I'd probably fumble in front of the family isn't happening. Installing from a browser instead of the App Store and paying by card on some website also makes me hesitate.",
+  "objection": "I'm not a magician. If I mess up the trick in front of everyone it's embarrassing, and then I've paid 99 shekels for nothing.",
+  "would_change_my_mind": "If the free tricks were so easy that I actually pulled one off and the kids went wild, I might pay, but only at a much lower price, like 30 or 40 shekels.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 45,
+  "price_too_expensive": 80
+}

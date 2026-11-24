@@ -1,0 +1,13 @@
+{
+  "id": "P080",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I'd try the free tricks first, and if one actually lands at Friday dinner and my family freaks out, I'd pay the 99 shekels that night without thinking twice. That's exactly the kind of thing I buy right after a video.",
+  "objection": "I'm not a magician, I'll mess it up in front of everyone and look stupid. Also it's not in the App Store, so I'm a bit wary of putting my card on some website.",
+  "would_change_my_mind": "If the free tricks felt clunky or I fumbled one in front of my family, I wouldn't pay for the rest.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 250
+}

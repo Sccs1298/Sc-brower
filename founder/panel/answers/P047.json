@@ -1,0 +1,13 @@
+{
+  "id": "P047",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I'd grab the free tricks and do them for the kids at home or in class, but I basically never pay for apps, and 99 shekels for a party trick I'll use a few times feels like a lot.",
+  "objection": "Will people really be fooled, or will they see it's fake? Plus I'm wary of putting my card into some website for an app that isn't even in the App Store.",
+  "would_change_my_mind": "If the free tricks genuinely fooled my family and the full version dropped to around 30 shekels, I might pay once.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 35,
+  "price_too_expensive": 60
+}

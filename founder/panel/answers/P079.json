@@ -1,0 +1,13 @@
+{
+  "id": "P079",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "If the free tricks actually freak out my friends at the next party, 99 shekels is nothing for me. Seeing the word show up in the Photos gallery or as an incoming call is exactly the kind of thing I'd buy right after a Reel.",
+  "objection": "It's installed from a website, not the App Store, and I'd have to type my card in on some site I've never heard of. That smells a bit like a scam.",
+  "would_change_my_mind": "If the free tricks are weak or the install from the browser feels sketchy, I'd close it and not pay.",
+  "price_too_cheap": 15,
+  "price_cheap": 39,
+  "price_expensive": 129,
+  "price_too_expensive": 220
+}

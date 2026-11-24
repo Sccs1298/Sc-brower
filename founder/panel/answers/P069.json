@@ -1,0 +1,13 @@
+{
+  "id": "P069",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I'd try the free tricks first, and if the photo-gallery and search reveals actually fool my friends, 99 ₪ is nothing next to the gimmicks I've already bought. A Hebrew mind-reading trick I can pull out at every party on the weekend is exactly what my collection is missing.",
+  "objection": "It's a website, not an App Store app, and I'm typing my card into some unknown site. I also worry the 'installed from the browser' thing looks fake on my phone or breaks after an iOS update.",
+  "would_change_my_mind": "If the free tricks look obviously like a web page (browser bar, slow loading) or I can't find any real reviews or videos of magicians using it, I wouldn't pay.",
+  "price_too_cheap": 20,
+  "price_cheap": 50,
+  "price_expensive": 180,
+  "price_too_expensive": 300
+}

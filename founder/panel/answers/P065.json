@@ -1,0 +1,13 @@
+{
+  "id": "P065",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason": "I already pay for magic stuff and the phone-gallery and incoming-call reveals are exactly the kind of thing that kills at a party. I'd try the free tricks first, and if one actually fools my sister, 99 shekels one time is nothing for me.",
+  "reason_code": "need",
+  "objection": "It's a website and not a real App Store app, and they want my card on their own site. That smells like a scam or a subscription trap, and I worry it'll break after an iOS update.",
+  "would_change_my_mind": "If the free tricks felt clunky or obviously fake, or if the payment page looked sketchy without Apple Pay or a known payment provider, I'd close it.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 129,
+  "price_too_expensive": 199
+}

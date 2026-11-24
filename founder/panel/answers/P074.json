@@ -1,0 +1,13 @@
+{
+  "id": "P074",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "quality",
+  "reason": "I already own a few English mind-reading apps, but a Hebrew one that works with family here is new to me, and 99 ₪ one time is small for a collector. I'd try the free tricks first, and if the gallery and calculator reveals look clean, I'd pay.",
+  "objection": "How long it takes to learn and set up, and whether it's really better than the apps I already own. A browser install outside the App Store also makes me wonder if it will keep working after the next phone update.",
+  "would_change_my_mind": "If the free tricks look clunky or take more than ten minutes to set up for a convincing reveal, I'd skip it and stick with what I have.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 249
+}

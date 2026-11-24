@@ -1,0 +1,13 @@
+{
+  "id": "P075",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "It looks fun and 99 ₪ isn't a lot for me, but I'm not a magician and I'm scared I'll mess it up in front of everyone. I'd try the free tricks, and with no party coming up this week I wouldn't pay yet.",
+  "objection": "I'll fumble the setup, my friend will see me fiddling with my phone, and the whole trick dies with everyone watching.",
+  "would_change_my_mind": "Nailing one of the free tricks on a friend without getting caught, and then having a birthday or dinner coming up.",
+  "price_too_cheap": 15,
+  "price_cheap": 39,
+  "price_expensive": 129,
+  "price_too_expensive": 199
+}

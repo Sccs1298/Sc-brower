@@ -1,0 +1,13 @@
+{
+  "id": "P057",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I'd happily try the free tricks on the kids at Friday dinner, but 99 ₪ for an app I'm not sure I'll use past a few weeks feels like too much. Most apps I pay for cost a few shekels.",
+  "objection": "99 ₪ up front for something installed from a website, not the App Store, and I don't know if the trick will still fool my family the second or third Friday.",
+  "would_change_my_mind": "If the free tricks really floor the whole table at Friday dinner and the kids beg for more, I'd pay, especially if it were closer to 50 ₪.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 60,
+  "price_too_expensive": 100
+}

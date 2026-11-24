@@ -1,0 +1,13 @@
+{
+  "id": "P037",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd maybe play with the free tricks, but I'm not typing my card into some random website to unlock an app that isn't even in the App Store. And 99 shekels for a party trick app feels like a lot when most apps are free.",
+  "objection": "It installs from the browser and takes payment on its own site, so if it's a scam or stops working, I have no Apple or Google to complain to and get my money back.",
+  "would_change_my_mind": "If it were on the App Store or Google Play at around 30-40 shekels, so I could pay the normal way and trust the refund.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 45,
+  "price_too_expensive": 80
+}

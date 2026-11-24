@@ -1,0 +1,13 @@
+{
+  "id": "P054",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not typing my card into some app's website that I install from the browser instead of the App Store. I'd play with the free tricks at a birthday, but 99 shekels for something I can't get through Google Play or Apple, when there are free magic apps already, no.",
+  "objection": "Paying by card on an unknown website, with no App Store protection or refund if it stops working or the site disappears, and I'm not sure it does more than the free apps.",
+  "would_change_my_mind": "If it were sold in the App Store or Google Play so I pay through them and can get a refund.",
+  "price_too_cheap": 10,
+  "price_cheap": 25,
+  "price_expensive": 50,
+  "price_too_expensive": 90
+}

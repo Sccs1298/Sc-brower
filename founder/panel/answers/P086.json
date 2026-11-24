@@ -1,0 +1,13 @@
+{
+  "id": "P086",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "quality",
+  "reason": "I already pay for magic apps, and a Hebrew one with several reveals (gallery, calculator, incoming call) is something I'd want in my collection. 99 shekels one-time is nothing for me, but I'd only pay after the free tricks actually fool my wife at home first.",
+  "objection": "I'm not a magician, and if the reveal lags or looks fake at a party I look like an idiot. Also, installing from the browser instead of the App Store makes me wonder how polished and reliable it really is compared to the apps I already own.",
+  "would_change_my_mind": "If the free tricks feel clunky or obviously staged when I test them, I'd walk away and stick with the apps I have.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 179,
+  "price_too_expensive": 299
+}

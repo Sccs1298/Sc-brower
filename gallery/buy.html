@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>גלריית הקסם · הטלפון שלך קורא מחשבות</title>
+<meta name="description" content="אפליקציית מנטליזם שנראית כמו גלריית התמונות. הצופה חושב על מספר, מילה או קלף, והבחירה שלו מופיעה בתוך סרטון. 99 ₪, תשלום אחד.">
+<meta property="og:title" content="גלריית הקסם · הטלפון שלך קורא מחשבות">
+<meta property="og:description" content="הצופה חושב על מספר. אתה פותח סרטון ישן בגלריה, והמספר שלו כבר שם. 99 ₪, תשלום אחד.">
+<meta name="theme-color" content="#0b0b12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 34 34%27%3E%3Crect width=%2734%27 height=%2734%27 rx=%279%27 fill=%27%23f2c14e%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&family=Amatic+SC:wght@700&display=swap">
+<style>
+/* Layout: dark stage, one gold accent; a live phone demo carries the hero. */
+:root { --bg: #0b0b12; --panel: #14141f; --line: #26263a; --fg: #f3f1ea; --dim: #a9a7b8; --gold: #f2c14e; --gold-ink: #1c1503; --ok: #4cd964;
+  --font: "Heebo", system-ui, -apple-system, "Segoe UI", sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 var(--font); -webkit-text-size-adjust: 100%; }
+a { color: inherit; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+h1, h2, h3 { line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(38px, 7.2vw, 68px); font-weight: 900; letter-spacing: -.5px; }
+h2 { font-size: clamp(28px, 4.6vw, 42px); font-weight: 900; }
+h3 { font-size: 20px; font-weight: 700; }
+p { margin: 0; }
+.dim { color: var(--dim); }
+.gold { color: var(--gold); }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 19px; text-decoration: none; }
+.brand img { width: 34px; height: 34px; border-radius: 9px; }
+.top a.try { font-size: 15px; color: var(--dim); text-decoration: none; border: 1px solid var(--line); border-radius: 99px; padding: 7px 14px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 40px; align-items: center; padding-block: 28px 64px; }
+.hero p.lead { font-size: clamp(18px, 2.4vw, 21px); color: var(--dim); margin-top: 16px; max-width: 34em; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; align-items: center; }
+.cta { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-height: 58px; padding: 10px 28px; border-radius: 16px; border: 0; cursor: pointer;
+  background: var(--gold); color: var(--gold-ink); font: 900 20px/1.2 var(--font); text-decoration: none; box-shadow: 0 10px 30px rgba(242,193,78,.25); }
+.cta small { font-weight: 500; font-size: 13px; opacity: .8; }
+.cta:hover { filter: brightness(1.06); }
+.cta:focus-visible, .ghost:focus-visible, summary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.ghost { display: inline-flex; align-items: center; min-height: 58px; padding: 10px 22px; border-radius: 16px; border: 1px solid var(--line); text-decoration: none; font-weight: 700; }
+.trust { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font-size: 14px; color: var(--dim); }
+.trust span::before { content: "✓ "; color: var(--ok); }
+
+/* הדגמה חיה: טלפון עם "סרטון" שבו המספר מופיע */
+.phone { width: min(78vw, 290px); aspect-ratio: 9/19; border-radius: 42px; background: #000; border: 8px solid #2a2a36; position: relative; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px #3a3a4a; }
+.stage { justify-self: center; display: grid; justify-items: center; gap: 12px; position: relative; }
+.stage::before { content: ""; position: absolute; inset: 8% -18% 14%; background: radial-gradient(closest-side, rgba(242,193,78,.32), transparent); filter: blur(30px); z-index: -1; animation: breathe 5s ease-in-out infinite; }
+.phone video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cap { font-size: 13px; color: var(--dim); }
+.cap::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ff3b30; margin-inline-end: 7px; vertical-align: 1px; animation: rec 1.6s infinite; }
+@keyframes rec { 50% { opacity: .25; } }
+@keyframes breathe { 50% { opacity: .55; transform: scale(.94); } }
+h1 .gold { background: linear-gradient(100deg, #f2c14e 20%, #fff3c4 40%, #f2c14e 60%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 4.5s linear infinite; }
+@keyframes shine { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+.rv { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.rv.in { opacity: 1; transform: none; }
+.wa { position: fixed; z-index: 30; inset-inline-start: max(16px, env(safe-area-inset-left)); bottom: calc(env(safe-area-inset-bottom) + 18px); width: 58px; height: 58px; border-radius: 50%; background: #25d366; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.45); }
+.wa svg { width: 32px; height: 32px; }
+.wa:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.wa-line { display: inline-flex; align-items: center; gap: 8px; color: #25d366; font-weight: 700; text-decoration: none; }
+.wa-line svg { width: 22px; height: 22px; }
+.phone .isl { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 84px; height: 24px; border-radius: 14px; background: #000; z-index: 3; }
+
+section { padding-block: 56px; border-top: 1px solid var(--line); }
+.kicker { color: var(--gold); font-weight: 700; font-size: 14px; letter-spacing: .5px; margin-bottom: 8px; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 28px; counter-reset: s; }
+.steps li { list-style: none; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 22px; counter-increment: s; }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: var(--gold-ink); font-weight: 900; margin-bottom: 12px; }
+.steps p { color: var(--dim); margin-top: 6px; font-size: 16px; }
+ul.steps, ol.steps { padding: 0; margin-block: 28px 0; }
+
+.tricks { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 28px; }
+.trick { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: grid; gap: 6px; align-content: start; }
+.trick .ico { font-size: 28px; }
+.trick p { color: var(--dim); font-size: 15.5px; }
+
+.why { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; margin-top: 24px; padding: 0; }
+.why li { list-style: none; padding-inline-start: 30px; position: relative; }
+.why li::before { content: "✓"; position: absolute; inset-inline-start: 0; color: var(--ok); font-weight: 900; }
+.why b { display: block; }
+.why span { color: var(--dim); font-size: 15.5px; }
+
+.price { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 32px; align-items: center; background: linear-gradient(160deg, #1b1a12, #14141f 55%); border: 1px solid #4a3f1c; border-radius: 26px; padding: 32px; margin-top: 8px; }
+.price .num { font-size: 76px; font-weight: 900; line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+.price .num small { font-size: 26px; }
+.price ul { margin: 14px 0 0; padding-inline-start: 20px; color: var(--dim); display: grid; gap: 4px; }
+.price .box { display: grid; gap: 12px; justify-items: stretch; text-align: center; }
+.price .cta { width: 100%; }
+.how { color: var(--dim); font-size: 14.5px; }
+
+details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+summary { cursor: pointer; font-weight: 700; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--gold); font-weight: 900; }
+details[open] summary::after { content: "–"; }
+details p { color: var(--dim); margin-top: 8px; max-width: 46em; }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px calc(env(safe-area-inset-bottom) + 90px); color: var(--dim); font-size: 14px; display: grid; gap: 8px; }
+footer a { color: var(--fg); }
+/* תשלום בביט */
+.bit-bg { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.7); display: grid; place-items: center; padding: 16px; }
+.bit-bg[hidden] { display: none; }
+.bit { width: 100%; max-width: 420px; max-height: calc(100dvh - 32px); overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px; display: grid; gap: 14px; position: relative; }
+.bit h3 { font-size: 22px; }
+.bit ol { margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: b; }
+.bit li { list-style: none; counter-increment: b; display: grid; gap: 6px; padding-inline-start: 38px; position: relative; }
+.bit li::before { content: counter(b); position: absolute; inset-inline-start: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: var(--gold-ink); font-weight: 900; display: grid; place-items: center; font-size: 15px; }
+.bit .val { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-weight: 800; font-size: 19px; direction: ltr; }
+.bit .val button { direction: rtl; font: inherit; font-size: 14px; font-weight: 700; background: none; color: var(--gold); border: 1px solid var(--line); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.bit input { font: inherit; width: 100%; box-sizing: border-box; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.bit .x { position: absolute; top: 12px; inset-inline-end: 12px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--bg); color: var(--fg); font-size: 20px; cursor: pointer; }
+.bit .cta { width: 100%; box-sizing: border-box; }
+.bit small.dim { font-size: 14px; }
+.sticky { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; display: none; padding: 10px max(16px, env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 10px) max(16px, env(safe-area-inset-left));
+  background: rgba(11,11,18,.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-top: 1px solid var(--line); }
+.sticky .cta { width: 100%; min-height: 52px; flex-direction: row; gap: 8px; font-size: 18px; }
+
+@media (max-width: 760px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 4px 44px; }
+  .hero > div:first-child { display: contents; }
+  .hero h1 { order: 1; text-align: center; }
+  .stage { order: 2; }
+  .hero p.lead { order: 3; margin-top: 4px; text-align: center; }
+  .cta-row { order: 4; margin-top: 4px; justify-content: center; }
+  .cta-row .cta { flex: 1 1 100%; }
+  .cta-row .ghost { display: none; }
+  .trust { order: 5; margin-top: 0; justify-content: center; }
+  .phone { width: min(58vw, 230px); border-radius: 34px; border-width: 6px; }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .why { grid-template-columns: minmax(0, 1fr); }
+  .price { grid-template-columns: minmax(0, 1fr); padding: 24px; }
+  .sticky { display: block; }
+  .wa { bottom: calc(env(safe-area-inset-bottom) + 86px); width: 54px; height: 54px; }
+  section { padding-block: 44px; }
+}
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } h1 .gold { animation: none; color: var(--gold); } .stage::before, .cap::before { animation: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top"><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="9" fill="#f2c14e"/><rect x="9" y="7" width="16" height="20" rx="2" fill="none" stroke="#1c1503" stroke-width="2.4"/><path d="M17 12.5l1.3 3 3.2.3-2.4 2.1.7 3.1-2.8-1.7-2.8 1.7.7-3.1-2.4-2.1 3.2-.3z" fill="#1c1503"/></svg>גלריית הקסם</a>
+    <a class="try" href="./">לנסות בחינם ›</a>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <h1>הטלפון שלך <span class="gold">קורא מחשבות.</span></h1>
+        <p class="lead">הצופה חושב על מספר. אתה פותח סרטון ישן בגלריה שלך, והמספר שלו כבר כתוב שם. אפליקציית מנטליזם שנראית בדיוק כמו גלריית התמונות של הטלפון.</p>
+        <div class="cta-row">
+          <a class="cta" data-buy href="#buy">קנה עכשיו · 99 ₪<small>תשלום אחד, בלי מנוי</small></a>
+          <a class="ghost" href="./">לנסות בחינם</a>
+        </div>
+        <div class="trust"><span>אייפון ואנדרואיד</span><span>עובד בלי אינטרנט</span><span>תשלום אחד, בלי מנוי</span></div>
+      </div>
+      <div class="stage">
+        <div class="phone">
+          <div class="isl"></div>
+          <video id="heroVid" src="media/hero.mp4" poster="media/hero.jpg" autoplay muted loop playsinline preload="auto" aria-label="הדגמה: הצופה חושב על מספר, והמספר 47 מופיע בתוך התמונה בגלריה"></video>
+        </div>
+        <p class="cap">צילום מסך אמיתי מהאפליקציה</p>
+      </div>
+    </div>
+
+    <section class="rv">
+      <p class="kicker">מה הצופה רואה</p>
+      <h2>סרטון רגיל בגלריה. בלי אפליקציה "חשודה".</h2>
+      <ol class="steps">
+        <li><h3>"תחשוב על מספר"</h3><p>הצופה בוחר מספר, מילה, קלף או ציור. חופשי לגמרי.</p></li>
+        <li><h3>פותחים סרטון בגלריה</h3><p>סרטון שצילמת מראש. נוגעים במסך כדי לעצור ולהמשיך, כמו בכל צפייה. ככה אתה מזין את הבחירה בסתר.</p></li>
+        <li><h3>הבחירה כבר בפנים</h3><p>המספר מופיע על הלוח שבסרטון, או בשעה שבה הסרטון "צולם". הטלפון הוא ההוכחה.</p></li>
+      </ol>
+    </section>
+
+    <section class="rv">
+      <p class="kicker">מה אפשר לחשוף</p>
+      <h2>כל מה שהצופה בוחר. בתוך סרטון שלך.</h2>
+      <div class="tricks">
+        <div class="trick"><h3>מספר</h3><p>כתוב על לוח, על פתק או על כוס בסרטון. נראה כאילו היה שם מהרגע הראשון.</p></div>
+        <div class="trick"><h3>מילה או שם</h3><p>עיר, חיה, שם של חבר. בכתב יד או בכל גופן, על כל משטח.</p></div>
+        <div class="trick"><h3>קלף</h3><p>הקלף שהצופה בחר מופיע ביד, על השולחן או בכיס.</p></div>
+        <div class="trick"><h3>ציור</h3><p>הצופה מצייר משהו, והציור שלו מופיע בסרטון.</p></div>
+        <div class="trick"><h3>שעת הצילום</h3><p>"תסתכל מתי הסרטון צולם." 17:47, בדיוק המספר שאמר.</p></div>
+        <div class="trick"><h3>הצופה מחפש בעצמו</h3><p>הוא מקליד את המילה בחיפוש של הגלריה, מוצא סרטון, והמילה בתוכו. אתה לא נוגע בטלפון.</p></div>
+      </div>
+    </section>
+
+    <section class="rv">
+      <p class="kicker">למה דווקא זו</p>
+      <h2>נבנתה כדי שלא יחשדו</h2>
+      <ul class="why">
+        <li><b>נראית כמו הגלריה של הטלפון</b><span>רשת תמונות, חיפוש, מידע, עריכה ומחיקה. כל כפתור מגיב.</span></li>
+        <li><b>החשיפה נראית מצולמת</b><span>מעקב תנועה, פרספקטיבה, תאורה וגרעיניות. הכתב יושב על המשטח.</span></li>
+        <li><b>תשלום אחד, בלי מנוי</b><span>משלמים פעם אחת, והאפליקציה שלך.</span></li>
+        <li><b>עובדת בלי אינטרנט ובלי שרת</b><span>הכל על המכשיר שלך. אין שרת שיכול ליפול באמצע הופעה.</span></li>
+        <li><b>מדריך בעברית</b><span>שלב אחרי שלב, ומדריך איך לצלם סרטון שנראה אמיתי.</span></li>
+        <li><b>אייפון, אנדרואיד ומחשב</b><span>מתקינים למסך הבית בלחיצה. הסרטונים נשמרים במכשיר.</span></li>
+      </ul>
+    </section>
+
+    <section id="buy" class="rv">
+      <div class="price">
+        <div>
+          <p class="kicker">הגרסה המלאה</p>
+          <h2>כל אפקטי הגלריה. תשלום אחד.</h2>
+          <ul>
+            <li>כל אפקטי הגלריה, עם הסרטונים והתמונות שלך</li>
+            <li>4 סרטונים מוכנים שנראים מצולמים בטלפון: לוח במשרד, מחברת בבית קפה, לוח גיר ופתק על המקרר</li>
+            <li>כל העדכונים, בלי תשלום נוסף</li>
+            <li>מדריך מצויר ומדריך צילום</li>
+            <li>תמיכה בוואטסאפ</li>
+          </ul>
+        </div>
+        <div class="box">
+          <div class="num">99<small> ₪</small></div>
+          <a class="cta" data-buy href="#buy">קנה עכשיו<small>תשלום מאובטח</small></a>
+          <p class="how">אחרי התשלום מקבלים בוואטסאפ קוד רישיון אישי. מזינים אותו באפליקציה, והכל נפתח.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="rv">
+      <p class="kicker">שאלות נפוצות</p>
+      <h2>לפני שקונים</h2>
+      <details><summary>אפשר לנסות לפני שקונים?</summary><p>כן. גרסת הניסיון חינם וכוללת סרטון הדגמה שבו אפשר לבצע את הקסם המלא ולקרוא את המדריך. הגרסה המלאה פותחת את הסרטונים שלך ואת שאר הקסמים.</p></details>
+      <details><summary>איך משלמים?</summary><p>בביט: שולחים 99 ₪ לטלפון שמופיע בחלון התשלום, עם מספר ההזמנה בהערה, ולוחצים "שילמתי". הקוד מגיע אליך בוואטסאפ.</p></details>
+      <details><summary>איך מקבלים את האפליקציה אחרי התשלום?</summary><p>מקבלים בוואטסאפ קוד רישיון אישי, לכל המאוחר תוך 24 שעות. פותחים את האפליקציה, לוחצים על "גרסת ניסיון" ומזינים את הקוד.</p></details>
+      <details><summary>על אילו טלפונים זה עובד?</summary><p>אייפון (ב-Safari) ואנדרואיד (ב-Chrome). מוסיפים את האפליקציה למסך הבית, והיא נפתחת במסך מלא ועובדת גם בלי אינטרנט.</p></details>
+      <details><summary>צריך ניסיון בקסמים?</summary><p>לא. יש באפליקציה הסבר צעד אחרי צעד וסרטון הדגמה מוכן. רוב האנשים מבצעים את הקסם הראשון תוך כמה דקות.</p></details>
+      <details><summary>הסרטונים שלי נשלחים למקום כלשהו?</summary><p>לא. הסרטונים והתמונות נשמרים רק על המכשיר שלך. אין שרת ואין העלאה.</p></details>
+      <details><summary>מה אם אחליף טלפון?</summary><p>הקוד שלך אישי ועובד גם בטלפון החדש שלך. הסרטונים נשמרים על המכשיר, אז מוסיפים אותם מחדש.</p></details>
+      <p style="margin-top:22px"><a class="wa-line" data-wa href="#"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#25d366" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-1-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c0-.2-.3-.3-.6-.5z"/></svg>יש עוד שאלה? כתבו לי בוואטסאפ</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>gynohide · עוסק פטור 328277025 · דליות 5, קצרין · <a href="mailto:nullbyteacademy1@gmail.com">nullbyteacademy1@gmail.com</a> · וואטסאפ <a href="https://wa.me/972559397892">055-939-7892</a></p>
+    <p><a href="terms.html">תקנון ותנאי רכישה</a> · <a href="privacy.html">מדיניות פרטיות</a></p>
+    <p>האפליקציה מיועדת לבידור והופעות קסמים. אייפון ואפל הם סימני מסחר של Apple Inc. המוצר אינו קשור לאפל ואינו מטעמה.</p>
+  </footer>
+</div>
+<a class="wa" data-wa href="#" target="_blank" rel="noopener" aria-label="שאלה? כתבו לי בוואטסאפ"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-1-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c0-.2-.3-.3-.6-.5z"/></svg></a>
+<div class="sticky"><a class="cta" data-buy href="#buy">קנה עכשיו · 99 ₪</a></div>
+
+<div class="bit-bg" id="bitBg" hidden>
+  <div class="bit" role="dialog" aria-modal="true" aria-labelledby="bitT">
+    <button class="x" type="button" id="bitX" aria-label="סגירה">×</button>
+    <h3 id="bitT">תשלום בביט</h3>
+    <ol>
+      <li><b>שולחים בביט לטלפון:</b><div class="val"><span id="bitPhone"></span><button type="button" data-copy="phone">העתק</button></div></li>
+      <li><b>סכום:</b><div class="val"><span id="bitSum"></span><button type="button" data-copy="sum">העתק</button></div></li>
+      <li><b>בהערה בביט כותבים את מספר ההזמנה:</b><div class="val"><span id="bitOrder"></span><button type="button" data-copy="order">העתק</button></div><small class="dim">ככה אני יודע שהתשלום שלך.</small></li>
+      <li><b>אחרי התשלום</b> לוחצים על הכפתור למטה, ומקבלים בוואטסאפ את קוד הרישיון.<input id="bitName" type="text" autocomplete="name" placeholder="השם שלך (לא חובה)" aria-label="השם שלך"></li>
+    </ol>
+    <a class="cta" id="bitDone" href="#" target="_blank" rel="noopener">שילמתי, שלחו לי את הקוד<small>נפתח וואטסאפ עם הודעה מוכנה</small></a>
+    <small class="dim">הקוד נשלח בדרך כלל תוך שעה, ולכל המאוחר תוך 24 שעות.</small>
+    <a class="wa-line" data-wa href="#" target="_blank" rel="noopener"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#25d366" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-1-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c0-.2-.3-.3-.6-.5z"/></svg>שאלה לפני שמשלמים? כתבו לי</a>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+// כפתורי הקנייה: קישור תשלום אם הוגדר, אחרת תשלום בביט והקוד נשלח בוואטסאפ
+(function () {
+  var g = window.GK || {};
+  var wa = g.WHATSAPP || '972559397892', price = g.PRICE || 99, name = g.NAME || 'גלריית הקסם';
+  var local = String(g.BIT_PHONE || wa).replace(/^972/, '0'), phone = local.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1-$2-$3');
+  var order = '';
+  try { order = sessionStorage.getItem('gk-order') || ''; } catch (e) {}
+  if (!order) { order = 'GK' + String(Math.floor(1000 + Math.random() * 9000)); try { sessionStorage.setItem('gk-order', order); } catch (e) {} }
+  var $ = function (id) { return document.getElementById(id); };
+  $('bitPhone').textContent = phone; $('bitSum').textContent = price + ' ₪'; $('bitOrder').textContent = order;
+  var vals = { phone: local, sum: String(price), order: order };
+  document.querySelectorAll('.bit [data-copy]').forEach(function (b) {
+    b.onclick = function () {
+      var t = vals[b.dataset.copy], old = b.textContent;
+      var ok = function () { b.textContent = 'הועתק ✓'; setTimeout(function () { b.textContent = old; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(t).then(ok, function () { prompt('העתק:', t); }); else prompt('העתק:', t);
+    };
+  });
+  function doneLink() {
+    var n = $('bitName').value.trim();
+    var msg = 'היי, שילמתי ' + price + ' ₪ בביט על ' + name + '. מספר הזמנה: ' + order + (n ? '. השם שלי: ' + n : '') + '. אשמח לקוד הרישיון 🙏';
+    $('bitDone').href = 'https://wa.me/' + wa + '?text=' + encodeURIComponent(msg);
+  }
+  $('bitName').addEventListener('input', doneLink); doneLink();
+  var bg = $('bitBg');
+  function open(e) { e.preventDefault(); bg.hidden = false; document.body.style.overflow = 'hidden'; }
+  function close() { bg.hidden = true; document.body.style.overflow = ''; }
+  $('bitX').onclick = close;
+  bg.addEventListener('click', function (e) { if (e.target === bg) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !bg.hidden) close(); });
+  document.querySelectorAll('[data-buy]').forEach(function (a) {
+    if (g.PAY_URL) { a.href = g.PAY_URL; a.target = '_blank'; a.rel = 'noopener'; }
+    else a.addEventListener('click', open);
+  });
+  var waHref = 'https://wa.me/' + wa + '?text=' + encodeURIComponent('היי, יש לי שאלה על ' + name);
+  document.querySelectorAll('[data-wa]').forEach(function (a) { a.href = waHref; a.target = '_blank'; a.rel = 'noopener'; });
+  var rv = document.querySelectorAll('.rv');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }); }, { rootMargin: '0px 0px -8% 0px' });
+    rv.forEach(function (el) { io.observe(el); });
+  } else rv.forEach(function (el) { el.classList.add('in'); });
+  var v = $('heroVid'); if (v) { var pl = v.play(); if (pl && pl.catch) pl.catch(function () {}); }
+  if (!g.PAY_URL) document.querySelectorAll('.price .cta small').forEach(function (s) { s.textContent = 'תשלום בביט'; });
+})();
+</script>
+</body>
+</html>

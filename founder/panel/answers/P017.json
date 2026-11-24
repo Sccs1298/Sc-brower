@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I might try the free tricks on my kids, but I'm not typing my card into some unknown website for an app that isn't even in the App Store or Google Play. If it's not in a real store, I don't pay for it.",
+  "objection": "Paying by card on a website I've never heard of, for something installed from the browser - who stands behind it if it's a scam or stops working? And I'm still not sure my family won't see right through the trick.",
+  "would_change_my_mind": "If it were on the App Store or Google Play and I could pay through the store, after the free tricks actually fooled my family.",
+  "price_too_cheap": 10,
+  "price_cheap": 25,
+  "price_expensive": 50,
+  "price_too_expensive": 90
+}

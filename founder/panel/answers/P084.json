@@ -1,0 +1,13 @@
+{
+  "id": "P084",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already pay for magic props, and the search-peek and incoming-call reveals are exactly the kind of thing I'd show off in my WhatsApp groups. If the free tricks fool my wife, I'd pay the 99 ₪ that same evening.",
+  "objection": "99 ₪ feels like a lot for an app, and paying by card on some website for something installed from the browser instead of the App Store makes me wonder if it will still work after the next phone update.",
+  "would_change_my_mind": "If the free tricks look clunky or the reveal is easy to spot, I wouldn't pay anything.",
+  "price_too_cheap": 15,
+  "price_cheap": 49,
+  "price_expensive": 99,
+  "price_too_expensive": 179
+}
