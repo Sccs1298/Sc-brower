@@ -41,7 +41,7 @@ const METHODS = {
 
 /* ---------- הגדרות ---------- */
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
-  startIn: 'hub', findName: 'דני', pinCode: '', chatName: 'אמא', chatBody: 'חלמתי עליך הלילה. מישהו אמר לך {x} ואתה היית בהלם 😮', chatDays: '3', aiText: 'אתה חושב על {x}.', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
+  startIn: 'hub', flyName: '', findName: 'דני', pinCode: '', chatName: 'אמא', chatBody: 'חלמתי עליך הלילה. מישהו אמר לך {x} ואתה היית בהלם 😮', chatDays: '3', aiText: 'אתה חושב על {x}.', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
   notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '',
   callDelay: '8', callName: 'אמא', phoneOS: 'auto', remoteTopic: '', remoteMode: 'g', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
   histFill: 'מזג אוויר מחר\nמתכון לפנקייקים\nכמה זה 30 דולר בשקלים\nשעות פתיחה סופר\nתרגום מאנגלית לעברית' };
@@ -2130,7 +2130,7 @@ async function goHome() {
   paint('hub'); ENTER.hub();
 }
 ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); try { $('#lWallDel').hidden = !localStorage.getItem('gk-lockwall'); } catch (e) { /* ignore */ } };
-const PAID_SCREENS = { find: 'האיתור', pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
+const PAID_SCREENS = { fly: 'כרטיס הטיסה', find: 'האיתור', pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
 $('#hub').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (!b) return;
   const t = b.dataset.open;
@@ -2577,6 +2577,50 @@ $('#ghGo').onclick = async () => { // רוח רפאים: המילה מוקלדת
   try { await fetch(`https://ntfy.sh/${remTopic()}x`, { method: 'POST', body: w }); toast('נשלח. המילה מוקלדת אצלו עכשיו'); $('#ghIn').value = ''; }
   catch (e) { toast('אין חיבור לאינטרנט'); }
 };
+
+/* ===================== כרטיס הטיסה =====================
+   כרטיס עלייה למטוס בארנק, ליעד שהצופה בחר. שם היעד מומר לקוד שדה תעופה (רשימה של ערים מוכרות,
+   ואחרת שלוש האותיות הראשונות של שם העיר באנגלית). */
+const IATA = { 'פריז': 'CDG', 'לונדון': 'LHR', 'ניו יורק': 'JFK', 'רומא': 'FCO', 'ברצלונה': 'BCN', 'מדריד': 'MAD', 'אמסטרדם': 'AMS', 'ברלין': 'BER', 'אתונה': 'ATH', 'פראג': 'PRG', 'בודפשט': 'BUD', 'וינה': 'VIE', 'ליסבון': 'LIS', 'מילאנו': 'MXP', 'ונציה': 'VCE', 'דובאי': 'DXB', 'בנגקוק': 'BKK', 'טוקיו': 'HND', 'לוס אנג\'לס': 'LAX', 'מיאמי': 'MIA', 'לאס וגאס': 'LAS', 'סן פרנסיסקו': 'SFO', 'קהיר': 'CAI', 'איסטנבול': 'IST', 'מוסקבה': 'SVO', 'ז\'נבה': 'GVA', 'ציריך': 'ZRH', 'קפריסין': 'LCA', 'לרנקה': 'LCA', 'פאפוס': 'PFO', 'סידני': 'SYD', 'ריו דה ז\'ניירו': 'GIG', 'בואנוס איירס': 'EZE', 'מקסיקו סיטי': 'MEX', 'טורונטו': 'YYZ', 'מונטריאול': 'YUL', 'אילת': 'ETM', 'קייפטאון': 'CPT', 'מומבאי': 'BOM', 'דלהי': 'DEL', 'ניו דלהי': 'DEL', 'סינגפור': 'SIN', 'הונג קונג': 'HKG', 'בייג\'ינג': 'PEK', 'סיאול': 'ICN', 'מרקש': 'RAK', 'בטומי': 'BUS', 'טביליסי': 'TBS', 'בוקרשט': 'OTP', 'ורשה': 'WAW', 'קרקוב': 'KRK', 'קופנהגן': 'CPH', 'שטוקהולם': 'ARN', 'אוסלו': 'OSL', 'הלסינקי': 'HEL', 'דבלין': 'DUB', 'אדינבורו': 'EDI', 'מינכן': 'MUC', 'פרנקפורט': 'FRA', 'ניס': 'NCE', 'נאפולי': 'NAP', 'פירנצה': 'FLR', 'סופיה': 'SOF', 'בלגרד': 'BEG', 'קייב': 'KBP', 'מרסיי': 'MRS', 'ליון': 'LYS', 'רודוס': 'RHO', 'כרתים': 'HER', 'סנטוריני': 'JTR', 'מאלי': 'MLE', 'האיים המלדיביים': 'MLE', 'זנזיבר': 'ZNZ', 'סיישל': 'SEZ', 'באלי': 'DPS', 'פוקט': 'HKT', 'הוואי': 'HNL', 'שיקגו': 'ORD', 'בוסטון': 'BOS', 'וושינגטון': 'IAD', 'אורלנדו': 'MCO' };
+const FLY = { run: 0 };
+async function flyDest(q) {
+  const key = String(q).trim();
+  if (IATA[key]) return { city: key, code: IATA[key] };
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&namedetails=1&accept-language=he&q=${encodeURIComponent(key)}`);
+    const j = (await r.json())[0]; if (!j) throw 0;
+    const a = j.address || {}, city = a.city || a.town || a.state || a.country || j.name || key;
+    if (IATA[city]) return { city, code: IATA[city] };
+    const en = (j.namedetails && (j.namedetails['name:en'] || j.namedetails.name) || 'XXX').normalize('NFD').replace(/[^A-Za-z]/g, '');
+    return { city, code: (en.slice(0, 3) || 'INT').toUpperCase() };
+  } catch (e) { return { city: key, code: 'INT' }; }
+}
+function flyQr(seed) { // "ברקוד" שנראה אמיתי (לא נסרק לשום דבר)
+  const c = $('#bpQr'), x = c.getContext('2d'), N = 29, s = c.width / N; let h = 2166136261;
+  for (const ch of seed) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  const rnd = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296);
+  x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#000';
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) if (rnd() < .5) x.fillRect(i * s, j * s, s + .3, s + .3);
+  const eye = (cx, cy) => { x.fillStyle = '#000'; x.fillRect(cx * s, cy * s, 7 * s, 7 * s); x.fillStyle = '#fff'; x.fillRect((cx + 1) * s, (cy + 1) * s, 5 * s, 5 * s); x.fillStyle = '#000'; x.fillRect((cx + 2) * s, (cy + 2) * s, 3 * s, 3 * s); };
+  eye(0, 0); eye(N - 7, 0); eye(0, N - 7);
+}
+ENTER.fly = async () => {
+  const run = ++FLY.run, d = new Date(), p2 = n => String(n).padStart(2, '0');
+  const dep = new Date(d.getTime() + 3 * 3600e3); dep.setMinutes(Math.round(dep.getMinutes() / 5) * 5);
+  $('#bpName').textContent = (S.flyName || 'ISRAELI/ISRAEL').toUpperCase();
+  $('#bpDate').textContent = dep.toLocaleDateString('he-IL', { day: 'numeric', month: 'short' });
+  $('#bpDep').textContent = p2(dep.getHours()) + ':' + p2(dep.getMinutes());
+  const bd = new Date(dep.getTime() - 40 * 60e3); $('#bpBoard').textContent = p2(bd.getHours()) + ':' + p2(bd.getMinutes());
+  const bought = new Date(d.getTime() - 6 * 864e5); $('#bpFoot').textContent = 'נקנה ב-' + bought.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' }) + ' · כרטיס אלקטרוני';
+  $('#bpCity').textContent = '…'; $('#bpCode').textContent = '···';
+  const q = String(LAST.text || '').trim() || 'פריז', dst = await flyDest(q); if (run !== FLY.run) return;
+  let h = 0; for (const ch of dst.code) h = h * 31 + ch.charCodeAt(0);
+  $('#bpCity').textContent = dst.city; $('#bpCode').textContent = dst.code;
+  $('#bpFlt').textContent = 'SK ' + (300 + h % 600); $('#bpGate').textContent = 'B' + (2 + h % 9); $('#bpSeat').textContent = (8 + h % 22) + 'ABCDEF'[h % 6];
+  flyQr(dst.code + q);
+};
+LEAVE.fly = () => { FLY.run++; };
+
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };
 const ICO = {
