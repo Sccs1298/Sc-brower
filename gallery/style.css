@@ -1012,6 +1012,21 @@ html[data-os="ios"] .w-priv b { order: -1; flex-direction: row; }
 .si4 { left: 166px; top: 36px; width: 88px; height: 88px; background: linear-gradient(160deg, #ff5a78, #e3264b); z-index: 3; }
 .si5 { left: 230px; top: 6px; width: 76px; height: 76px; background: #fff; }
 .si6 { left: 262px; top: 52px; width: 62px; height: 62px; background: linear-gradient(160deg, #9b3cf5, #6417c8); }
-.sf-edit { display: none; }
-html[data-os="ios"] .web:not(.is-off) .sf-edit { display: block; position: absolute; z-index: 4; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 50px); background: var(--sf-card); color: var(--pg-fg); font-size: 17px; font-weight: 600; line-height: 1; padding: 8px 24px 22px; border-radius: 18px; pointer-events: none; }
 @media (max-width: 370px) { .sf-icons { transform: scale(.88); transform-origin: center top; } }
+
+/* ספארי: מצב חיפוש (המקלדת פתוחה) */
+.sf-recent, .w-x { display: none; }
+html[data-os="ios"] .web.w-focus { background: var(--pg-bg); }
+html[data-os="ios"] .web.w-focus .w-home { visibility: hidden; }
+html[data-os="ios"] .web.w-focus .sf-recent { display: grid; justify-items: center; gap: 18px; position: absolute; inset: 0; align-content: start; padding-top: calc(env(safe-area-inset-top) + 24vh); color: #8e8e93; z-index: 3; }
+html[data-os="ios"] .sf-recent svg { width: 50px; height: 50px; }
+html[data-os="ios"] .sf-recent p { margin: 0; font-size: 16px; }
+html[data-os="ios"] .web.w-focus .w-more, html[data-os="ios"] .web.w-focus .w-fwd { display: none; }
+html[data-os="ios"] .web.w-focus .w-x { display: grid; width: 48px; height: 48px; border-radius: 50%; flex: none; place-items: center; border: 1px solid var(--gl-b); background: var(--gl); color: var(--gl-fg); box-shadow: var(--gl-sh); padding: 0; cursor: pointer; }
+html[data-os="ios"] .w-x svg { width: 22px; height: 22px; }
+html[data-os="ios"] .web.w-focus .w-chrome { padding-left: 8px; padding-right: 8px; }
+html[data-os="ios"] .web.w-focus .w-form input { text-align: right; }
+html[data-os="ios"] .web.w-focus .w-ico-search { display: none; }
+.sf-edit-wrap { display: none; }
+html[data-os="ios"] .sf-edit-wrap { display: flex; justify-content: center; margin: 34px 0 0; }
+html[data-os="ios"] .sf-edit-wrap .sf-edit { display: inline-block; position: static; transform: none; background: var(--sf-card); color: var(--pg-fg); font-size: 17px; font-weight: 600; line-height: 1; padding: 11px 26px; border-radius: 22px; }
