@@ -2525,7 +2525,10 @@ function remGot(m) {
   if (m.time && m.time <= REM.last) return;
   REM.last = m.time || Math.floor(Date.now() / 1000); try { localStorage.setItem('gk-rem-last', String(REM.last)); } catch (e) { /* ignore */ }
   if (m.title === 'בדיקה') { $('#rmTestRes').textContent = 'התקבלה ✓'; return; }
-  setChoice(String(m.message).slice(0, 80));
+  const msg = String(m.message);
+  if (msg === '✓') { if (navigator.vibrate) navigator.vibrate(20); return; } // הצופה פתח את הקישור
+  setChoice(msg.split('\n')[0].replace(/ \(חיפש: .*\)$/, '').slice(0, 80)); // ויקיפדיה: שם הערך בלבד
+  if (navigator.vibrate) navigator.vibrate([25, 60, 25]);
   if (curScreen() === 'hub') $('#hubPeek').textContent = LAST.text;
 }
 function remListen() {
@@ -2578,7 +2581,7 @@ $('#rmDone').onclick = () => uiBack();
    wikistat.html מציג מספר ערכים שארבע הספרות האחרונות שלו הן קוד, וממוצע מילים 5XX (עוד שתי ספרות).
    כשהקוסם מכפיל את שני המספרים במחשבון, האפליקציה מזהה את הקוד ומאזינה לחיפושים של הצופה (w.html). */
 const WK = { es: null, code: '', got: false, t: 0 };
-const wkLink = () => new URL('wikistat.html', location.href).href;
+const wkLink = () => { const t = remTopic(); if (!REM.es) remListen(); return new URL('wikistat.html', location.href).href + '#' + t; };
 function wkPairFrom(expr) {
   const e = String(expr), m = e.match(/^([\d,]{6,9})×(5\d\d)$/), r = e.match(/^(5\d\d)×([\d,]{6,9})$/); if (!m && !r) return;
   const pages = +(m ? m[1] : r[2]).replace(/,/g, ''), words = +(m ? m[2] : r[1]);
