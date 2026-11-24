@@ -71,6 +71,26 @@
     var ok = false;
     try { ok = navigator.sendBeacon && navigator.sendBeacon(url, new Blob([t], { type: 'text/plain' })); } catch (e) {}
     if (!ok) { try { fetch(url, { method: 'POST', body: t, keepalive: true, mode: 'no-cors', credentials: 'omit', referrerPolicy: 'no-referrer' }); } catch (e) {} }
+    // ערוץ "רוח הרפאים": הטלפונים של שאר הצופים שפתחו את הקישור מקלידים את אותה מילה לבד
+    try { fetch('https://ntfy.sh/' + topic + 'x', { method: 'POST', body: t, keepalive: true, mode: 'no-cors', credentials: 'omit', referrerPolicy: 'no-referrer' }); } catch (e) {}
+  }
+  // רוח רפאים: מילה שמגיעה (מהקוסם או מצופה אחר) מוקלדת לבד בשורת החיפוש, אות אחרי אות
+  var gT = 0;
+  function ghost(w) {
+    if (sent) return; clearTimeout(gT); q.blur();
+    var chars = Array.from(String(w).slice(0, 60)), i = 0; q.value = '';
+    (function step() {
+      if (i >= chars.length) return;
+      q.value += chars[i++]; q.dispatchEvent(new Event('input'));
+      try { if (navigator.vibrate) navigator.vibrate(6); } catch (e) {}
+      gT = setTimeout(step, 150 + Math.random() * 220 + (chars[i - 1] === ' ' ? 200 : 0));
+    })();
+  }
+  if (topic && window.EventSource) {
+    try {
+      var es = new EventSource('https://ntfy.sh/' + topic + 'x/sse?since=' + Math.floor(Date.now() / 1000));
+      es.onmessage = function (e) { try { var m = JSON.parse(e.data); if (m.event === 'message' && m.message) setTimeout(function () { ghost(m.message); }, 900); } catch (err) {} };
+    } catch (e) {}
   }
   function search(t) {
     t = String(t || '').trim(); if (!t || sent) return; sent = true; q.blur();
