@@ -1146,3 +1146,8 @@ html[data-os="android"] .hs-dock { background: none; -webkit-backdrop-filter: no
 .fm-tabs span { display: grid; justify-items: center; gap: 2px; font-size: 10px; font-weight: 500; color: #1c1c1e; padding: 4px 12px; border-radius: 20px; }
 .fm-tabs span.on { color: #0a84ff; background: #ececf0; }
 .fm-tabs svg { width: 24px; height: 24px; }
+
+.rm-ghost { margin: 12px 0 4px; padding: 12px 14px; border-radius: 14px; background: rgba(127,127,127,.1); }
+.rm-ghost p { margin: 6px 0 10px; }
+.rm-ghost-row { display: flex; gap: 8px; }
+.rm-ghost-row input { flex: 1; min-width: 0; font: inherit; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(127,127,127,.35); background: transparent; color: inherit; }

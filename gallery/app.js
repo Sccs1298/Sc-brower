@@ -2571,6 +2571,12 @@ ENTER.find = async () => {
 };
 LEAVE.find = () => { FM.run++; };
 
+$('#ghGo').onclick = async () => { // רוח רפאים: המילה מוקלדת לבד בטלפון של הצופה
+  if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return;
+  const w = $('#ghIn').value.trim() || LAST.text; if (!w) { toast('כתוב מילה, או קלוט בחירה קודם'); return; }
+  try { await fetch(`https://ntfy.sh/${remTopic()}x`, { method: 'POST', body: w }); toast('נשלח. המילה מוקלדת אצלו עכשיו'); $('#ghIn').value = ''; }
+  catch (e) { toast('אין חיבור לאינטרנט'); }
+};
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };
 const ICO = {
