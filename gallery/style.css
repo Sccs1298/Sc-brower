@@ -1030,3 +1030,87 @@ html[data-os="ios"] .web.w-focus .w-ico-search { display: none; }
 .sf-edit-wrap { display: none; }
 html[data-os="ios"] .sf-edit-wrap { display: flex; justify-content: center; margin: 34px 0 0; }
 html[data-os="ios"] .sf-edit-wrap .sf-edit { display: inline-block; position: static; transform: none; background: var(--sf-card); color: var(--pg-fg); font-size: 17px; font-weight: 600; line-height: 1; padding: 11px 26px; border-radius: 22px; }
+
+/* ===================== קוד הנעילה + מסך הבית ===================== */
+.pin .l-wall { transition: filter .35s, transform .35s; }
+.pin.p-blur .l-wall { filter: blur(22px) brightness(.62); transform: scale(1.08); }
+.p-lock { position: absolute; inset: 0; z-index: 5; transition: transform .35s ease, opacity .35s; touch-action: none; }
+.p-lock.up { transform: translateY(-40%); opacity: 0; pointer-events: none; }
+.p-swipe { position: absolute; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom) + 34px); text-align: center; font-size: 15px; opacity: .8; }
+html[data-os="android"] .p-swipe::before { content: ""; }
+.p-code { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; padding-top: calc(env(safe-area-inset-top) + 13vh); color: #fff; animation: pIn .3s ease; }
+.p-code[hidden] { display: none; }
+@keyframes pIn { from { opacity: 0; transform: scale(1.06); } }
+.p-title { font-size: 20px; font-weight: 400; }
+.p-dots { display: flex; gap: 22px; margin: 22px 0 6vh; direction: ltr; }
+.p-dots i { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #fff; transition: background .08s; }
+.p-dots i.on { background: #fff; }
+.p-dots.bad { animation: pShake .45s; }
+@keyframes pShake { 15%, 55% { transform: translateX(-16px); } 35%, 75% { transform: translateX(14px); } 90% { transform: translateX(-5px); } }
+.p-keys { display: grid; grid-template-columns: repeat(3, 78px); gap: 16px 26px; direction: ltr; }
+.pk { width: 78px; height: 78px; border-radius: 50%; border: 0; padding: 0; background: rgba(255,255,255,.17); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); cursor: pointer; transition: background .25s; font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; }
+.pk:active { background: rgba(255,255,255,.55); transition: none; }
+.pk b { font-size: 36px; font-weight: 400; line-height: 1; }
+.pk small { font-size: 10px; font-weight: 700; letter-spacing: 2px; margin-top: 2px; min-height: 12px; }
+.p-foot { position: absolute; left: 44px; right: 44px; bottom: calc(env(safe-area-inset-bottom) + 36px); display: flex; justify-content: space-between; font-size: 17px; direction: rtl; }
+.p-foot button { background: none; border: 0; color: #fff; font: inherit; padding: 0; cursor: pointer; }
+html[data-os="android"] .pk { background: rgba(255,255,255,.1); }
+html[data-os="android"] .pk small { display: none; }
+/* מסך הבית */
+.hs { position: absolute; inset: 0; z-index: 7; padding: calc(env(safe-area-inset-top) + 62px) 22px 0; animation: hsIn .45s cubic-bezier(.2,.8,.2,1); color: #fff; }
+.hs[hidden] { display: none; }
+@keyframes hsIn { from { opacity: 0; transform: scale(1.25); } }
+.hs-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px 10px; direction: rtl; }
+.hs-app { background: none; border: 0; padding: 0; color: #fff; display: grid; justify-items: center; gap: 6px; cursor: pointer; font-family: -apple-system, system-ui, sans-serif; }
+.hs-app i { width: 64px; height: 64px; border-radius: 15px; overflow: hidden; display: block; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.hs-app i svg { width: 100%; height: 100%; display: block; }
+.hs-app span { font-size: 12px; text-shadow: 0 1px 3px rgba(0,0,0,.45); white-space: nowrap; }
+.hs-app:active i { filter: brightness(.7); }
+.hs-search { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 124px); display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; padding: 7px 14px; border-radius: 99px; background: rgba(255,255,255,.2); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+.hs-search svg { width: 14px; height: 14px; }
+.hs-dock { position: absolute; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 12px); height: 96px; border-radius: 36px; background: rgba(255,255,255,.22); -webkit-backdrop-filter: blur(26px) saturate(1.4); backdrop-filter: blur(26px) saturate(1.4); display: flex; justify-content: space-around; align-items: center; direction: rtl; }
+.hs-dock .hs-app span { display: none; }
+html[data-os="android"] .hs-app i { border-radius: 50%; }
+html[data-os="android"] .hs-dock { background: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* העוזר הקולי: זוהר צבעוני מסביב למסך */
+.ai-glow { position: absolute; inset: 0; z-index: 9; pointer-events: none; border-radius: 0; }
+.ai-glow::before, .ai-glow::after { content: ""; position: absolute; inset: 0; padding: 7px; border-radius: 46px; background: conic-gradient(from var(--a, 0deg), #ff6ec4, #7873f5, #4ade80, #facc15, #fb7185, #38bdf8, #ff6ec4);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: aiSpin 3s linear infinite; }
+.ai-glow::after { filter: blur(18px); opacity: .9; padding: 14px; }
+.ai-glow { animation: aiIn .5s ease; }
+@keyframes aiIn { from { opacity: 0; transform: scale(1.04); } }
+@property --a { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes aiSpin { to { --a: 360deg; } }
+.ai-say { position: absolute; z-index: 10; left: 14px; right: 14px; top: calc(env(safe-area-inset-top) + 14px); padding: 16px 18px; border-radius: 26px; background: rgba(30,30,32,.78); -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); color: #fff; font-size: 17px; line-height: 1.35; animation: pIn .35s ease; }
+.ai-say[hidden], .ai-glow[hidden] { display: none; }
+
+/* ===================== הודעות (iMessage) ===================== */
+.chat { background: var(--pg-bg); color: var(--pg-fg); font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; flex-direction: column; }
+.chat.active { display: flex; }
+.ch-head { position: relative; z-index: 3; display: flex; align-items: flex-end; justify-content: space-between; padding: calc(env(safe-area-inset-top) + 8px) 12px 8px; background: color-mix(in srgb, var(--pg-bg) 82%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-bottom: .5px solid rgba(127,127,127,.25); direction: rtl; }
+.ch-back, .ch-vid { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--gl); border: 1px solid var(--gl-b); color: var(--pg-fg); box-shadow: var(--gl-sh); padding: 0; margin-bottom: 14px; }
+.ch-back svg, .ch-vid svg { width: 22px; height: 22px; }
+.ch-who { display: grid; justify-items: center; gap: 4px; }
+.ch-who i { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(#a1a6b4, #858a96); color: #fff; display: grid; place-items: center; font: 500 24px -apple-system, system-ui, sans-serif; font-style: normal; }
+.ch-who span { display: flex; align-items: center; gap: 2px; font-size: 12px; padding: 3px 10px; border-radius: 99px; background: var(--gl); border: 1px solid var(--gl-b); }
+.ch-who span svg { width: 11px; height: 11px; opacity: .6; }
+.ch-who b { font-weight: 500; }
+.ch-list { flex: 1; overflow-y: auto; padding: 10px 14px 90px; display: flex; flex-direction: column; gap: 3px; direction: rtl; }
+.ch-time { text-align: center; font-size: 11px; color: #8e8e93; margin: 14px 0 6px; }
+.ch-time b { font-weight: 600; }
+.bub { max-width: 74%; padding: 7px 12px; border-radius: 18px; font-size: 17px; line-height: 1.3; word-wrap: break-word; position: relative; }
+.bub.in { align-self: flex-start; background: #e9e9eb; color: #000; }
+.bub.out { align-self: flex-end; background: #0b84fe; color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bub.in { background: #262628; color: #fff; } }
+:root[data-theme="dark"] .bub.in { background: #262628; color: #fff; }
+.bub.tail.in { border-bottom-right-radius: 5px; }
+.bub.tail.out { border-bottom-left-radius: 5px; }
+.ch-read { align-self: flex-end; font-size: 11px; color: #8e8e93; margin: 1px 4px 4px; }
+.ch-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; align-items: center; gap: 8px; padding: 8px 12px calc(env(safe-area-inset-bottom) + 8px); direction: rtl; }
+.ch-plus { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--gl); border: 1px solid var(--gl-b); font-size: 26px; font-weight: 300; color: var(--pg-fg); flex: none; }
+.ch-in { flex: 1; height: 38px; border-radius: 19px; border: 1px solid rgba(127,127,127,.35); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; color: #8e8e93; font-size: 17px; background: var(--pg-bg); }
+.ch-in svg { width: 20px; height: 20px; }
+.ch-touch { position: absolute; inset: 30% 0 20%; z-index: 2; pointer-events: none; }
+.ch-touch.on { pointer-events: auto; }
+
+.pin.p-blur::before { content: ""; position: absolute; inset: 0; z-index: 2; background: rgba(0,0,0,.28); -webkit-backdrop-filter: blur(26px); backdrop-filter: blur(26px); }
