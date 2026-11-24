@@ -41,7 +41,7 @@ const METHODS = {
 
 /* ---------- הגדרות ---------- */
 const S = { vibrate: true, indicator: false, record: false, contactName: '', contactLink: '', sample: '47', phTheme: 'auto', seenHelp: false, searchMode: 'result', forceId: '',
-  startIn: 'hub', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
+  startIn: 'hub', calcEasy: '1', calcMode: 'time', calcNumber: '1089', deckMode: 'force', deckForce: '7 לב',
   notifyFrom: 'אמא', notifyBody: 'חלמתי הלילה על {x} 😮', notifyDelay: '6', license: '',
   callDelay: '8', callName: 'אמא', phoneOS: 'auto', remoteTopic: '', remoteMode: 'g', noteTitle: 'לא לפתוח 🤫', noteBody: 'אני יודע שתבחר ב: {x}', swNumber: '47', swUseLast: true,
   histFill: 'מזג אוויר מחר\nמתכון לפנקייקים\nכמה זה 30 דולר בשקלים\nשעות פתיחה סופר\nתרגום מאנגלית לעברית' };
@@ -2147,7 +2147,7 @@ $('#hubClear').onclick = () => { PEEK.text = ''; LAST.text = ''; LASTVIEW = null
 const setChoice = t => { PEEK.text = t; PEEK.at = Date.now(); LAST.text = t; };
 
 /* ---------- מחשבון עם הכרחה (כמו iOS 26: כל התרגיל מוצג בזמן ההקלדה) ---------- */
-const C = { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null, fi: 0, expr: '', done: false };
+const C = { acc: null, op: null, cur: '0', fresh: true, armed: false, force: null, fi: 0, expr: '', done: false, easyUsed: false };
 function calcTarget() {
   const d = new Date(), p2 = n => String(n).padStart(2, '0');
   if (S.calcMode === 'time') return +(p2(d.getHours()) + p2(d.getMinutes()));
@@ -2202,7 +2202,18 @@ function calcKey(k) {
   if (k === '=') {
     if (C.done) return;
     const exp = calcMain();
-    if (C.op === '×') wkPairFrom(exp);
+    if (C.op === '×' && wkPairFrom(exp)) { /* חיבור לוויקיפדיה, בלי הכרחה */ }
+    else if (S.calcEasy !== '0' && C.op && !C.easyUsed && C.force === null) { // שיטה פשוטה: ה-= הראשון מביא את המספר שנקבע
+      C.easyUsed = true;
+      const T = calcTarget(), A = C.acc;
+      let op = C.op, b = op === '+' ? T - A : op === '-' ? A - T : NaN;
+      if (!isFinite(b)) { op = '+'; b = T - A; } // כפל/חילוק: מוחלפים בחיבור
+      if (b < 0) { op = op === '+' ? '-' : '+'; b = -b; }
+      b = Math.round(b * 1e6) / 1e6;
+      const shown = C.expr.slice(0, -1) + OPS[op] + calcFmt(b); // התרגיל האפור מסתדר כך שהחשבון נכון
+      C.acc = T; C.op = null; C.cur = String(T); C.fresh = true; C.expr = ''; C.done = true;
+      calcShow(calcFmt(T), shown); return;
+    }
     if (C.op) { C.acc = calcApply(C.acc, C.op, parseFloat(C.cur)); C.op = null; }
     else C.acc = parseFloat(C.cur);
     C.cur = String(C.acc); C.fresh = true; C.expr = ''; C.done = true; if (C.force !== null) { C.armed = false; C.force = null; }
@@ -2219,7 +2230,7 @@ function calcKey(k) {
 }
 $('#calc .c-keys').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) calcKey(b.dataset.k); });
 longPress($('#cDisp'), 800, () => { C.armed = true; const d = $('#cDisp'); d.style.opacity = '.55'; setTimeout(() => d.style.opacity = '', 160); });
-ENTER.calc = () => { calcKey('ac'); keepAwake(true); };
+ENTER.calc = () => { calcKey('ac'); C.easyUsed = false; keepAwake(true); };
 LEAVE.calc = () => keepAwake(false);
 /* החלקה על המספר מוחקת ספרה, כמו במחשבון אמיתי */
 (() => {
@@ -2583,7 +2594,7 @@ $('#rmDone').onclick = () => uiBack();
 const WK = { es: null, code: '', got: false, t: 0 };
 const wkLink = () => { const t = remTopic(); if (!REM.es) remListen(); return new URL('wikistat.html', location.href).href + '#' + t; };
 function wkPairFrom(expr) { // מהמחשבון: מספר הערכים × משהו
-  const e = String(expr), m = e.match(/^([\d,]{6,9})×/) || e.match(/×([\d,]{6,9})$/); if (m) wkPairNum(m[1]);
+  const e = String(expr), m = e.match(/^([\d,]{6,9})×/) || e.match(/×([\d,]{6,9})$/); return m ? wkPairNum(m[1]) : false;
 }
 function wkPairNum(v) { // מספר הערכים שהצופה הקריא: 5 הספרות האחרונות הן הקוד
   const n = String(v).replace(/\D/g, ''); if (n.length < 6) return false;

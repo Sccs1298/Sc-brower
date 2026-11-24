@@ -982,3 +982,10 @@ html[data-os="ios"] .l-home { height: 5px; width: 140px; margin-left: -70px; }
 @media (max-height: 560px) { #sw .sw-wrap { padding-top: calc(env(safe-area-inset-top) + 40px); padding-bottom: 10px; } #sw .sw-btns { margin-top: 12px; } #sw .sw-b { width: 64px; height: 64px; font-size: 15px; } #sw .sw-time { font-size: 52px; } .sw-tabs, #sw .sw-laps { display: none; } }
 
 .wk-num { display: block; width: 100%; box-sizing: border-box; margin: 8px 0 4px; font: inherit; font-size: 20px; direction: ltr; text-align: center; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(128,128,128,.35); background: rgba(128,128,128,.08); color: inherit; }
+
+/* מחשבון: סימני פעולה דקים וגדולים כמו ב-iOS 26 */
+.ck.op svg { width: 46%; }
+.ck.fn svg { width: 50%; }
+.ck[data-k="neg"] svg { width: 50%; }
+.c-disp { font-size: 78px; }
+@media (max-width: 360px) { .c-disp { font-size: 68px; } }
