@@ -700,11 +700,11 @@ function fillSbars() {
 }
 setInterval(fillSbars, 30000);
 /* צבע הפס העליון האמיתי של הטלפון מתאים את עצמו למסך הקסם (במקום פס לבן מעל מסך נעול) */
-const BAR_COLORS = { lock: () => isAndroid() ? '#22302a' : '#1d2a5c', call: () => '#000000', deck: () => '#1b5e3c', calc: () => '#000000', sw: () => '#000000' };
+const BAR_COLORS = { web: () => isAndroid() ? '' : (matchMedia('(prefers-color-scheme: dark)').matches && S.phTheme !== 'light') || S.phTheme === 'dark' ? '#1e1e20' : '#f2f2f7', lock: () => isAndroid() ? '#22302a' : '#1d2a5c', call: () => '#000000', deck: () => '#1b5e3c', calc: () => '#000000', sw: () => '#000000' };
 function setBarColor(id) {
   $$('meta[name="theme-color"]').forEach(m => {
     if (!m.dataset.orig) m.dataset.orig = m.content;
-    m.content = BAR_COLORS[id] ? BAR_COLORS[id]() : m.dataset.orig;
+    m.content = (BAR_COLORS[id] && BAR_COLORS[id]()) || m.dataset.orig;
   });
 }
 
@@ -2242,10 +2242,16 @@ LEAVE.calc = () => keepAwake(false);
 /* ---------- חיפוש באינטרנט (הצצה): נראה כמו הדפדפן של הטלפון ---------- */
 const W = { t: 0, at: 0, host: 'google.com' };
 const WEB_FAVS = [['חדשות', '#e0332f'], ['מזג אוויר', '#2f7fe0'], ['ספורט', '#1f9d55'], ['מתכונים', '#f08a24'], ['מפות', '#34a3a0'], ['בנק', '#6a4fd0'], ['קניות', '#d0447a'], ['דואר', '#4a5568']];
+const SF_FAVS = [['Apple', '<svg viewBox="0 0 24 24"><path fill="#6e6e73" d="M16.37 12.62c-.02-2.33 1.9-3.45 1.99-3.5-1.08-1.58-2.77-1.8-3.37-1.82-1.43-.15-2.8.84-3.53.84-.73 0-1.85-.82-3.04-.8-1.56.02-3 .91-3.81 2.31-1.62 2.82-.41 6.99 1.17 9.28.77 1.12 1.69 2.38 2.89 2.33 1.16-.05 1.6-.75 3-.75s1.8.75 3.03.73c1.25-.02 2.04-1.14 2.81-2.27.88-1.3 1.25-2.56 1.27-2.63-.03-.01-2.43-.93-2.45-3.72zM14.06 5.77c.64-.78 1.07-1.85.95-2.93-.92.04-2.04.61-2.7 1.39-.59.69-1.11 1.79-.97 2.85 1.03.08 2.07-.52 2.72-1.31z"/></svg>', 'sf-apple'], ['Bing', '<svg viewBox="0 0 48 48"><defs><linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#37bdff"/><stop offset=".6" stop-color="#2779f0"/><stop offset="1" stop-color="#1a5bd6"/></linearGradient><linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1fd2ff"/><stop offset=".55" stop-color="#1b9cf2"/><stop offset="1" stop-color="#2468e8"/></linearGradient></defs><path d="M12 3.5l8 2.8v27.5l9.5-5.5-4.6-2.2-2.9-7.1 15 5.2v7.6L20 44.5l-8-4.5z" fill="url(#bg1)"/><path d="M22 19l15 5.2v7.6L20 44.5l-8-4.5 17.5-11.7-4.6-2.2z" fill="url(#bg2)" opacity=".9"/></svg>', ''], ['Google', '<svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>', '']];
+$('#sfExtX').onclick = () => { $('#sfExt').hidden = true; try { localStorage.setItem('gk-sf-ext', '1'); } catch (e) { /* ignore */ } };
 function webFavs() {
   const box = $('#wFavs'); box.innerHTML = '';
-  const list = isAndroid() ? WEB_FAVS : [['Apple', '#fff', '\uF8FF'], ['Bing', '#fff', 'b'], ['Google', '#fff', 'G']];
-  for (const [n, c, g] of list) { const d = document.createElement('div'); d.className = 'w-fav'; const i = document.createElement('i'); i.style.background = c; i.textContent = g || n[0]; d.append(i, document.createTextNode(n)); box.appendChild(d); }
+  if (!isAndroid()) { // ספארי: הלוגואים האמיתיים
+    for (const [n, svg, cls] of SF_FAVS) { const d = document.createElement('div'); d.className = 'w-fav'; const i = document.createElement('i'); i.className = cls; i.innerHTML = svg; d.append(i, document.createTextNode(n)); box.appendChild(d); }
+    try { $('#sfExt').hidden = !!localStorage.getItem('gk-sf-ext'); } catch (e) { /* ignore */ }
+    return;
+  }
+  for (const [n, c, g] of WEB_FAVS) { const d = document.createElement('div'); d.className = 'w-fav'; const i = document.createElement('i'); i.style.background = c; i.textContent = g || n[0]; d.append(i, document.createTextNode(n)); box.appendChild(d); }
 }
 ENTER.web = () => {
   webFavs(); $('#wIn').value = ''; $('#wHome').hidden = false; $('#wOff').hidden = true; $('#wPeek').hidden = true; $('#wHist').hidden = true; $('#wBar').hidden = true;

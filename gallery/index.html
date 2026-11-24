@@ -297,6 +297,20 @@
       <div class="w-ntp-logo">חיפוש</div>
       <div class="w-ntp-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><span>חיפוש או הקלדת כתובת URL</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg></div>
     </div>
+    <div class="sf-ext ios-only" id="sfExt">
+      <button class="sf-x" type="button" id="sfExtX" aria-label="סגירה"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+      <b class="sf-ext-t">הרחבות</b>
+      <div class="sf-icons" aria-hidden="true">
+        <i class="si si1">æ</i>
+        <i class="si si2"><svg viewBox="0 0 40 40"><path d="M11 13h18l-1.5 20h-15z" fill="#e9edf0"/><path d="M15 13v-2a5 5 0 0110 0v2" fill="none" stroke="#e9edf0" stroke-width="2.4"/><path d="M15 23l4 4 7-8" fill="none" stroke="#18b47b" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></i>
+        <i class="si si3"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="#fff" stroke="#1a73e8" stroke-width="4.5"/><circle cx="20" cy="20" r="9" fill="none" stroke="#c9d6ea" stroke-width="1.5"/><rect x="17.6" y="12" width="4.8" height="16" rx="2.4" fill="#1c2a44"/></svg></i>
+        <i class="si si4"><svg viewBox="0 0 40 40"><path d="M10 7h20v26l-10-6-10 6z" fill="#fff" opacity=".95"/><path d="M20 11l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5-3.7-3.4 5-.6z" fill="#e8344e"/></svg></i>
+        <i class="si si5"><svg viewBox="0 0 40 40"><path d="M29 14a11 11 0 100 12h-8" fill="none" stroke="#14a37f" stroke-width="5" stroke-linecap="round"/></svg></i>
+        <i class="si si6"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" fill="#2a0d55"/><path d="M23 11a9 9 0 10 6 14 10 10 0 01-6-14z" fill="#fff"/></svg></i>
+      </div>
+      <p>ניתן להעשיר את חוויית הגלישה ב-Safari באמצעות הרחבות שיכולות למצוא הנחות, לחסום מודעות ועוד.</p>
+      <span class="sf-btn">עיון בהרחבות</span>
+    </div>
     <div class="w-favs-title ios-only"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7.5" r="4.5"/><path d="M3 21c0-5 4-8 9-8s9 3 9 8z"/></svg>מועדפים</div>
     <div class="w-favs" id="wFavs"></div>
     <div class="w-favs-title ios-only">דו"ח פרטיות</div>
@@ -313,6 +327,7 @@
     </div>
     <span id="wPeek" class="w-peek" hidden></span>
   </div>
+  <span class="sf-edit ios-only" aria-hidden="true">עריכה</span>
   <div class="w-chrome">
     <button id="wHistBtn" class="w-more" type="button" aria-label="עוד"><svg class="ios-only" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg><svg class="and-only" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
     <div class="w-addr">
