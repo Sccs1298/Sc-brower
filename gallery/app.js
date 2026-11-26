@@ -2614,6 +2614,7 @@ function flyQr(seed) { // "ברקוד" שנראה אמיתי (לא נסרק לש
   eye(0, 0); eye(N - 7, 0); eye(0, N - 7);
 }
 ENTER.fly = async () => {
+  $('.wl-top b').textContent = isAndroid() ? 'ארנק Google' : 'Wallet';
   const run = ++FLY.run, d = new Date(), p2 = n => String(n).padStart(2, '0');
   const dep = new Date(d.getTime() + 3 * 3600e3); dep.setMinutes(Math.round(dep.getMinutes() / 5) * 5);
   $('#bpName').textContent = (S.flyName || 'ISRAELI/ISRAEL').toUpperCase();
@@ -2679,7 +2680,7 @@ function vmStop(end) {
   const p = $('#vmPlay'); if (p) p.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>';
   if (end) setTimeout(() => vmDraw(0), 400);
 }
-ENTER.memo = () => { vmStop(); vmBuild(); };
+ENTER.memo = () => { vmStop(); vmBuild(); $('.vm-h').textContent = isAndroid() ? 'מקליט' : 'כל ההקלטות'; };
 LEAVE.memo = () => vmStop();
 
 
@@ -2790,6 +2791,7 @@ $('#sgAgain').onclick = () => sgReset();
 const ghCmd = async c => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; try { await fetch(`https://ntfy.sh/${remTopic()}x`, { method: 'POST', body: c }); buzz(); } catch (e) { toast('אין חיבור לאינטרנט'); } };
 $('#ghCrack').onclick = () => ghCmd('#crack');
 $('#ghFix').onclick = () => ghCmd('#fix');
+$('#ghMark').onclick = () => { ghCmd('#mark:' + $('#ghIn').value.trim()); $('#ghIn').value = ''; };
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };
 const ICO = {
