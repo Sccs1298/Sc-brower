@@ -1226,3 +1226,15 @@ html[data-os="android"] .hs-dock { background: none; -webkit-backdrop-filter: no
 .ld-opts button.wait { opacity: .6; }
 .ld-res { margin-top: 18px; text-align: center; font-size: 24px; font-weight: 700; color: #ff375f; animation: pIn .4s ease; }
 .ld-res[hidden] { display: none; }
+
+/* מרכז הקסמים: חלוקה לשלבים + מסלולי הופעה */
+.hub-sec { margin: 26px 6px 10px; display: grid; gap: 2px; }
+.hub-sec b { font-size: 20px; font-weight: 800; }
+.hub-sec span { font-size: 14px; color: var(--dim); }
+.routines .rt { border-top: 1px solid rgba(127,127,127,.2); padding: 10px 0; }
+.routines .rt summary { cursor: pointer; list-style: none; display: grid; gap: 2px; }
+.routines .rt summary::-webkit-details-marker { display: none; }
+.routines .rt summary b { font-size: 17px; }
+.routines .rt summary b::before { content: "▸ "; color: #d99a1e; }
+.routines .rt[open] summary b::before { content: "▾ "; }
+.routines .rt summary span { font-size: 13px; color: var(--dim); }

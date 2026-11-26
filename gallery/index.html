@@ -46,8 +46,6 @@
         <button type="button" data-open="lie"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff375f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21h7l3-7 5 14 3-9 2 2h10"/></svg></span>גלאי שקר</button>
         <button type="button" data-open="lock"><span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>התראה</button>
         <button type="button" data-open="call"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span> שיחה</button>
-        <button type="button" data-open="notes"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span> פתק</button>
-        <button type="button" data-open="sw"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff9f0a" stroke-width="2.600" stroke-linecap="round"><circle cx="20" cy="22" r="10"/><path d="M20 22v-6M17 8h6M20 8v4"/></svg></span> סטופר</button>
       </div>
     </div>
 
@@ -68,31 +66,38 @@
         <div class="tc-sub"><button class="btn" data-open="manage" type="button">ניהול הסרטונים</button><button class="btn" data-open="help" type="button">מדריך מלא עם ציורים</button></div></div>
     </div>
 
-    <!-- ויקיפדיה בטלפון של הצופה -->
-    <div class="group pad tcard" id="wkCard">
-      <div class="tc-head">
-        <span class="tc-ico" style="background:#36c"><svg viewBox="0 0 40 40"><text x="20" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#fff">W</text></svg></span>
-        <div><h2>ויקיפדיה בטלפון של הצופה <span class="tc-new">חדש</span></h2><p class="dim">הצופה מחפש בוויקיפדיה בטלפון שלו, ואתה יודע מיד באיזה ערך הוא נמצא. שולחים קישור אחד, וזהו.</p></div>
+    <!-- הופעה שלמה -->
+    <div class="group pad tcard routines">
+      <div class="tc-head"><span class="tc-ico" style="background:linear-gradient(#f2c14e,#d99a1e)"><svg viewBox="0 0 40 40" fill="#1c1503"><path d="M20 6l3.6 8.4 9 .8-6.8 6 2 8.8L20 25.4 12.2 30l2-8.8-6.8-6 9-.8z"/></svg></span>
+        <div><h2>הופעה שלמה: 3 מסלולים</h2><p class="dim">קסם אחד מרשים. שלושה קסמים שנבנים זה על זה משאירים את הפה פעור. כל מסלול לוקח 3–5 דקות.</p></div>
       </div>
-      <ol class="tc-list">
-        <li>לוחצים <b>"שלח לו קישור"</b> ושולחים לו בוואטסאפ. נפתח לו אתר סטטיסטיקה רגיל של ויקיפדיה.<br><small class="dim">"יודע כמה ערכים יש בוויקיפדיה? תסתכל."</small></li>
-        <li>"עכשיו תלחץ <b>למעבר לוויקיפדיה</b> ותחפש כל דבר שבא לך." החיפוש והערכים אמיתיים.</li>
-        <li>ברגע שהוא פותח ערך: רטט אצלך, והערך מגיע לכל הקסמים (סרטון בגלריה, שיחה, פתק, התראה). אם הוא עובר לערך אחר, תמיד נשמר האחרון.</li>
-      </ol>
-      <p class="dim small" style="margin:6px 0 0">זהו. בלי מחשבון ובלי קודים. רק להשאיר את האפליקציה פתוחה.<br>רוצה שהערך יגיע גם <b>לשעון</b>, עם השורה הראשונה של הערך? עושים פעם אחת את ההכנה בכרטיס "הטלפון של הצופה + שעון".</p>
-      <details class="tc-set"><summary>בלי לשלוח קישור בכלל</summary>
+      <details class="rt"><summary><b>הטלפון הנעול</b><span>מחשבון ← קוד נעילה ← הודעה</span></summary>
         <ol class="tc-list">
-          <li>"תחפש בגוגל <b>ויקי סטט</b>, תיכנס לתוצאה הראשונה. כמה ערכים יש בוויקיפדיה?" (עובד אחרי שגוגל מכניס את האתר לתוצאות.)</li>
-          <li>הוא מקריא את המספר, ואתה מקליד אותו כאן. זה מתחבר לבד:
-            <input id="wkNum" class="wk-num" type="text" inputmode="numeric" autocomplete="off" placeholder="מספר הערכים, למשל 372,345" aria-label="מספר הערכים שהצופה הקריא">
-            <small class="dim" id="wkStat" aria-live="polite"></small></li>
-          <li>"עכשיו תלחץ <b>למעבר לוויקיפדיה</b> ותחפש מה שבא לך." משם זה כמו בקישור.</li>
+          <li><b>"אני לא רוצה להשפיע עליכם."</b> שלושה אנשים מקלידים במחשבון מספרים אקראיים עם +, והאחרון לוחץ =. יוצא מספר בן 4 ספרות.</li>
+          <li><b>"הטלפון שלי נעול כל הערב."</b> פותחים "קוד נעילה". נותנים לשניים לנחש קוד: הנקודות רועדות. "עכשיו תקליד את המספר שיצא לכם." הטלפון נפתח.</li>
+          <li><b>הסיום:</b> במסך הבית לוחצים "הודעות". אמא שלך כתבה את אותו מספר לפני שלושה ימים, ב-23:14.</li>
+        </ol>
+        <p class="dim small">הגדרה: במחשבון, "התוצאה תהיה" ← מספר שבחרתי (4 ספרות). את אותו מספר מקבלים קוד הנעילה וההודעה.</p>
+      </details>
+      <details class="rt"><summary><b>המטייל</b><span>הטלפון של הצופה ← רוח רפאים ← איתור ← טיסה</span></summary>
+        <ol class="tc-list">
+          <li>שולחים לשני צופים את הקישור (כרטיס "הטלפון של הצופה", מצב <b>מפות</b>). "תחשוב על מקום בעולם שהיית רוצה להיות בו עכשיו, ותחפש אותו." רק הראשון מחפש.</li>
+          <li><b>רגע ההלם הראשון:</b> בטלפון של הצופה השני, אותו מקום מתחיל להיות מוקלד לבד. אתה לא נוגע בכלום.</li>
+          <li><b>"יש לי חבר שמטייל המון."</b> פותחים "איתור", והחבר נמצא שם עכשיו.</li>
+          <li><b>הסיום:</b> "ומה שהכי מצחיק..." פותחים "טיסה". כרטיס על השם שלך, היום, לשם, שנקנה לפני 6 ימים.</li>
         </ol>
       </details>
-      <div class="tc-acts"><button class="btn-big primary" id="wkShare" type="button">שלח לו קישור (וואטסאפ, AirDrop)</button>
-        <div class="tc-sub"><button class="btn" id="wkCopy" type="button">העתק קישור</button><button class="btn" id="wkQr" type="button">קוד לסריקה</button><button class="btn" data-open="calc" type="button">פתח מחשבון</button></div></div>
+      <details class="rt"><summary><b>קורא המחשבות</b><span>ויקיפדיה ← גלאי שקר ← עוזר קולי ← הקלטה</span></summary>
+        <ol class="tc-list">
+          <li>שולחים קישור ויקיפדיה. "תחפש כל דבר שבא לך, אל תראה לי." אתה כבר יודע את הערך.</li>
+          <li><b>"אני לא קורא מחשבות. אבל הגוף שלך מדבר."</b> גלאי השקר: על כל אפשרות הוא אומר "לא", והדופק תופס אותו.</li>
+          <li><b>"אפילו הטלפון יודע."</b> מסך הבית, לחיצה ארוכה: הטלפון אומר את הבחירה בקול.</li>
+          <li><b>הסיום:</b> "אתמול בלילה הקלטתי לעצמי משהו." ההקלטה מאתמול אומרת את אותה מילה.</li>
+        </ol>
+      </details>
     </div>
 
+    <div class="hub-sec"><b>שלב 1: לדעת מה הוא חשב</b><span>כל אחת מהדרכים האלה מעבירה את הבחירה לכל הקסמים</span></div>
     <!-- הטלפון של הצופה + שעון -->
     <div class="group pad tcard" id="rmCard">
       <div class="tc-head">
@@ -132,6 +137,31 @@
       </details>
       <div class="tc-acts"><button class="btn-big primary" id="rmShare" type="button">שלח לו קישור (וואטסאפ, AirDrop)</button>
         <div class="tc-sub"><button class="btn" id="rmCopyLink" type="button">העתק קישור</button><button class="btn" data-open="remote" type="button">קוד לסריקה</button></div></div>
+    </div>
+
+    <!-- ויקיפדיה בטלפון של הצופה -->
+    <div class="group pad tcard" id="wkCard">
+      <div class="tc-head">
+        <span class="tc-ico" style="background:#36c"><svg viewBox="0 0 40 40"><text x="20" y="28" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#fff">W</text></svg></span>
+        <div><h2>ויקיפדיה בטלפון של הצופה <span class="tc-new">חדש</span></h2><p class="dim">הצופה מחפש בוויקיפדיה בטלפון שלו, ואתה יודע מיד באיזה ערך הוא נמצא. שולחים קישור אחד, וזהו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>לוחצים <b>"שלח לו קישור"</b> ושולחים לו בוואטסאפ. נפתח לו אתר סטטיסטיקה רגיל של ויקיפדיה.<br><small class="dim">"יודע כמה ערכים יש בוויקיפדיה? תסתכל."</small></li>
+        <li>"עכשיו תלחץ <b>למעבר לוויקיפדיה</b> ותחפש כל דבר שבא לך." החיפוש והערכים אמיתיים.</li>
+        <li>ברגע שהוא פותח ערך: רטט אצלך, והערך מגיע לכל הקסמים (סרטון בגלריה, שיחה, פתק, התראה). אם הוא עובר לערך אחר, תמיד נשמר האחרון.</li>
+      </ol>
+      <p class="dim small" style="margin:6px 0 0">זהו. בלי מחשבון ובלי קודים. רק להשאיר את האפליקציה פתוחה.<br>רוצה שהערך יגיע גם <b>לשעון</b>, עם השורה הראשונה של הערך? עושים פעם אחת את ההכנה בכרטיס "הטלפון של הצופה + שעון".</p>
+      <details class="tc-set"><summary>בלי לשלוח קישור בכלל</summary>
+        <ol class="tc-list">
+          <li>"תחפש בגוגל <b>ויקי סטט</b>, תיכנס לתוצאה הראשונה. כמה ערכים יש בוויקיפדיה?" (עובד אחרי שגוגל מכניס את האתר לתוצאות.)</li>
+          <li>הוא מקריא את המספר, ואתה מקליד אותו כאן. זה מתחבר לבד:
+            <input id="wkNum" class="wk-num" type="text" inputmode="numeric" autocomplete="off" placeholder="מספר הערכים, למשל 372,345" aria-label="מספר הערכים שהצופה הקריא">
+            <small class="dim" id="wkStat" aria-live="polite"></small></li>
+          <li>"עכשיו תלחץ <b>למעבר לוויקיפדיה</b> ותחפש מה שבא לך." משם זה כמו בקישור.</li>
+        </ol>
+      </details>
+      <div class="tc-acts"><button class="btn-big primary" id="wkShare" type="button">שלח לו קישור (וואטסאפ, AirDrop)</button>
+        <div class="tc-sub"><button class="btn" id="wkCopy" type="button">העתק קישור</button><button class="btn" id="wkQr" type="button">קוד לסריקה</button><button class="btn" data-open="calc" type="button">פתח מחשבון</button></div></div>
     </div>
 
     <!-- מחשבון -->
@@ -175,6 +205,7 @@
       <div class="tc-acts"><button class="btn-big primary" data-open="web" type="button">פתח חיפוש</button></div>
     </div>
 
+    <div class="hub-sec"><b>שלב 2: החשיפה</b><span>בוחרים את הרגע שבו הפה נפער</span></div>
     <!-- קוד הנעילה -->
     <div class="group pad tcard">
       <div class="tc-head"><span class="tc-ico" style="background:linear-gradient(#3b4b8a,#7a5aa8)"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 18v-3a7 7 0 0114 0v3h1a2 2 0 012 2v10a2 2 0 01-2 2H12a2 2 0 01-2-2V20a2 2 0 012-2zm3 0h8v-3a4 4 0 00-8 0z"/></svg></span>
@@ -336,42 +367,6 @@
         </div>
       </details>
       <div class="tc-acts"><button class="btn-big primary" data-open="call" type="button">פתח שיחה נכנסת</button></div>
-    </div>
-
-    <div class="group pad tcard">
-      <div class="tc-head"><span class="tc-ico" style="background:#ffd60a"><svg viewBox="0 0 40 40"><rect x="9" y="8" width="22" height="25" rx="3" fill="#fff"/><path d="M13 15h14M13 20h14M13 25h9" stroke="#b08900" stroke-width="2" stroke-linecap="round"/></svg></span>
-        <div><h2>פתק ישן</h2><p class="dim">הצופה רואה: פתק שכתבת לפני שבוע, ובו בדיוק מה שהוא בחר עכשיו.</p></div>
-      </div>
-      <ol class="tc-list">
-        <li>קולטים את הבחירה בכל קסם אחר (חיפוש, מחשבון, סרטון).</li>
-        <li>"כתבתי משהו לפני שבוע." פותחים את הפתקים. ברשימה יש פתק נעול מלפני שבוע.</li>
-        <li>נותנים לצופה לפתוח אותו בעצמו. הבחירה שלו כתובה שם.</li>
-      </ol>
-      <details class="tc-set"><summary>הגדרות</summary>
-        <div class="group">
-          <label class="row"><span>שם הפתק</span><input data-s="noteTitle" placeholder="לא לפתוח 🤫"></label>
-          <label class="row col"><span>הטקסט ({x} = הבחירה)</span><input data-s="noteBody" placeholder="אני יודע שתבחר ב: {x}"></label>
-        </div>
-      </details>
-      <div class="tc-acts"><button class="btn-big primary" data-open="notes" type="button">פתח פתקים</button></div>
-    </div>
-
-    <div class="group pad tcard">
-      <div class="tc-head"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff9f0a" stroke-width="2.600" stroke-linecap="round"><circle cx="20" cy="22" r="10"/><path d="M20 22v-6M17 8h6M20 8v4"/></svg></span>
-        <div><h2>סטופר</h2><p class="dim">הצופה רואה: הוא עוצר את הסטופר מתי שבא לו, והמאיות יוצאות המספר שחזית.</p></div>
-      </div>
-      <ol class="tc-list">
-        <li>כותבים חיזוי על דף, או שהמספר כבר נקלט בקסם אחר.</li>
-        <li>הצופה לוחץ "התחל", ועוצר מתי שהוא רוצה.</li>
-        <li>שתי הספרות האחרונות (המאיות) הן תמיד המספר שלך.</li>
-      </ol>
-      <details class="tc-set"><summary>הגדרות</summary>
-        <div class="group">
-          <label class="row"><span>המספר (2 ספרות)</span><input data-s="swNumber" inputmode="numeric" placeholder="47"></label>
-          <label class="row"><span>להשתמש בבחירה האחרונה אם היא מספר</span><input data-s="swUseLast" type="checkbox" class="switch"></label>
-        </div>
-      </details>
-      <div class="tc-acts"><button class="btn-big primary" data-open="sw" type="button">פתח סטופר</button></div>
     </div>
 
     <div class="group pad">
