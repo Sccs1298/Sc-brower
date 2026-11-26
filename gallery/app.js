@@ -2778,6 +2778,9 @@ $('#sgAudio').addEventListener('timeupdate', e => { const a = e.target; $('#sgPr
 $('#sgAudio').addEventListener('ended', sgPlayIcon);
 $('#sgAgain').onclick = () => sgReset();
 
+const ghCmd = async c => { if (!needFull('הקסם בטלפון של הצופה הוא חלק מהגרסה המלאה.')) return; try { await fetch(`https://ntfy.sh/${remTopic()}x`, { method: 'POST', body: c }); buzz(); } catch (e) { toast('אין חיבור לאינטרנט'); } };
+$('#ghCrack').onclick = () => ghCmd('#crack');
+$('#ghFix').onclick = () => ghCmd('#fix');
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };
 const ICO = {

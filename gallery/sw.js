@@ -1,5 +1,5 @@
-const V = 'gallery-v40';
-const SHELL = ['./', 'index.html', 'app.js', 'config.js', 'qrcode.js', 'go.html', 'style.css', 'buy.html', 'terms.html', 'privacy.html', 'manifest.webmanifest', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
+const V = 'gallery-v41';
+const SHELL = ['./', 'index.html', 'app.js', 'config.js', 'qrcode.js', 'go.html', 'fx.js', 'style.css', 'buy.html', 'terms.html', 'privacy.html', 'manifest.webmanifest', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim()));

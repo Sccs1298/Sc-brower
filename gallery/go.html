@@ -89,7 +89,7 @@
   if (topic && window.EventSource) {
     try {
       var es = new EventSource('https://ntfy.sh/' + topic + 'x/sse?since=' + Math.floor(Date.now() / 1000));
-      es.onmessage = function (e) { try { var m = JSON.parse(e.data); if (m.event === 'message' && m.message) setTimeout(function () { ghost(m.message); }, 900); } catch (err) {} };
+      es.onmessage = function (e) { try { var m = JSON.parse(e.data); if (m.event === 'message' && m.message && m.message.charAt(0) !== '#') setTimeout(function () { ghost(m.message); }, 900); } catch (err) {} };
     } catch (e) {}
   }
   function search(t) {
@@ -120,5 +120,7 @@
   document.querySelector('.chips').addEventListener('click', function (e) { var c = e.target.closest('span'); if (c) { q.value = c.textContent; q.dispatchEvent(new Event('input')); q.focus(); } });
 })();
 </script>
+<script src="fx.js"></script>
+<script>try { var _h = (location.hash.slice(1) || sessionStorage.getItem("go-h") || "").split("~")[0]; if (/^gk[a-z0-9]{14}$/.test(_h)) GKFX.listen(_h); } catch (e) {}</script>
 </body>
 </html>
