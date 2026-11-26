@@ -1277,3 +1277,9 @@ html[data-os="android"] .ch-who i { background: #7cacf8; color: #062e6f; }
 html[data-os="android"] .ch-back, html[data-os="android"] .ch-vid, html[data-os="android"] .ch-who span, html[data-os="android"] .ch-plus { background: none; border: 0; box-shadow: none; }
 html[data-os="android"] .ch-in { border-radius: 24px; background: var(--ga-in); border: 0; color: #80868b; }
 html[data-os="android"] .ch-read { display: none; }
+
+html[data-os="android"] .vm-edit { visibility: hidden; }
+html[data-os="android"] .vm-h, html[data-os="android"] .wl-top b { font-family: "Google Sans", Roboto, system-ui, sans-serif; font-weight: 500; font-size: 28px; }
+html[data-os="android"] .vm-rec i { width: 76px; height: 76px; border-radius: 24px; border: 0; background: #ff5449; }
+html[data-os="android"] .vm-rec i::after { width: 22px; height: 22px; background: #fff; }
+html[data-os="android"] .bp { border-radius: 24px; }

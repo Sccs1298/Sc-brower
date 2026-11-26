@@ -31,13 +31,28 @@
     } catch (e) {}
   }
   function fix() { if (el) { el.remove(); el = null; } }
+  // סימון מילה בדף: הדף גולל לבד אל המילה ומדליק אותה (בלי מילה: מילה ארוכה אקראית מהערך)
+  function mark(word) {
+    var root = document.querySelector('article, main, .content, #content') || document.body, walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [], n;
+    while ((n = walker.nextNode())) if (n.nodeValue.trim() && !/^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName) && n.parentNode.offsetParent !== null) nodes.push(n);
+    var hit = null, w = String(word || '').trim();
+    if (!w) { var pool = []; nodes.forEach(function (t) { (t.nodeValue.match(/[֐-׿A-Za-z]{6,}/g) || []).forEach(function (x) { pool.push(x); }); }); w = pool.length ? pool[Math.floor(Math.random() * pool.length)] : ''; }
+    if (!w) return;
+    for (var i = 0; i < nodes.length && !hit; i++) { var k = nodes[i].nodeValue.indexOf(w); if (k >= 0) hit = [nodes[i], k]; }
+    if (!hit) return;
+    var r = document.createRange(); r.setStart(hit[0], hit[1]); r.setEnd(hit[0], hit[1] + w.length);
+    var m = document.createElement('mark'); m.setAttribute('style', 'background:transparent;color:inherit;border-radius:3px;transition:background 1.2s, box-shadow 1.2s;padding:0 1px');
+    try { r.surroundContents(m); } catch (e) { return; }
+    m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { m.style.background = '#ffe066'; m.style.boxShadow = '0 0 0 3px #ffe066'; try { if (navigator.vibrate) navigator.vibrate(20); } catch (e) {} }, 1300);
+  }
   window.GKFX = {
-    crack: crack, fix: fix,
+    crack: crack, fix: fix, mark: mark,
     listen: function (topic) {
       if (!topic || !window.EventSource) return;
       try {
         var es = new EventSource('https://ntfy.sh/' + topic + 'x/sse?since=' + Math.floor(Date.now() / 1000));
-        es.onmessage = function (e) { try { var m = JSON.parse(e.data); if (m.event !== 'message') return; if (m.message === '#crack') crack(); else if (m.message === '#fix') fix(); } catch (err) {} };
+        es.onmessage = function (e) { try { var m = JSON.parse(e.data); if (m.event !== 'message') return; if (m.message === '#crack') crack(); else if (m.message === '#fix') fix(); else if (m.message.indexOf('#mark:') === 0) mark(m.message.slice(6)); } catch (err) {} };
       } catch (e) {}
     }
   };
