@@ -44,6 +44,7 @@
         <button type="button" data-open="fly"><span class="tc-ico" style="background:#000"><svg viewBox="0 0 40 40"><rect x="8" y="9" width="24" height="22" rx="3" fill="#1e6fd9"/><rect x="8" y="14" width="24" height="17" rx="3" fill="#ff9f0a"/><rect x="8" y="19" width="24" height="12" rx="3" fill="#34c759"/></svg></span>טיסה</button>
         <button type="button" data-open="memo"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40"><g stroke="#ff453a" stroke-width="2.6" stroke-linecap="round"><path d="M8 20v0M12 16v8M16 11v18M20 14v12M24 9v22M28 15v10M32 19v2"/></g></svg></span>הקלטה</button>
         <button type="button" data-open="lie"><span class="tc-ico" style="background:#1c1c1e"><svg viewBox="0 0 40 40" fill="none" stroke="#ff375f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21h7l3-7 5 14 3-9 2 2h10"/></svg></span>גלאי שקר</button>
+        <button type="button" data-open="song"><span class="tc-ico" style="background:linear-gradient(#1a8cff,#0a55d6)"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><path d="M10 20v0M14 16v8M18 11v18M22 14v12M26 9v22M30 16v8"/></svg></span>שיר</button>
         <button type="button" data-open="lock"><span class="tc-ico" style="background:#ff3b30"><svg viewBox="0 0 40 40" fill="#fff"><path d="M20 8a8 8 0 018 8v6l3 4H9l3-4v-6a8 8 0 018-8z"/><circle cx="20" cy="30" r="3"/></svg></span>התראה</button>
         <button type="button" data-open="call"><span class="tc-ico" style="background:#34c759"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 8l4 1 2 6-3 2c1.500 3 3.500 5 6.500 6.500l2-3 6 2 1 4c0 2-2 4-4 4C17 30.500 9.500 23 9 12c0-2 2-4 4-4z"/></svg></span> שיחה</button>
       </div>
@@ -206,6 +207,20 @@
     </div>
 
     <div class="hub-sec"><b>שלב 2: החשיפה</b><span>בוחרים את הרגע שבו הפה נפער</span></div>
+    <!-- השיר שבראש -->
+    <div class="group pad tcard">
+      <div class="tc-head"><span class="tc-ico" style="background:linear-gradient(#1a8cff,#0a55d6)"><svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><path d="M10 20v0M14 16v8M18 11v18M22 14v12M26 9v22M30 16v8"/></svg></span>
+        <div><h2>השיר שבראש <span class="tc-new">חדש</span></h2><p class="dim">הצופה רואה: הוא שר שיר בראש, בלי קול. הטלפון שלך "מקשיב לשקט", מזהה את השיר, מציג את עטיפת האלבום ומנגן אותו.</p></div>
+      </div>
+      <ol class="tc-list">
+        <li>"תחשוב על שיר שאתה אוהב." הוא מחפש אותו בטלפון שלו (בקסם "הטלפון של הצופה" במצב <b>יוטיוב</b>).</li>
+        <li>"עכשיו תשיר אותו בראש. בלי קול. רק בראש." מחזיקים את הטלפון ליד הראש שלו ונוגעים בכפתור.</li>
+        <li>"מקשיב…", "מחפש התאמה…", ואז: עטיפת האלבום, שם השיר והזמר. <b>והשיר מתחיל להתנגן.</b></li>
+        <li>צריך אינטרנט. השיר מגיע ממאגר השירים של Apple (קטע של 30 שניות).</li>
+      </ol>
+      <div class="tc-acts"><button class="btn-big primary" data-open="song" type="button">פתח זיהוי שירים</button></div>
+    </div>
+
     <!-- קוד הנעילה -->
     <div class="group pad tcard">
       <div class="tc-head"><span class="tc-ico" style="background:linear-gradient(#3b4b8a,#7a5aa8)"><svg viewBox="0 0 40 40" fill="#fff"><path d="M13 18v-3a7 7 0 0114 0v3h1a2 2 0 012 2v10a2 2 0 01-2 2H12a2 2 0 01-2-2V20a2 2 0 012-2zm3 0h8v-3a4 4 0 00-8 0z"/></svg></span>
@@ -686,6 +701,25 @@
   <div class="ld-opts" id="ldOpts"></div>
   <div class="ld-res" id="ldRes" hidden></div>
   <video id="ldCam" playsinline muted hidden></video>
+</section>
+
+
+<!-- ===================== השיר שבראש ===================== -->
+<section id="song" class="screen trick-screen song">
+  <div class="exit-band" aria-hidden="true"></div>
+  <div class="sg-home" id="sgHome">
+    <p class="sg-hint" id="sgHint">הקש/י כדי לזהות</p>
+    <button class="sg-btn" id="sgBtn" type="button" aria-label="זיהוי שיר"><i></i><i></i><i></i><svg viewBox="0 0 60 60" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M14 30v0M20 24v12M26 17v26M32 21v18M38 14v32M44 23v14"/></svg></button>
+    <p class="sg-sub" id="sgSub"></p>
+  </div>
+  <div class="sg-res" id="sgRes" hidden>
+    <div class="sg-art"><img id="sgArt" alt=""></div>
+    <b id="sgTitle"></b><span id="sgArtist"></span><small id="sgAlbum"></small>
+    <div class="sg-bar"><i id="sgProg"></i></div>
+    <button class="sg-play" id="sgPlay" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg></button>
+    <button class="sg-again" id="sgAgain" type="button">זיהוי נוסף</button>
+  </div>
+  <audio id="sgAudio" preload="auto"></audio>
 </section>
 
 <!-- ===================== הגלריה (מסך הבית המוסווה) ===================== -->

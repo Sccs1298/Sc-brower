@@ -1238,3 +1238,29 @@ html[data-os="android"] .hs-dock { background: none; -webkit-backdrop-filter: no
 .routines .rt summary b::before { content: "▸ "; color: #d99a1e; }
 .routines .rt[open] summary b::before { content: "▾ "; }
 .routines .rt summary span { font-size: 13px; color: var(--dim); }
+
+/* ===================== השיר שבראש ===================== */
+.song { background: linear-gradient(180deg, #1c7cf2 0%, #0b56d6 55%, #0841a8 100%); color: #fff; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; overflow: hidden; }
+.sg-home { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 34px; }
+.sg-hint { font-size: 22px; font-weight: 700; margin: 0; }
+.sg-sub { font-size: 16px; opacity: .85; min-height: 22px; margin: 0; }
+.sg-btn { position: relative; width: 210px; height: 210px; border-radius: 50%; border: 0; background: radial-gradient(circle at 50% 35%, #3d9bff, #0a6cf0 70%); box-shadow: 0 10px 40px rgba(0,0,0,.25), inset 0 -6px 20px rgba(0,0,0,.15); display: grid; place-items: center; cursor: pointer; }
+.sg-btn svg { width: 96px; height: 96px; position: relative; z-index: 2; }
+.sg-btn i { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,.5); opacity: 0; }
+.sg-btn.on i { animation: sgRing 2.1s infinite; }
+.sg-btn.on i:nth-child(2) { animation-delay: .7s; } .sg-btn.on i:nth-child(3) { animation-delay: 1.4s; }
+.sg-btn.on { animation: sgPulse 1.05s ease-in-out infinite; }
+@keyframes sgRing { from { transform: scale(1); opacity: .7; } to { transform: scale(1.9); opacity: 0; } }
+@keyframes sgPulse { 50% { transform: scale(1.06); } }
+.sg-res { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: calc(env(safe-area-inset-top) + 50px) 28px 0; text-align: center; animation: pIn .45s ease; background: #0d0d10; }
+.sg-res[hidden] { display: none; }
+.sg-art { width: min(72vw, 300px); aspect-ratio: 1; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.6); background: #222; }
+.sg-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sg-res b { font-size: 26px; font-weight: 700; margin-top: 26px; }
+.sg-res > span { font-size: 19px; color: #1a8cff; margin-top: 4px; font-weight: 500; }
+.sg-res small { font-size: 14px; color: #8e8e93; margin-top: 4px; }
+.sg-bar { width: 100%; height: 4px; border-radius: 2px; background: #2c2c2e; margin-top: 26px; overflow: hidden; direction: ltr; }
+.sg-bar i { display: block; height: 100%; width: 0; background: #fff; }
+.sg-play { margin-top: 20px; width: 64px; height: 64px; border-radius: 50%; border: 0; background: #fff; color: #000; display: grid; place-items: center; cursor: pointer; }
+.sg-play svg { width: 28px; height: 28px; }
+.sg-again { margin-top: 22px; background: none; border: 0; color: #8e8e93; font: inherit; font-size: 15px; cursor: pointer; }
