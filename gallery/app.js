@@ -2130,7 +2130,7 @@ async function goHome() {
   paint('hub'); ENTER.hub();
 }
 ENTER.hub = () => { $('#hubPeek').textContent = LAST.text || '—'; fillS($('#hub')); syncLicense(); try { $('#lWallDel').hidden = !localStorage.getItem('gk-lockwall'); } catch (e) { /* ignore */ } };
-const PAID_SCREENS = { lie: 'גלאי השקר', memo: 'ההקלטה מאתמול', fly: 'כרטיס הטיסה', find: 'האיתור', pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
+const PAID_SCREENS = { song: 'השיר שבראש', lie: 'גלאי השקר', memo: 'ההקלטה מאתמול', fly: 'כרטיס הטיסה', find: 'האיתור', pin: 'קוד הנעילה', chat: 'ההודעה מלפני כמה ימים', remote: 'הקסם בטלפון של הצופה', calc: 'המחשבון', web: 'קסם החיפוש', deck: 'חפיסת הקלפים', lock: 'קסם ההתראה', call: 'השיחה הנכנסת', notes: 'הפתק הישן', sw: 'הסטופר' };
 $('#hub').addEventListener('click', e => {
   const b = e.target.closest('[data-open]'); if (!b) return;
   const t = b.dataset.open;
@@ -2735,6 +2735,48 @@ $('#ldOpts').addEventListener('click', e => {
     else { b.classList.add('ok'); LD.target = 72 + Math.random() * 6; }
   }, 2600);
 });
+
+
+/* ===================== השיר שבראש =====================
+   הבחירה האחרונה (שיר שהצופה חיפש) נמצאת במאגר השירים של Apple: עטיפה, זמר, וקטע של 30 שניות שמתנגן. */
+const SG = { t: 0, run: 0, hit: null };
+async function sgLookup(q) {
+  const url = `https://itunes.apple.com/search?entity=song&limit=1&country=il&term=${encodeURIComponent(q)}`;
+  const j = await (await fetch(url)).json(); const t = j.results && j.results[0]; if (!t) return null;
+  return { title: t.trackName, artist: t.artistName, album: t.collectionName, year: (t.releaseDate || '').slice(0, 4), art: (t.artworkUrl100 || '').replace('100x100bb', '600x600bb'), audio: t.previewUrl };
+}
+function sgReset() {
+  clearTimeout(SG.t); SG.run++; const a = $('#sgAudio'); a.pause();
+  $('#sgRes').hidden = true; $('#sgHome').hidden = false; $('#sgBtn').classList.remove('on');
+  $('#sgHint').textContent = 'הקש/י כדי לזהות'; $('#sgSub').textContent = '';
+  const q = String(LAST.text || '').trim(); SG.hit = null;
+  if (q) sgLookup(q).then(h => { SG.hit = h; if (h && h.art) { const im = new Image(); im.src = h.art; } }).catch(() => {}); // טוענים מראש, בשקט
+}
+ENTER.song = () => sgReset();
+LEAVE.song = () => { clearTimeout(SG.t); SG.run++; $('#sgAudio').pause(); };
+$('#sgBtn').onclick = () => {
+  const b = $('#sgBtn'); if (b.classList.contains('on')) return;
+  const run = ++SG.run; b.classList.add('on'); $('#sgHint').textContent = 'מקשיב…'; $('#sgSub').textContent = 'שיר/י בראש, בלי קול';
+  // מכינים את הנגן בתוך הנגיעה (באייפון מותר לנגן רק אחרי נגיעה)
+  const a = $('#sgAudio'); try { a.muted = true; a.play().then(() => { a.pause(); a.muted = false; }).catch(() => { a.muted = false; }); } catch (e) { /* ignore */ }
+  SG.t = setTimeout(() => {
+    if (run !== SG.run) return; $('#sgHint').textContent = 'מחפש התאמה…'; $('#sgSub').textContent = '';
+    SG.t = setTimeout(async () => {
+      if (run !== SG.run) return;
+      let h = SG.hit; if (!h && LAST.text) { try { h = await sgLookup(LAST.text); } catch (e) { /* ignore */ } }
+      if (run !== SG.run) return;
+      if (!h) { b.classList.remove('on'); $('#sgHint').textContent = 'אין התאמה'; $('#sgSub').textContent = 'נסה/י שוב, ולחשוב חזק יותר'; return; }
+      $('#sgArt').src = h.art; $('#sgTitle').textContent = h.title; $('#sgArtist').textContent = h.artist; $('#sgAlbum').textContent = [h.album, h.year].filter(Boolean).join(' · ');
+      $('#sgHome').hidden = true; $('#sgRes').hidden = false; if (navigator.vibrate) navigator.vibrate(30);
+      if (h.audio) { a.src = h.audio; a.currentTime = 0; a.play().then(sgPlayIcon).catch(sgPlayIcon); }
+    }, 2400);
+  }, 3600);
+};
+function sgPlayIcon() { const a = $('#sgAudio'); $('#sgPlay').innerHTML = a.paused ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5z"/></svg>' : '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>'; }
+$('#sgPlay').onclick = () => { const a = $('#sgAudio'); if (a.paused) a.play().catch(() => {}); else a.pause(); setTimeout(sgPlayIcon, 50); };
+$('#sgAudio').addEventListener('timeupdate', e => { const a = e.target; $('#sgProg').style.width = (a.duration ? a.currentTime / a.duration * 100 : 0) + '%'; });
+$('#sgAudio').addEventListener('ended', sgPlayIcon);
+$('#sgAgain').onclick = () => sgReset();
 
 /* ===================== שיחה נכנסת ===================== */
 const CALL = { t: 0, tick: 0, ac: null, ring: 0, t0: 0 };
