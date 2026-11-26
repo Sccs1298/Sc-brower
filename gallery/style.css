@@ -1264,3 +1264,16 @@ html[data-os="android"] .hs-dock { background: none; -webkit-backdrop-filter: no
 .sg-play { margin-top: 20px; width: 64px; height: 64px; border-radius: 50%; border: 0; background: #fff; color: #000; display: grid; place-items: center; cursor: pointer; }
 .sg-play svg { width: 28px; height: 28px; }
 .sg-again { margin-top: 22px; background: none; border: 0; color: #8e8e93; font: inherit; font-size: 15px; cursor: pointer; }
+
+/* הודעות באנדרואיד: צבעים וצורות של אפליקציית ההודעות של גוגל */
+html[data-os="android"] .chat { --ga-in: #f0f4f9; --ga-in-fg: #1f1f1f; --ga-out: #d3e3fd; --ga-out-fg: #041e49; }
+@media (prefers-color-scheme: dark) { html[data-os="android"]:not([data-theme="light"]) .chat { --ga-in: #303134; --ga-in-fg: #e3e3e3; --ga-out: #004a77; --ga-out-fg: #c2e7ff; } }
+html[data-os="android"][data-theme="dark"] .chat { --ga-in: #303134; --ga-in-fg: #e3e3e3; --ga-out: #004a77; --ga-out-fg: #c2e7ff; }
+html[data-os="android"] .bub { border-radius: 20px; font-family: "Google Sans", Roboto, system-ui, sans-serif; font-size: 16px; padding: 9px 14px; }
+html[data-os="android"] .bub.in { background: var(--ga-in); color: var(--ga-in-fg); }
+html[data-os="android"] .bub.out { background: var(--ga-out); color: var(--ga-out-fg); }
+html[data-os="android"] .bub.tail.in, html[data-os="android"] .bub.tail.out { border-radius: 20px; }
+html[data-os="android"] .ch-who i { background: #7cacf8; color: #062e6f; }
+html[data-os="android"] .ch-back, html[data-os="android"] .ch-vid, html[data-os="android"] .ch-who span, html[data-os="android"] .ch-plus { background: none; border: 0; box-shadow: none; }
+html[data-os="android"] .ch-in { border-radius: 24px; background: var(--ga-in); border: 0; color: #80868b; }
+html[data-os="android"] .ch-read { display: none; }

@@ -2508,7 +2508,7 @@ function chatBuild() {
   const list = $('#chList'); list.innerHTML = L2.join(''); list.scrollTop = list.scrollHeight;
   $('#chTouch').classList.toggle('on', !x); CH.buf = '';
 }
-ENTER.chat = () => { chatBuild(); };
+ENTER.chat = () => { chatBuild(); $('.ch-in').firstChild.textContent = isAndroid() ? 'הודעת RCS' : 'iMessage'; };
 $('#chBack').onclick = () => uiBack();
 $('#chTouch').addEventListener('click', e => { // מקשים נסתרים 3×3 כשאין בחירה: שתי נגיעות = מספר
   const col = clamp(Math.floor(e.clientX / innerWidth * 3), 0, 2), row = clamp(Math.floor((e.clientY - innerHeight * .3) / (innerHeight * .5) * 3), 0, 2);
