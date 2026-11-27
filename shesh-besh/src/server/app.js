@@ -31,6 +31,25 @@ for (const [k, t] of Object.entries(TOURNAMENT_TYPES)) {
   if (t.currency === 'ILS' && (!isSkillFormat(t.mode, t.length) || t.botFill)) throw new Error(`cash tournament ${k} must be a humans-only skill format`);
 }
 
+// Arenas: 1v1 tables with an entry fee; winner takes the pot minus a 10% fee.
+// Coin arenas use beta points (no monetary value) and unlock by LEVEL (earned by playing).
+// Cash arenas (ILS) unlock by RATING and games played — never by spending — and use skill formats only.
+export const ARENAS = [
+  { id: 'cafe', name: 'קפה השכונה', currency: 'POINTS', entry: 50, mode: 'classic', length: 3, minLevel: 1, rakePct: 10 },
+  { id: 'shuk', name: 'שוק הכרמל', currency: 'POINTS', entry: 200, mode: 'duplicate', length: 1, minLevel: 3, rakePct: 10 },
+  { id: 'yafo', name: 'נמל יפו', currency: 'POINTS', entry: 1000, mode: 'classic', length: 5, minLevel: 6, rakePct: 10 },
+  { id: 'roof', name: 'גג רוטשילד', currency: 'POINTS', entry: 5000, mode: 'duplicate', length: 2, minLevel: 10, rakePct: 10 },
+  { id: 'ils10', name: 'שולחן ₪10', currency: 'ILS', entry: 1000, mode: 'duplicate', length: 2, minRating: 0, rakePct: 10 },
+  { id: 'ils25', name: 'שולחן ₪25', currency: 'ILS', entry: 2500, mode: 'classic', length: 7, minRating: 1550, rakePct: 10 },
+  { id: 'ils50', name: 'שולחן ₪50', currency: 'ILS', entry: 5000, mode: 'duplicate', length: 2, minRating: 1600, rakePct: 10 },
+  { id: 'ils100', name: 'שולחן ₪100', currency: 'ILS', entry: 10000, mode: 'classic', length: 7, minRating: 1700, rakePct: 10 },
+];
+for (const a of ARENAS) if (a.currency === 'ILS' && !isSkillFormat(a.mode, a.length)) throw new Error(`cash arena ${a.id} must use a skill format`);
+
+export const levelFromXp = (xp) => Math.floor(Math.sqrt((xp || 0) / 40)) + 1;
+export const xpForLevel = (lv) => 40 * (lv - 1) ** 2;
+const DAILY_BASE = 100; const DAILY_STEP = 25;
+
 const ageOn = (birthDate, now = new Date()) => {
   const b = new Date(birthDate + 'T00:00:00Z');
   if (Number.isNaN(b.getTime())) return -1;
@@ -101,7 +120,21 @@ export class App {
     const u = Object.values(this.store.data.users).find((x) => x.tokenHash === th);
     if (!u) throw new Error('התחברות נכשלה');
     this._weeklyGrant(u);
+    u._gift = this._dailyGift(u);
     return u;
+  }
+
+  /** Fixed daily gift in beta points (never random, never money). Streak adds a little, missing a day restarts it. */
+  _dailyGift(u) {
+    const today = new Date().toISOString().slice(0, 10);
+    if (u.lastDaily === today) return null;
+    const yesterday = new Date(Date.now() - 86400_000).toISOString().slice(0, 10);
+    u.streak = u.lastDaily === yesterday ? (u.streak || 0) + 1 : 1;
+    u.lastDaily = today;
+    const amount = DAILY_BASE + DAILY_STEP * Math.min(u.streak - 1, 6);
+    this.ledger.grant(u.id, amount, 'daily');
+    this.store.save();
+    return { amount, streak: u.streak };
   }
 
   _weeklyGrant(u) {
@@ -118,6 +151,8 @@ export class App {
       id: u.id, name: u.name, rating: u.rating, games: u.games, wins: u.wins, trophies: u.trophies,
       balance: this.ledger.balance(`user:${u.id}`), limits: u.limits,
       avgError: this.fair.avgError(u), termsVersion: u.termsVersion,
+      xp: u.xp || 0, level: levelFromXp(u.xp), nextLevelXp: xpForLevel(levelFromXp(u.xp) + 1), streak: u.streak || 0,
+      cashBalance: this.cash.cfg.enabled ? this.cash.ledger.balance(`user:${u.id}`) : null,
     };
   }
 
@@ -244,7 +279,83 @@ export class App {
   }
 
   cancelQueue(userId) {
-    for (const [k, q] of this.queues) this.queues.set(k, q.filter((x) => x.userId !== userId));
+    for (const [k, q] of this.queues) {
+      for (const x of q) if (x.userId === userId && x.holdId) this._releaseHold(x);
+      this.queues.set(k, q.filter((x) => x.userId !== userId));
+    }
+  }
+
+  // ---------- arenas ----------
+  _arenaLedger(a) { return a.currency === 'ILS' ? this.cash.ledger : this.ledger; }
+
+  listArenas(u) {
+    return ARENAS.filter((a) => a.currency !== 'ILS' || this.cash.cfg.enabled).map((a) => {
+      let locked = null;
+      if (a.currency === 'POINTS' && levelFromXp(u?.xp) < a.minLevel) locked = `נפתח ברמה ${a.minLevel}`;
+      if (a.currency === 'ILS') {
+        if ((u?.games || 0) < this.cash.cfg.minGamesForCash) locked = `נפתח אחרי ${this.cash.cfg.minGamesForCash} משחקים מדורגים`;
+        else if (a.minRating && (u?.rating || 0) < a.minRating) locked = `נפתח בדירוג ${a.minRating}`;
+        else if (u?.kyc?.status !== 'verified') locked = 'נדרש אימות זהות';
+      }
+      const pot = a.entry * 2; const fee = Math.floor((pot * a.rakePct) / 100);
+      return { ...a, prize: pot - fee, fee, locked, waiting: (this.queues.get('arena:' + a.id) || []).length };
+    });
+  }
+
+  joinArena(u, { arenaId, clientSeed, country }) {
+    this._assertMayPlay(u);
+    this._applyPendingLimits(u);
+    const a = ARENAS.find((x) => x.id === arenaId);
+    if (!a || (a.currency === 'ILS' && !this.cash.cfg.enabled)) throw new Error('הזירה אינה זמינה');
+    if (this._inMatch(u.id)) throw new Error('כבר יש לך משחק פעיל');
+    this.cancelQueue(u.id);
+    const holdId = 'aq_' + crypto.randomBytes(5).toString('hex');
+    if (a.currency === 'ILS') {
+      this.cash.arenaHold(u, a, holdId, country);
+    } else {
+      if (levelFromXp(u.xp) < a.minLevel) throw new Error(`הזירה נפתחת ברמה ${a.minLevel}`);
+      const lim = u.limits.dailyEntry;
+      if (lim !== null && this._entriesToday(u) + a.entry > lim) throw new Error('חרגת ממגבלת דמי הכניסה היומית שהגדרת');
+      this.ledger.post('entry', [{ account: `user:${u.id}`, amount: -a.entry }, { account: `hold:${holdId}`, amount: a.entry }], { arena: a.id });
+    }
+    const key = 'arena:' + a.id;
+    const q = this.queues.get(key) || [];
+    const i = q.findIndex((x) => x.userId !== u.id);
+    const me = { userId: u.id, clientSeed, holdId, arena: a, at: Date.now() };
+    if (i < 0) { q.push(me); this.queues.set(key, q); return { matched: false, arena: a.id }; }
+    const opp = q.splice(i, 1)[0];
+    this.queues.set(key, q);
+    const ou = this.store.data.users[opp.userId];
+    this.fair.noteOpponents(u, ou);
+    const poolId = 'ar_' + crypto.randomBytes(5).toString('hex');
+    const L = this._arenaLedger(a);
+    L.post('arena-start', [
+      { account: `hold:${opp.holdId}`, amount: -a.entry }, { account: `hold:${holdId}`, amount: -a.entry },
+      { account: `pool:${poolId}`, amount: 2 * a.entry },
+    ], { arena: a.id });
+    this._startSession({ A: this._seat(ou, opp.clientSeed), B: this._seat(u, clientSeed) },
+      { mode: a.mode, length: a.length, cube: a.mode === 'classic', rated: true, arena: { id: a.id, name: a.name, currency: a.currency, entry: a.entry, rakePct: a.rakePct, poolId } });
+    return { matched: true, arena: a.id };
+  }
+
+  _releaseHold(x) {
+    const L = this._arenaLedger(x.arena);
+    if (L.balance(`hold:${x.holdId}`) >= x.arena.entry) {
+      L.post('refund', [{ account: `hold:${x.holdId}`, amount: -x.arena.entry }, { account: `user:${x.userId}`, amount: x.arena.entry }], { arena: x.arena.id });
+    }
+  }
+
+  _arenaPayout(s, winnerSeat) {
+    const ar = s.config.arena;
+    const p = s.seats[winnerSeat];
+    if (ar.currency === 'ILS') {
+      const r = this.cash.payoutTournament({ id: ar.poolId, rakePct: ar.rakePct, payout: [1], entryFee: ar.entry }, [p]);
+      return { pot: r.pool, fee: r.rake, prize: r.prizes[0] };
+    }
+    const pot = this.ledger.balance(`pool:${ar.poolId}`);
+    const fee = Math.floor((pot * ar.rakePct) / 100);
+    this.ledger.post('payout', [{ account: `pool:${ar.poolId}`, amount: -pot }, { account: 'house:rake', amount: fee }, { account: `user:${p.userId}`, amount: pot - fee }], { arena: ar.id });
+    return { pot, fee, prize: { name: p.name, gross: pot - fee, tax: 0, net: pot - fee } };
   }
 
   _startSession(seats, config, tournamentId = null) {
@@ -275,7 +386,7 @@ export class App {
     const A = s.seats.A.userId && this.store.data.users[s.seats.A.userId];
     const B = s.seats.B.userId && this.store.data.users[s.seats.B.userId];
     let winner = s.match.winner;
-    if (winner === 'draw' && s.tournamentId) {
+    if (winner === 'draw' && (s.tournamentId || s.config.arena)) {
       // Skill tiebreak: lower engine-measured average error advances.
       const ea = A ? this.fair.avgError(A) ?? 99 : 99;
       const eb = B ? this.fair.avgError(B) ?? 99 : 99;
@@ -287,6 +398,13 @@ export class App {
       if (!u) continue;
       u.games++;
       if (winner === seat) u.wins++;
+      const before = levelFromXp(u.xp);
+      u.xp = (u.xp || 0) + 10 + (winner === seat ? 15 : 0) + (s.config.arena ? 10 : 0) + (s.match.kind === 'duplicate' ? 5 : 0);
+      if (levelFromXp(u.xp) > before) this.send(u.id, { t: 'levelUp', level: levelFromXp(u.xp) });
+    }
+    if (s.config.arena && (winner === 'A' || winner === 'B')) {
+      rec.arenaPayout = this._arenaPayout(s, winner);
+      for (const seat of ['A', 'B']) if (s.seats[seat].userId) this.send(s.seats[seat].userId, { t: 'arenaResult', you: seat, winner, payout: rec.arenaPayout, arena: s.config.arena });
     }
     if (A && B && s.config.rated !== false) {
       const scoreA = winner === 'A' ? 1 : winner === 'B' ? 0 : 0.5;
@@ -564,6 +682,7 @@ export class App {
   }
 
   // ---------- real money (wallet) ----------
+  redeem(u, { code, country }) { return this.cash.redeemVoucher(u, code, country); }
   wallet(u) { return this.cash.wallet(u); }
   submitKyc(u, msg) { this.cash.submitKyc(u, msg); return this.wallet(u); }
   deposit(u, { amount, country }) { return this.cash.deposit(u, amount, country); }

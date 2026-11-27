@@ -78,6 +78,11 @@ const server = http.createServer((req, res) => {
         app.cash.approveKyc(u, url.searchParams.get('approve') !== '0');
         return json(res, 200, { ok: true, kyc: u.kyc.status });
       }
+      if (req.method === 'POST' && p === '/admin/voucher') {
+        const v = app.cash.createVoucher({ amount: Number(url.searchParams.get('amount')), days: Number(url.searchParams.get('days') || 14), userId: url.searchParams.get('user') || null, note: url.searchParams.get('note') || '' });
+        return json(res, 200, v);
+      }
+      if (p === '/admin/vouchers') return json(res, 200, app.cash.listVouchers());
       if (req.method === 'POST' && p === '/admin/withdrawal') {
         app.cash.reviewWithdrawal(url.searchParams.get('id'), url.searchParams.get('approve') !== '0')
           .then((w) => json(res, 200, w)).catch((e) => json(res, 400, { error: e.message }));
@@ -122,7 +127,8 @@ wss.on('connection', (ws, req) => {
         user = app.auth(msg.token);
         if (ip) user.ipHash = app.hashIp(ip);
         app.attach(user.id, send);
-        send({ t: 'welcome', user: app.publicUser(user) });
+        send({ t: 'welcome', user: app.publicUser(user), gift: user._gift || null });
+        user._gift = null;
         return;
       }
       if (!user) return send({ t: 'error', msg: 'יש להתחבר' });
@@ -138,6 +144,9 @@ wss.on('connection', (ws, req) => {
         case 'limits': app.setLimits(user, msg); return send(meMsg());
         case 'leaderboard': return send({ t: 'leaderboard', list: app.leaderboard() });
         case 'wallet': return send({ t: 'wallet', wallet: app.wallet(user) });
+        case 'redeem': return send({ t: 'wallet', wallet: app.redeem(user, { ...msg, country }) });
+        case 'arenas': return send({ t: 'arenas', list: app.listArenas(user) });
+        case 'joinArena': return send({ t: 'queued', ...app.joinArena(user, { ...msg, country }) });
         case 'kyc': return send({ t: 'wallet', wallet: app.submitKyc(user, msg) });
         case 'withdraw': return send({ t: 'wallet', wallet: app.withdraw(user, { ...msg, country }) });
         case 'cashLimits': return send({ t: 'wallet', wallet: app.setCashLimits(user, msg) });

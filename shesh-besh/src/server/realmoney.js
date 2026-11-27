@@ -40,6 +40,8 @@ export function realMoneyConfig(env = process.env) {
     prizeTaxRate: Number(env.PRIZE_TAX_RATE ?? 0.25),
     prizeTaxThreshold: Number(env.PRIZE_TAX_THRESHOLD_AGOROT ?? 0),
     autoVerifyKyc: env.KYC_AUTO_VERIFY === '1', // sandbox/testing only
+    minGamesForCash: Number(env.MIN_GAMES_FOR_CASH ?? 10), // rated games before any cash arena
+    voucherMax: Number(env.VOUCHER_MAX_AGOROT || 100000), // ₪1,000 per code
     allowedCountries: (env.ALLOWED_COUNTRIES || '').split(',').map((s) => s.trim()).filter(Boolean),
   };
 }
@@ -94,6 +96,7 @@ export class CashService {
     this.audit = audit;
     this.ledger = new Ledger(store, { field: 'cashLedger', currency: 'ILS' });
     store.data.withdrawals ??= {};
+    store.data.vouchers ??= {}; // codeHash -> voucher
     store.data.kycIndex ??= {}; // idHash -> userId (one verified identity per account)
   }
 
@@ -236,6 +239,66 @@ export class CashService {
     this.audit('withdraw-reviewed', { id, status: w.status });
     this.store.save();
     return w;
+  }
+
+  // ----- deposit codes (manual top-up while no terminal is connected) -----
+  // The operator receives the money outside the app (with a receipt), creates a one-time code,
+  // and the player redeems it. Redemption is a deposit in every respect: KYC, limits, AML, ledger.
+  static hashCode(code) { return crypto.createHash('sha256').update('voucher:' + String(code).trim().toUpperCase()).digest('hex'); }
+
+  createVoucher({ amount, days = 14, userId = null, note = '' }) {
+    this.assertEnabled();
+    amount = Math.round(Number(amount));
+    if (!(amount >= this.cfg.minDeposit) || amount > this.cfg.voucherMax) throw new Error(`סכום קוד בין ${ILS(this.cfg.minDeposit)} ל-${ILS(this.cfg.voucherMax)}`);
+    const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const rnd = crypto.randomBytes(10);
+    const raw = Array.from(rnd, (b) => A[b % A.length]).join('');
+    const code = `SB-${raw.slice(0, 5)}-${raw.slice(5, 10)}`;
+    const v = { id: 'v_' + crypto.randomBytes(4).toString('hex'), amount, userId, note: String(note).slice(0, 80), createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + days * DAY).toISOString(), status: 'active', last4: code.slice(-4) };
+    this.store.data.vouchers[CashService.hashCode(code)] = v;
+    this.audit('voucher-created', { id: v.id, amount, userId, note: v.note });
+    this.store.save();
+    return { code, ...v }; // the plain code is shown once and never stored
+  }
+
+  redeemVoucher(u, code, country) {
+    this.assertCashAllowed(u, country);
+    this._applyPending(u);
+    const key = CashService.hashCode(code);
+    const v = this.store.data.vouchers[key];
+    u._voucherFails = (u._voucherFails || []).filter((t) => Date.now() - t < 3600_000);
+    if (u._voucherFails.length >= 5) throw new Error('יותר מדי ניסיונות. נסה שוב בעוד שעה');
+    if (!v || v.status !== 'active') { u._voucherFails.push(Date.now()); throw new Error('קוד לא תקין או שכבר נוצל'); }
+    if (new Date(v.expiresAt).getTime() < Date.now()) throw new Error('תוקף הקוד פג');
+    if (v.userId && v.userId !== u.id) throw new Error('הקוד הונפק למשתמש אחר');
+    const L = u.cashLimits || {};
+    if (L.depositDaily != null && this.depositsSince(u, DAY) + v.amount > L.depositDaily) throw new Error('חריגה ממגבלת ההפקדה היומית שהגדרת');
+    if (L.depositMonthly != null && this.depositsSince(u, 30 * DAY) + v.amount > L.depositMonthly) throw new Error('חריגה ממגבלת ההפקדה החודשית שהגדרת');
+    v.status = 'used'; v.usedBy = u.id; v.usedAt = new Date().toISOString();
+    this.ledger.post('deposit', [
+      { account: 'ext:voucher', amount: -v.amount },
+      { account: `user:${u.id}`, amount: v.amount },
+    ], { voucherId: v.id, method: 'code' });
+    if (this.depositsSince(u, DAY) > this.cfg.amlDailyDeposits) this.flag(u.id, 'AML_DEPOSITS', { last24h: this.depositsSince(u, DAY) });
+    this.audit('voucher-redeemed', { id: v.id, userId: u.id, amount: v.amount });
+    this.store.save();
+    return this.wallet(u);
+  }
+
+  listVouchers() {
+    return Object.values(this.store.data.vouchers).map((v) => ({ id: v.id, amount: v.amount, status: v.status, last4: v.last4, userId: v.userId, usedBy: v.usedBy || null, expiresAt: v.expiresAt, note: v.note }));
+  }
+
+  // ----- 1v1 cash arenas -----
+  arenaHold(u, arena, holdId, country) {
+    this.assertCashAllowed(u, country);
+    this._applyPending(u);
+    if (!isSkillFormat(arena.mode, arena.length)) throw new Error('פורמט זה אינו מורשה למשחק בכסף');
+    if ((u.games || 0) < this.cfg.minGamesForCash) throw new Error(`זירות כסף נפתחות אחרי ${this.cfg.minGamesForCash} משחקים מדורגים`);
+    if (arena.minRating && (u.rating || 0) < arena.minRating) throw new Error(`הזירה נפתחת בדירוג ${arena.minRating}`);
+    const L = u.cashLimits || {};
+    if (L.lossMonthly != null && this.netLossSince(u, 30 * DAY) + arena.entry > L.lossMonthly) throw new Error('חריגה ממגבלת ההפסד החודשית שהגדרת');
+    this.ledger.post('entry', [{ account: `user:${u.id}`, amount: -arena.entry }, { account: `hold:${holdId}`, amount: arena.entry }], { arena: arena.id });
   }
 
   // ----- tournaments -----

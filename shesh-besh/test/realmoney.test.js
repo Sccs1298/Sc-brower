@@ -4,7 +4,7 @@ import { Store } from '../src/server/store.js';
 import { App } from '../src/server/app.js';
 import { realMoneyConfig, validIsraeliId, isSkillFormat, SandboxProvider, NoTerminalProvider, CashService } from '../src/server/realmoney.js';
 
-const ON = { REAL_MONEY: '1', LEGAL_APPROVAL_REF: 'opinion-2027-001', PAYMENT_PROVIDER: 'sandbox', KYC_AUTO_VERIFY: '1' };
+const ON = { REAL_MONEY: '1', LEGAL_APPROVAL_REF: 'opinion-2027-001', PAYMENT_PROVIDER: 'sandbox', KYC_AUTO_VERIFY: '1', MIN_GAMES_FOR_CASH: '0' };
 const mkApp = (env = ON) => new App(new Store(null), { cashCfg: realMoneyConfig(env) });
 const user = (app, name, birth = '1990-03-04') => app.register({ name, birthDate: birth, acceptTerms: '2026-11-beta-1' }).user;
 // Valid test IDs (check digit correct).
@@ -111,4 +111,68 @@ test('loss limit blocks further cash entries', async () => {
 
 test('sandbox provider is explicit', () => {
   assert.equal(new SandboxProvider().name, 'sandbox');
+});
+
+test('deposit codes: one-time, bound user, limits, ledger', () => {
+  const app = mkApp({ ...ON, PAYMENT_PROVIDER: 'none' }); // no terminal — codes are the only way in
+  const a = user(app, 'codeA'); const b = user(app, 'codeB');
+  app.submitKyc(a, { fullName: 'אלה כהן', idNumber: IDS[0], birthDate: '1990-03-04' });
+  app.submitKyc(b, { fullName: 'בני כהן', idNumber: IDS[1], birthDate: '1990-03-04' });
+  const v100 = app.cash.createVoucher({ amount: 10000, note: 'ביט מאלה' });
+  assert.match(v100.code, /^SB-[A-Z2-9]{5}-[A-Z2-9]{5}$/);
+  assert.equal(app.redeem(a, { code: v100.code.toLowerCase() }).balance, 10000);
+  assert.throws(() => app.redeem(b, { code: v100.code }), /נוצל/);
+  const bound = app.cash.createVoucher({ amount: 20000, userId: a.id });
+  assert.throws(() => app.redeem(b, { code: bound.code }), /משתמש אחר/);
+  app.setCashLimits(a, { depositDaily: 15000 });
+  assert.throws(() => app.redeem(a, { code: bound.code }), /היומית/);
+  assert.ok(!JSON.stringify(app.store.data).includes(v100.code), 'plain code is never stored');
+  assert.ok(app.cash.ledger.integrity());
+  for (let i = 0; i < 4; i++) assert.throws(() => app.redeem(b, { code: 'SB-AAAAA-AAAAA' }));
+  assert.throws(() => app.redeem(b, { code: 'SB-AAAAA-AAAAA' }), /ניסיונות/);
+});
+
+function resignAll(app, u, matchId) {
+  for (let k = 0; k < 20; k++) {
+    const s = app.sessions.get(matchId);
+    if (s.ended) return s;
+    s.match.boards().forEach((g, b) => { if (g.phase !== 'over') app.act(u, { matchId, board: b, action: 'resign' }); });
+  }
+  return app.sessions.get(matchId);
+}
+
+test('cash arena: holds, pot to winner minus fee and tax, cancel refunds', async () => {
+  const app = mkApp();
+  const [a, b, c] = ['arA', 'arB', 'arC'].map((n, i) => {
+    const u = user(app, n); app.submitKyc(u, { fullName: `שחקן ${n}`, idNumber: IDS[i], birthDate: '1990-03-04' }); return u;
+  });
+  for (const u of [a, b, c]) await app.deposit(u, { amount: 5000 });
+  // c queues then cancels → refunded
+  assert.equal(app.joinArena(c, { arenaId: 'ils10' }).matched, false);
+  assert.equal(app.wallet(c).balance, 4000);
+  app.cancelQueue(c.id);
+  assert.equal(app.wallet(c).balance, 5000);
+  // a vs b
+  app.joinArena(a, { arenaId: 'ils10' });
+  assert.equal(app.joinArena(b, { arenaId: 'ils10' }).matched, true);
+  const s = [...app.sessions.values()].find((x) => !x.ended);
+  assert.equal(s.config.mode, 'duplicate'); assert.ok(s.config.length >= 2);
+  // A seat = a (first in queue). a resigns everything → b wins.
+  resignAll(app, a, s.id);
+  const pot = 2000; const fee = 200; const gross = 1800; const tax = Math.floor((gross - 1000) * 0.25);
+  assert.equal(app.wallet(b).balance, 5000 - 1000 + gross - tax);
+  assert.equal(app.wallet(a).balance, 4000);
+  assert.equal(app.cash.ledger.balance('house:rake'), fee);
+  assert.ok(app.cash.ledger.integrity());
+  assert.ok(app.publicUser(b).xp > app.publicUser(a).xp);
+});
+
+test('arenas: coin arenas unlock by level, cash arenas by rating — never by spending', () => {
+  const app = mkApp();
+  const u = user(app, 'lvl1');
+  const list = app.listArenas(u);
+  assert.equal(list.find((x) => x.id === 'cafe').locked, null);
+  assert.match(list.find((x) => x.id === 'roof').locked, /רמה/);
+  assert.match(list.find((x) => x.id === 'ils100').locked, /דירוג|אימות/);
+  assert.throws(() => app.joinArena(u, { arenaId: 'roof' }), /רמה/);
 });
