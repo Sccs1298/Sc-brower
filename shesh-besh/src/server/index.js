@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
 import { Store } from './store.js';
 import { App, TERMS_VERSION, TOURNAMENT_TYPES } from './app.js';
+import { realMoneyConfig } from './realmoney.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.env.PORT || 3000);
@@ -17,7 +18,9 @@ const RATE_LIMIT = Number(process.env.RATE_LIMIT || 40);
 
 const store = new Store(DB_FILE);
 store.data.config ??= { salt: crypto.randomBytes(16).toString('hex') };
-const app = new App(store, { salt: store.data.config.salt });
+const cashCfg = realMoneyConfig(process.env); // throws if REAL_MONEY=1 without LEGAL_APPROVAL_REF
+const app = new App(store, { salt: store.data.config.salt, cashCfg });
+if (cashCfg.enabled) console.log(`REAL MONEY ON · legal ref: ${cashCfg.legalRef} · provider: ${app.cash.provider.name}`);
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.md': 'text/markdown; charset=utf-8', '.svg': 'image/svg+xml' };
 const STATIC = [
@@ -41,7 +44,9 @@ function serveStatic(req, res, pathname) {
       res.writeHead(200, {
         'content-type': MIME[path.extname(file)] || 'application/octet-stream',
         'x-content-type-options': 'nosniff',
-        'content-security-policy': "default-src 'self'; connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; img-src 'self' data:",
+        'content-security-policy': path.basename(file) === 'play.html'
+          ? "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:"
+          : "default-src 'self'; connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; img-src 'self' data:",
       });
       fs.createReadStream(file).pipe(res);
       return true;
@@ -55,7 +60,7 @@ const server = http.createServer((req, res) => {
   const p = url.pathname;
   try {
     if (p === '/api/health') return json(res, 200, { ok: true, terms: TERMS_VERSION });
-    if (p === '/api/config') return json(res, 200, { termsVersion: TERMS_VERSION, tournamentTypes: TOURNAMENT_TYPES, realMoney: false });
+    if (p === '/api/config') return json(res, 200, { termsVersion: TERMS_VERSION, tournamentTypes: TOURNAMENT_TYPES, realMoney: cashCfg.enabled, paymentProvider: app.cash.provider.name });
     if (p === '/api/leaderboard') return json(res, 200, app.leaderboard());
     if (p === '/api/evidence') return json(res, 200, app.evidence());
     if (p === '/api/tournaments') return json(res, 200, app.listTournaments());
@@ -67,6 +72,17 @@ const server = http.createServer((req, res) => {
       if (!ADMIN_TOKEN || req.headers.authorization !== `Bearer ${ADMIN_TOKEN}`) return json(res, 401, { error: 'unauthorized' });
       if (p === '/admin/stats') return json(res, 200, app.adminStats());
       if (p === '/admin/audit') return json(res, 200, store.data.audit.slice(-500));
+      if (req.method === 'POST' && p === '/admin/kyc') {
+        const u = store.data.users[url.searchParams.get('user')];
+        if (!u) return json(res, 404, { error: 'no user' });
+        app.cash.approveKyc(u, url.searchParams.get('approve') !== '0');
+        return json(res, 200, { ok: true, kyc: u.kyc.status });
+      }
+      if (req.method === 'POST' && p === '/admin/withdrawal') {
+        app.cash.reviewWithdrawal(url.searchParams.get('id'), url.searchParams.get('approve') !== '0')
+          .then((w) => json(res, 200, w)).catch((e) => json(res, 400, { error: e.message }));
+        return;
+      }
       return json(res, 404, { error: 'not found' });
     }
     if (req.method === 'GET' && serveStatic(req, res, p)) return;
@@ -80,6 +96,7 @@ const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 32 * 1024 });
 
 wss.on('connection', (ws, req) => {
   const ip = (req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || '').trim();
+  const country = String(req.headers['cf-ipcountry'] || req.headers['x-country'] || '').toUpperCase() || null;
   let user = null;
   let lastMsgs = [];
   const send = (msg) => { if (ws.readyState === 1) ws.send(JSON.stringify(msg)); };
@@ -116,10 +133,19 @@ wss.on('connection', (ws, req) => {
         case 'cancelQueue': app.cancelQueue(user.id); return send({ t: 'queued', matched: false, cancelled: true });
         case 'act': app.act(user, msg); return;
         case 'tournaments': return send({ t: 'tournaments', list: app.listTournaments() });
-        case 'joinTournament': app.joinTournament(user, msg); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments() });
+        case 'joinTournament': app.joinTournament(user, { ...msg, country }); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments() });
         case 'leaveTournament': app.leaveTournament(user, msg); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments() });
         case 'limits': app.setLimits(user, msg); return send(meMsg());
         case 'leaderboard': return send({ t: 'leaderboard', list: app.leaderboard() });
+        case 'wallet': return send({ t: 'wallet', wallet: app.wallet(user) });
+        case 'kyc': return send({ t: 'wallet', wallet: app.submitKyc(user, msg) });
+        case 'withdraw': return send({ t: 'wallet', wallet: app.withdraw(user, { ...msg, country }) });
+        case 'cashLimits': return send({ t: 'wallet', wallet: app.setCashLimits(user, msg) });
+        case 'deposit':
+          app.deposit(user, { ...msg, country })
+            .then((w) => send({ t: 'wallet', wallet: w }))
+            .catch((e) => send({ t: 'error', msg: e.message }));
+          return;
         default: return send({ t: 'error', msg: 'unknown message' });
       }
     } catch (e) {

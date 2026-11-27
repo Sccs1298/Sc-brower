@@ -1,0 +1,1643 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>שש בש כפול</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Frank+Ruhl+Libre:wght@700;900&family=Assistant:wght@400;600;700;800&display=swap">
+<style>
+/* Concept: a club backgammon table at night — deep baize, brass trim, ivory and ebony checkers.
+   One deliberate dark game world (single theme). Screens: intro guide → lobby → table / wallet / tournaments. */
+:root {
+  color-scheme: dark;
+  --baize: #0d2a1f; --baize-2: #12382a; --baize-deep: #071a13;
+  --ink: #f3ead6; --ink-dim: #b9b29e; --ink-faint: #7f8a7c;
+  --brass: #e0b04a; --brass-hi: #ffd77a; --brass-lo: #8c6418;
+  --ivory: #f7efdc; --ebony: #1b1714; --ruby: #c2402e; --jade: #4fe09a; --sky: #7cc4ff;
+  --panel: rgba(8, 24, 18, .72); --panel-line: rgba(224, 176, 74, .28);
+  --display: "Secular One", "Frank Ruhl Libre", "Arial Hebrew", sans-serif;
+  --serif: "Frank Ruhl Libre", "David", Georgia, serif;
+  --body: "Assistant", "Segoe UI", Arial, sans-serif;
+  --r: 16px;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0; color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; direction: rtl;
+  background: radial-gradient(120% 80% at 50% 0%, var(--baize-2) 0%, var(--baize) 45%, var(--baize-deep) 100%) fixed, var(--baize);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px 40px;
+  overflow-x: hidden;
+}
+body::after { /* baize fibre */
+  content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .18; z-index: 0;
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px), repeating-linear-gradient(-45deg, rgba(0,0,0,.18) 0 1px, transparent 1px 4px);
+}
+#app { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; }
+button { font: inherit; cursor: pointer; border: 0; color: inherit; background: none; }
+button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; border-radius: 8px; }
+.btn {
+  font-family: var(--display); font-size: 1.05rem; letter-spacing: .01em; padding: 12px 22px; border-radius: 999px; color: #2a1b02;
+  background: linear-gradient(180deg, var(--brass-hi), var(--brass) 55%, var(--brass-lo)); box-shadow: 0 4px 0 #5e420c, 0 10px 24px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6);
+  transition: transform .08s, box-shadow .08s, filter .2s;
+}
+.btn:hover { filter: brightness(1.07); }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #5e420c, 0 4px 12px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.6); }
+.btn.ghost { background: rgba(255,255,255,.06); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--panel-line); }
+.btn.red { background: linear-gradient(180deg, #ff8a72, var(--ruby) 60%, #7c1f12); color: #fff; box-shadow: 0 4px 0 #551208, 0 10px 24px rgba(0,0,0,.45); }
+.btn.sm { font-size: .9rem; padding: 8px 14px; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+input, select { font: inherit; color: var(--ink); background: rgba(0,0,0,.35); border: 1.5px solid var(--panel-line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+label.f { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; color: var(--ink-dim); font-weight: 700; }
+.panel { background: var(--panel); border: 1px solid var(--panel-line); border-radius: var(--r); padding: 18px; backdrop-filter: blur(6px); box-shadow: 0 20px 50px rgba(0,0,0,.35); min-width: 0; }
+.eyebrow { font-size: .75rem; letter-spacing: .14em; color: var(--brass); font-weight: 800; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.muted { color: var(--ink-dim); }
+.faint { color: var(--ink-faint); font-size: .85rem; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- top bar ---------- */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 6px 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-size: 1.4rem; color: var(--ink); }
+.brand .mark { width: 38px; height: 38px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.35); border: 1px solid var(--panel-line); font-weight: 700; font-size: .9rem; }
+.chip.cash { color: var(--brass-hi); }
+.chip.demo { color: var(--sky); border-color: rgba(124,196,255,.4); }
+
+/* ---------- intro / guide ---------- */
+.hero { text-align: center; padding-block: 28px 10px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.hero h1 { font-family: var(--display); font-size: clamp(3rem, 11vw, 6.4rem); line-height: .95; color: var(--ivory); text-shadow: 0 4px 0 #04110c, 0 14px 40px rgba(0,0,0,.6); }
+.hero h1 span { color: var(--brass); }
+.hero p { max-width: 56ch; margin: 0; color: var(--ink-dim); font-size: 1.1rem; }
+.dice-stage { display: flex; gap: 18px; justify-content: center; perspective: 600px; height: 92px; align-items: center; }
+.dice-stage .bigdie { width: 72px; height: 72px; animation: bob 3.4s ease-in-out infinite; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.dice-stage .bigdie:nth-child(2) { animation-delay: -1.7s; }
+@keyframes bob { 0%,100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-12px) rotate(8deg); } }
+.guide { display: grid; gap: 18px; margin-top: 18px; }
+.steps { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.steps button { width: 34px; height: 8px; border-radius: 4px; background: rgba(255,255,255,.15); }
+.steps button[aria-current="step"] { background: var(--brass); }
+.slide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 22px; align-items: center; }
+@media (max-width: 820px) { .slide { grid-template-columns: 1fr; } }
+.slide h2 { font-family: var(--serif); font-weight: 900; font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.1; color: var(--ivory); }
+.slide p { margin: 10px 0 0; color: var(--ink-dim); max-width: 60ch; font-size: 1.05rem; }
+.slide .big { font-family: var(--display); font-size: clamp(3rem, 9vw, 5rem); color: var(--brass-hi); line-height: 1; }
+.conds { display: grid; gap: 12px; }
+.cond { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 14px; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid var(--panel-line); }
+.cond .k { font-family: var(--display); font-size: 1.6rem; color: var(--brass); width: 38px; text-align: center; }
+.cond b { color: var(--ivory); }
+.and { text-align: center; font-family: var(--display); color: var(--brass); letter-spacing: .1em; }
+.bars { display: grid; gap: 12px; }
+.bar { display: grid; gap: 4px; }
+.bar .lbl { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: .95rem; }
+.bar .track { height: 18px; border-radius: 9px; background: rgba(0,0,0,.4); overflow: hidden; position: relative; }
+.bar .fill { position: absolute; inset: 0 0 0 auto; width: 0; border-radius: 9px; background: linear-gradient(90deg, var(--brass-lo), var(--brass-hi)); transition: width 1.1s cubic-bezier(.2,.8,.2,1); }
+.bar .fill.weak { background: linear-gradient(90deg, #7c1f12, var(--ruby)); }
+.bar .fill.tie { background: linear-gradient(90deg, #1f7a52, var(--jade)); }
+.exp { display: grid; gap: 12px; }
+.exp .counter { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; text-align: center; }
+.exp .counter div { background: rgba(0,0,0,.3); border-radius: 12px; padding: 10px 6px; border: 1px solid var(--panel-line); }
+.exp .counter b { display: block; font-family: var(--display); font-size: 2rem; color: var(--ivory); }
+.pips-row { display: flex; flex-wrap: wrap; gap: 4px; min-height: 16px; }
+.pips-row i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.pips-row i.t { background: var(--jade); } .pips-row i.w { background: var(--brass); } .pips-row i.l { background: var(--ruby); }
+.mini-boards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mini { border-radius: 12px; padding: 10px; background: rgba(0,0,0,.3); border: 1px solid var(--panel-line); text-align: center; }
+.mini .dd { display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
+.mini .dd svg { width: 40px; height: 40px; }
+.guide-nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+.law { font-family: var(--serif); font-size: 1.05rem; color: var(--ivory); border-inline-start: 3px solid var(--brass); padding: 6px 14px; background: rgba(0,0,0,.25); border-radius: 0 10px 10px 0; }
+
+/* ---------- lobby ---------- */
+.lobby { display: grid; gap: 18px; }
+.lobby-hero { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+.lobby-hero h2 { font-family: var(--display); font-size: clamp(2rem, 6vw, 3rem); color: var(--ivory); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+.tile { text-align: start; position: relative; overflow: hidden; border-radius: 20px; padding: 20px; min-height: 190px; display: flex; flex-direction: column; gap: 8px; justify-content: flex-end;
+  background: linear-gradient(160deg, rgba(255,255,255,.08), rgba(0,0,0,.25)), var(--baize-2); border: 1px solid var(--panel-line); box-shadow: 0 16px 40px rgba(0,0,0,.4); transition: transform .15s, box-shadow .15s; }
+.tile:hover { transform: translateY(-4px); box-shadow: 0 22px 50px rgba(0,0,0,.5); }
+.tile h3 { font-family: var(--display); font-size: 1.6rem; color: var(--ivory); }
+.tile p { margin: 0; color: var(--ink-dim); }
+.tile .art { position: absolute; inset-inline-end: -10px; top: -6px; width: 130px; height: 130px; opacity: .9; }
+.tile.gold { background: linear-gradient(160deg, rgba(255,215,122,.22), rgba(0,0,0,.35)), #2b2208; }
+.tile .tag { align-self: flex-start; font-size: .75rem; font-weight: 800; letter-spacing: .1em; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,.4); color: var(--brass-hi); }
+.setup { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.setup label.f { min-width: 140px; flex: 1; }
+.seg { display: inline-flex; background: rgba(0,0,0,.35); border-radius: 999px; padding: 4px; border: 1px solid var(--panel-line); flex-wrap: wrap; }
+.seg button { padding: 8px 14px; border-radius: 999px; font-weight: 700; color: var(--ink-dim); }
+.seg button[aria-pressed="true"] { background: var(--brass); color: #2a1b02; }
+
+/* ---------- table ---------- */
+.hud { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-bottom: 14px; }
+.player { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.player.opp { flex-direction: row-reverse; text-align: left; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: 1.3rem; flex: none; box-shadow: inset 0 -4px 0 rgba(0,0,0,.25), 0 6px 16px rgba(0,0,0,.4); }
+.avatar.me { background: radial-gradient(circle at 35% 30%, #fff, var(--ivory) 45%, #cbbf9f); color: #3a2c12; }
+.avatar.bot { background: radial-gradient(circle at 35% 30%, #5a514a, var(--ebony) 60%); color: var(--brass-hi); }
+.player .nm { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player .sub { font-size: .8rem; color: var(--ink-faint); }
+.scorebox { text-align: center; font-family: var(--display); }
+.scorebox .s { font-size: 2.2rem; color: var(--ivory); line-height: 1; letter-spacing: .04em; }
+.scorebox .m { font-family: var(--body); font-size: .78rem; color: var(--brass); font-weight: 800; letter-spacing: .08em; }
+.boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 18px; }
+.boardcard { border-radius: 20px; padding: 10px; background: linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.45)); border: 1px solid var(--panel-line); transition: box-shadow .25s, transform .25s; min-width: 0; }
+.boardcard.active { box-shadow: 0 0 0 2px var(--brass), 0 0 40px rgba(224,176,74,.35); }
+.boardcard .bh { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 2px 6px 8px; flex-wrap: wrap; }
+.boardcard .bh .t { font-family: var(--display); font-size: 1.05rem; }
+.status { font-weight: 800; font-size: .9rem; padding: 3px 12px; border-radius: 999px; background: rgba(0,0,0,.4); }
+.status.go { background: var(--brass); color: #2a1b02; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(224,176,74,.18); } }
+.boardcard svg.board { width: 100%; height: auto; display: block; direction: ltr; touch-action: manipulation; user-select: none; }
+.tray { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 6px 2px; flex-wrap: wrap; }
+.dicebox { display: flex; gap: 8px; align-items: center; min-height: 52px; }
+.dicebox svg { width: 48px; height: 48px; filter: drop-shadow(0 6px 6px rgba(0,0,0,.45)); }
+.dicebox svg.used { opacity: .28; filter: none; }
+.dicebox svg.roll { animation: tumble .55s cubic-bezier(.3,1.4,.5,1); }
+@keyframes tumble { 0% { transform: translateY(-30px) rotate(-200deg) scale(.6); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.meta { font-size: .82rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.pt-hit { cursor: pointer; outline: none; }
+
+/* ---------- wallet & tournaments ---------- */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.balance { font-family: var(--display); font-size: clamp(2.4rem, 7vw, 3.4rem); color: var(--brass-hi); line-height: 1; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+.row > * { flex: 1; min-width: 120px; }
+.notice { border-radius: 12px; padding: 12px 14px; background: rgba(124,196,255,.08); border: 1px solid rgba(124,196,255,.35); color: #d7ecff; font-size: .92rem; }
+.notice.warn { background: rgba(224,176,74,.1); border-color: var(--panel-line); color: var(--ink); }
+.hist { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+.hist td { padding: 7px 4px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.hist td:last-child { text-align: left; font-weight: 800; }
+.plus { color: var(--jade); } .minus { color: #ff9b8a; }
+.tcard { display: grid; gap: 10px; }
+.tcard h3 { font-family: var(--display); font-size: 1.4rem; color: var(--ivory); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: .92rem; }
+.kv dt { color: var(--ink-faint); } .kv dd { margin: 0; font-weight: 700; }
+.bracket { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center; }
+.bracket .m { background: rgba(0,0,0,.3); border-radius: 10px; padding: 8px 10px; border: 1px solid var(--panel-line); font-size: .9rem; }
+.bracket .m .w { color: var(--brass-hi); font-weight: 800; }
+.receipt { font-family: var(--body); font-variant-numeric: tabular-nums; display: grid; gap: 4px; }
+.receipt div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dashed rgba(255,255,255,.12); padding: 4px 0; }
+.receipt .tot { font-weight: 800; color: var(--brass-hi); font-size: 1.1rem; border: 0; }
+
+/* ---------- overlay ---------- */
+.overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(2,10,7,.72); padding: 16px; }
+.overlay .card { max-width: 460px; width: 100%; text-align: center; display: grid; gap: 12px; padding: 26px; border-radius: 22px; background: linear-gradient(180deg, #173b2d, #0b2219); border: 1px solid var(--brass); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.overlay h2 { font-family: var(--display); font-size: 2.4rem; color: var(--brass-hi); }
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; }
+#toast { position: fixed; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%) translateY(20px); z-index: 70; background: var(--ivory); color: #2a1b02; font-weight: 800; padding: 10px 18px; border-radius: 999px; opacity: 0; transition: .25s; pointer-events: none; max-width: calc(100vw - 32px); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+#toast.show { opacity: 1; transform: translateX(-50%); }
+@media (max-width: 560px) {
+  .hud { grid-template-columns: 1fr auto; } .hud .opp { grid-column: 1 / -1; flex-direction: row; text-align: start; }
+  .avatar { width: 40px; height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div id="app"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ---- engine/board.js ----
+// Backgammon rules engine. Pure JS (ESM) — runs in Node and in the browser.
+//
+// Absolute board: points[0..23]. Positive = white checkers, negative = black.
+// White moves from 23 -> 0 and bears off below 0; white home = 0..5.
+// Black moves from 0 -> 23 and bears off above 23; black home = 18..23.
+//
+// Moves are expressed in the mover's OWN perspective:
+//   own index 0..23 (0 = deepest home point), BAR = 24, OFF = -1.
+
+const BAR = 24;
+const OFF = -1;
+const COLORS = ['w', 'b'];
+
+const other = (c) => (c === 'w' ? 'b' : 'w');
+const sign = (c) => (c === 'w' ? 1 : -1);
+const toAbs = (c, i) => (c === 'w' ? i : 23 - i);
+const toOwn = (c, a) => (c === 'w' ? a : 23 - a);
+
+function initialState() {
+  const points = new Array(24).fill(0);
+  points[23] = 2; points[12] = 5; points[7] = 3; points[5] = 5;
+  points[0] = -2; points[11] = -5; points[16] = -3; points[18] = -5;
+  return { points, bar: { w: 0, b: 0 }, off: { w: 0, b: 0 } };
+}
+
+function cloneState(s) {
+  return { points: s.points.slice(), bar: { ...s.bar }, off: { ...s.off } };
+}
+
+function stateKey(s) {
+  return s.points.join(',') + '|' + s.bar.w + ',' + s.bar.b + '|' + s.off.w + ',' + s.off.b;
+}
+
+/** Number of `c`'s checkers on own index i. */
+function ownCount(s, c, i) {
+  const v = s.points[toAbs(c, i)] * sign(c);
+  return v > 0 ? v : 0;
+}
+
+/** Number of opponent checkers on `c`'s own index i. */
+function oppCount(s, c, i) {
+  const v = -s.points[toAbs(c, i)] * sign(c);
+  return v > 0 ? v : 0;
+}
+
+function allHome(s, c) {
+  if (s.bar[c] > 0) return false;
+  for (let i = 6; i < 24; i++) if (ownCount(s, c, i) > 0) return false;
+  return true;
+}
+
+/** Returns destination own-index (or OFF) if checker at `from` can move `die`, else null. */
+function singleTarget(s, c, from, die) {
+  if (s.bar[c] > 0 && from !== BAR) return null;
+  if (from === BAR) {
+    if (s.bar[c] === 0) return null;
+    const to = BAR - die;
+    return oppCount(s, c, to) < 2 ? to : null;
+  }
+  if (from < 0 || from > 23 || ownCount(s, c, from) === 0) return null;
+  const to = from - die;
+  if (to >= 0) return oppCount(s, c, to) < 2 ? to : null;
+  if (!allHome(s, c)) return null;
+  if (to === -1) return OFF;
+  for (let i = from + 1; i < 6; i++) if (ownCount(s, c, i) > 0) return null;
+  return OFF;
+}
+
+/** Applies a single checker move (own perspective). Returns a new state. */
+function applyMove(s, c, m) {
+  const n = cloneState(s);
+  const sg = sign(c);
+  if (m.from === BAR) n.bar[c]--;
+  else n.points[toAbs(c, m.from)] -= sg;
+  if (m.to === OFF) {
+    n.off[c]++;
+  } else {
+    const a = toAbs(c, m.to);
+    if (n.points[a] === -sg) { // hit a blot
+      n.points[a] = 0;
+      n.bar[other(c)]++;
+    }
+    n.points[a] += sg;
+  }
+  return n;
+}
+
+function applySequence(s, c, seq) {
+  let n = s;
+  for (const m of seq) n = applyMove(n, c, m);
+  return n;
+}
+
+function sources(s, c) {
+  if (s.bar[c] > 0) return [BAR];
+  const out = [];
+  for (let i = 23; i >= 0; i--) if (ownCount(s, c, i) > 0) out.push(i);
+  return out;
+}
+
+/**
+ * All legal full-turn move sequences for dice [d1, d2].
+ * Enforces: play as many dice as possible; if only one die can be played,
+ * the larger must be played when possible. Sequences leading to identical
+ * positions are de-duplicated. Returns [{ moves, state }]. If nothing is
+ * playable, returns [{ moves: [], state }].
+ */
+function legalSequences(s, c, dice) {
+  const [d1, d2] = dice;
+  const orders = d1 === d2 ? [[d1, d1, d1, d1]] : [[d1, d2], [d2, d1]];
+  const results = [];
+  let maxLen = 0;
+
+  const rec = (st, rest, moves) => {
+    let moved = false;
+    if (rest.length > 0) {
+      const die = rest[0];
+      for (const from of sources(st, c)) {
+        const to = singleTarget(st, c, from, die);
+        if (to === null) continue;
+        moved = true;
+        const m = { from, to, die };
+        rec(applyMove(st, c, m), rest.slice(1), moves.concat([m]));
+      }
+    }
+    if (!moved) {
+      if (moves.length > maxLen) maxLen = moves.length;
+      results.push({ moves, state: st });
+    }
+  };
+  for (const order of orders) rec(s, order, []);
+
+  let filtered = results.filter((r) => r.moves.length === maxLen);
+  if (maxLen === 1 && d1 !== d2) {
+    const hi = Math.max(d1, d2);
+    if (filtered.some((r) => r.moves[0].die === hi)) {
+      filtered = filtered.filter((r) => r.moves[0].die === hi);
+    }
+  }
+  const seen = new Set();
+  const out = [];
+  for (const r of filtered) {
+    const k = stateKey(r.state);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(r);
+  }
+  return out.length ? out : [{ moves: [], state: s }];
+}
+
+function pipCount(s, c) {
+  let p = s.bar[c] * 25;
+  for (let i = 0; i < 24; i++) p += ownCount(s, c, i) * (i + 1);
+  return p;
+}
+
+function checkerTotal(s, c) {
+  let n = s.bar[c] + s.off[c];
+  for (let i = 0; i < 24; i++) n += ownCount(s, c, i);
+  return n;
+}
+
+/** If `winner` has borne off all checkers: 1 single, 2 gammon, 3 backgammon. */
+function winMultiplier(s, winner) {
+  const loser = other(winner);
+  if (s.off[loser] > 0) return 1;
+  if (s.bar[loser] > 0) return 3;
+  // Loser checkers inside the winner's home board (loser own idx 18..23).
+  for (let i = 18; i < 24; i++) if (ownCount(s, loser, i) > 0) return 3;
+  return 2;
+}
+
+function sameMoves(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].from !== b[i].from || a[i].to !== b[i].to) return false;
+  }
+  return true;
+}
+
+/** Finds the legal sequence matching submitted moves (by from/to), or the same resulting position. */
+function matchSequence(legal, s, c, moves) {
+  const exact = legal.find((l) => sameMoves(l.moves, moves));
+  if (exact) return exact;
+  // Accept any ordering of the same checker moves that yields a legal end position.
+  try {
+    let st = s;
+    for (const m of moves) {
+      if (typeof m.from !== 'number' || typeof m.to !== 'number') return null;
+      st = applyMove(st, c, m);
+    }
+    const k = stateKey(st);
+    if (moves.length !== (legal[0]?.moves.length ?? 0)) return null;
+    return legal.find((l) => stateKey(l.state) === k) || null;
+  } catch {
+    return null;
+  }
+}
+
+// ---- engine/game.js ----
+// Game & match flow (pure, deterministic given a dice function).
+
+const MAX_CUBE = 64;
+
+/**
+ * One game of backgammon.
+ * diceFn(rollIndex) -> [d1, d2]  (deterministic stream; see server/dice.js)
+ * Phases: 'roll' -> 'move' -> ... ; 'doubled' while a cube offer is pending; 'over'.
+ */
+class Game {
+  constructor({ diceFn, cubeEnabled = true, crawford = false }) {
+    this.diceFn = diceFn;
+    this.cubeEnabled = cubeEnabled && !crawford;
+    this.crawford = crawford;
+    this.state = initialState();
+    this.cube = { value: 1, owner: null };
+    this.rollIndex = 0;
+    this.turn = null;
+    this.dice = null;
+    this.phase = 'init';
+    this.legal = null;
+    this.result = null; // { winner, multiplier, points, reason }
+    this.log = [];
+    this.plies = 0;
+    this._opening();
+  }
+
+  _nextRoll() {
+    const r = this.diceFn(this.rollIndex);
+    this.rollIndex++;
+    return r;
+  }
+
+  _opening() {
+    let d;
+    do { d = this._nextRoll(); } while (d[0] === d[1]);
+    this.turn = d[0] > d[1] ? 'w' : 'b';
+    this._startMove(d);
+    this.log.push({ t: 'opening', dice: d, turn: this.turn });
+  }
+
+  _startMove(dice) {
+    this.dice = dice;
+    this.legal = legalSequences(this.state, this.turn, dice);
+    this.phase = 'move';
+    if (this.legal.length === 1 && this.legal[0].moves.length === 0) {
+      this.log.push({ t: 'pass', color: this.turn, dice });
+      this._endTurn();
+    }
+  }
+
+  _endTurn() {
+    this.plies++;
+    this.turn = other(this.turn);
+    this.dice = null;
+    this.legal = null;
+    this.phase = 'roll';
+  }
+
+  canDouble(color) {
+    return this.phase === 'roll' && this.turn === color && this.cubeEnabled
+      && this.cube.value < MAX_CUBE && (this.cube.owner === null || this.cube.owner === color);
+  }
+
+  /** True when the player on roll has no cube decision (so the server may auto-roll). */
+  rollIsForced() {
+    return this.phase === 'roll' && !this.canDouble(this.turn);
+  }
+
+  roll(color) {
+    if (this.phase !== 'roll' || this.turn !== color) throw new Error('not your roll');
+    const d = this._nextRoll();
+    this.log.push({ t: 'roll', color, dice: d });
+    this._startMove(d);
+    return d;
+  }
+
+  move(color, moves) {
+    if (this.phase !== 'move' || this.turn !== color) throw new Error('not your move');
+    const seq = matchSequence(this.legal, this.state, color, moves);
+    if (!seq) throw new Error('illegal move');
+    this.state = seq.state;
+    this.log.push({ t: 'move', color, dice: this.dice, moves: seq.moves });
+    if (this.state.off[color] === 15) {
+      const mult = winMultiplier(this.state, color);
+      this._finish(color, mult, mult === 1 ? 'single' : mult === 2 ? 'gammon' : 'backgammon');
+    } else {
+      this._endTurn();
+    }
+    return seq;
+  }
+
+  double(color) {
+    if (!this.canDouble(color)) throw new Error('cannot double');
+    this.phase = 'doubled';
+    this.log.push({ t: 'double', color, value: this.cube.value * 2 });
+  }
+
+  take(color) {
+    if (this.phase !== 'doubled' || this.turn === color) throw new Error('no double to take');
+    this.cube = { value: this.cube.value * 2, owner: color };
+    this.phase = 'roll';
+    this.log.push({ t: 'take', color });
+  }
+
+  drop(color) {
+    if (this.phase !== 'doubled' || this.turn === color) throw new Error('no double to drop');
+    this.log.push({ t: 'drop', color });
+    this._finish(other(color), 1, 'drop');
+  }
+
+  resign(color) {
+    if (this.phase === 'over') throw new Error('game over');
+    // Resigning concedes what the opponent would win if the game ended now
+    // (gammon if the resigner has borne off nothing) — prevents gammon-dodging.
+    const winner = other(color);
+    const mult = this.state.off[color] > 0 ? 1 : 2;
+    this.log.push({ t: 'resign', color });
+    this._finish(winner, mult, 'resign');
+  }
+
+  _finish(winner, multiplier, reason) {
+    this.phase = 'over';
+    this.dice = null;
+    this.legal = null;
+    this.result = { winner, multiplier, points: multiplier * this.cube.value, reason };
+  }
+
+  pips() {
+    return { w: pipCount(this.state, 'w'), b: pipCount(this.state, 'b') };
+  }
+
+  snapshot() {
+    return {
+      state: this.state,
+      cube: this.cube,
+      cubeEnabled: this.cubeEnabled,
+      crawford: this.crawford,
+      turn: this.turn,
+      dice: this.dice,
+      phase: this.phase,
+      result: this.result,
+      pips: this.pips(),
+      rollIndex: this.rollIndex,
+    };
+  }
+}
+
+/**
+ * Classic match to `target` points between seats A and B.
+ * Seat A plays white in odd games, black in even games (colors alternate).
+ * gameDiceFn(gameIndex) -> diceFn
+ */
+class ClassicMatch {
+  constructor({ target = 5, cube = true, gameDiceFn }) {
+    this.kind = 'classic';
+    this.target = target;
+    this.cube = cube;
+    this.gameDiceFn = gameDiceFn;
+    this.score = { A: 0, B: 0 };
+    this.crawfordUsed = false;
+    this.games = [];
+    this.over = false;
+    this.winner = null;
+    this._newGame();
+  }
+
+  colorOf(seat, gi = this.games.length - 1) {
+    const aWhite = gi % 2 === 0;
+    return (seat === 'A') === aWhite ? 'w' : 'b';
+  }
+
+  seatOf(color, gi = this.games.length - 1) {
+    return this.colorOf('A', gi) === color ? 'A' : 'B';
+  }
+
+  _newGame() {
+    const gi = this.games.length;
+    let crawford = false;
+    if (this.target > 1 && !this.crawfordUsed
+      && (this.score.A === this.target - 1 || this.score.B === this.target - 1)) {
+      crawford = true;
+      this.crawfordUsed = true;
+    }
+    const g = new Game({ diceFn: this.gameDiceFn(gi), cubeEnabled: this.cube && this.target > 1, crawford });
+    this.games.push(g);
+    return g;
+  }
+
+  /** Boards in play (always one for classic). */
+  boards() { return [this.current()]; }
+  current() { return this.games[this.games.length - 1]; }
+
+  /** Call after any action; rolls over to next game when one ends. Returns true if a game just ended. */
+  settle() {
+    const g = this.current();
+    if (g.phase !== 'over' || this.over) return false;
+    const seat = this.seatOf(g.result.winner);
+    this.score[seat] += g.result.points;
+    if (this.score[seat] >= this.target) {
+      this.over = true;
+      this.winner = seat;
+    } else {
+      this._newGame();
+    }
+    return true;
+  }
+}
+
+/**
+ * Duplicate match: `pairs` rounds; in each round two boards are played at the
+ * same time with the SAME dice stream. Board 1: A = white. Board 2: A = black.
+ * Because both boards consume the identical roll sequence by roll index, each
+ * player faces exactly the dice their opponent faced on the other board, so
+ * luck cancels out. Total points over all boards decide the match.
+ * Ties go to sudden-death extra rounds (up to maxExtra), then to the skill
+ * tiebreak supplied by the caller (lower average engine-measured error).
+ */
+class DuplicateMatch {
+  constructor({ pairs = 1, cube = false, gameDiceFn, maxExtra = 2 }) {
+    this.kind = 'duplicate';
+    this.pairs = pairs;
+    this.cube = cube;
+    this.gameDiceFn = gameDiceFn;
+    this.maxExtra = maxExtra;
+    this.score = { A: 0, B: 0 };
+    this.rounds = [];
+    this.over = false;
+    this.winner = null; // 'A' | 'B' | 'draw'
+    this.tiebreak = null;
+    this._newRound();
+  }
+
+  colorOf(seat, board) {
+    return (seat === 'A') === (board === 0) ? 'w' : 'b';
+  }
+
+  seatOf(color, board) {
+    return this.colorOf('A', board) === color ? 'A' : 'B';
+  }
+
+  _newRound() {
+    const ri = this.rounds.length;
+    const diceFn = this.gameDiceFn(ri);
+    this.rounds.push([
+      new Game({ diceFn, cubeEnabled: this.cube }),
+      new Game({ diceFn, cubeEnabled: this.cube }),
+    ]);
+  }
+
+  boards() { return this.rounds[this.rounds.length - 1]; }
+
+  settle() {
+    const round = this.boards();
+    if (this.over || round.some((g) => g.phase !== 'over')) return false;
+    if (round._settled) return false;
+    round._settled = true;
+    round.forEach((g, b) => {
+      this.score[this.seatOf(g.result.winner, b)] += g.result.points;
+    });
+    const played = this.rounds.length;
+    if (played >= this.pairs) {
+      if (this.score.A !== this.score.B) {
+        this.over = true;
+        this.winner = this.score.A > this.score.B ? 'A' : 'B';
+      } else if (played >= this.pairs + this.maxExtra) {
+        this.over = true;
+        this.winner = 'draw';
+      } else {
+        this._newRound();
+      }
+    } else {
+      this._newRound();
+    }
+    return true;
+  }
+}
+
+// ---- engine/bot.js ----
+// Heuristic backgammon AI with adjustable strength (pure JS).
+// Strength is controlled by evaluation noise: the same evaluator is used at
+// every level, weaker levels add random error to each candidate's score.
+// The noiseless evaluator also powers the anti-cheat / move-quality metric.
+
+const LEVELS = {
+  expert: { noise: 0, label: 'מומחה' },
+  strong: { noise: 3, label: 'חזק' },
+  intermediate: { noise: 8, label: 'בינוני' },
+  beginner: { noise: 20, label: 'מתחיל' },
+  random: { noise: Infinity, label: 'אקראי' },
+};
+
+const ROLLS = [];
+for (let a = 1; a <= 6; a++) for (let b = a; b <= 6; b++) ROLLS.push([a, b, a === b ? 1 : 2]);
+
+/** Is own point i blocked for `c` (opponent has 2+)? */
+const blocked = (s, c, i) => i >= 0 && i <= 23 && oppCount(s, c, i) >= 2;
+
+/**
+ * Probability (0..1) that opponent hits c's blot at own index i next roll.
+ * Approximation: considers direct and combination shots, intermediate landing
+ * points, ignores bar-entry restrictions for the hitter.
+ */
+function shotProbability(s, c, i) {
+  const o = other(c);
+  // Opponent checkers positions in opponent's own perspective; blot position in o's perspective:
+  const target = 23 - i;
+  const hitters = [];
+  if (s.bar[o] > 0) hitters.push(24);
+  for (let j = target + 1; j < 24; j++) if (ownCount(s, o, j) > 0) hitters.push(j);
+  if (!hitters.length) return 0;
+  // Blocked check for the hitter (o) at its own index k means c has 2+ there.
+  const blk = (k) => k >= 0 && k <= 23 && ownCount(s, c, 23 - k) >= 2;
+  let hits = 0;
+  for (const [a, b, w] of ROLLS) {
+    let hit = false;
+    for (const h of hitters) {
+      const d = h - target;
+      if (a !== b) {
+        if (d === a || d === b) { hit = true; break; }
+        if (d === a + b && (!blk(h - a) || !blk(h - b))) { hit = true; break; }
+      } else {
+        for (let k = 1; k <= 4; k++) {
+          if (blk(h - a * k) && k * a < d) break;
+          if (d === a * k) { hit = true; break; }
+        }
+        if (hit) break;
+      }
+    }
+    if (hit) hits += w;
+  }
+  return hits / 36;
+}
+
+function hasContact(s, c) {
+  // c's rearmost checker (own idx) vs opponent's rearmost checker expressed in c's own coords.
+  let myBack = -1;
+  if (s.bar[c] > 0) myBack = 24;
+  else for (let i = 23; i >= 0; i--) if (ownCount(s, c, i) > 0) { myBack = i; break; }
+  const o = other(c);
+  if (s.bar[o] > 0) return true;
+  let oppBackInMine = 24;
+  for (let i = 0; i < 24; i++) if (oppCount(s, c, i) > 0) { oppBackInMine = i; break; }
+  return myBack > oppBackInMine;
+}
+
+/** Static evaluation of position `s` from the perspective of `c` who just moved. Higher = better. */
+function evaluate(s, c) {
+  const o = other(c);
+  if (s.off[c] === 15) return 1000;
+  const myPip = pipCount(s, c);
+  const opPip = pipCount(s, o);
+
+  if (!hasContact(s, c)) {
+    // Pure race: pips dominate; small penalty for checkers far from home & gaps.
+    let waste = 0;
+    for (let i = 6; i < 24; i++) waste += ownCount(s, c, i) * 0.5;
+    return (opPip - myPip) * 1.2 + s.off[c] * 1.5 - waste;
+  }
+
+  let score = (opPip - myPip) * 0.6;
+  // Made points & primes.
+  let run = 0; let best = 0; let homeMade = 0;
+  for (let i = 0; i < 24; i++) {
+    const n = ownCount(s, c, i);
+    if (n >= 2) {
+      run++; best = Math.max(best, run);
+      if (i <= 5) { homeMade++; score += 3; }
+      if (i === 6) score += 3;
+      if (i === 3 || i === 4) score += 2.5;
+      if (i >= 18) score += 2.5; // anchor in opponent's home board
+      if (i > 6 && i < 18) score += 1.2;
+      if (n > 3) score -= (n - 3) * 0.5; // stacking
+    } else {
+      run = 0;
+    }
+  }
+  score += best * best * 1.3;
+
+  // Blot exposure.
+  for (let i = 0; i < 24; i++) {
+    if (ownCount(s, c, i) === 1) {
+      const p = shotProbability(s, c, i);
+      score -= p * ((24 - i) * 0.55 + 5 + homeMadeOpp(s, o) * 1.5);
+    }
+  }
+
+  // Opponent checkers on the bar are worth more against a strong home board.
+  score += s.bar[o] * (6 + homeMade * 2.5);
+  score -= s.bar[c] * 6;
+  score += s.off[c] * 1.5;
+  return score;
+}
+
+function homeMadeOpp(s, o) {
+  let n = 0;
+  for (let i = 0; i <= 5; i++) if (ownCount(s, o, i) >= 2) n++;
+  return n;
+}
+
+function gauss(rng) {
+  const u = 1 - rng(); const v = rng();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+/** Scores every legal sequence with the noiseless evaluator. */
+function scoreSequences(legal, c) {
+  return legal.map((l) => evaluate(l.state, c));
+}
+
+/** Choose a sequence index for `level`. rng: () => [0,1). */
+function chooseSequence(legal, c, level = 'expert', rng = Math.random) {
+  if (legal.length === 1) return 0;
+  const noise = (LEVELS[level] ?? LEVELS.expert).noise;
+  if (noise === Infinity) return Math.floor(rng() * legal.length);
+  let bestI = 0; let bestV = -Infinity;
+  for (let i = 0; i < legal.length; i++) {
+    const v = evaluate(legal[i].state, c) + (noise ? gauss(rng) * noise : 0);
+    if (v > bestV) { bestV = v; bestI = i; }
+  }
+  return bestI;
+}
+
+/** Rough "position strength" for cube decisions, from c's perspective (c on roll). */
+function cubeView(s, c) {
+  const myPip = pipCount(s, c);
+  const opPip = pipCount(s, other(c));
+  if (!hasContact(s, c) && !hasContact(s, other(c))) {
+    return { race: true, lead: (opPip - myPip) / Math.max(myPip, 1) };
+  }
+  return { race: false, score: evaluate(s, c) - evaluate(s, other(c)) };
+}
+
+function shouldDouble(s, c, level = 'expert') {
+  if (level === 'random') return false;
+  const v = cubeView(s, c);
+  return v.race ? v.lead > 0.09 && v.lead < 0.25 : v.score > 30 && v.score < 70;
+}
+
+function shouldTake(s, c, level = 'expert') {
+  if (level === 'random') return Math.random() < 0.5;
+  // c is the one being doubled, opponent is on roll.
+  const v = cubeView(s, other(c));
+  return v.race ? v.lead < 0.2 : v.score < 60;
+}
+
+/** Equity-like loss of a chosen sequence vs the best (noiseless). Used for move-quality stats. */
+function moveError(legal, c, chosenIndex) {
+  if (legal.length <= 1) return { error: 0, rank: 0, forced: true };
+  const scores = scoreSequences(legal, c);
+  const best = Math.max(...scores);
+  const chosen = scores[chosenIndex];
+  const rank = scores.filter((x) => x > chosen).length;
+  return { error: best - chosen, rank, forced: false };
+}
+
+
+
+
+// =====================================================================
+// Study numbers (from docs/skill-study.md · npm run study · 18,000 matchups)
+// =====================================================================
+const STUDY = {
+  tie: { n: 1000, ties: 1000 },
+  intermediate: { single: 72.1, match7: 97.0, dup3: 88.3, weakSingle: 27.9, weakMatch7: 3.0, weakDup3: 9.7 },
+  beginner: { single: 93.0, match7: 100.0, dup3: 99.8 },
+  equalSingle: 49.8,
+};
+
+// =====================================================================
+// helpers
+// =====================================================================
+const $ = (s, r = document) => r.querySelector(s);
+const h = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const k of kids.flat(Infinity)) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+};
+const NS = 'http://www.w3.org/2000/svg';
+const S = (tag, attrs = {}, text) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text != null) e.textContent = text; return e; };
+const shekel = (ag) => '₪' + (ag / 100).toLocaleString('he-IL', { minimumFractionDigits: ag % 100 ? 2 : 0, maximumFractionDigits: 2 });
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('sbk:' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('sbk:' + k, JSON.stringify(v)); } catch { /* storage blocked */ } },
+};
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2800); }
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- dice face SVG ----------
+const PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[28, 28], [50, 50], [72, 72]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]], 5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]], 6: [[28, 26], [72, 26], [28, 50], [72, 50], [28, 74], [72, 74]] };
+function dieSVG(n, cls = '') {
+  const svg = S('svg', { viewBox: '0 0 100 100', class: cls, role: 'img', 'aria-label': `קובייה ${n}` });
+  const id = 'dg' + Math.random().toString(36).slice(2, 7);
+  const defs = S('defs');
+  const g = S('linearGradient', { id, x1: 0, y1: 0, x2: 1, y2: 1 });
+  g.append(S('stop', { offset: '0', 'stop-color': '#fffdf6' }), S('stop', { offset: '1', 'stop-color': '#e3d6b6' }));
+  defs.append(g); svg.append(defs);
+  svg.append(S('rect', { x: 4, y: 4, width: 92, height: 92, rx: 20, fill: `url(#${id})`, stroke: '#9c8a60', 'stroke-width': 2 }));
+  for (const [x, y] of PIPS[n] || []) svg.append(S('circle', { cx: x, cy: y, r: 8.5, fill: n === 1 ? '#b3261e' : '#231c14' }));
+  return svg;
+}
+
+// ---------- sound (synthesised; starts after first tap) ----------
+const audio = { ctx: null, on: store.get('sound', true) };
+function tone(freq, dur, type = 'sine', vol = .12) {
+  if (!audio.on) return;
+  try {
+    audio.ctx ??= new (window.AudioContext || window.webkitAudioContext)();
+    const o = audio.ctx.createOscillator(); const g = audio.ctx.createGain();
+    o.type = type; o.frequency.value = freq; g.gain.value = vol;
+    g.gain.exponentialRampToValueAtTime(0.0001, audio.ctx.currentTime + dur);
+    o.connect(g).connect(audio.ctx.destination); o.start(); o.stop(audio.ctx.currentTime + dur);
+  } catch { /* audio unavailable */ }
+}
+const sfx = {
+  dice() { for (let i = 0; i < 5; i++) setTimeout(() => tone(180 + Math.random() * 260, .05, 'square', .05), i * 45); },
+  click() { tone(520, .07, 'triangle', .1); },
+  hit() { tone(140, .18, 'sawtooth', .08); },
+  win() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .25, 'triangle', .12), i * 120)); },
+  lose() { [392, 330, 262].forEach((f, i) => setTimeout(() => tone(f, .3, 'sine', .1), i * 150)); },
+};
+
+// ---------- confetti ----------
+function confetti() {
+  if (reduced) return;
+  const c = $('#confetti'); const x = c.getContext('2d');
+  c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio; x.scale(devicePixelRatio, devicePixelRatio);
+  const cols = ['#ffd77a', '#e0b04a', '#f7efdc', '#4fe09a', '#c2402e'];
+  const parts = Array.from({ length: 160 }, () => ({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - .5) * 14, vy: Math.random() * -12 - 4, s: 4 + Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)], r: Math.random() * 6 }));
+  let t = 0;
+  (function f() {
+    x.clearRect(0, 0, innerWidth, innerHeight);
+    for (const p of parts) { p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += .2; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore(); }
+    if (t++ < 150) requestAnimationFrame(f); else x.clearRect(0, 0, innerWidth, innerHeight);
+  })();
+}
+
+// =====================================================================
+// App state
+// =====================================================================
+const S0 = {
+  screen: store.get('seenGuide', false) ? 'lobby' : 'intro',
+  guideStep: 0,
+  setup: { mode: 'duplicate', len: 1, level: 'intermediate' },
+  wallet: store.get('wallet', null) || { balance: 0, kyc: null, limits: { depositDaily: null, lossMonthly: null }, excludedUntil: null, history: [] },
+  stats: store.get('stats', { played: 0, won: 0 }),
+  tour: null, // active cash tournament
+};
+const st = S0;
+const saveWallet = () => store.set('wallet', st.wallet);
+function go(screen) { st.screen = screen; stopTimers(); render(); scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); }
+
+// =====================================================================
+// Rendering root
+// =====================================================================
+function render() {
+  const app = $('#app');
+  const views = { intro: viewIntro, lobby: viewLobby, table: viewTable, wallet: viewWallet, tours: viewTours };
+  app.replaceChildren(topbar(), views[st.screen]());
+}
+
+function logo() {
+  const svg = S('svg', { viewBox: '0 0 40 40', class: 'mark', 'aria-hidden': 'true' });
+  svg.append(S('rect', { x: 2, y: 8, width: 22, height: 22, rx: 5, fill: '#f7efdc', transform: 'rotate(-12 13 19)' }));
+  svg.append(S('rect', { x: 16, y: 10, width: 22, height: 22, rx: 5, fill: '#e0b04a', transform: 'rotate(10 27 21)' }));
+  for (const [cx, cy] of [[9, 14], [17, 24]]) svg.append(S('circle', { cx, cy, r: 2.2, fill: '#231c14' }));
+  for (const [cx, cy] of [[23, 16], [27, 21], [31, 26]]) svg.append(S('circle', { cx, cy, r: 2.2, fill: '#231c14' }));
+  return svg;
+}
+
+function topbar() {
+  return h('div', { class: 'topbar' },
+    h('button', { class: 'brand', onclick: () => go('lobby'), 'aria-label': 'ללובי' }, logo(), 'שש בש כפול'),
+    h('div', { class: 'chips' },
+      h('span', { class: 'chip demo', title: 'כסף מדומה – גרסת הדגמה' }, 'הדגמה'),
+      h('button', { class: 'chip cash', onclick: () => go('wallet') }, '👛 ', h('span', { class: 'num' }, shekel(st.wallet.balance))),
+      h('button', { class: 'chip', onclick: () => go('intro') }, '⚖️ למה זה חוקי'),
+      h('button', { class: 'chip', 'aria-pressed': String(audio.on), onclick: () => { audio.on = !audio.on; store.set('sound', audio.on); render(); } }, audio.on ? '🔊' : '🔈')));
+}
+
+// =====================================================================
+// INTRO — the legal / statistics guide
+// =====================================================================
+const GUIDE = [
+  { key: 'hook', render: slideHook },
+  { key: 'law', render: slideLaw },
+  { key: 'luck', render: slideLuck },
+  { key: 'dup', render: slideDup },
+  { key: 'exp', render: slideExperiment },
+  { key: 'data', render: slideData },
+  { key: 'money', render: slideMoney },
+];
+
+function viewIntro() {
+  const i = st.guideStep;
+  const last = i === GUIDE.length - 1;
+  const finish = () => { store.set('seenGuide', true); go('lobby'); };
+  return h('div', {},
+    h('section', { class: 'hero' },
+      h('div', { class: 'dice-stage', 'aria-hidden': 'true' }, dieSVG(6, 'bigdie'), dieSVG(5, 'bigdie')),
+      h('h1', {}, 'שש בש ', h('span', {}, 'כפול')),
+      h('p', {}, 'משחק שבו הקוביות זהות לשני הצדדים, ומי שמשחק טוב יותר מנצח. לפני שמתחילים: דקה על הסיבה שזה משחק מיומנות ולא הימור.')),
+    h('div', { class: 'guide' },
+      h('div', { class: 'steps', role: 'tablist', 'aria-label': 'שלבי המדריך' },
+        GUIDE.map((g, k) => h('button', { 'aria-label': `שלב ${k + 1}`, 'aria-current': k === i ? 'step' : null, onclick: () => { st.guideStep = k; render(); } }))),
+      h('article', { class: 'panel slide', 'aria-live': 'polite' }, GUIDE[i].render()),
+      h('div', { class: 'guide-nav' },
+        h('button', { class: 'btn ghost sm', onclick: finish }, 'דלג ללובי'),
+        h('div', { class: 'acts' },
+          i > 0 ? h('button', { class: 'btn ghost', onclick: () => { st.guideStep--; render(); } }, 'הקודם') : null,
+          last ? h('button', { class: 'btn', onclick: finish }, 'בוא נשחק') : h('button', { class: 'btn', onclick: () => { st.guideStep++; render(); } }, 'הבא')))));
+}
+
+function slideHook() {
+  return [
+    h('div', {}, h('div', { class: 'eyebrow' }, 'השאלה'), h('h2', {}, 'יש קוביות. אז זה מזל?'),
+      h('p', {}, 'כולם יודעים שבשש בש יש מזל. כולם יודעים גם שהאלוף מהשכונה מנצח כמעט תמיד. אז מה קובע את התוצאה, הקוביות או השחקן?'),
+      h('p', {}, 'בדקנו את זה ב-18,000 התמודדויות מדודות. בשקפים הבאים: מה החוק אומר, מה המספרים אומרים, ואיך אפשר לבדוק את זה בעצמך כאן, בדפדפן.')),
+    h('div', { style: 'text-align:center' }, h('div', { class: 'big' }, '18,000'), h('div', { class: 'muted' }, 'התמודדויות בסימולציה'), h('div', { class: 'big', style: 'margin-top:14px' }, '100%'), h('div', { class: 'muted' }, 'תיקו כשהשחקנים שווים ברמתם, בשש בש כפול')),
+  ];
+}
+
+function slideLaw() {
+  return [
+    h('div', {}, h('div', { class: 'eyebrow' }, 'החוק בשתי שורות'), h('h2', {}, 'הימור אסור דורש שני תנאים יחד'),
+      h('p', { class: 'law' }, '"משחק אסור" הוא משחק שבו אפשר לזכות בכסף, בשווה כסף או בטובת הנאה, והתוצאות תלויות יותר בגורל מאשר בהבנה או ביכולת.'),
+      h('p', { class: 'faint' }, 'סעיף 224 לחוק העונשין, התשל"ז-1977')),
+    h('div', { class: 'conds' },
+      h('div', { class: 'cond' }, h('span', { class: 'k' }, '1'), h('div', {}, h('b', {}, 'אפשר לזכות בכסף או בשווה כסף'), h('div', { class: 'muted' }, 'במצב האימון אין כסף בכלל, ולכן התנאי הזה לא מתקיים.'))),
+      h('div', { class: 'and' }, 'וגם'),
+      h('div', { class: 'cond' }, h('span', { class: 'k' }, '2'), h('div', {}, h('b', {}, 'המזל קובע יותר מהיכולת'), h('div', { class: 'muted' }, 'כאן נכנסת הסטטיסטיקה. בשקפים הבאים נראה שהיכולת קובעת.')))),
+  ];
+}
+
+function bar(label, value, cls = '') {
+  const fill = h('span', { class: 'fill ' + cls });
+  requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = value + '%'; }));
+  return h('div', { class: 'bar' }, h('div', { class: 'lbl' }, h('span', {}, label), h('span', { class: 'num' }, value.toFixed(1) + '%')), h('div', { class: 'track' }, fill));
+}
+
+function slideLuck() {
+  return [
+    h('div', {}, h('div', { class: 'eyebrow' }, 'שש בש רגיל'), h('h2', {}, 'במשחק בודד המזל עוד מורגש'),
+      h('p', {}, 'מומחה מול שחקן בינוני, במשחק בודד: המומחה מנצח ב-72% מהמשחקים. השחקן הבינוני עדיין לוקח 28% בזכות הקוביות.'),
+      h('p', {}, 'כשמאריכים למאץ\' עד 7 נקודות, המזל מתקזז והמומחה מנצח ב-97%. ככל שמשחקים יותר, היכולת מכריעה.')),
+    h('div', { class: 'bars' },
+      bar('מומחה מול בינוני · משחק בודד', STUDY.intermediate.single),
+      bar('הבינוני ניצח · משחק בודד', STUDY.intermediate.weakSingle, 'weak'),
+      bar('מומחה מול בינוני · מאץ\' עד 7', STUDY.intermediate.match7),
+      bar('הבינוני ניצח · מאץ\' עד 7', STUDY.intermediate.weakMatch7, 'weak')),
+  ];
+}
+
+function slideDup() {
+  const roll = [6, 4];
+  const mini = (title, who) => h('div', { class: 'mini' }, h('b', {}, title), h('div', { class: 'muted' }, who), h('div', { class: 'dd' }, dieSVG(roll[0]), dieSVG(roll[1])));
+  return [
+    h('div', {}, h('div', { class: 'eyebrow' }, 'הפתרון'), h('h2', {}, 'שני לוחות, אותן קוביות'),
+      h('p', {}, 'בשש בש כפול משחקים שני לוחות במקביל. בלוח 1 אתה לבן, בלוח 2 אתה שחור. רצף הקוביות זהה בשני הלוחות.'),
+      h('p', {}, 'כשיוצא 6-4 ללבן בלוח 1, יוצא 6-4 ללבן גם בלוח 2. כל אחד מקבל בדיוק את המזל שקיבל היריב. מה שנשאר להכריע הוא איך שיחקת.')),
+    h('div', { class: 'mini-boards' }, mini('לוח 1', 'אתה לבן · היריב שחור'), mini('לוח 2', 'אתה שחור · היריב לבן')),
+  ];
+}
+
+function slideExperiment() {
+  const out = h('div', { class: 'exp' });
+  const draw = (title, sub) => {
+    const tally = { t: 0, w: 0, l: 0 };
+    const nums = h('div', { class: 'counter' }, h('div', {}, h('b', { class: 'num' }, '0'), 'תיקו'), h('div', {}, h('b', { class: 'num' }, '0'), 'החזק ניצח'), h('div', {}, h('b', { class: 'num' }, '0'), 'החלש ניצח'));
+    const dots = h('div', { class: 'pips-row', 'aria-hidden': 'true' });
+    out.replaceChildren(h('b', {}, title), h('div', { class: 'faint' }, sub), nums, dots);
+    return (r) => { tally[r]++; const b = nums.querySelectorAll('b'); b[0].textContent = tally.t; b[1].textContent = tally.w; b[2].textContent = tally.l; dots.append(h('i', { class: r })); };
+  };
+  const run = (strong, weak, title, sub) => {
+    const push = draw(title, sub);
+    let k = 0; const N = 24;
+    const tick = () => {
+      if (k++ >= N || st.screen !== 'intro') return;
+      const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+      const m = new DuplicateMatch({ pairs: 1, cube: false, maxExtra: 0, gameDiceFn: diceFactory(seed) });
+      m.boards().forEach((g, b) => autoplay(g, (c) => (m.seatOf(c, b) === 'A' ? strong : weak)));
+      m.settle();
+      push(m.winner === 'draw' ? 't' : m.winner === 'A' ? 'w' : 'l');
+      setTimeout(tick, 30);
+    };
+    tick();
+  };
+  out.append(h('div', { class: 'faint' }, 'לחץ על אחד הכפתורים. הניסוי רץ כאן בדפדפן, עם אותו מנוע חוקים ואותו בוט של המשחק.'));
+  return [
+    h('div', {}, h('div', { class: 'eyebrow' }, 'תבדוק בעצמך'), h('h2', {}, 'ניסוי חי: 24 סבבים בשש בש כפול'),
+      h('p', {}, 'ניסוי א\': אותו בוט מול עצמו, כלומר מיומנות זהה. אם המזל היה משפיע, היינו רואים ניצחונות לשני הצדדים.'),
+      h('p', {}, 'ניסוי ב\': בוט מומחה מול בוט מתחיל. כאן ההבדל הוא רק במיומנות.'),
+      h('div', { class: 'acts', style: 'margin-top:12px' },
+        h('button', { class: 'btn sm', onclick: () => run('expert', 'expert', 'ניסוי א\': מומחה מול מומחה', 'צפי: תיקו בכל הסבבים') }, 'הרץ ניסוי א\''),
+        h('button', { class: 'btn ghost sm', onclick: () => run('expert', 'beginner', 'ניסוי ב\': מומחה מול מתחיל', 'צפי: המומחה מנצח כמעט תמיד') }, 'הרץ ניסוי ב\''))),
+    out,
+  ];
+}
+
+function slideData() {
+  return [
+    h('div', {}, h('div', { class: 'eyebrow' }, 'המספרים המלאים'), h('h2', {}, 'ככל שהפורמט ארוך יותר, היכולת קובעת'),
+      h('p', {}, 'ציון השחקן החזק לפי פורמט (תיקו נספר כחצי). 50% פירושו הטלת מטבע, 100% פירושו מיומנות טהורה.'),
+      h('p', { class: 'faint' }, 'שחקנים ממוחשבים עם אותו מנוע הערכה. ההבדל היחיד ביניהם הוא כמות הטעויות. הקוביות הגיעו ממחולל הקוביות של המערכת. רווחי סמך של 95% מפורטים בדוח המחקר.')),
+    h('div', { class: 'bars' },
+      bar('שני שחקנים שווים · כפול · תיקו', 100, 'tie'),
+      bar('מומחה מול מתחיל · משחק בודד', STUDY.beginner.single),
+      bar('מומחה מול מתחיל · כפול 3 סבבים', STUDY.beginner.dup3),
+      bar('מומחה מול מתחיל · מאץ\' עד 7', STUDY.beginner.match7),
+      bar('מומחה מול בינוני · כפול 3 סבבים', STUDY.intermediate.dup3)),
+  ];
+}
+
+function slideMoney() {
+  return [
+    h('div', {}, h('div', { class: 'eyebrow' }, 'ומה עם כסף?'), h('h2', {}, 'איך בנוי מצב הכסף'),
+      h('p', {}, 'במצב אימון אין כסף בכלל, ולכן תנאי 1 לא מתקיים. במצב כסף אמיתי תנאי 1 מתקיים, ולכן הכל בנוי כדי שהמשחק יישאר מבוסס יכולת:')),
+    h('div', { class: 'conds' },
+      h('div', { class: 'cond' }, h('span', { class: 'k' }, '✓'), h('div', {}, h('b', {}, 'רק פורמטים ארוכים'), h('div', { class: 'muted' }, 'שש בש כפול של 2 סבבים לפחות, או מאץ\' עד 7. אין פרס על משחק בודד.'))),
+      h('div', { class: 'cond' }, h('span', { class: 'k' }, '✓'), h('div', {}, h('b', {}, 'שחקנים מול שחקנים'), h('div', { class: 'muted' }, 'הבית לא משחק נגדך. דמי הכניסה הופכים לקופת פרסים, והמערכת לוקחת עמלה קבועה של 10%.'))),
+      h('div', { class: 'cond' }, h('span', { class: 'k' }, '✓'), h('div', {}, h('b', {}, 'כללים ופרסים קבועים מראש'), h('div', { class: 'muted' }, 'שובר שוויון לפי איכות המהלכים, אף פעם לא בהגרלה. אימות זהות, גיל 18 ומעלה, מגבלות והחרגה עצמית.'))),
+      h('div', { class: 'notice warn' }, 'מצב הכסף האמיתי ייפתח לציבור רק אחרי חוות דעת משפטית כתובה. בהדגמה הזו הכסף מדומה ואין מסוף סליקה.')),
+  ];
+}
+
+// Autoplay a game with bots (used by the live experiment).
+function autoplay(g, levelOf) {
+  let guard = 0;
+  while (g.phase !== 'over' && guard++ < 3000) {
+    if (g.phase === 'roll') g.roll(g.turn);
+    else if (g.phase === 'move') { const i = chooseSequence(g.legal, g.turn, levelOf(g.turn)); g.move(g.turn, g.legal[i].moves); }
+  }
+}
+
+// =====================================================================
+// LOBBY
+// =====================================================================
+function tileArt(kind) {
+  const svg = S('svg', { viewBox: '0 0 120 120', class: 'art', 'aria-hidden': 'true' });
+  if (kind === 'dup') { const a = dieSVG(6); const b = dieSVG(6); a.setAttribute('x', 8); a.setAttribute('y', 30); a.setAttribute('width', 56); a.setAttribute('height', 56); b.setAttribute('x', 58); b.setAttribute('y', 22); b.setAttribute('width', 56); b.setAttribute('height', 56); svg.append(a, b); }
+  else if (kind === 'classic') { for (let i = 0; i < 4; i++) svg.append(S('circle', { cx: 60, cy: 30 + i * 18, r: 16, fill: i % 2 ? '#1b1714' : '#f7efdc', stroke: '#000', 'stroke-opacity': .3 })); }
+  else if (kind === 'cup') { svg.append(S('path', { d: 'M35 20h50v18a25 25 0 0 1-50 0z', fill: '#e0b04a' }), S('rect', { x: 52, y: 62, width: 16, height: 16, fill: '#b98a2a' }), S('rect', { x: 40, y: 78, width: 40, height: 10, rx: 3, fill: '#e0b04a' })); }
+  else { svg.append(S('rect', { x: 22, y: 36, width: 76, height: 50, rx: 10, fill: '#8c6418' }), S('rect', { x: 22, y: 30, width: 76, height: 18, rx: 8, fill: '#e0b04a' }), S('circle', { cx: 84, cy: 62, r: 7, fill: '#2a1b02' })); }
+  return svg;
+}
+
+function seg(options, value, onpick) {
+  return h('div', { class: 'seg', role: 'group' }, options.map(([v, l]) => h('button', { type: 'button', 'aria-pressed': String(v === value), onclick: () => onpick(v) }, l)));
+}
+
+function viewLobby() {
+  const s = st.setup;
+  const lens = s.mode === 'duplicate' ? [[1, 'סבב'], [2, '2 סבבים'], [3, '3 סבבים']] : [[1, 'משחק'], [3, 'עד 3'], [5, 'עד 5'], [7, 'עד 7']];
+  if (!lens.some(([v]) => v === s.len)) s.len = lens[0][0];
+  return h('div', { class: 'lobby' },
+    h('div', { class: 'lobby-hero' },
+      h('div', {}, h('div', { class: 'eyebrow' }, 'הלובי'), h('h2', {}, 'לאיזה שולחן הולכים?')),
+      h('div', { class: 'faint num' }, `שיחקת ${st.stats.played} · ניצחת ${st.stats.won}`)),
+    h('div', { class: 'tiles' },
+      h('button', { class: 'tile', onclick: () => { s.mode = 'duplicate'; s.len = 1; startPractice(); } }, tileArt('dup'), h('span', { class: 'tag' }, 'מומלץ'), h('h3', {}, 'שש בש כפול'), h('p', {}, 'שני לוחות, אותן קוביות. מי שמשחק טוב יותר מנצח.')),
+      h('button', { class: 'tile', onclick: () => { s.mode = 'classic'; s.len = 5; startPractice(); } }, tileArt('classic'), h('span', { class: 'tag' }, 'קלאסי'), h('h3', {}, 'מאץ\' עד 5'), h('p', {}, 'שש בש מסורתי עם קוביית הכפלה וכלל קרופורד.')),
+      h('button', { class: 'tile gold', onclick: () => go('tours') }, tileArt('cup'), h('span', { class: 'tag' }, '₪ הדגמה'), h('h3', {}, 'טורנירים על כסף'), h('p', {}, 'דמי כניסה, קופת פרסים ועמלה. רק בפורמטים של מיומנות.')),
+      h('button', { class: 'tile', onclick: () => go('wallet') }, tileArt('wallet'), h('span', { class: 'tag' }, 'ארנק'), h('h3', {}, 'הארנק שלי'), h('p', {}, 'אימות זהות, הפקדה ומשיכה, מגבלות ומשחק אחראי.'))),
+    h('div', { class: 'panel' },
+      h('div', { class: 'eyebrow', style: 'margin-bottom:10px' }, 'שולחן אימון מותאם'),
+      h('div', { class: 'setup' },
+        h('div', {}, h('div', { class: 'faint' }, 'מצב'), seg([['duplicate', 'כפול'], ['classic', 'קלאסי']], s.mode, (v) => { s.mode = v; render(); })),
+        h('div', {}, h('div', { class: 'faint' }, 'אורך'), seg(lens, s.len, (v) => { s.len = v; render(); })),
+        h('div', {}, h('div', { class: 'faint' }, 'יריב'), seg([['beginner', 'מתחיל'], ['intermediate', 'בינוני'], ['strong', 'חזק'], ['expert', 'מומחה']], s.level, (v) => { s.level = v; render(); })),
+        h('button', { class: 'btn', onclick: startPractice }, 'לשולחן'))));
+}
+
+// =====================================================================
+// GAME CONTROLLER
+// =====================================================================
+function hash32(a, b, c, d) { let x = 0x9e3779b9 ^ a; for (const y of [b, c, d]) { x = Math.imul(x ^ y, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16; } return x >>> 0; }
+function diceFactory(seed) { return (gk) => (ri) => { const o = []; let k = 0; while (o.length < 2) { const v = hash32(seed, gk, ri, k++) & 0xff; if (v < 252) o.push((v % 6) + 1); } return o; }; }
+
+const G = { M: null, cfg: null, timers: [], pending: new Set(), partial: new Map(), selected: null, last: new Map(), rolled: new Set(), onEnd: null, ended: false };
+function stopTimers() { G.timers.forEach(clearTimeout); G.timers = []; G.pending = new Set(); }
+const LEVEL_NAME = { beginner: 'בוט מתחיל', intermediate: 'בוט בינוני', strong: 'בוט חזק', expert: 'בוט מומחה' };
+
+function startPractice() { startMatch({ ...st.setup, oppName: LEVEL_NAME[st.setup.level], label: 'שולחן אימון', cash: false }); }
+
+function startMatch(cfg, onEnd = null) {
+  stopTimers();
+  const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+  G.cfg = cfg; G.onEnd = onEnd; G.ended = false;
+  G.M = cfg.mode === 'duplicate'
+    ? new DuplicateMatch({ pairs: cfg.len, cube: false, gameDiceFn: diceFactory(seed) })
+    : new ClassicMatch({ target: cfg.len, cube: cfg.len > 1, gameDiceFn: diceFactory(seed) });
+  G.partial = new Map(); G.selected = null; G.last = new Map(); G.rolled = new Set();
+  st.screen = 'table';
+  step();
+}
+
+const colorOf = (seat, b) => (G.M.kind === 'duplicate' ? G.M.colorOf(seat, b) : G.M.colorOf(seat));
+const seatOf = (color, b) => (G.M.kind === 'duplicate' ? G.M.seatOf(color, b) : G.M.seatOf(color));
+const actor = (g, b) => (g.phase === 'over' ? null : seatOf(g.phase === 'doubled' ? other(g.turn) : g.turn, b));
+
+function step() {
+  const before = G.M.kind === 'duplicate' ? G.M.rounds.length : G.M.games.length;
+  G.M.settle();
+  const after = G.M.kind === 'duplicate' ? G.M.rounds.length : G.M.games.length;
+  if (after !== before) { G.partial = new Map(); G.last = new Map(); toast(G.M.kind === 'duplicate' ? `סבב ${after} מתחיל` : `משחק ${after} מתחיל`); }
+  if (st.screen === 'table') render();
+  if (G.M.over) { if (!G.ended) { G.ended = true; finishMatch(); } return; }
+  G.M.boards().forEach((g, b) => {
+    const seat = actor(g, b);
+    if (!seat) return;
+    const key = b + ':' + seat;
+    if (G.pending.has(key)) return;
+    if (seat === 'B') { G.pending.add(key); const m0 = G.M; G.timers.push(setTimeout(() => { G.pending.delete(key); if (G.M === m0) botStep(g, b); }, 650)); }
+    else if (g.phase === 'roll' && g.rollIsForced()) { G.pending.add(key); const m0 = G.M; G.timers.push(setTimeout(() => { G.pending.delete(key); if (G.M === m0 && g.phase === 'roll' && actor(g, b) === 'A') { g.roll(g.turn); sfx.dice(); step(); } }, 380)); }
+  });
+}
+
+function recordLast(b, color, moves, before) {
+  G.last.set(b, { color, moves });
+  if (before && moves.some((m) => m.to !== OFF && oppCount(before, color, m.to) === 1)) sfx.hit(); else sfx.click();
+}
+
+function botStep(g, b) {
+  if (g.phase === 'over' || actor(g, b) !== 'B') return;
+  const lv = G.cfg.level;
+  if (g.phase === 'doubled') { const me = colorOf('B', b); if (shouldTake(g.state, me, lv)) { g.take(me); toast('הבוט קיבל את ההכפלה'); } else { g.drop(me); toast('הבוט ויתר'); } }
+  else if (g.phase === 'roll') { if (g.canDouble(g.turn) && shouldDouble(g.state, g.turn, lv)) { g.double(g.turn); toast(`הבוט מכפיל ל-${g.cube.value * 2}`); } else { g.roll(g.turn); sfx.dice(); } }
+  else if (g.phase === 'move') { const c = g.turn; const before = g.state; const i = chooseSequence(g.legal, c, lv); const mv = g.legal[i].moves; g.move(c, mv); recordLast(b, c, mv, before); }
+  step();
+}
+
+function finishMatch() {
+  const M = G.M;
+  const won = M.winner === 'A'; const draw = M.winner === 'draw';
+  st.stats.played++; if (won) st.stats.won++; store.set('stats', st.stats);
+  if (won) { sfx.win(); confetti(); } else if (!draw) sfx.lose();
+  const next = G.onEnd;
+  const close = () => { $('.overlay')?.remove(); if (next) next(M.winner); else go('lobby'); };
+  const again = () => { $('.overlay')?.remove(); startMatch(G.cfg, G.onEnd); };
+  document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'ov-t' },
+    h('div', { class: 'card' },
+      h('h2', { id: 'ov-t' }, draw ? 'תיקו!' : won ? 'ניצחת!' : 'הפסד'),
+      h('div', { class: 'num', style: 'font-family:var(--display);font-size:2rem' }, `${M.score.A} : ${M.score.B}`),
+      h('p', { class: 'muted' }, draw ? 'שיחקתם באותה רמה בדיוק, עם אותן קוביות.' : M.kind === 'duplicate' ? 'עם אותן קוביות בדיוק. ההבדל היה במהלכים.' : won ? 'יפה מאוד.' : 'הקוביות היו אותן קוביות. נסה שוב.'),
+      h('div', { class: 'acts', style: 'justify-content:center' },
+        next ? h('button', { class: 'btn', onclick: close }, 'המשך בטורניר') : [h('button', { class: 'btn', onclick: again }, 'עוד משחק'), h('button', { class: 'btn ghost', onclick: close }, 'ללובי')]))));
+}
+
+// ----- human move entry -----
+const fullDice = (d) => (d[0] === d[1] ? [d[0], d[0], d[0], d[0]] : [...d]);
+function getPartial(g, b) {
+  let p = G.partial.get(b);
+  if (!p || p.rollIndex !== g.rollIndex || p.plies !== g.plies) { p = { state: g.state, moves: [], remaining: fullDice(g.dice), rollIndex: g.rollIndex, plies: g.plies }; G.partial.set(b, p); }
+  return p;
+}
+function sourcesOf(s, c) { if (s.bar[c] > 0) return [BAR]; const o = []; for (let i = 23; i >= 0; i--) if (ownCount(s, c, i) > 0) o.push(i); return o; }
+function reachable(s, c, rem, finals, full, used) {
+  if (used === full) return finals.has(stateKey(s));
+  const tried = new Set();
+  for (let i = 0; i < rem.length; i++) {
+    if (tried.has(rem[i])) continue; tried.add(rem[i]);
+    for (const from of sourcesOf(s, c)) {
+      const to = singleTarget(s, c, from, rem[i]); if (to === null) continue;
+      const r2 = rem.slice(); r2.splice(i, 1);
+      if (reachable(applyMove(s, c, { from, to }), c, r2, finals, full, used + 1)) return true;
+    }
+  }
+  return false;
+}
+function nextMoves(g, b) {
+  if (g.phase !== 'move' || actor(g, b) !== 'A') return [];
+  const c = g.turn; const p = getPartial(g, b); const full = g.legal[0].moves.length;
+  if (p.moves.length >= full) return [];
+  const finals = new Set(g.legal.map((l) => stateKey(l.state)));
+  const out = []; const tried = new Set();
+  for (let i = 0; i < p.remaining.length; i++) {
+    const die = p.remaining[i]; if (tried.has(die)) continue; tried.add(die);
+    for (const from of sourcesOf(p.state, c)) {
+      const to = singleTarget(p.state, c, from, die); if (to === null) continue;
+      const r2 = p.remaining.slice(); r2.splice(i, 1);
+      if (reachable(applyMove(p.state, c, { from, to }), c, r2, finals, full, p.moves.length + 1)) out.push({ from, to, die, dieIndex: i });
+    }
+  }
+  return out;
+}
+function playMove(g, b, mv) {
+  const p = getPartial(g, b);
+  const before = p.state;
+  p.state = applyMove(p.state, g.turn, mv); p.moves.push({ from: mv.from, to: mv.to }); p.remaining.splice(mv.dieIndex, 1);
+  if (mv.to !== OFF && oppCount(before, g.turn, mv.to) === 1) sfx.hit(); else sfx.click();
+  G.selected = null;
+  if (p.moves.length === g.legal[0].moves.length) {
+    const c = g.turn; g.move(c, p.moves); G.last.set(b, { color: c, moves: p.moves.slice() }); G.partial.delete(b); step();
+  } else render();
+}
+function onPoint(g, b, idx) {
+  const moves = nextMoves(g, b);
+  if (!moves.length) return;
+  if (G.selected && G.selected.b === b) {
+    const ch = moves.filter((m) => m.from === G.selected.from && m.to === idx).sort((x, y) => x.die - y.die);
+    if (ch.length) { playMove(g, b, ch[0]); return; }
+  }
+  const from = moves.filter((m) => m.from === idx);
+  if (from.length) {
+    // Single possible destination → move immediately (fast play).
+    const dests = [...new Set(from.map((m) => m.to))];
+    if (dests.length === 1 && G.selected?.b === b && G.selected.from === idx) { playMove(g, b, from[0]); return; }
+    G.selected = { b, from: idx };
+  } else G.selected = null;
+  render();
+}
+
+// =====================================================================
+// TABLE VIEW
+// =====================================================================
+const W = 780; const H = 540; const COLW = 54; const BARW = 42; const PAD = 22; const OFFW = 50;
+const colX = (c) => PAD + c * COLW + (c >= 6 ? BARW : 0);
+const pos = (i) => (i <= 11 ? { col: 11 - i, top: false } : { col: i - 12, top: true });
+const CR = 21;
+
+function boardDefs(svg) {
+  const d = S('defs');
+  const lg = (id, a, b, x2 = 0, y2 = 1) => { const g = S('linearGradient', { id, x1: 0, y1: 0, x2, y2 }); g.append(S('stop', { offset: 0, 'stop-color': a }), S('stop', { offset: 1, 'stop-color': b })); return g; };
+  const rg = (id, a, b, c) => { const g = S('radialGradient', { id, cx: '38%', cy: '32%', r: '70%' }); g.append(S('stop', { offset: 0, 'stop-color': a }), S('stop', { offset: .55, 'stop-color': b }), S('stop', { offset: 1, 'stop-color': c })); return g; };
+  d.append(lg('frame', '#6b3f1d', '#2c170a'), lg('field', '#1d5a43', '#0f3a2b'), lg('ptA', '#c75a34', '#7a2410'), lg('ptB', '#f2e2bd', '#c7ab78'), lg('barG', '#4a2a12', '#241306', 1, 0));
+  d.append(rg('chkW', '#ffffff', '#efe4c8', '#b9a983'), rg('chkB', '#5d544c', '#221d19', '#0a0807'));
+  const f = S('filter', { id: 'grain' }); f.append(S('feTurbulence', { type: 'fractalNoise', baseFrequency: '.9 .04', numOctaves: 2, seed: 3 }), S('feColorMatrix', { values: '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0' }), S('feComposite', { operator: 'in', in2: 'SourceGraphic' }));
+  const sh = S('filter', { id: 'chkShadow', x: '-30%', y: '-30%', width: '160%', height: '160%' }); sh.append(S('feDropShadow', { dx: 0, dy: 3, stdDeviation: 2.2, 'flood-opacity': .55 }));
+  d.append(f, sh);
+  svg.append(d);
+}
+
+function checker(svg, cx, cy, color, lit, r = CR) {
+  const g = S('g', { filter: 'url(#chkShadow)' });
+  g.append(S('circle', { cx, cy, r, fill: color === 'w' ? 'url(#chkW)' : 'url(#chkB)', stroke: lit ? 'var(--brass-hi)' : color === 'w' ? '#8b7b58' : '#000', 'stroke-width': lit ? 4 : 1.2 }));
+  g.append(S('circle', { cx, cy, r: r * .62, fill: 'none', stroke: color === 'w' ? 'rgba(120,100,60,.45)' : 'rgba(255,255,255,.12)', 'stroke-width': 1.5 }));
+  svg.append(g);
+}
+
+function renderBoard(g, b) {
+  const me = colorOf('A', b); const op = other(me);
+  const mine = actor(g, b) === 'A';
+  const moving = mine && g.phase === 'move';
+  const p = moving ? getPartial(g, b) : null;
+  const s = p ? p.state : g.state;
+  const moves = moving ? nextMoves(g, b) : [];
+  const srcs = new Set(moves.map((m) => m.from));
+  const sel = G.selected && G.selected.b === b ? G.selected.from : null;
+  const dests = new Set(sel != null ? moves.filter((m) => m.from === sel).map((m) => m.to) : []);
+  const last = G.last.get(b);
+  const lastPts = new Set();
+  if (last && !moving) for (const m of last.moves) { lastPts.add(toOwn(me, toAbs(last.color, m.from === BAR ? 24 : m.from))); if (m.to !== OFF) lastPts.add(toOwn(me, toAbs(last.color, m.to))); }
+
+  const svg = S('svg', { class: 'board', viewBox: `0 0 ${W + OFFW} ${H}`, role: 'group', 'aria-label': `לוח ${b + 1}` });
+  boardDefs(svg);
+  svg.append(S('rect', { x: 0, y: 0, width: W + OFFW, height: H, rx: 18, fill: 'url(#frame)' }));
+  svg.append(S('rect', { x: 0, y: 0, width: W + OFFW, height: H, rx: 18, fill: '#a0703a', filter: 'url(#grain)' }));
+  svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: H - 2 * PAD, rx: 6, fill: 'url(#field)' }));
+  svg.append(S('rect', { x: PAD + COLW * 6, y: PAD - 6, width: BARW, height: H - 2 * PAD + 12, rx: 4, fill: 'url(#barG)' }));
+  for (let i = 0; i < 24; i++) {
+    const { col, top } = pos(i); const x = colX(col);
+    const tip = 205;
+    const tri = top ? `${x + 2},${PAD} ${x + COLW - 2},${PAD} ${x + COLW / 2},${PAD + tip}` : `${x + 2},${H - PAD} ${x + COLW - 2},${H - PAD} ${x + COLW / 2},${H - PAD - tip}`;
+    svg.append(S('polygon', { points: tri, fill: i % 2 ? 'url(#ptA)' : 'url(#ptB)', opacity: .95 }));
+    if (lastPts.has(i)) svg.append(S('polygon', { points: tri, fill: 'rgba(124,196,255,.22)' }));
+    if (dests.has(i) || sel === i) svg.append(S('polygon', { points: tri, fill: 'rgba(255,215,122,.28)', stroke: 'var(--brass-hi)', 'stroke-width': 2.5 }));
+    const nMe = ownCount(s, me, i); const nOp = oppCount(s, me, i); const n = nMe || nOp; const c = nMe ? me : op;
+    const step = n > 5 ? (tip - 2 * CR + 8) / (n - 1) : 2 * CR;
+    for (let k = 0; k < n; k++) {
+      const cy = top ? PAD + CR + 2 + k * Math.min(step, 2 * CR) : H - PAD - CR - 2 - k * Math.min(step, 2 * CR);
+      checker(svg, x + COLW / 2, cy, c, srcs.has(i) && sel == null && k === n - 1);
+    }
+    if (dests.has(i)) {
+      const k = Math.min(n, 4);
+      svg.append(S('circle', { cx: x + COLW / 2, cy: top ? PAD + CR + 2 + k * 2 * CR : H - PAD - CR - 2 - k * 2 * CR, r: 9, fill: 'var(--brass-hi)', class: 'dest' }));
+    }
+    svg.append(S('text', { x: x + COLW / 2, y: top ? 15 : H - 6, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: 'rgba(255,240,210,.55)' }, i + 1));
+    const hit = S('rect', { x, y: top ? PAD : H / 2, width: COLW, height: H / 2 - PAD, fill: 'transparent', class: 'pt-hit', tabindex: srcs.has(i) || dests.has(i) ? 0 : -1, role: 'button', 'aria-label': `נקודה ${i + 1}: ${nMe ? `${nMe} שלך` : nOp ? `${nOp} של היריב` : 'ריקה'}${srcs.has(i) ? ' · אפשר להזיז' : ''}${dests.has(i) ? ' · יעד' : ''}` });
+    hit.addEventListener('click', () => onPoint(g, b, i));
+    hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPoint(g, b, i); } });
+    svg.append(hit);
+  }
+  const bx = PAD + COLW * 6 + BARW / 2;
+  for (const [c, top] of [[op, true], [me, false]]) {
+    const n = s.bar[c]; const lit = c === me && srcs.has(BAR);
+    for (let k = 0; k < Math.min(n, 4); k++) checker(svg, bx, top ? H / 2 - 36 - k * 34 : H / 2 + 36 + k * 34, c, lit && k === Math.min(n, 4) - 1, 17);
+    if (n > 4) svg.append(S('text', { x: bx, y: top ? H / 2 - 12 : H / 2 + 20, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 800 }, '×' + n));
+  }
+  const barHit = S('rect', { x: PAD + COLW * 6, y: H / 2, width: BARW, height: H / 2 - PAD, fill: 'transparent', class: 'pt-hit', role: 'button', tabindex: srcs.has(BAR) ? 0 : -1, 'aria-label': 'בר' });
+  barHit.addEventListener('click', () => onPoint(g, b, BAR)); svg.append(barHit);
+  // bear-off tray
+  const ox = W + 2; const tw = OFFW - 6;
+  svg.append(S('rect', { x: ox, y: PAD, width: tw, height: H - 2 * PAD, rx: 8, fill: dests.has(OFF) ? 'rgba(255,215,122,.35)' : 'rgba(0,0,0,.35)', stroke: dests.has(OFF) ? 'var(--brass-hi)' : 'none', 'stroke-width': 2.5 }));
+  for (const [c, top] of [[op, true], [me, false]]) {
+    const n = s.off[c];
+    for (let k = 0; k < n; k++) svg.append(S('rect', { x: ox + 6, y: top ? PAD + 6 + k * 13 : H - PAD - 16 - k * 13, width: tw - 12, height: 10, rx: 3, fill: c === 'w' ? '#efe4c8' : '#2b2420', stroke: '#000', 'stroke-opacity': .4 }));
+  }
+  const offHit = S('rect', { x: ox, y: H / 2, width: tw, height: H / 2 - PAD, fill: 'transparent', class: 'pt-hit', role: 'button', tabindex: dests.has(OFF) ? 0 : -1, 'aria-label': 'הוצאה' });
+  offHit.addEventListener('click', () => onPoint(g, b, OFF)); svg.append(offHit);
+
+  // header + tray
+  const reasons = { single: 'רגיל', gammon: 'גמון ×2', backgammon: 'בקגמון ×3', drop: 'ויתור', resign: 'פרישה' };
+  let statusText; let hot = false;
+  if (g.phase === 'over') statusText = `${g.result.winner === me ? 'ניצחת' : 'הפסדת'} · ${g.result.points} (${reasons[g.result.reason]})`;
+  else if (mine && g.phase === 'doubled') { statusText = `הכפלה ל-${g.cube.value * 2}!`; hot = true; }
+  else if (mine) { statusText = g.phase === 'move' ? 'תורך – בחר כלי' : 'תורך'; hot = true; }
+  else statusText = 'היריב משחק…';
+  const key = `${b}:${g.rollIndex}`;
+  const fresh = g.dice && !G.rolled.has(key); if (fresh) G.rolled.add(key);
+  const diceEls = g.dice ? (g.dice[0] === g.dice[1]
+    ? [0, 1, 2, 3].map((k) => dieSVG(g.dice[0], (fresh ? 'roll ' : '') + (p && k < 4 - p.remaining.length ? 'used' : '')))
+    : g.dice.map((d) => dieSVG(d, (fresh ? 'roll ' : '') + (p && !p.remaining.includes(d) ? 'used' : '')))) : [];
+  const canDouble = mine && g.canDouble(me);
+  const act = (fn) => () => { fn(); step(); };
+  const pips = { me: pipCount(g.state, me), op: pipCount(g.state, op) };
+  return h('section', { class: 'boardcard' + (mine && g.phase !== 'over' ? ' active' : '') },
+    h('div', { class: 'bh' },
+      h('span', { class: 't' }, G.M.kind === 'duplicate' ? `לוח ${b + 1} · אתה ${me === 'w' ? 'לבן' : 'שחור'}` : `אתה ${me === 'w' ? 'לבן' : 'שחור'}`),
+      h('span', { class: 'status' + (hot ? ' go' : '') }, statusText)),
+    svg,
+    h('div', { class: 'tray' },
+      h('div', { class: 'dicebox' }, diceEls),
+      h('div', { class: 'acts' },
+        canDouble ? h('button', { class: 'btn sm', onclick: act(() => { g.roll(me); sfx.dice(); }) }, 'הטל קוביות') : null,
+        canDouble ? h('button', { class: 'btn ghost sm', onclick: act(() => g.double(me)) }, `הכפל ×${g.cube.value * 2}`) : null,
+        mine && g.phase === 'doubled' ? h('button', { class: 'btn sm', onclick: act(() => g.take(me)) }, 'קבל') : null,
+        mine && g.phase === 'doubled' ? h('button', { class: 'btn red sm', onclick: act(() => g.drop(me)) }, 'ותר') : null,
+        p && p.moves.length ? h('button', { class: 'btn ghost sm', onclick: () => { G.partial.delete(b); G.selected = null; render(); } }, 'בטל') : null),
+      h('div', { class: 'meta' }, `פיפס ${pips.me} · ${pips.op}${g.cubeEnabled ? ` · קובייה ×${g.cube.value}` : ''}${g.crawford ? ' · קרופורד' : ''}`)));
+}
+
+function viewTable() {
+  const M = G.M; const cfg = G.cfg;
+  const kind = M.kind === 'duplicate' ? (M.pairs === 1 ? 'כפול · סבב אחד' : `כפול · ${M.pairs} סבבים · סבב ${M.rounds.length}`) : (M.target === 1 ? 'משחק בודד' : `מאץ' עד ${M.target}`);
+  return h('div', {},
+    h('div', { class: 'hud' },
+      h('div', { class: 'player' }, h('div', { class: 'avatar me', 'aria-hidden': 'true' }, '★'), h('div', {}, h('div', { class: 'nm' }, 'אתה'), h('div', { class: 'sub' }, cfg.cash ? `טורניר ${cfg.label}` : cfg.label))),
+      h('div', { class: 'scorebox' }, h('div', { class: 's num' }, `${M.score.A} : ${M.score.B}`), h('div', { class: 'm' }, kind)),
+      h('div', { class: 'player opp' }, h('div', { class: 'avatar bot', 'aria-hidden': 'true' }, cfg.cash ? (cfg.oppName || '?')[0] : '🤖'), h('div', {}, h('div', { class: 'nm' }, cfg.oppName), h('div', { class: 'sub' }, cfg.cash ? 'יריב מדומה (הדגמה)' : 'יריב ממוחשב')))),
+    h('div', { class: 'boards' }, M.boards().map((g, b) => renderBoard(g, b))),
+    h('div', { class: 'acts', style: 'margin-top:14px;justify-content:space-between' },
+      h('span', { class: 'faint' }, 'לחץ על כלי מוזהב ואז על היעד שלו. לחיצה כפולה על כלי עם יעד יחיד מזיזה אותו מיד.'),
+      cfg.cash ? null : h('button', { class: 'btn ghost sm', onclick: () => go('lobby') }, 'יציאה ללובי')));
+}
+
+// =====================================================================
+// WALLET (demo money · no payment terminal)
+// =====================================================================
+function validIsraeliId(id) {
+  const s = String(id || '').replace(/\D/g, ''); if (s.length < 5 || s.length > 9) return false;
+  const p = s.padStart(9, '0'); let sum = 0;
+  for (let i = 0; i < 9; i++) { let d = Number(p[i]) * ((i % 2) + 1); if (d > 9) d -= 9; sum += d; }
+  return sum % 10 === 0;
+}
+function ledger(kind, amount, note) { st.wallet.balance += amount; st.wallet.history.unshift({ at: Date.now(), kind, amount, note }); st.wallet.history = st.wallet.history.slice(0, 40); saveWallet(); }
+const DAY = 86400000;
+const sumKind = (kinds, ms) => st.wallet.history.filter((x) => kinds.includes(x.kind) && Date.now() - x.at < ms).reduce((a, x) => a + x.amount, 0);
+function excluded() { return st.wallet.excludedUntil && st.wallet.excludedUntil > Date.now(); }
+
+function viewWallet() {
+  const w = st.wallet;
+  const kyc = w.kyc;
+  const kycPanel = kyc
+    ? h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'אימות זהות'), h('h3', {}, '✅ מאומת'), h('p', { class: 'muted' }, `${kyc.name} · ת"ז ‎•••••${kyc.last3}`), h('p', { class: 'faint' }, 'בגרסה האמיתית האימות מתבצע מול ספק אימות זהות, ונשמר רק המינימום הנדרש.'))
+    : h('form', { class: 'panel', onsubmit: (e) => {
+      e.preventDefault(); const f = e.target.elements;
+      const name = f.kname.value.trim(); const id = f.kid.value; const dob = new Date(f.kdob.value);
+      if (name.split(/\s+/).length < 2) return toast('יש להזין שם פרטי ושם משפחה');
+      if (!validIsraeliId(id)) return toast('מספר תעודת הזהות לא תקין (ספרת ביקורת)');
+      if (!(Date.now() - dob.getTime() >= 18 * 365.2425 * DAY)) return toast('משחק בכסף מגיל 18 בלבד');
+      w.kyc = { name, last3: String(id).slice(-3), at: Date.now() }; saveWallet(); toast('הזהות אומתה (הדגמה)'); render();
+    } },
+    h('div', { class: 'eyebrow' }, 'שלב 1'), h('h3', { style: 'font-family:var(--display);font-size:1.4rem' }, 'אימות זהות'),
+    h('p', { class: 'muted' }, 'משחק בכסף מותר רק אחרי אימות זהות וגיל 18 ומעלה. אחד לכל אדם.'),
+    h('div', { class: 'row' },
+      h('label', { class: 'f', for: 'kname' }, 'שם מלא', h('input', { id: 'kname', name: 'kname', required: true, autocomplete: 'name' })),
+      h('label', { class: 'f', for: 'kid' }, 'תעודת זהות', h('input', { id: 'kid', name: 'kid', inputmode: 'numeric', required: true, placeholder: '9 ספרות' })),
+      h('label', { class: 'f', for: 'kdob' }, 'תאריך לידה', h('input', { id: 'kdob', name: 'kdob', type: 'date', required: true }))),
+    h('div', { class: 'acts' }, h('button', { class: 'btn' }, 'אמת זהות'), h('span', { class: 'faint' }, 'לבדיקה: 000000018')));
+
+  const amounts = [5000, 10000, 20000];
+  const dep = (a) => {
+    if (!w.kyc) return toast('צריך לאמת זהות קודם');
+    if (excluded()) return toast('החשבון בהחרגה עצמית');
+    if (w.limits.depositDaily != null && sumKind(['deposit'], DAY) + a > w.limits.depositDaily) return toast('חריגה ממגבלת ההפקדה היומית');
+    ledger('deposit', a, 'הפקדה (הדגמה, בלי מסוף סליקה)'); toast(`הופקדו ${shekel(a)} של כסף מדומה`); render();
+  };
+  return h('div', { class: 'lobby' },
+    h('div', { class: 'lobby-hero' }, h('div', {}, h('div', { class: 'eyebrow' }, 'ארנק'), h('h2', {}, 'הארנק שלי')), h('button', { class: 'btn ghost sm', onclick: () => go('lobby') }, 'ללובי')),
+    h('div', { class: 'notice' }, 'הדגמה: הכסף כאן מדומה ומסוף הסליקה לא מחובר. כל התהליכים (אימות, הפקדה, מגבלות, דמי כניסה, עמלה, מס ומשיכה) עובדים כמו בגרסה האמיתית, שתיפתח רק אחרי אישור משפטי.'),
+    h('div', { class: 'grid2' },
+      h('div', { class: 'panel' },
+        h('div', { class: 'eyebrow' }, 'יתרה'), h('div', { class: 'balance num' }, shekel(w.balance)),
+        h('div', { class: 'faint num' }, `הופקד ב-24 שעות: ${shekel(sumKind(['deposit'], DAY))} · הפסד נטו ב-30 יום: ${shekel(Math.max(0, -sumKind(['entry', 'prize', 'refund'], 30 * DAY)))}`),
+        h('div', { class: 'acts', style: 'margin-top:12px' }, amounts.map((a) => h('button', { class: 'btn sm', onclick: () => dep(a), disabled: !w.kyc || excluded() }, `הפקד ${shekel(a)}`))),
+        h('div', { class: 'acts', style: 'margin-top:8px' }, h('button', { class: 'btn ghost sm', disabled: !w.kyc || w.balance < 5000, onclick: () => { ledger('withdraw', -w.balance, 'משיכה לחשבון בנק על שם בעל החשבון (הדגמה)'); toast('בקשת המשיכה התקבלה'); render(); } }, 'משוך הכל'),
+          h('span', { class: 'faint' }, 'משיכה רק לחשבון בנק על שם בעל החשבון המאומת. מינימום ₪50.'))),
+      kycPanel,
+      h('form', { class: 'panel', onsubmit: (e) => {
+        e.preventDefault(); const f = e.target.elements;
+        const val = (x) => (x.value === '' ? null : Math.round(Number(x.value) * 100));
+        const nd = val(f.ldep); const nl = val(f.lloss);
+        const raise = (o, n) => o != null && (n == null || n > o);
+        if (raise(w.limits.depositDaily, nd) || raise(w.limits.lossMonthly, nl)) toast('העלאת מגבלה תיכנס לתוקף בעוד 24 שעות (בגרסה האמיתית)');
+        else toast('המגבלות עודכנו');
+        if (!raise(w.limits.depositDaily, nd)) w.limits.depositDaily = nd;
+        if (!raise(w.limits.lossMonthly, nl)) w.limits.lossMonthly = nl;
+        saveWallet(); render();
+      } },
+      h('div', { class: 'eyebrow' }, 'משחק אחראי'), h('h3', { style: 'font-family:var(--display);font-size:1.4rem' }, 'מגבלות'),
+      h('div', { class: 'row' },
+        h('label', { class: 'f', for: 'ldep' }, 'הפקדה יומית (₪)', h('input', { id: 'ldep', name: 'ldep', type: 'number', min: 0, value: w.limits.depositDaily == null ? '' : w.limits.depositDaily / 100 })),
+        h('label', { class: 'f', for: 'lloss' }, 'הפסד חודשי (₪)', h('input', { id: 'lloss', name: 'lloss', type: 'number', min: 0, value: w.limits.lossMonthly == null ? '' : w.limits.lossMonthly / 100 }))),
+      h('div', { class: 'acts' }, h('button', { class: 'btn sm' }, 'שמור'),
+        h('button', { type: 'button', class: 'btn red sm', onclick: () => { w.excludedUntil = Date.now() + 7 * DAY; saveWallet(); toast('החשבון הוחרג ל-7 ימים'); render(); } }, 'החרגה עצמית (7 ימים)')),
+      excluded() ? h('p', { class: 'notice warn' }, `בהחרגה עצמית עד ${new Date(w.excludedUntil).toLocaleDateString('he-IL')}`) : null,
+      h('p', { class: 'faint' }, 'הורדת מגבלה חלה מיד. העלאה רק אחרי 24 שעות. אי אפשר לבטל החרגה לפני הזמן.')),
+      h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'תנועות'),
+        w.history.length ? h('table', { class: 'hist' }, h('tbody', {}, w.history.map((x) => h('tr', {}, h('td', {}, new Date(x.at).toLocaleDateString('he-IL')), h('td', {}, x.note), h('td', { class: x.amount >= 0 ? 'plus' : 'minus' }, (x.amount >= 0 ? '+' : '') + shekel(x.amount))))))
+          : h('p', { class: 'muted' }, 'אין עדיין תנועות.')),
+    ));
+}
+
+// =====================================================================
+// CASH TOURNAMENTS (demo)
+// =====================================================================
+const TOURS = [
+  { id: 'dup20', name: 'כפול ₪20', mode: 'duplicate', len: 2, fee: 2000, desc: 'שש בש כפול · 2 סבבים (4 לוחות)' },
+  { id: 'c7_50', name: 'מאץ\' ₪50', mode: 'classic', len: 7, fee: 5000, desc: 'קלאסי · מאץ\' עד 7 עם קוביית הכפלה' },
+];
+const RAKE = 10; const TAX = 0.25; const SPLIT = [0.7, 0.3];
+const OPP = [['דני', 'intermediate'], ['מאיה', 'strong'], ['יוסי', 'beginner'], ['רונית', 'intermediate'], ['אבי', 'strong'], ['נועה', 'beginner']];
+
+function payoutPlan(fee) {
+  const pool = fee * 4; const rake = Math.floor(pool * RAKE / 100); const net = pool - rake;
+  const first = Math.floor(net * SPLIT[0]); const second = net - first;
+  const tax = (gross) => Math.floor(Math.max(0, gross - fee) * TAX);
+  return { pool, rake, net, first, second, tax1: tax(first), tax2: tax(second) };
+}
+
+function viewTours() {
+  const t = st.tour;
+  if (t) return viewTourProgress(t);
+  return h('div', { class: 'lobby' },
+    h('div', { class: 'lobby-hero' }, h('div', {}, h('div', { class: 'eyebrow' }, 'טורנירים'), h('h2', {}, 'טורנירים על כסף')), h('button', { class: 'btn ghost sm', onclick: () => go('lobby') }, 'ללובי')),
+    h('div', { class: 'notice' }, 'הדגמה: הכסף מדומה. בגרסה האמיתית משחקים רק מול בני אדם. כאן, כדי להראות את התהליך, היריבים הם בוטים עם שמות.'),
+    h('div', { class: 'grid2' }, TOURS.map((tt) => {
+      const pp = payoutPlan(tt.fee);
+      return h('div', { class: 'panel tcard' },
+        h('div', { class: 'eyebrow' }, '4 שחקנים · הדחה'), h('h3', {}, tt.name), h('div', { class: 'muted' }, tt.desc),
+        h('dl', { class: 'kv num' },
+          h('dt', {}, 'דמי כניסה'), h('dd', {}, shekel(tt.fee)),
+          h('dt', {}, 'קופה'), h('dd', {}, shekel(pp.pool)),
+          h('dt', {}, `עמלת מערכת ${RAKE}%`), h('dd', {}, shekel(pp.rake)),
+          h('dt', {}, 'מקום 1 · 70%'), h('dd', {}, `${shekel(pp.first)} (נטו ${shekel(pp.first - pp.tax1)})`),
+          h('dt', {}, 'מקום 2 · 30%'), h('dd', {}, `${shekel(pp.second)} (נטו ${shekel(pp.second - pp.tax2)})`),
+          h('dt', {}, 'מס'), h('dd', {}, `${TAX * 100}% מהרווח נטו, בניכוי במקור`),
+          h('dt', {}, 'שובר שוויון'), h('dd', {}, 'איכות מהלכים, לא הגרלה')),
+        h('p', { class: 'faint' }, 'הכללים נקבעים לפני ההרשמה ולא משתנים אחריה.'),
+        h('button', { class: 'btn', onclick: () => joinTour(tt) }, `הירשם · ${shekel(tt.fee)}`));
+    })),
+    h('p', { class: 'faint' }, 'שיעור המס מוצג לצורך ההדגמה בלבד ויאומת מול רואה חשבון.'));
+}
+
+function joinTour(tt) {
+  const w = st.wallet;
+  if (!w.kyc) { toast('צריך לאמת זהות בארנק'); return go('wallet'); }
+  if (excluded()) return toast('החשבון בהחרגה עצמית');
+  if (w.balance < tt.fee) { toast('אין מספיק יתרה. הפקד בארנק'); return go('wallet'); }
+  const lossNow = Math.max(0, -sumKind(['entry', 'prize', 'refund'], 30 * DAY));
+  if (w.limits.lossMonthly != null && lossNow + tt.fee > w.limits.lossMonthly) return toast('חריגה ממגבלת ההפסד החודשית שהגדרת');
+  ledger('entry', -tt.fee, `דמי כניסה · ${tt.name}`);
+  const pool = OPP.slice().sort(() => Math.random() - .5).slice(0, 3).map(([name, level]) => ({ name, level }));
+  st.tour = { def: tt, opps: pool, stage: 'semi', semi2: null, finalOpp: null, result: null };
+  render();
+}
+
+function viewTourProgress(t) {
+  const [o1, o2, o3] = t.opps;
+  const sim = () => (Math.random() < 0.5 ? o2 : o3); // other semifinal (shown as completed)
+  t.semi2 ??= sim();
+  const m = (a, b, w) => h('div', { class: 'm' }, h('div', { class: w === a ? 'w' : '' }, a), h('div', { class: w === b ? 'w' : '' }, b));
+  const pp = payoutPlan(t.def.fee);
+  const semiWinner = t.stage === 'semi' ? null : t.semiResult === 'A' ? 'אתה' : o1.name;
+  const finalWinner = t.result ? (t.result.place === 1 ? 'אתה' : t.result.place === 2 ? t.semi2.name : null) : null;
+  const playSemi = () => startMatch({ mode: t.def.mode, len: t.def.len, level: o1.level, oppName: o1.name, label: t.def.name, cash: true }, (winner) => {
+    t.semiResult = winner === 'draw' ? (Math.random() < .5 ? 'A' : 'B') : winner; // demo tiebreak stands in for move-quality
+    if (t.semiResult === 'A') t.stage = 'final';
+    else { t.stage = 'done'; t.result = { place: 0 }; }
+    st.screen = 'tours'; render();
+  });
+  const playFinal = () => startMatch({ mode: t.def.mode, len: t.def.len, level: t.semi2.level, oppName: t.semi2.name, label: t.def.name + ' · גמר', cash: true }, (winner) => {
+    const won = winner === 'A' || (winner === 'draw' && Math.random() < .5);
+    const gross = won ? pp.first : pp.second; const tax = won ? pp.tax1 : pp.tax2;
+    ledger('prize', gross - tax, `פרס מקום ${won ? 1 : 2} · ${t.def.name} (אחרי ניכוי מס ${shekel(tax)})`);
+    t.stage = 'done'; t.result = { place: won ? 1 : 2, gross, tax };
+    if (won) { confetti(); sfx.win(); }
+    st.screen = 'tours'; render();
+  });
+  return h('div', { class: 'lobby' },
+    h('div', { class: 'lobby-hero' }, h('div', {}, h('div', { class: 'eyebrow' }, 'טורניר פעיל'), h('h2', {}, t.def.name)), h('div', { class: 'chip cash num' }, `קופה ${shekel(pp.pool)}`)),
+    h('div', { class: 'grid2' },
+      h('div', { class: 'panel' }, h('div', { class: 'eyebrow', style: 'margin-bottom:8px' }, 'הטבלה'),
+        h('div', { class: 'bracket' },
+          h('div', { style: 'display:grid;gap:10px' }, m('אתה', o1.name, semiWinner), m(o2.name, o3.name, t.stage === 'semi' ? null : t.semi2.name)),
+          h('div', {}, h('div', { class: 'faint', style: 'margin-bottom:4px' }, 'גמר'), t.stage === 'semi' ? h('div', { class: 'm muted' }, 'ממתין…') : m(semiWinner === 'אתה' ? 'אתה' : o1.name, t.semi2.name, finalWinner)))),
+      h('div', { class: 'panel' },
+        t.stage === 'semi' ? [h('h3', { style: 'font-family:var(--display);font-size:1.5rem' }, `חצי גמר מול ${o1.name}`), h('p', { class: 'muted' }, t.def.desc), h('button', { class: 'btn', onclick: playSemi }, 'לשולחן')] : null,
+        t.stage === 'final' ? [h('h3', { style: 'font-family:var(--display);font-size:1.5rem' }, `גמר מול ${t.semi2.name}`), h('p', { class: 'muted' }, `${t.semi2.name} ניצח/ה בחצי הגמר השני.`), h('button', { class: 'btn', onclick: playFinal }, 'לגמר')] : null,
+        t.stage === 'done' ? [
+          h('h3', { style: 'font-family:var(--display);font-size:1.6rem;color:var(--brass-hi)' }, t.result.place === 1 ? '🏆 זכית בטורניר' : t.result.place === 2 ? 'מקום שני' : 'הודחת בחצי הגמר'),
+          h('div', { class: 'receipt num' },
+            h('div', {}, h('span', {}, 'קופה (4 × דמי כניסה)'), h('span', {}, shekel(pp.pool))),
+            h('div', {}, h('span', {}, `עמלת מערכת ${RAKE}%`), h('span', {}, '−' + shekel(pp.rake))),
+            h('div', {}, h('span', {}, 'לחלוקה'), h('span', {}, shekel(pp.net))),
+            t.result.place ? h('div', {}, h('span', {}, 'הפרס שלך'), h('span', {}, shekel(t.result.gross))) : null,
+            t.result.place ? h('div', {}, h('span', {}, `ניכוי מס ${TAX * 100}% מהרווח`), h('span', {}, '−' + shekel(t.result.tax))) : null,
+            h('div', { class: 'tot' }, h('span', {}, 'נכנס לארנק'), h('span', {}, shekel(t.result.place ? t.result.gross - t.result.tax : 0)))),
+          h('div', { class: 'acts', style: 'margin-top:10px' }, h('button', { class: 'btn', onclick: () => { st.tour = null; render(); } }, 'לטורנירים'), h('button', { class: 'btn ghost', onclick: () => go('wallet') }, 'לארנק'))] : null)));
+}
+
+// =====================================================================
+// boot
+// =====================================================================
+addEventListener('keydown', (e) => { if (e.key === 'Escape') { G.selected = null; if (st.screen === 'table') render(); } });
+render();
+</script>
+
+</body>
+</html>

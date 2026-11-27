@@ -9,8 +9,9 @@
 cd shesh-besh
 npm install
 npm start          # http://localhost:3000
-npm test           # 21 בדיקות: חוקים, קוביות, שרת מקצה לקצה
+npm test           # 30 בדיקות: חוקים, קוביות, שרת מקצה לקצה, כסף אמיתי
 npm run study      # מחקר מיומנות מול מזל (כ-3.5 דקות), מעדכן את docs/skill-study.md
+node scripts/build-play.js   # בונה את גרסת המשחק העצמאית: public/play.html
 ```
 
 משתני סביבה: `PORT`, `DB_FILE` (ברירת מחדל: `data/db.json`), `ADMIN_TOKEN` (מפעיל את `/admin/stats` ו-`/admin/audit`), `BOT_DELAY_MS`, `RATE_LIMIT`.
@@ -31,6 +32,8 @@ npm run study      # מחקר מיומנות מול מזל (כ-3.5 דקות), מ
 | **גיל** | 18 ומעלה, ונשמרת רק שנת הלידה |
 | **ראיות** | `/api/evidence`: באיזו תדירות השחקן בעל הדירוג הגבוה יותר מנצח, לפי פורמט |
 | **מסמכים** | [תקנון](docs/terms.md) (כולל נספח "למה זה לא הימורים"), [מחקר מיומנות](docs/skill-study.md), [פרטיות](docs/privacy.md), [משחק אחראי](docs/responsible-play.md), [נגישות](docs/accessibility.md) |
+| **גרסת משחק** | `/play.html`: מדריך "למה זה לא הימורים" עם ניסוי חי, שולחן נגד בוטים, וארנק וטורנירים על כסף מדומה. רץ כולו בדפדפן |
+| **כסף אמיתי** | `src/server/realmoney.js`: ארנק בש"ח, אימות זהות, מגבלות, משיכות, מס וטורנירים כספיים. **בלי מסוף סליקה, ונעול עד שיש חוות דעת משפטית.** [פירוט](legal/real-money-design.md) |
 | **פנימי (לעו"ד)** | [ניתוח משפטי ותיק גיבויים](legal/legal-analysis.md). המסמך לא מוגש לציבור |
 
 ## מבנה

@@ -12,13 +12,18 @@ export const SIGNUP_GRANT = 1000;
 export const WEEKLY_GRANT = 500;
 
 export class Ledger {
-  constructor(store) {
+  constructor(store, { field = 'ledger', currency = CURRENCY } = {}) {
     this.store = store;
+    this.field = field;
+    this.currency = currency;
+    store.data[field] ??= [];
   }
+
+  get txs() { return this.store.data[this.field]; }
 
   balance(account) {
     let b = 0;
-    for (const tx of this.store.data.ledger) for (const e of tx.entries) if (e.account === account) b += e.amount;
+    for (const tx of this.txs) for (const e of tx.entries) if (e.account === account) b += e.amount;
     return b;
   }
 
@@ -28,12 +33,12 @@ export class Ledger {
     if (sum !== 0) throw new Error('unbalanced transaction');
     if (!entries.every((e) => Number.isInteger(e.amount))) throw new Error('amounts must be integers');
     for (const e of entries) {
-      if (e.account.startsWith('user:') && e.amount < 0 && this.balance(e.account) + e.amount < 0) {
+      if (/^(user|pool|hold):/.test(e.account) && e.amount < 0 && this.balance(e.account) + e.amount < 0) {
         throw new Error('insufficient balance');
       }
     }
-    const tx = { id: `tx_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`, at: new Date().toISOString(), kind, currency: CURRENCY, entries, meta };
-    this.store.data.ledger.push(tx);
+    const tx = { id: `tx_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`, at: new Date().toISOString(), kind, currency: this.currency, entries, meta };
+    this.txs.push(tx);
     this.store.save();
     return tx;
   }
@@ -47,7 +52,7 @@ export class Ledger {
 
   history(userId, limit = 50) {
     const acc = `user:${userId}`;
-    return this.store.data.ledger
+    return this.txs
       .filter((tx) => tx.entries.some((e) => e.account === acc))
       .slice(-limit)
       .map((tx) => ({ id: tx.id, at: tx.at, kind: tx.kind, amount: tx.entries.filter((e) => e.account === acc).reduce((a, e) => a + e.amount, 0), meta: tx.meta }));
@@ -56,7 +61,7 @@ export class Ledger {
   /** Sum of all accounts — must always be 0. */
   integrity() {
     let total = 0;
-    for (const tx of this.store.data.ledger) for (const e of tx.entries) total += e.amount;
+    for (const tx of this.txs) for (const e of tx.entries) total += e.amount;
     return total === 0;
   }
 }

@@ -6,9 +6,10 @@ import { Ledger, SIGNUP_GRANT, WEEKLY_GRANT } from './ledger.js';
 import { FairPlay } from './anticheat.js';
 import { updateElo, START_RATING } from './rating.js';
 import { LEVELS } from '../engine/bot.js';
+import { CashService, realMoneyConfig, isSkillFormat, ILS } from './realmoney.js';
 
 export const TERMS_VERSION = '2026-11-beta-1';
-export const REAL_MONEY_ENABLED = false; // hard-off in beta. See docs/legal — requires written legal opinion.
+// Real money is OFF unless REAL_MONEY=1 and LEGAL_APPROVAL_REF are set (see realmoney.js).
 
 const MODES = {
   classic: { lengths: [1, 3, 5, 7] },
@@ -17,12 +18,18 @@ const MODES = {
 
 export const TOURNAMENT_TYPES = {
   // Free practice: no entry, bots may fill empty seats, prize = trophy + rating only.
-  'free-dup': { name: 'טורניר אימון – שש בש כפול (חינם)', mode: 'duplicate', length: 1, size: 4, entryFee: 0, botFill: true, payout: [] },
+  'free-dup': { name: 'טורניר אימון – שש בש כפול (חינם)', currency: 'POINTS', mode: 'duplicate', length: 1, size: 4, entryFee: 0, botFill: true, payout: [] },
   // Beta-points tournament: humans only, entry in BETA POINTS (no monetary value),
   // fixed published prize split, 10% "rake" simulated to test the accounting flow.
-  'points-dup': { name: 'טורניר נקודות בטא – שש בש כפול', mode: 'duplicate', length: 2, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
-  'points-classic7': { name: 'טורניר נקודות בטא – מאץ\' עד 7', mode: 'classic', length: 7, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
+  'points-dup': { name: 'טורניר נקודות בטא – שש בש כפול', currency: 'POINTS', mode: 'duplicate', length: 2, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
+  'points-classic7': { name: 'טורניר נקודות בטא – מאץ\' עד 7', currency: 'POINTS', mode: 'classic', length: 7, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
+  // Real-money (ILS, agorot). Created only when the real-money gate is open. Humans only, skill formats only.
+  'cash-dup': { name: 'טורניר ₪20 – שש בש כפול (2 סבבים)', currency: 'ILS', mode: 'duplicate', length: 2, size: 4, entryFee: 2000, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
+  'cash-classic7': { name: 'טורניר ₪50 – מאץ\' עד 7', currency: 'ILS', mode: 'classic', length: 7, size: 4, entryFee: 5000, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
 };
+for (const [k, t] of Object.entries(TOURNAMENT_TYPES)) {
+  if (t.currency === 'ILS' && (!isSkillFormat(t.mode, t.length) || t.botFill)) throw new Error(`cash tournament ${k} must be a humans-only skill format`);
+}
 
 const ageOn = (birthDate, now = new Date()) => {
   const b = new Date(birthDate + 'T00:00:00Z');
@@ -34,11 +41,16 @@ const ageOn = (birthDate, now = new Date()) => {
 };
 
 export class App {
-  constructor(store, { salt = crypto.randomBytes(16).toString('hex') } = {}) {
+  constructor(store, { salt = crypto.randomBytes(16).toString('hex'), cashCfg = realMoneyConfig({}), provider } = {}) {
     this.store = store;
     this.salt = salt;
     this.ledger = new Ledger(store);
     this.fair = new FairPlay(store);
+    this.cash = new CashService(store, cashCfg, {
+      ...(provider ? { provider } : {}),
+      flag: (id, type, d) => this.fair.flag(id, type, d),
+      audit: (e, d) => store.audit(e, d),
+    });
     this.sessions = new Map(); // matchId -> MatchSession
     this.queues = new Map(); // key -> [{userId, clientSeed}]
     this.sockets = new Map(); // userId -> Set(send fn)
@@ -46,8 +58,14 @@ export class App {
     this.tournaments = store.data.tournaments;
     this.fillTimers = new Map();
     this._recoverTournaments();
-    for (const type of Object.keys(TOURNAMENT_TYPES)) this._ensureOpenTournament(type);
+    for (const type of this._activeTypes()) this._ensureOpenTournament(type);
   }
+
+  _activeTypes() {
+    return Object.keys(TOURNAMENT_TYPES).filter((k) => TOURNAMENT_TYPES[k].currency !== 'ILS' || this.cash.cfg.enabled);
+  }
+
+  _isCash(t) { return t.currency === 'ILS'; }
 
   // ---------- users ----------
   hashIp(ip) { return crypto.createHash('sha256').update(this.salt + ip).digest('hex').slice(0, 16); }
@@ -293,11 +311,14 @@ export class App {
       rounds: [], results: null,
       // Published BEFORE registration, never changed afterwards:
       rules: {
-        currency: 'BETA_POINTS (ללא ערך כספי)',
+        currency: def.currency === 'ILS' ? 'ILS' : 'BETA_POINTS (ללא ערך כספי)',
         entryFee: def.entryFee,
+        entryFeeLabel: def.currency === 'ILS' ? ILS(def.entryFee) : `${def.entryFee} נקודות בטא`,
         rakePct: def.rakePct || 0,
         payoutSplit: def.payout,
-        prizeFundedBy: def.entryFee ? 'דמי הכניסה בנקודות בטא בלבד' : 'אין פרס נקודות – גביע ודירוג בלבד',
+        prizeFundedBy: def.currency === 'ILS' ? 'דמי הכניסה של המשתתפים בלבד (הבית אינו משחק)' : def.entryFee ? 'דמי הכניסה בנקודות בטא בלבד' : 'אין פרס נקודות – גביע ודירוג בלבד',
+        humansOnly: !def.botFill,
+        prizeTax: def.currency === 'ILS' ? `ניכוי מס במקור ${Math.round(this.cash.cfg.prizeTaxRate * 100)}% מהרווח נטו` : null,
         tiebreak: 'סבבים נוספים, ואז ממוצע שגיאה נמוך יותר (מדד מיומנות)',
       },
     };
@@ -313,8 +334,9 @@ export class App {
       t.status = 'aborted';
       t.finishedAt = new Date().toISOString();
       for (const p of t.players) {
-        if (p.userId && t.entryFee > 0 && this.ledger.balance(`pool:${t.id}`) >= t.entryFee) {
-          this.ledger.post('refund', [
+        const L = this._isCash(t) ? this.cash.ledger : this.ledger;
+        if (p.userId && t.entryFee > 0 && L.balance(`pool:${t.id}`) >= t.entryFee) {
+          L.post('refund', [
             { account: `pool:${t.id}`, amount: -t.entryFee },
             { account: `user:${p.userId}`, amount: t.entryFee },
           ], { tournamentId: t.id, reason: 'server-restart' });
@@ -327,18 +349,19 @@ export class App {
   listTournaments() {
     return Object.values(this.tournaments)
       .filter((t) => !['done', 'aborted'].includes(t.status) || Date.now() - new Date(t.finishedAt || 0).getTime() < 3600_000)
-      .map((t) => ({ id: t.id, type: t.type, name: t.name, mode: t.mode, length: t.length, size: t.size, status: t.status, players: t.players.map((p) => p.name), rules: t.rules, results: t.results, botFill: t.botFill }));
+      .map((t) => ({ id: t.id, type: t.type, name: t.name, currency: t.currency || 'POINTS', mode: t.mode, length: t.length, size: t.size, status: t.status, players: t.players.map((p) => p.name), rules: t.rules, results: t.results, botFill: t.botFill }));
   }
 
-  joinTournament(u, { id, clientSeed }) {
+  joinTournament(u, { id, clientSeed, country }) {
     this._assertMayPlay(u);
     this._applyPendingLimits(u);
     const t = this.tournaments[id];
     if (!t || t.status !== 'registering') throw new Error('הטורניר אינו פתוח להרשמה');
     if (t.players.some((p) => p.userId === u.id)) throw new Error('כבר נרשמת');
     if (this._inMatch(u.id)) throw new Error('כבר יש לך משחק פעיל');
-    if (t.entryFee > 0) {
-      if (REAL_MONEY_ENABLED) throw new Error('real money is not supported');
+    if (this._isCash(t)) {
+      this.cash.enterTournament(u, t, country);
+    } else if (t.entryFee > 0) {
       const lim = u.limits.dailyEntry;
       if (lim !== null && this._entriesToday(u) + t.entryFee > lim) throw new Error('חרגת ממגבלת דמי הכניסה היומית שהגדרת');
       this.ledger.post('entry', [
@@ -363,7 +386,9 @@ export class App {
     const i = t.players.findIndex((p) => p.userId === u.id);
     if (i < 0) throw new Error('אינך רשום');
     t.players.splice(i, 1);
-    if (t.entryFee > 0) {
+    if (this._isCash(t)) {
+      this.cash.refundEntry(u.id, t);
+    } else if (t.entryFee > 0) {
       this.ledger.post('refund', [
         { account: `pool:${t.id}`, amount: -t.entryFee },
         { account: `user:${u.id}`, amount: t.entryFee },
@@ -444,6 +469,16 @@ export class App {
   _payout(t, ranking) {
     t.status = 'done';
     t.finishedAt = new Date().toISOString();
+    if (this._isCash(t)) {
+      const r = this.cash.payoutTournament(t, ranking);
+      const champ = ranking[0];
+      if (champ?.userId) this.store.data.users[champ.userId].trophies++;
+      t.results = { ranking: ranking.map((p) => p.name), prizes: r.prizes.map((x) => ({ ...x, amount: x.net, label: ILS(x.net) })), rake: r.rake, pool: r.pool, currency: 'ILS' };
+      this.store.audit('tournament-done', { tournamentId: t.id, results: t.results });
+      this.store.save();
+      for (const p of t.players) if (p.userId) this.send(p.userId, { t: 'tournament', tournament: this.listTournaments().find((x) => x.id === t.id) });
+      return;
+    }
     const pool = this.ledger.balance(`pool:${t.id}`);
     const rake = Math.floor((pool * (t.rakePct || 0)) / 100);
     const prizes = [];
@@ -515,7 +550,23 @@ export class App {
       ledgerBalanced: this.ledger.integrity(),
       houseRake: this.ledger.balance('house:rake'),
       openFlags: flags,
-      realMoney: REAL_MONEY_ENABLED,
+      realMoney: this.cash.cfg.enabled,
+      legalApprovalRef: this.cash.cfg.legalRef,
+      paymentProvider: this.cash.provider.name,
+      cash: {
+        ledgerBalanced: this.cash.ledger.integrity(),
+        houseRake: this.cash.ledger.balance('house:rake'),
+        taxWithheld: this.cash.ledger.balance('house:tax'),
+        pendingWithdrawals: Object.values(this.store.data.withdrawals || {}).filter((w) => w.status === 'pending'),
+        pendingKyc: Object.values(this.store.data.users).filter((u) => u.kyc?.status === 'pending').map((u) => ({ id: u.id, name: u.name })),
+      },
     };
   }
+
+  // ---------- real money (wallet) ----------
+  wallet(u) { return this.cash.wallet(u); }
+  submitKyc(u, msg) { this.cash.submitKyc(u, msg); return this.wallet(u); }
+  deposit(u, { amount, country }) { return this.cash.deposit(u, amount, country); }
+  withdraw(u, { amount, country }) { this.cash.requestWithdraw(u, amount, country); return this.wallet(u); }
+  setCashLimits(u, msg) { this.cash.setLimits(u, msg); return this.wallet(u); }
 }
