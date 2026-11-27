@@ -1,0 +1,289 @@
+{
+  "generatedAt": "2026-11-27T18:37:12.116Z",
+  "seconds": "204",
+  "scale": 1,
+  "levels": {
+    "expert": {
+      "noise": 0,
+      "label": "מומחה"
+    },
+    "strong": {
+      "noise": 3,
+      "label": "חזק"
+    },
+    "intermediate": {
+      "noise": 8,
+      "label": "בינוני"
+    },
+    "beginner": {
+      "noise": 20,
+      "label": "מתחיל"
+    },
+    "random": {
+      "noise": null,
+      "label": "אקראי"
+    }
+  },
+  "results": [
+    {
+      "strong": "expert",
+      "weak": "expert",
+      "format": "single",
+      "n": 2000,
+      "strongerScore": 0.4975,
+      "ci95": [
+        0.4756126151701534,
+        0.5193969704178492
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.5025
+    },
+    {
+      "strong": "expert",
+      "weak": "expert",
+      "format": "match7",
+      "n": 300,
+      "strongerScore": 0.48,
+      "ci95": [
+        0.4240757908015887,
+        0.5364299463983206
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.52
+    },
+    {
+      "strong": "expert",
+      "weak": "expert",
+      "format": "duplicate1",
+      "n": 1000,
+      "strongerScore": 0.5,
+      "ci95": [
+        0.4690690341793595,
+        0.5309309658206405
+      ],
+      "drawRate": 1,
+      "weakerWinRate": 0
+    },
+    {
+      "strong": "expert",
+      "weak": "expert",
+      "format": "duplicate3",
+      "n": 300,
+      "strongerScore": 0.5,
+      "ci95": [
+        0.4437784961119509,
+        0.556221503888049
+      ],
+      "drawRate": 1,
+      "weakerWinRate": 0
+    },
+    {
+      "strong": "expert",
+      "weak": "strong",
+      "format": "single",
+      "n": 2000,
+      "strongerScore": 0.592,
+      "ci95": [
+        0.5703042379953714,
+        0.6133430123661342
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.408
+    },
+    {
+      "strong": "expert",
+      "weak": "strong",
+      "format": "match7",
+      "n": 300,
+      "strongerScore": 0.7833333333333333,
+      "ci95": [
+        0.7332891734257104,
+        0.826212882908906
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.21666666666666667
+    },
+    {
+      "strong": "expert",
+      "weak": "strong",
+      "format": "duplicate1",
+      "n": 1000,
+      "strongerScore": 0.6245,
+      "ci95": [
+        0.5940630143265065,
+        0.6539840879254825
+      ],
+      "drawRate": 0.321,
+      "weakerWinRate": 0.215
+    },
+    {
+      "strong": "expert",
+      "weak": "strong",
+      "format": "duplicate3",
+      "n": 300,
+      "strongerScore": 0.7133333333333334,
+      "ci95": [
+        0.6597173468493974,
+        0.7615547896849021
+      ],
+      "drawRate": 0.11333333333333333,
+      "weakerWinRate": 0.23
+    },
+    {
+      "strong": "expert",
+      "weak": "intermediate",
+      "format": "single",
+      "n": 2000,
+      "strongerScore": 0.721,
+      "ci95": [
+        0.7009338892917649,
+        0.7402187447288084
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.279
+    },
+    {
+      "strong": "expert",
+      "weak": "intermediate",
+      "format": "match7",
+      "n": 300,
+      "strongerScore": 0.97,
+      "ci95": [
+        0.943976849008093,
+        0.9841383267940355
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.03
+    },
+    {
+      "strong": "expert",
+      "weak": "intermediate",
+      "format": "duplicate1",
+      "n": 1000,
+      "strongerScore": 0.7835,
+      "ci95": [
+        0.7569135985960247,
+        0.8079165499054919
+      ],
+      "drawRate": 0.193,
+      "weakerWinRate": 0.12
+    },
+    {
+      "strong": "expert",
+      "weak": "intermediate",
+      "format": "duplicate3",
+      "n": 300,
+      "strongerScore": 0.8833333333333333,
+      "ci95": [
+        0.8420660083343473,
+        0.9149073620007219
+      ],
+      "drawRate": 0.04,
+      "weakerWinRate": 0.09666666666666666
+    },
+    {
+      "strong": "expert",
+      "weak": "beginner",
+      "format": "single",
+      "n": 2000,
+      "strongerScore": 0.9305,
+      "ci95": [
+        0.9185095267044423,
+        0.9408398350415161
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.0695
+    },
+    {
+      "strong": "expert",
+      "weak": "beginner",
+      "format": "match7",
+      "n": 300,
+      "strongerScore": 1,
+      "ci95": [
+        0.9873565700022643,
+        0.9999999999999999
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0
+    },
+    {
+      "strong": "expert",
+      "weak": "beginner",
+      "format": "duplicate1",
+      "n": 1000,
+      "strongerScore": 0.9745,
+      "ci95": [
+        0.9627647196540591,
+        0.9826035535874565
+      ],
+      "drawRate": 0.029,
+      "weakerWinRate": 0.011
+    },
+    {
+      "strong": "expert",
+      "weak": "beginner",
+      "format": "duplicate3",
+      "n": 300,
+      "strongerScore": 0.9983333333333333,
+      "ci95": [
+        0.9842394012929491,
+        0.9998259801426407
+      ],
+      "drawRate": 0.0033333333333333335,
+      "weakerWinRate": 0
+    },
+    {
+      "strong": "expert",
+      "weak": "random",
+      "format": "single",
+      "n": 2000,
+      "strongerScore": 0.998,
+      "ci95": [
+        0.9948685655953601,
+        0.9992219852745291
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0.002
+    },
+    {
+      "strong": "expert",
+      "weak": "random",
+      "format": "match7",
+      "n": 300,
+      "strongerScore": 1,
+      "ci95": [
+        0.9873565700022643,
+        0.9999999999999999
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0
+    },
+    {
+      "strong": "expert",
+      "weak": "random",
+      "format": "duplicate1",
+      "n": 1000,
+      "strongerScore": 1,
+      "ci95": [
+        0.9961731014136095,
+        1
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0
+    },
+    {
+      "strong": "expert",
+      "weak": "random",
+      "format": "duplicate3",
+      "n": 300,
+      "strongerScore": 1,
+      "ci95": [
+        0.9873565700022643,
+        0.9999999999999999
+      ],
+      "drawRate": 0,
+      "weakerWinRate": 0
+    }
+  ]
+}

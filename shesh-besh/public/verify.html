@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>אימות קוביות</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<header class="top"><h1>🔐 אימות קוביות שקופות</h1><a href="/">חזרה</a></header>
+<main>
+  <div class="card">
+    <p>הדף מחשב מחדש <strong>בדפדפן שלך</strong> (Web Crypto) את כל הטלות הקוביות של משחק שהסתיים, ומשווה אותן למה שקרה במשחק. אין צורך לסמוך על השרת.</p>
+    <ol>
+      <li>בודקים ש-SHA256(זרע השרת) = ההתחייבות שפורסמה בתחילת המשחק.</li>
+      <li>כל הטלה = HMAC-SHA256(זרע השרת, "זרע-שחקנים:מספר-משחק:מספר-הטלה"), בתים קטנים מ-252 ממופים ל-1..6.</li>
+    </ol>
+    <label>מזהה משחק <input id="mid" placeholder="m_..."></label>
+    <button id="go">אמת</button>
+  </div>
+  <div id="out" class="card" aria-live="polite"></div>
+</main>
+<script type="module" src="/verify.js"></script>
+</body></html>

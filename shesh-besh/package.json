@@ -1,0 +1,17 @@
+{
+  "name": "shesh-besh-duplicate",
+  "version": "0.1.0-beta",
+  "description": "Skill-based backgammon platform (beta, no real money)",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "test": "node --test test/*.test.js",
+    "study": "node scripts/skill-study.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "type": "module",
+  "private": true
+}

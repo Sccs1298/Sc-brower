@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>שש בש כפול – בטא</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">דלג לתוכן</a>
+  <header class="top">
+    <h1>🎲 שש בש כפול <span class="badge">בטא</span></h1>
+    <div id="userbar" aria-live="polite"></div>
+  </header>
+  <div class="notice" role="note">גרסת בטא: משחקים על <strong>נקודות בטא בלבד</strong> – ללא ערך כספי, לא ניתן לקנות, למכור, להעביר או לפדות אותן. השירות לבני 18+.</div>
+  <main id="main">
+    <section id="screen-register" hidden>
+      <h2>הרשמה</h2>
+      <form id="register-form" class="card">
+        <label>כינוי <input name="name" required minlength="2" maxlength="20" autocomplete="nickname"></label>
+        <label>תאריך לידה <input name="birthDate" type="date" required></label>
+        <label class="check"><input type="checkbox" name="terms" required> קראתי ואני מסכים/ה ל<a href="/doc.html?f=terms.md" target="_blank">תקנון</a> ול<a href="/doc.html?f=privacy.md" target="_blank">מדיניות הפרטיות</a></label>
+        <button type="submit">יצירת חשבון</button>
+        <p class="muted">אנחנו לא אוספים שם מלא, תעודת זהות או פרטי תשלום בבטא. תאריך הלידה משמש רק לאימות גיל 18+; נשמרת רק שנת הלידה.</p>
+      </form>
+    </section>
+
+    <section id="screen-lobby" hidden>
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="play" aria-selected="true">משחק</button>
+        <button role="tab" data-tab="tournaments">טורנירים</button>
+        <button role="tab" data-tab="leaderboard">דירוג</button>
+        <button role="tab" data-tab="account">החשבון שלי</button>
+        <button role="tab" data-tab="about">הוגנות ומידע</button>
+      </nav>
+
+      <div data-panel="play" class="grid">
+        <form id="bot-form" class="card">
+          <h3>משחק נגד המחשב</h3>
+          <label>מצב <select name="mode"><option value="duplicate">שש בש כפול</option><option value="classic">קלאסי</option></select></label>
+          <label>אורך <select name="len"></select></label>
+          <label>רמה <select name="level">
+            <option value="beginner">מתחיל</option><option value="intermediate" selected>בינוני</option>
+            <option value="strong">חזק</option><option value="expert">מומחה</option></select></label>
+          <button type="submit">התחל</button>
+        </form>
+        <form id="queue-form" class="card">
+          <h3>משחק נגד שחקן</h3>
+          <label>מצב <select name="mode"><option value="duplicate">שש בש כפול</option><option value="classic">קלאסי</option></select></label>
+          <label>אורך <select name="len"></select></label>
+          <button type="submit" id="queue-btn">חפש יריב</button>
+          <p id="queue-status" class="muted" aria-live="polite"></p>
+        </form>
+        <div class="card explain">
+          <h3>מה זה שש בש כפול?</h3>
+          <p>משחקים <strong>שני לוחות במקביל</strong>. בלוח אחד אתה לבן, בשני – שחור. <strong>הקוביות זהות בשני הלוחות</strong>, כך שכל אחד מקבל בדיוק את המזל שקיבל היריב. מי שמשחק טוב יותר עם אותן קוביות – מנצח.</p>
+          <p>סכום הנקודות משני הלוחות קובע. תיקו = שני השחקנים שיחקו באותה רמה בדיוק.</p>
+        </div>
+      </div>
+
+      <div data-panel="tournaments" hidden>
+        <div id="tournament-list" class="grid"></div>
+      </div>
+
+      <div data-panel="leaderboard" hidden>
+        <table class="table" id="leaderboard"><thead><tr><th>#</th><th>שחקן</th><th>דירוג</th><th>משחקים</th><th>ניצחונות</th><th>גביעים</th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <div data-panel="account" hidden class="grid">
+        <div class="card" id="account-info"></div>
+        <form class="card" id="limits-form">
+          <h3>משחק אחראי</h3>
+          <label>מגבלת דמי כניסה יומית (נקודות, ריק = ללא) <input name="dailyEntry" type="number" min="0"></label>
+          <label>תזכורת זמן משחק כל (דקות) <input name="sessionReminderMin" type="number" min="15" max="240"></label>
+          <button type="submit">שמור מגבלות</button>
+          <p class="muted">הורדת מגבלה חלה מיד. העלאה או ביטול – רק אחרי 24 שעות.</p>
+          <hr>
+          <label>החרגה עצמית (ימים) <input name="selfExcludeDays" type="number" min="1" max="3650"></label>
+          <button type="button" id="self-exclude" class="danger">החרג אותי</button>
+          <p class="muted">בזמן החרגה לא ניתן להצטרף למשחקים או טורנירים, ולא ניתן לבטל אותה.</p>
+        </form>
+        <div class="card"><h3>היסטוריית נקודות</h3><table class="table" id="history"><tbody></tbody></table></div>
+      </div>
+
+      <div data-panel="about" hidden class="grid">
+        <div class="card">
+          <h3>קוביות שקופות (Provably Fair)</h3>
+          <p>לפני כל משחק השרת מתחייב על "זרע" סודי ומפרסם את ה-hash שלו. גם אתה תורם זרע אקראי מהדפדפן. בסוף המשחק הזרע נחשף, ואפשר לחשב מחדש כל הטלה ולוודא שאיש לא שינה דבר.</p>
+          <a href="/verify.html">לדף האימות</a>
+        </div>
+        <div class="card">
+          <h3>מסמכים</h3>
+          <ul>
+            <li><a href="/doc.html?f=terms.md">תקנון</a></li>
+            <li><a href="/doc.html?f=skill-study.md">מחקר מיומנות מול מזל</a></li>
+            <li><a href="/doc.html?f=responsible-play.md">משחק אחראי</a></li>
+            <li><a href="/doc.html?f=privacy.md">מדיניות פרטיות</a></li>
+            <li><a href="/doc.html?f=accessibility.md">הצהרת נגישות</a></li>
+            <li><a href="/api/evidence">נתוני אמת מהמשחקים (JSON)</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-match" hidden>
+      <div class="match-head">
+        <div id="match-info"></div>
+        <button id="leave-match" hidden>חזרה ללובי</button>
+      </div>
+      <div id="boards"></div>
+      <div id="fairness" class="muted small"></div>
+    </section>
+  </main>
+  <div id="toast" role="status" aria-live="assertive"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

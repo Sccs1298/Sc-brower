@@ -1,0 +1,137 @@
+// HTTP + WebSocket entry point.
+//   PORT (default 3000), DB_FILE (default data/db.json), ADMIN_TOKEN (enables /admin/*)
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { WebSocketServer } from 'ws';
+import { Store } from './store.js';
+import { App, TERMS_VERSION, TOURNAMENT_TYPES } from './app.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const PORT = Number(process.env.PORT || 3000);
+const DB_FILE = process.env.DB_FILE || path.join(root, 'data', 'db.json');
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || null;
+const RATE_LIMIT = Number(process.env.RATE_LIMIT || 40);
+
+const store = new Store(DB_FILE);
+store.data.config ??= { salt: crypto.randomBytes(16).toString('hex') };
+const app = new App(store, { salt: store.data.config.salt });
+
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.md': 'text/markdown; charset=utf-8', '.svg': 'image/svg+xml' };
+const STATIC = [
+  ['/engine/', path.join(root, 'src', 'engine')],
+  ['/docs/', path.join(root, 'docs')],
+  ['/', path.join(root, 'public')],
+];
+
+function json(res, code, body) {
+  res.writeHead(code, { 'content-type': MIME['.json'], 'cache-control': 'no-store' });
+  res.end(JSON.stringify(body));
+}
+
+function serveStatic(req, res, pathname) {
+  for (const [prefix, dir] of STATIC) {
+    if (!pathname.startsWith(prefix)) continue;
+    let rel = decodeURIComponent(pathname.slice(prefix.length)) || 'index.html';
+    const file = path.resolve(dir, rel);
+    if (!file.startsWith(dir + path.sep) && file !== dir) break;
+    if (fs.existsSync(file) && fs.statSync(file).isFile()) {
+      res.writeHead(200, {
+        'content-type': MIME[path.extname(file)] || 'application/octet-stream',
+        'x-content-type-options': 'nosniff',
+        'content-security-policy': "default-src 'self'; connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; img-src 'self' data:",
+      });
+      fs.createReadStream(file).pipe(res);
+      return true;
+    }
+  }
+  return false;
+}
+
+const server = http.createServer((req, res) => {
+  const url = new URL(req.url, 'http://x');
+  const p = url.pathname;
+  try {
+    if (p === '/api/health') return json(res, 200, { ok: true, terms: TERMS_VERSION });
+    if (p === '/api/config') return json(res, 200, { termsVersion: TERMS_VERSION, tournamentTypes: TOURNAMENT_TYPES, realMoney: false });
+    if (p === '/api/leaderboard') return json(res, 200, app.leaderboard());
+    if (p === '/api/evidence') return json(res, 200, app.evidence());
+    if (p === '/api/tournaments') return json(res, 200, app.listTournaments());
+    if (p === '/api/verify') {
+      const v = app.verify(url.searchParams.get('id'));
+      return v ? json(res, 200, v) : json(res, 404, { error: 'not found' });
+    }
+    if (p.startsWith('/admin/')) {
+      if (!ADMIN_TOKEN || req.headers.authorization !== `Bearer ${ADMIN_TOKEN}`) return json(res, 401, { error: 'unauthorized' });
+      if (p === '/admin/stats') return json(res, 200, app.adminStats());
+      if (p === '/admin/audit') return json(res, 200, store.data.audit.slice(-500));
+      return json(res, 404, { error: 'not found' });
+    }
+    if (req.method === 'GET' && serveStatic(req, res, p)) return;
+    json(res, 404, { error: 'not found' });
+  } catch (e) {
+    json(res, 500, { error: e.message });
+  }
+});
+
+const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 32 * 1024 });
+
+wss.on('connection', (ws, req) => {
+  const ip = (req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress || '').trim();
+  let user = null;
+  let lastMsgs = [];
+  const send = (msg) => { if (ws.readyState === 1) ws.send(JSON.stringify(msg)); };
+  const meMsg = () => ({ t: 'me', user: app.publicUser(user), history: app.ledger.history(user.id, 30) });
+
+  ws.on('message', (raw) => {
+    // Simple rate limit: RATE_LIMIT messages / 5 seconds (default 40).
+    const now = Date.now();
+    lastMsgs = lastMsgs.filter((x) => now - x < 5000);
+    lastMsgs.push(now);
+    if (lastMsgs.length > RATE_LIMIT) return send({ t: 'error', msg: 'יותר מדי בקשות' });
+    let msg;
+    try { msg = JSON.parse(raw); } catch { return send({ t: 'error', msg: 'bad json' }); }
+    try {
+      if (msg.t === 'register') {
+        const { user: u, token } = app.register({ ...msg, ip });
+        user = u;
+        app.attach(user.id, send);
+        send({ t: 'welcome', token, user: app.publicUser(user) });
+        return;
+      }
+      if (msg.t === 'auth') {
+        user = app.auth(msg.token);
+        if (ip) user.ipHash = app.hashIp(ip);
+        app.attach(user.id, send);
+        send({ t: 'welcome', user: app.publicUser(user) });
+        return;
+      }
+      if (!user) return send({ t: 'error', msg: 'יש להתחבר' });
+      switch (msg.t) {
+        case 'me': return send(meMsg());
+        case 'bot': app.playBot(user, msg); return;
+        case 'queue': return send({ t: 'queued', ...app.queue(user, msg) });
+        case 'cancelQueue': app.cancelQueue(user.id); return send({ t: 'queued', matched: false, cancelled: true });
+        case 'act': app.act(user, msg); return;
+        case 'tournaments': return send({ t: 'tournaments', list: app.listTournaments() });
+        case 'joinTournament': app.joinTournament(user, msg); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments() });
+        case 'leaveTournament': app.leaveTournament(user, msg); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments() });
+        case 'limits': app.setLimits(user, msg); return send(meMsg());
+        case 'leaderboard': return send({ t: 'leaderboard', list: app.leaderboard() });
+        default: return send({ t: 'error', msg: 'unknown message' });
+      }
+    } catch (e) {
+      send({ t: 'error', msg: e.message });
+    }
+  });
+
+  ws.on('close', () => { if (user) app.detach(user.id, send); });
+});
+
+setInterval(() => app.tick(), 30_000).unref();
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { store.flush(); process.exit(0); });
+
+server.listen(PORT, () => console.log(`shesh-besh beta on http://localhost:${PORT}`));
+export { server, app };
