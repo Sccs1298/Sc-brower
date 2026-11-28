@@ -612,7 +612,7 @@ const BRAND = 'דאבל שש';
 const CL = Object.assign({ clubs: [], tours: [], nick: 'שחקן ' + Math.floor(1000 + Math.random() * 9000), uid: String(Math.floor(1e7 + Math.random() * 9e7)) }, store.get('clubs', {}));
 P.tickets ??= { s2: 0, final: 0, live: 0 };
 P.stats.clubTours ??= 0;
-const saveCL = () => store.set('clubs', CL);
+const saveCL = () => { if (!ONLINE) store.set('clubs', CL); };
 const st = { screen: P.seenGuide ? 'home' : 'guide', guideStep: 0, tourHook: null, clubId: null, tourId: null, search: '' };
 function go(screen, extra = {}) { Object.assign(st, extra); st.screen = screen; stopTimers(); render(); window.scrollTo?.(0, 0); }
 function render() {
@@ -639,7 +639,7 @@ function topbar() {
 }
 function confirmLeave() {
   document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' }, h('div', { class: 'card' }, h('h2', {}, 'לצאת מהמשחק?'), h('p', { class: 'muted' }, 'יציאה באמצע נחשבת להפסד.'),
-    h('div', { class: 'acts', style: 'justify-content:center' }, h('button', { class: 'btn ghost', onclick: () => $('.overlay')?.remove() }, 'הישאר'), h('button', { class: 'btn red', onclick: () => { $('.overlay')?.remove(); stopTimers(); for (let k = 0; k < 40 && !G.M.over; k++) { G.M.boards().forEach((g, b) => { if (g.phase !== 'over') g.resign(colorOf('A', b)); }); G.M.settle(); } step(); } }, 'צא')))));
+    h('div', { class: 'acts', style: 'justify-content:center' }, h('button', { class: 'btn ghost', onclick: () => $('.overlay')?.remove() }, 'הישאר'), h('button', { class: 'btn red', onclick: () => { $('.overlay')?.remove(); if (G.online) { G.M.boards().forEach((g) => { if (g.phase !== 'over') g.resign(); }); return; } stopTimers(); for (let k = 0; k < 40 && !G.M.over; k++) { G.M.boards().forEach((g, b) => { if (g.phase !== 'over') g.resign(colorOf('A', b)); }); G.M.settle(); } step(); } }, 'צא')))));
 }
 function avatar(size = 46) {
   const s = S('svg', { viewBox: '0 0 46 46', width: size, height: size, class: 'L-av', 'aria-hidden': 'true' });
@@ -756,7 +756,10 @@ function viewClubHome() {
       h('button', { class: 'L-btn', onclick: () => go('clubNew') }, 'צור מועדון')),
     h('button', { class: 'L-banner', onclick: () => go('s1') },
       h('div', {}, h('b', {}, 'הדרך לגמר'), h('span', {}, 'שלב 1 ← שלב 2 ← גמר ← אירוע חי בתל אביב')), h('span', { class: 'L-banner-cta' }, 'התחל ›')),
+    ONLINE ? h('form', { class: 'L-search', onsubmit: (e) => { e.preventDefault(); const v = e.target.elements.jc.value.trim(); if (v) { st.pendingClub = true; netSend({ t: 'joinClub', code: v }); } } },
+      h('span', { 'aria-hidden': 'true' }, '🔑'), h('input', { name: 'jc', placeholder: 'יש לך קוד מועדון? הזן כאן', 'aria-label': 'קוד מועדון', autocomplete: 'off', style: 'text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הצטרף')) : null,
     h('div', { class: 'L-row2' },
+      ONLINE ? h('button', { class: 'L-mini', onclick: () => { if (NET.queued) { netSend({ t: 'cancelQueue' }); NET.queued = false; render(); } else netSend({ t: 'queue', mode: 'duplicate', length: 1, clientSeed: seedHex() }); } }, h('b', {}, NET.queued ? '⏳ מחפש… (ביטול)' : '⚔️ מול שחקן'), h('span', {}, 'כפול · יריב אמיתי')) : null,
       h('button', { class: 'L-mini', onclick: practice }, h('b', {}, '🎯 אימון מהיר'), h('span', {}, 'כפול נגד בוט')),
       h('button', { class: 'L-mini', onclick: () => go('guide', { guideStep: 0 }) }, h('b', {}, '⚖️ למה זה חוקי'), h('span', {}, 'החוק והסטטיסטיקה'))));
 }
@@ -768,11 +771,13 @@ function viewClubNew() {
     h('label', { class: 'L-field', for: 'cname' }, 'שם המועדון', h('input', { id: 'cname', placeholder: 'למשל: המועדון של השכונה', maxlength: 24, value: n.name, oninput: (e) => { n.name = e.target.value; $('#cconfirm').disabled = n.name.trim().length < 2; } })),
     h('div', { class: 'L-field' }, 'לוגו', h('div', { class: 'L-logos', role: 'radiogroup', 'aria-label': 'לוגו' }, LOGOS.map((L) => h('button', { class: 'L-lg' + (n.logo === L.id ? ' on' : ''), role: 'radio', 'aria-checked': String(n.logo === L.id), 'aria-label': L.id, onclick: () => { n.logo = L.id; render(); } }, logoArt(L.id, 96))))),
     h('button', { id: 'cconfirm', class: 'L-btn wide', disabled: n.name.trim().length < 2 || null, onclick: () => {
+      if (ONLINE) { netSend({ t: 'createClub', name: n.name.trim(), logo: n.logo }); st.newClub = null; st.pendingClub = true; return; }
       const c = { id: 'c' + Math.random().toString(36).slice(2, 8), name: n.name.trim(), logo: n.logo, owner: CL.nick, members: [CL.nick], code: Math.random().toString(36).slice(2, 8).toUpperCase(), createdAt: Date.now() };
       CL.clubs.unshift(c); saveCL(); st.newClub = null; toast('המועדון נוצר'); go('club', { clubId: c.id });
     } }, 'אישור'));
 }
 function viewClub() {
+  if (ONLINE && st.clubFetched !== st.clubId) { st.clubFetched = st.clubId; netSend({ t: 'club', id: st.clubId }); }
   const c = CL.clubs.find((x) => x.id === st.clubId); if (!c) return viewClubHome();
   const tours = CL.tours.filter((t) => t.clubId === c.id).sort((a, b) => (a.status === 'done') - (b.status === 'done') || a.startAt - b.startAt);
   return h('div', { class: 'L-col' },
@@ -808,6 +813,7 @@ function viewTourNew() {
       h('div', {}, h('span', {}, n.size > 2 ? 'פרסים: 70% / 30%' : 'למנצח'), h('b', {}, n.size > 2 ? `${fmt(Math.floor(p.net * .7))} / ${fmt(p.net - Math.floor(p.net * .7))}` : fmt(p.net)))),
     h('p', { class: 'L-note' }, 'כרגע הכל במטבעות ללא ערך כספי. טורנירים בכסף ייפתחו רק אחרי אישור משפטי.'),
     h('button', { class: 'L-btn wide', onclick: () => {
+      if (ONLINE) { netSend({ t: 'createClubTournament', clubId: c.id, name: n.name.trim(), mode: n.mode, length: n.len, size: n.size, entryFee: n.entry, hostFeePct: n.hostFee }); st.newTour = null; return; }
       const t = { id: 't' + Math.random().toString(36).slice(2, 8), clubId: c.id, stage: 'club', name: n.name.trim() || 'טורניר ' + c.name, mode: n.mode, len: n.len, size: n.size, entry: { coins: n.entry }, hostFee: n.hostFee, prize: { coins: true }, players: [], status: 'open', bracket: null, createdAt: Date.now(), startAt: Date.now() + n.start * MIN, host: CL.nick };
       CL.tours.unshift(t); saveCL(); st.newTour = null; toast('הטורניר נפתח'); go('tour', { tourId: t.id });
     } }, 'פתח טורניר'));
@@ -875,12 +881,14 @@ function viewTour() {
     t.result ? h('div', { class: 'L-result' }, h('b', {}, t.result.text), t.result.sub ? h('span', {}, t.result.sub) : null) : null);
 }
 function joinTour(t) {
+  if (ONLINE && t.online) { netSend({ t: 'joinTournament', id: t.id, clientSeed: seedHex() }); return; }
   if (t.entry.coins != null) { P.coins -= t.entry.coins; } else { P.tickets[t.entry.ticket]--; }
   t.players.push(CL.nick); save(); saveCL(); sfx.coin(); render();
   toast('נרשמת. ממלא שחקנים…');
   setTimeout(() => fillAndStart(t), 1400);
 }
 function leaveTour(t) {
+  if (ONLINE && t.online) { netSend({ t: 'leaveTournament', id: t.id }); return; }
   t.players = t.players.filter((x) => x !== CL.nick);
   if (t.entry.coins != null) P.coins += t.entry.coins; else P.tickets[t.entry.ticket]++;
   save(); saveCL(); render();
@@ -1054,7 +1062,7 @@ function practice() {
   vsScreen(nm, lv, () => startMatch({ mode: 'duplicate', len: 1, level: lv, oppName: nm, arena: null, label: 'אימון' }), 0);
 }
 function startMatch(cfg) {
-  stopTimers();
+  stopTimers(); G.online = false;
   const seed = crypto.getRandomValues(new Uint32Array(1))[0];
   G.cfg = cfg; G.ended = false; G.view = 0; G.bubbles = {};
   G.M = cfg.mode === 'duplicate' ? new DuplicateMatch({ pairs: cfg.len, cube: false, gameDiceFn: diceFactory(seed) }) : new ClassicMatch({ target: cfg.len, cube: cfg.len > 1, gameDiceFn: diceFactory(seed) });
@@ -1067,6 +1075,7 @@ const seatOf = (color, b) => (G.M.kind === 'duplicate' ? G.M.seatOf(color, b) : 
 const actor = (g, b) => (g.phase === 'over' ? null : seatOf(g.phase === 'doubled' ? other(g.turn) : g.turn, b));
 
 function step() {
+  if (G.online) { if (st.screen === 'table') render(); if (G.M.over && !G.ended) { G.ended = true; setTimeout(finishOnline, 600); } return; }
   G.M.boards().forEach((g, b) => noteGameEnd(g, b));
   const before = G.M.kind === 'duplicate' ? G.M.rounds.length : G.M.games.length;
   G.M.settle();
@@ -1369,6 +1378,145 @@ function resultScreen({ won, draw, xp, delta, prizeLine, again, close, cash }) {
 }
 
 // =====================================================================
+// ONLINE MODE — when served by the game server, the lobby and matches run against it.
+// Offline (e.g. a single-file preview), everything stays local with bots.
+// =====================================================================
+let ONLINE = false;
+const NET = { ws: null, me: null, clubs: [], tours: [], queued: false, ratingAtStart: null };
+const TOKEN_KEY = 'token';
+const netSend = (m) => { try { NET.ws?.readyState === 1 && NET.ws.send(JSON.stringify(m)); } catch { /* closed */ } };
+const seedHex = () => Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(16).padStart(2, '0')).join('');
+
+function netConnect() {
+  if (!/^https?:$/.test(location.protocol)) return;
+  let ws;
+  try { ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`); } catch { return; }
+  const giveUp = setTimeout(() => { if (!ONLINE) try { ws.close(); } catch { /* */ } }, 3000);
+  ws.onopen = () => {
+    clearTimeout(giveUp); ONLINE = true; NET.ws = ws;
+    const token = store.get(TOKEN_KEY, null);
+    if (token) netSend({ t: 'auth', token }); else showRegister();
+  };
+  ws.onmessage = (ev) => { try { onNet(JSON.parse(ev.data)); } catch (e) { console.error(e); } };
+  ws.onclose = () => { if (ONLINE) { toast('החיבור לשרת נותק – מתחבר מחדש…'); NET.ws = null; setTimeout(netConnect, 2500); } };
+}
+
+function showRegister() {
+  if ($('#reg')) return;
+  document.body.append(h('div', { class: 'overlay', id: 'reg', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'reg-t' },
+    h('form', { class: 'card', onsubmit: (e) => { e.preventDefault(); const f = e.target.elements; netSend({ t: 'register', name: f.nick.value, birthDate: f.bd.value, acceptTerms: f.terms.checked ? '2026-11-beta-1' : null }); } },
+      h('h2', { id: 'reg-t' }, 'ברוך הבא ל' + BRAND),
+      h('label', { class: 'f', for: 'nick' }, 'כינוי', h('input', { id: 'nick', name: 'nick', required: true, minlength: 2, maxlength: 20, value: CL.nick.replace(/\s/g, '') })),
+      h('label', { class: 'f', for: 'bd' }, 'תאריך לידה (18+)', h('input', { id: 'bd', name: 'bd', type: 'date', required: true })),
+      h('label', { class: 'acts faint', style: 'justify-content:center' }, h('input', { type: 'checkbox', name: 'terms', required: true, style: 'width:auto' }), 'קראתי ואני מסכים ל', h('a', { href: '/doc.html?f=terms.md', target: '_blank', style: 'color:var(--brass-hi)' }, 'תקנון')),
+      h('button', { class: 'btn' }, 'כניסה'),
+      h('p', { class: 'faint' }, 'משחקים על נקודות ללא ערך כספי. נשמרת רק שנת הלידה.'))));
+}
+
+const STATUS_MAP = { registering: 'open', running: 'running', done: 'done', aborted: 'done' };
+function mapTour(t) {
+  const r = t.rules || {};
+  return {
+    id: t.id, name: t.name, clubId: t.clubId, stage: t.stage || 'club', mode: t.mode, len: t.length, size: t.size,
+    entry: r.entryTicket ? { ticket: r.entryTicket } : { coins: r.entryFee || 0 },
+    prize: r.prizeTicket ? { ticket: r.prizeTicket, n: 1 } : { coins: true },
+    hostFee: r.hostFeePct || 0, host: t.hostName, players: t.players || [], status: STATUS_MAP[t.status] || 'open',
+    startAt: Date.now() - 1, result: t.results ? { text: `המנצח: ${t.results.ranking[0]}`, sub: t.results.prizeTicket ? 'קיבל כרטיס לשלב הבא' : `פרסים: ${(t.results.prizes || []).map((p) => fmt(p.amount)).join(' / ')}` } : null,
+    online: true,
+  };
+}
+function syncMe(u) {
+  NET.me = u; P.coins = u.balance; P.tickets = { ...(u.tickets || { s2: 0, final: 0, live: 0 }) };
+  P.rating = u.rating; P.xp = Math.max(P.xp, u.xp || 0); CL.nick = u.name;
+}
+function refreshLobby() { netSend({ t: 'me' }); netSend({ t: 'clubs' }); netSend({ t: 'tournaments' }); }
+
+function onNet(m) {
+  switch (m.t) {
+    case 'welcome':
+      if (m.token) store.set(TOKEN_KEY, m.token);
+      $('#reg')?.remove(); syncMe(m.user); refreshLobby();
+      if (m.gift) toast(`+${m.gift.amount} מטבעות · מתנה יומית (רצף ${m.gift.streak})`);
+      if (st.screen !== 'table') render();
+      break;
+    case 'me': syncMe(m.user); if (st.screen !== 'table') render(); break;
+    case 'error':
+      if (m.msg === 'התחברות נכשלה') { store.set(TOKEN_KEY, null); showRegister(); }
+      toast(m.msg); break;
+    case 'clubs': CL.clubs = m.list.map((c) => ({ id: c.id, name: c.name, logo: c.logo, members: Array(c.members).fill(''), owner: c.owner ? CL.nick : '' })); if (!['table', 'guide'].includes(st.screen)) render(); break;
+    case 'club': {
+      const c = m.club; const i = CL.clubs.findIndex((x) => x.id === c.id);
+      const loc = { id: c.id, name: c.name, logo: c.logo, members: c.members, owner: c.ownerName, code: c.code, isOwner: c.owner };
+      if (i >= 0) CL.clubs[i] = loc; else CL.clubs.unshift(loc);
+      CL.tours = CL.tours.filter((t) => t.clubId !== c.id).concat(c.tournaments.map(mapTour));
+      if (st.screen === 'clubNew' || st.screen === 'tourNew' || st.pendingClub) { st.pendingClub = false; go('club', { clubId: c.id }); } else if (!['table', 'guide'].includes(st.screen)) render();
+      break;
+    }
+    case 'tournaments': CL.tours = m.list.map(mapTour); if (!['table', 'guide'].includes(st.screen)) render(); break;
+    case 'tournament': toast(`🏁 ${m.tournament?.name}: ${m.tournament?.results?.ranking?.[0] || ''} ניצח`); refreshLobby(); break;
+    case 'queued': NET.queued = !m.matched && !m.cancelled; if (!m.matched && !m.cancelled) toast('מחפש יריב…'); if (st.screen !== 'table') render(); break;
+    case 'levelUp': setTimeout(() => showLevelUp(m.level), 600); break;
+    case 'reminder': toast(`⏰ אתה משחק כבר ${m.minutes} דקות. זה זמן טוב להפסקה.`); break;
+    case 'match': onMatchView(m.view); break;
+    default: break;
+  }
+}
+
+// ----- live match adapter: makes a server view look like the local engine objects -----
+function boardAdapter(bv, view) {
+  const legal = bv.legal ? bv.legal.map((moves) => ({ moves, state: applySequence(bv.state, bv.turn, moves) })) : null;
+  const act = (action, extra = {}) => netSend({ t: 'act', matchId: view.id, board: bv.index, action, ...extra });
+  return {
+    state: bv.state, dice: bv.dice, phase: bv.phase, turn: bv.turn, cube: bv.cube, cubeEnabled: bv.cubeEnabled, crawford: bv.crawford,
+    result: bv.result, rollIndex: bv.rollIndex, plies: bv.rollIndex, legal, _you: bv.yourColor,
+    canDouble: () => !!bv.canDouble, rollIsForced: () => !bv.canDouble,
+    roll: () => act('roll'), double: () => act('double'), take: () => act('take'), drop: () => act('drop'), resign: () => act('resign'),
+    move: (c, moves) => act('move', { moves }),
+  };
+}
+function matchAdapter(view, prev) {
+  const you = view.you; const opp = you === 'A' ? 'B' : 'A';
+  const boards = view.boards.map((bv) => boardAdapter(bv, view));
+  // keep per-game "counted" flags across updates
+  if (prev) boards.forEach((b, i) => { if (prev._boards?.[i]?._counted && b.phase === 'over') b._counted = true; });
+  return {
+    _view: view, _boards: boards, kind: view.kind, over: view.over, pairs: view.target, target: view.target,
+    winner: view.winner === 'draw' ? 'draw' : view.winner == null ? null : view.winner === you ? 'A' : 'B',
+    score: { A: view.score[you], B: view.score[opp] },
+    rounds: { length: view.kind === 'duplicate' ? Math.floor(view.gamesFinished / 2) + 1 : 0 },
+    games: { length: view.gamesFinished + 1 },
+    boards: () => boards,
+    colorOf: (seat, b = 0) => (seat === 'A' ? view.boards[b].yourColor : other(view.boards[b].yourColor)),
+    seatOf: (color, b = 0) => (color === view.boards[b].yourColor ? 'A' : 'B'),
+    settle() {},
+  };
+}
+function onMatchView(view) {
+  const first = !G.online || G.M?._view?.id !== view.id;
+  const oppSeat = view.you === 'A' ? 'B' : 'A'; const opp = view.players[oppSeat];
+  G.online = true;
+  G.M = matchAdapter(view, first ? null : G.M);
+  if (first) {
+    stopTimers(); G.ended = false; G.view = 0; G.partial = new Map(); G.selected = null; G.last = new Map(); G.rolled = new Set(); G.bubbles = {};
+    NET.ratingAtStart = NET.me?.rating ?? P.rating; NET.queued = false;
+    G.cfg = { oppName: opp.name, level: opp.bot || 'intermediate', label: view.tournamentId ? 'טורניר' : 'משחק אונליין', stake: 0, arena: null };
+    vsScreen(opp.name, opp.bot || 'intermediate', () => { st.screen = 'table'; render(); }, 0);
+    return;
+  }
+  if (st.screen === 'table') step();
+}
+function finishOnline() {
+  const M = G.M; const won = M.winner === 'A'; const draw = M.winner === 'draw';
+  netSend({ t: 'me' });
+  if (won) { sfx.win(); confetti(); } else if (!draw) sfx.lose();
+  setTimeout(() => {
+    const delta = (NET.me?.rating ?? P.rating) - (NET.ratingAtStart ?? P.rating);
+    const done = () => { $('.V.res')?.remove(); G.online = false; go('home'); refreshLobby(); };
+    document.body.append(resultScreen({ won, draw, xp: 10 + (won ? 15 : 0), delta, prizeLine: null, again: done, close: done, cash: false }));
+  }, 700);
+}
+
+// =====================================================================
 // boot
 // =====================================================================
 $('#portrait-ok').addEventListener('click', () => document.body.classList.add('portrait-ok'));
@@ -1378,6 +1526,7 @@ setInterval(() => { if (['s1', 's2', 'final', 'club', 'tour'].includes(st.screen
 seedSystem();
 ensureMissions();
 render();
+netConnect();
 function ledger() {}
 const excluded = () => false;
 const sumKind = () => 0;

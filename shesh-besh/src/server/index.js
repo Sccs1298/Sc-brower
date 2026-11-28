@@ -38,7 +38,7 @@ function json(res, code, body) {
 function serveStatic(req, res, pathname) {
   for (const [prefix, dir] of STATIC) {
     if (!pathname.startsWith(prefix)) continue;
-    let rel = decodeURIComponent(pathname.slice(prefix.length)) || 'index.html';
+    let rel = decodeURIComponent(pathname.slice(prefix.length)) || 'play.html';
     const file = path.resolve(dir, rel);
     if (!file.startsWith(dir + path.sep) && file !== dir) break;
     if (fs.existsSync(file) && fs.statSync(file).isFile()) {
@@ -46,7 +46,7 @@ function serveStatic(req, res, pathname) {
         'content-type': MIME[path.extname(file)] || 'application/octet-stream',
         'x-content-type-options': 'nosniff',
         'content-security-policy': path.basename(file) === 'play.html'
-          ? "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:"
+          ? "default-src 'self'; connect-src 'self' ws: wss:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:"
           : "default-src 'self'; connect-src 'self' ws: wss:; style-src 'self' 'unsafe-inline'; img-src 'self' data:",
       });
       fs.createReadStream(file).pipe(res);
