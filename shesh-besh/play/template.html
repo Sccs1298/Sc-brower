@@ -1,7 +1,7 @@
 <title>דאבל שש</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Frank+Ruhl+Libre:wght@700;900&family=Assistant:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Frank+Ruhl+Libre:wght@700;900&family=Rubik:wght@400;500;600;700;800&display=swap">
 <style>
 /* Concept: a night-time Israeli backgammon tour — from the neighbourhood café to the Rothschild rooftop.
    Landscape-first game shell: top bar · stage. Single deliberate dark world (baize, brass, ivory, ebony). */
@@ -14,7 +14,7 @@
   --panel: rgba(6, 20, 15, .78); --panel-line: rgba(224, 176, 74, .26);
   --display: "Secular One", "Frank Ruhl Libre", "Arial Hebrew", sans-serif;
   --serif: "Frank Ruhl Libre", "David", Georgia, serif;
-  --body: "Assistant", "Segoe UI", Arial, sans-serif;
+  --body: "Rubik", "Segoe UI", Arial, sans-serif;
   --bar-h: 58px;
 }
 * { box-sizing: border-box; }
@@ -213,7 +213,7 @@ body.light::after { display: none; }
 body.light #app { padding: 0; height: auto; min-height: 100%; }
 .L { --g: #17a467; --g-d: #0e7d4c; --g-bg: #e8f6ee; --red: #d1342a; --red-bg: #fdecea; --blue: #2667d8; --blue-bg: #e9f0fd; --gray: #6f6a62; --gray-bg: #f1eee9;
   --line: #e2e4e8; --muted: #6b7079; --card: #fff; --ink: #16181b; --gold: #c08a14;
-  font-family: "Assistant", "Segoe UI", Arial, sans-serif; max-width: 760px; margin: 0 auto; min-height: 100vh; background: #fff; display: flex; flex-direction: column; color: var(--ink); }
+  font-family: "Rubik", "Segoe UI", Arial, sans-serif; max-width: 760px; margin: 0 auto; min-height: 100vh; background: #fff; display: flex; flex-direction: column; color: var(--ink); }
 .L .faint { color: var(--muted); font-size: .85rem; }
 .L-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: calc(12px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); position: sticky; top: 0; background: #fff; z-index: 5; border-bottom: 1px solid var(--line); }
 .L-me { display: flex; align-items: center; gap: 10px; }
@@ -331,6 +331,8 @@ body.light #app { padding: 0; height: auto; min-height: 100%; }
 body.light #toast { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 761px) { body.light { background: #e9ebef; } .L { box-shadow: 0 0 0 1px var(--line); } }
 
+.li { width: 1.15em; height: 1.15em; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.av { display: block; border-radius: 50%; overflow: hidden; } .av svg { width: 100%; height: 100%; display: block; }
 /* ---------- game screens (VS · table · results) ---------- */
 body.on-table { background: radial-gradient(120% 100% at 50% 0%, #16264d 0%, #0a1430 55%, #050914 100%) fixed, #070d1f; }
 body.on-table::after { display: none; }
@@ -635,13 +637,14 @@ function topbar() {
     h('button', { class: 'brand', onclick: () => (inGame && !G.M.over ? confirmLeave() : go('home')), 'aria-label': 'ללובי' }, logo(), h('span', {}, BRAND)),
     h('div', { class: 'hudchips' },
       h('span', { class: 'chip num', title: 'מטבעות – ללא ערך כספי' }, coinSVG(), fmt(P.coins)),
-      h('button', { class: 'chip', 'aria-label': audio.on ? 'השתק' : 'הפעל צלילים', onclick: () => { audio.on = !audio.on; store.set('sound', audio.on); render(); } }, audio.on ? '🔊' : '🔈')));
+      h('button', { class: 'chip', 'aria-label': audio.on ? 'השתק' : 'הפעל צלילים', onclick: () => { audio.on = !audio.on; store.set('sound', audio.on); render(); } }, LI(audio.on ? 'volume-2' : 'volume-x'))));
 }
 function confirmLeave() {
   document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' }, h('div', { class: 'card' }, h('h2', {}, 'לצאת מהמשחק?'), h('p', { class: 'muted' }, 'יציאה באמצע נחשבת להפסד.'),
     h('div', { class: 'acts', style: 'justify-content:center' }, h('button', { class: 'btn ghost', onclick: () => $('.overlay')?.remove() }, 'הישאר'), h('button', { class: 'btn red', onclick: () => { $('.overlay')?.remove(); if (G.online) { G.M.boards().forEach((g) => { if (g.phase !== 'over') g.resign(); }); return; } stopTimers(); for (let k = 0; k < 40 && !G.M.over; k++) { G.M.boards().forEach((g, b) => { if (g.phase !== 'over') g.resign(colorOf('A', b)); }); G.M.settle(); } step(); } }, 'צא')))));
 }
 function avatar(size = 46) {
+  if (typeof AVATARS !== 'undefined' && AVATARS.length) { const a = avatarFor(CL.nick, size); a.classList.add('L-av'); return a; }
   const s = S('svg', { viewBox: '0 0 46 46', width: size, height: size, class: 'L-av', 'aria-hidden': 'true' });
   s.append(S('circle', { cx: 23, cy: 23, r: 23, fill: '#1f2a24' }), S('circle', { cx: 23, cy: 18, r: 8, fill: '#e9d3b0' }), S('path', { d: 'M8 40c3-9 9-12 15-12s12 3 15 12', fill: '#e9d3b0' }), S('path', { d: 'M15 16c1-6 15-7 16 0-4-3-12-3-16 0z', fill: '#2b2119' }));
   return s;
@@ -652,7 +655,7 @@ function lobbyHeader() {
     h('div', { class: 'L-me' }, avatar(), h('div', {}, h('b', {}, CL.nick), h('button', { class: 'L-pill', onclick: () => go('me') }, `רמה ${level(P.xp)} ›`))),
     h('div', { class: 'L-wallet' },
       h('span', { class: 'L-chip', title: 'מטבעות' }, coinSVG(), h('b', { class: 'num' }, fmt(P.coins))),
-      h('button', { class: 'L-chip tk', onclick: () => go('me'), title: 'כרטיסים' }, '🎟️ ', h('b', { class: 'num' }, t.s2 + t.final + t.live), ' כרטיסים')));
+      h('button', { class: 'L-chip tk', onclick: () => go('me'), title: 'כרטיסים' }, LI('ticket'), h('b', { class: 'num' }, t.s2 + t.final + t.live), ' כרטיסים')));
 }
 const TABS = [['home', 'מועדון', 'club'], ['live', 'אירוע חי', 'star'], ['s1', 'שלב 1', '1'], ['s2', 'שלב 2', '2'], ['final', 'גמר', 'F'], ['me', 'אני', 'me']];
 function tabIcon(k, on) {
@@ -739,7 +742,7 @@ function tourCard(t) {
     h('div', { class: 'L-ti' },
       h('div', { class: 'L-tn' }, t.stage === 's1' ? h('span', { class: 'L-tag' }, 'שלב 1') : null, club ? h('span', { class: 'L-tag club' }, club.name) : null, h('span', {}, t.name)),
       h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, 'כניסה'), h('span', { class: 'L-v num' }, entryLabel(t)), h('span', { class: 'L-sp' }), h('span', { class: 'L-k' }, '⏰ ' + (t.startAt > Date.now() ? new Date(t.startAt).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) : 'עכשיו'))),
-      h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, '👥 ' + t.players.length), h('span', { class: 'L-k' }, fmtName(t)), h('span', { class: 'L-sp' }), h('span', { class: 'L-prize' }, prizeLabel(t))),
+      h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, LI('users'), ' ' + t.players.length), h('span', { class: 'L-k' }, fmtName(t)), h('span', { class: 'L-sp' }), h('span', { class: 'L-prize' }, prizeLabel(t))),
       mine ? h('span', { class: 'L-mine' }, '✓ רשום') : null));
 }
 
@@ -748,7 +751,7 @@ function viewClubHome() {
   const q = st.search.trim();
   const clubs = CL.clubs.filter((c) => !q || c.name.includes(q));
   return h('div', { class: 'L-col' },
-    h('label', { class: 'L-search' }, h('span', { 'aria-hidden': 'true' }, '🔍'), h('input', { placeholder: 'חפש מועדון', value: st.search, 'aria-label': 'חיפוש מועדון', oninput: (e) => { st.search = e.target.value; const pos = e.target.selectionStart; render(); const i = $('.L-search input'); i.focus(); i.setSelectionRange(pos, pos); } })),
+    h('label', { class: 'L-search' }, LI('search'), h('input', { placeholder: 'חפש מועדון', value: st.search, 'aria-label': 'חיפוש מועדון', oninput: (e) => { st.search = e.target.value; const pos = e.target.selectionStart; render(); const i = $('.L-search input'); i.focus(); i.setSelectionRange(pos, pos); } })),
     clubs.length ? h('div', { class: 'L-list' }, clubs.map((c) => h('button', { class: 'L-club', onclick: () => go('club', { clubId: c.id }) }, logoArt(c.logo, 56),
       h('div', {}, h('b', {}, c.name), h('span', { class: 'faint' }, `${c.members.length} חברים · ${CL.tours.filter((t) => t.clubId === c.id && t.status !== 'done').length} טורנירים פתוחים`)), h('span', { class: 'L-chev' }, '‹')))) : null,
     h('div', { class: 'L-create' },
@@ -757,13 +760,13 @@ function viewClubHome() {
     h('button', { class: 'L-banner', onclick: () => go('s1') },
       h('div', {}, h('b', {}, 'הדרך לגמר'), h('span', {}, 'שלב 1 ← שלב 2 ← גמר ← אירוע חי בתל אביב')), h('span', { class: 'L-banner-cta' }, 'התחל ›')),
     ONLINE && NET.cashEnabled ? h('button', { class: 'L-banner', style: 'background:radial-gradient(120% 140% at 0% 0%, #0f5a3a, #04140d 65%)', onclick: () => { netSend({ t: 'wallet' }); go('cash'); } },
-      h('div', {}, h('b', {}, '💰 שולחנות כסף'), h('span', {}, NET.wallet ? `יתרה ${shekel(NET.wallet.balance)} · ₪10 עד ₪100 מול יריב אונליין` : '₪10 עד ₪100 מול יריב אונליין')), h('span', { class: 'L-banner-cta' }, 'כניסה ›')) : null,
+      h('div', {}, h('b', {}, LI('wallet'), ' שולחנות כסף'), h('span', {}, NET.wallet ? `יתרה ${shekel(NET.wallet.balance)} · ₪10 עד ₪100 מול יריב אונליין` : '₪10 עד ₪100 מול יריב אונליין')), h('span', { class: 'L-banner-cta' }, 'כניסה ›')) : null,
     ONLINE ? h('form', { class: 'L-search', onsubmit: (e) => { e.preventDefault(); const v = e.target.elements.jc.value.trim(); if (v) { st.pendingClub = true; netSend({ t: 'joinClub', code: v }); } } },
-      h('span', { 'aria-hidden': 'true' }, '🔑'), h('input', { name: 'jc', placeholder: 'יש לך קוד מועדון? הזן כאן', 'aria-label': 'קוד מועדון', autocomplete: 'off', style: 'text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הצטרף')) : null,
+      LI('key-round'), h('input', { name: 'jc', placeholder: 'יש לך קוד מועדון? הזן כאן', 'aria-label': 'קוד מועדון', autocomplete: 'off', style: 'text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הצטרף')) : null,
     h('div', { class: 'L-row2' },
-      ONLINE ? h('button', { class: 'L-mini', onclick: () => { if (NET.queued) { netSend({ t: 'cancelQueue' }); NET.queued = false; render(); } else netSend({ t: 'queue', mode: 'duplicate', length: 1, clientSeed: seedHex() }); } }, h('b', {}, NET.queued ? '⏳ מחפש… (ביטול)' : '⚔️ מול שחקן'), h('span', {}, 'כפול · יריב אמיתי')) : null,
-      h('button', { class: 'L-mini', onclick: practice }, h('b', {}, '🎯 אימון מהיר'), h('span', {}, 'כפול נגד בוט')),
-      h('button', { class: 'L-mini', onclick: () => go('guide', { guideStep: 0 }) }, h('b', {}, '⚖️ למה זה חוקי'), h('span', {}, 'החוק והסטטיסטיקה'))));
+      ONLINE ? h('button', { class: 'L-mini', onclick: () => { if (NET.queued) { netSend({ t: 'cancelQueue' }); NET.queued = false; render(); } else netSend({ t: 'queue', mode: 'duplicate', length: 1, clientSeed: seedHex() }); } }, h('b', {}, LI(NET.queued ? 'hourglass' : 'swords'), NET.queued ? ' מחפש… (ביטול)' : ' מול שחקן'), h('span', {}, 'כפול · יריב אמיתי')) : null,
+      h('button', { class: 'L-mini', onclick: practice }, h('b', {}, LI('target'), ' אימון מהיר'), h('span', {}, 'כפול נגד בוט')),
+      h('button', { class: 'L-mini', onclick: () => go('guide', { guideStep: 0 }) }, h('b', {}, LI('scale'), ' למה זה חוקי'), h('span', {}, 'החוק והסטטיסטיקה'))));
 }
 function viewClubNew() {
   st.newClub ??= { name: '', logo: 'die' };
@@ -847,15 +850,15 @@ function viewMe() {
     h('div', { class: 'L-prof' }, avatar(96), h('h1', {}, CL.nick, h('button', { class: 'L-link', 'aria-label': 'שנה כינוי', onclick: () => { const v = (window.prompt?.('כינוי חדש', CL.nick) || '').trim(); if (v.length >= 2) { CL.nick = v.slice(0, 16); saveCL(); render(); } else toast('לשינוי כינוי: בגרסת השרת'); } }, ' ✎')), h('span', { class: 'L-id num' }, 'ID ' + CL.uid)),
     h('div', { class: 'L-tickets num' }, [['s2', 'שלב 2'], ['final', 'גמר'], ['live', 'אירוע חי']].map(([k, l]) => h('div', {}, h('b', {}, P.tickets[k]), h('span', {}, 'כרטיס ' + l)))),
     h('div', { class: 'L-menu' },
-      row('⭐', `רמה ${level(P.xp)} · דירוג ${P.rating}`, `${P.stats.wins}/${P.stats.games} ניצחונות`, () => go('me')),
-      row('🎖️', 'הישגים', `${Object.keys(P.ach).length}/${ACHIEVEMENTS.length}`, () => toast(ACHIEVEMENTS.filter((a) => P.ach[a.id]).map((a) => a.ic + ' ' + a.t).join(' · ') || 'עוד אין הישגים')),
-      row('🎨', 'לוח', SKINS.find((s) => s.id === P.skin)?.t, () => { const open = SKINS.filter((s) => level(P.xp) >= s.lv); const i = open.findIndex((s) => s.id === P.skin); P.skin = open[(i + 1) % open.length].id; save(); render(); toast('לוח: ' + SKINS.find((s) => s.id === P.skin).t); }),
-      row('🪙', 'מטבעות', `${fmt(P.coins)} · מילוי חינם כשנגמר`, () => { if (P.coins < 100 && Date.now() - P.lastRefill > 3600_000) { P.lastRefill = Date.now(); addCoins(300, 'מילוי חינם'); render(); } else toast('מילוי חינם זמין כשיש פחות מ-100 מטבעות, פעם בשעה'); }),
-      row('⚖️', 'למה זה חוקי', 'החוק, הסטטיסטיקה וניסוי חי', () => go('guide', { guideStep: 0 })),
-      row('🛡️', 'משחק אחראי', 'מגבלות והחרגה עצמית', () => toast('מגבלות והחרגה עצמית זמינות בגרסת השרת')),
-      row(audio.on ? '🔊' : '🔈', 'צלילים', audio.on ? 'פועל' : 'כבוי', () => { audio.on = !audio.on; store.set('sound', audio.on); render(); })),
+      row(LI('star'), `רמה ${level(P.xp)} · דירוג ${P.rating}`, `${P.stats.wins}/${P.stats.games} ניצחונות`, () => go('me')),
+      row(LI('award'), 'הישגים', `${Object.keys(P.ach).length}/${ACHIEVEMENTS.length}`, () => toast(ACHIEVEMENTS.filter((a) => P.ach[a.id]).map((a) => a.ic + ' ' + a.t).join(' · ') || 'עוד אין הישגים')),
+      row(LI('palette'), 'לוח', SKINS.find((s) => s.id === P.skin)?.t, () => { const open = SKINS.filter((s) => level(P.xp) >= s.lv); const i = open.findIndex((s) => s.id === P.skin); P.skin = open[(i + 1) % open.length].id; save(); render(); toast('לוח: ' + SKINS.find((s) => s.id === P.skin).t); }),
+      row(LI('coins'), 'מטבעות', `${fmt(P.coins)} · מילוי חינם כשנגמר`, () => { if (P.coins < 100 && Date.now() - P.lastRefill > 3600_000) { P.lastRefill = Date.now(); addCoins(300, 'מילוי חינם'); render(); } else toast('מילוי חינם זמין כשיש פחות מ-100 מטבעות, פעם בשעה'); }),
+      row(LI('scale'), 'למה זה חוקי', 'החוק, הסטטיסטיקה וניסוי חי', () => go('guide', { guideStep: 0 })),
+      row(LI('shield'), 'משחק אחראי', 'מגבלות והחרגה עצמית', () => toast('מגבלות והחרגה עצמית זמינות בגרסת השרת')),
+      row(LI(audio.on ? 'volume-2' : 'volume-x'), 'צלילים', audio.on ? 'פועל' : 'כבוי', () => { audio.on = !audio.on; store.set('sound', audio.on); render(); })),
     h('button', { class: 'L-refer', onclick: () => { const txt = `בוא לשחק איתי ${BRAND} – שש בש כפול, בלי מזל. הקוד שלי: ${CL.uid}`; try { navigator.clipboard.writeText(txt).then(() => toast('ההזמנה הועתקה'), () => toast(txt)); } catch { toast(txt); } } }, h('b', {}, 'הזמן חבר'), h('span', {}, 'שניכם מקבלים 300 מטבעות כשהוא משחק את המשחק הראשון')),
-    h('p', { class: 'L-note' }, 'אייקונים: game-icons.net (Lorc, Delapouite ואחרים), ברישיון CC BY 3.0'));
+    h('p', { class: 'L-note' }, 'אייקונים: game-icons.net (CC BY 3.0) · Lucide (ISC) · דמויות: DiceBear Avataaars (Pablo Stanley) · טקסטורות עץ: Poly Haven (CC0)'));
 }
 
 // ---------- tournament detail & bracket play ----------
@@ -1202,7 +1205,18 @@ function boardDefs(svg) {
   d.append(rg('chkW', '#ffffff', '#ececec', '#a9abae'), rg('chkB', '#5a5a60', '#232327', '#060607'));
   const f = S('filter', { id: 'grain' }); f.append(S('feTurbulence', { type: 'fractalNoise', baseFrequency: '.9 .04', numOctaves: 2, seed: 3 }), S('feColorMatrix', { values: '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .2 0' }), S('feComposite', { operator: 'in', in2: 'SourceGraphic' }));
   const sh = S('filter', { id: 'chkShadow', x: '-30%', y: '-30%', width: '160%', height: '160%' }); sh.append(S('feDropShadow', { dx: 0, dy: 3, stdDeviation: 2.2, 'flood-opacity': .55 }));
+  if (sk.id === 'classic' && typeof TEX !== 'undefined') {
+    const pat = (id, href, size) => { const pt = S('pattern', { id, patternUnits: 'userSpaceOnUse', width: size, height: size }); pt.append(S('image', { href, width: size, height: size, preserveAspectRatio: 'none' })); return pt; };
+    d.append(pat('texWalnut', TEX.walnut, 360), pat('texAsh', TEX.ash, 300), pat('texCherry', TEX.cherry, 260));
+  }
   d.append(f, sh); svg.append(d);
+}
+// Layered real-wood fill: CC0 texture + a tint (multiply) so it reads as warm wood.
+function woodFill(svg, tag, attrs, tex, tint, op) {
+  if (P.skin !== 'classic' || typeof TEX === 'undefined') return false;
+  svg.append(S(tag, { ...attrs, fill: `url(#${tex})` }));
+  svg.append(S(tag, { ...attrs, fill: tint, opacity: op, style: 'mix-blend-mode:multiply' }));
+  return true;
 }
 function checker(svg, cx, cy, color, lit, r = CR) {
   const g = S('g', { filter: 'url(#chkShadow)' });
@@ -1224,13 +1238,14 @@ function drawBoard(g, b, mini = false) {
   if (last && !p) for (const m of last.moves) { if (m.from !== BAR) lastPts.add(toOwn(me, toAbs(last.color, m.from))); if (m.to !== OFF) lastPts.add(toOwn(me, toAbs(last.color, m.to))); }
   const svg = S('svg', { class: 'board', viewBox: `0 0 ${BW + OFFW} ${BH}`, role: mini ? 'img' : 'group', 'aria-label': `לוח ${b + 1}` });
   boardDefs(svg);
-  svg.append(S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: 'url(#frame)' }), S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: '#a0703a', filter: 'url(#grain)' }));
-  svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6, fill: 'url(#field)' }));
+  if (!woodFill(svg, 'rect', { width: BW + OFFW, height: BH, rx: 18 }, 'texWalnut', '#7a3214', .85)) svg.append(S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: 'url(#frame)' }), S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: '#a0703a', filter: 'url(#grain)' }));
+  if (!woodFill(svg, 'rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6 }, 'texCherry', '#fff1d6', .35)) svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6, fill: 'url(#field)' }));
+  svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6, fill: 'none', stroke: 'rgba(0,0,0,.35)', 'stroke-width': 3 }));
   svg.append(S('rect', { x: PAD + COLW * 6, y: PAD - 6, width: BARW, height: BH - 2 * PAD + 12, rx: 4, fill: 'url(#barG)' }));
   for (let i = 0; i < 24; i++) {
     const { col, top } = pos(i); const x = colX(col); const tip = 205;
     const tri = top ? `${x + 2},${PAD} ${x + COLW - 2},${PAD} ${x + COLW / 2},${PAD + tip}` : `${x + 2},${BH - PAD} ${x + COLW - 2},${BH - PAD} ${x + COLW / 2},${BH - PAD - tip}`;
-    svg.append(S('polygon', { points: tri, fill: i % 2 ? 'url(#ptA)' : 'url(#ptB)', opacity: .95 }));
+    if (!woodFill(svg, 'polygon', { points: tri }, i % 2 ? 'texWalnut' : 'texAsh', i % 2 ? '#9c2f10' : '#fff0d0', i % 2 ? .9 : .55)) svg.append(S('polygon', { points: tri, fill: i % 2 ? 'url(#ptA)' : 'url(#ptB)', opacity: .95 }));
     if (lastPts.has(i)) svg.append(S('polygon', { points: tri, fill: 'rgba(124,196,255,.22)' }));
     if (dests.has(i) || sel === i) svg.append(S('polygon', { points: tri, fill: 'rgba(255,215,122,.28)', stroke: 'var(--brass-hi)', 'stroke-width': 2.5 }));
     const nMe = ownCount(s, me, i); const nOp = oppCount(s, me, i); const n = nMe || nOp; const c = nMe ? me : op;
@@ -1275,12 +1290,15 @@ function ICON(name, cls = 'ic') {
   s.innerHTML = ICONS.icons[name] || '';
   return s;
 }
+function LI(name, cls = 'li') { const s = S('svg', { viewBox: '0 0 24 24', class: cls, 'aria-hidden': 'true' }); s.innerHTML = LUCIDE[name] || ''; return s; }
+const hashStr = (t) => [...String(t || '')].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+function avatarFor(name, size = 46) { const d = h('span', { class: 'av', style: `width:${size}px;height:${size}px`, 'aria-hidden': 'true' }); d.innerHTML = AVATARS[hashStr(name) % AVATARS.length]; return d; }
 const TIPS = ['שמור עוגן בבית של היריב, זו רשת הביטחון שלך', 'בנה את הבית לפני שאתה מתחיל להוציא', 'כלי בודד ליד היריב = הזמנה להכאה', 'שש בש כפול: אותן קוביות לשניכם, ההחלטות מכריעות', 'נקודה 5 ונקודה 7 הן הכי חשובות בפתיחה', 'כשאתה מוביל במרוץ, פרק מגע ורוץ הביתה'];
 const FLAG = '🇮🇱';
 
 function ringAvatar(side, name, lvl, extra = {}) {
   return h('div', { class: 'V-ring ' + side + (extra.turn ? ' turn' : ''), style: extra.pct != null ? `--p:${extra.pct}` : null },
-    h('div', { class: 'V-face' }, side === 'blue' ? avatar(120) : h('span', { class: 'V-ini' }, (name || '?')[0])),
+    h('div', { class: 'V-face' }, avatarFor(name, 200)),
     h('span', { class: 'V-star' }, h('b', {}, lvl)),
     extra.coins != null ? h('span', { class: 'V-coin num' }, coinSVG(), h('b', {}, fmt(extra.coins))) : null);
 }
@@ -1318,7 +1336,7 @@ function hudSide(seat) {
   const fill = Math.max(0, Math.min(1, 1 - pip / 167));
   const bub = G.bubbles[seat];
   return h('div', { class: 'T-hud ' + (me ? 'me' : 'op') },
-    h('div', { class: 'T-av ' + (me ? 'blue' : 'red') + (turn ? ' turn' : '') }, me ? avatar(64) : h('span', { class: 'V-ini' }, (G.cfg.oppName || '?')[0]),
+    h('div', { class: 'T-av ' + (me ? 'blue' : 'red') + (turn ? ' turn' : '') }, avatarFor(me ? CL.nick : G.cfg.oppName, 64),
       h('span', { class: 'T-lvl' }, me ? level(P.xp) : ({ beginner: 1, intermediate: 3, strong: 6, expert: 10 }[G.cfg.level] || 2)),
       bub ? h('span', { class: 'bubble' }, bub.e) : null),
     h('div', { class: 'T-id' }, h('div', { class: 'T-nm' }, h('b', {}, me ? CL.nick : G.cfg.oppName), h('span', {}, FLAG)),
@@ -1358,7 +1376,7 @@ function viewTable() {
       h('div', { class: 'T-right' },
         h('button', { class: 'T-rb', 'aria-label': 'תגובות', onclick: () => { G.showEmotes = !G.showEmotes; render(); } }, ICON('chat-bubble')),
         emoteBar,
-        h('button', { class: 'T-rb', 'aria-label': audio.on ? 'השתק' : 'הפעל צלילים', onclick: () => { audio.on = !audio.on; store.set('sound', audio.on); render(); } }, audio.on ? '🔊' : '🔈'),
+        h('button', { class: 'T-rb', 'aria-label': audio.on ? 'השתק' : 'הפעל צלילים', onclick: () => { audio.on = !audio.on; store.set('sound', audio.on); render(); } }, LI(audio.on ? 'volume-2' : 'volume-x')),
         h('button', { class: 'T-rb red', 'aria-label': 'יציאה', onclick: () => (G.M.over ? go('home') : confirmLeave()) }, ICON('exit-door')))));
 }
 
@@ -1475,7 +1493,7 @@ function viewCash() {
   const back = h('div', { class: 'L-bar' }, h('button', { class: 'L-back', onclick: () => go('home'), 'aria-label': 'חזרה' }, '›'), h('h1', {}, 'שולחנות כסף'));
   if (!w) return h('div', { class: 'L-col' }, back, h('p', { class: 'L-empty' }, 'טוען…'));
   const kyc = w.kyc.status;
-  const kycBox = kyc === 'verified' ? h('div', { class: 'L-sum' }, h('div', {}, h('span', {}, 'אימות זהות'), h('b', {}, '✅ מאושר')), h('div', { class: 'sub' }, h('span', {}, w.kyc.fullName), h('span', {}, 'ת"ז ••' + w.kyc.idLast3)))
+  const kycBox = kyc === 'verified' ? h('div', { class: 'L-sum' }, h('div', {}, h('span', {}, 'אימות זהות'), h('b', {}, LI('badge-check'), ' מאושר')), h('div', { class: 'sub' }, h('span', {}, w.kyc.fullName), h('span', {}, 'ת"ז ••' + w.kyc.idLast3)))
     : kyc === 'pending' ? h('p', { class: 'L-result' }, h('b', {}, '⏳ ממתין לאישור המפעיל'), h('span', {}, 'אחרי האישור תוכל להפקיד ולשחק על כסף.'))
     : h('form', { class: 'L-col', onsubmit: (e) => { e.preventDefault(); const f = e.target.elements; netSend({ t: 'kyc', fullName: f.fn.value, idNumber: f.idn.value, birthDate: f.dob.value }); } },
       h('h2', { class: 'L-h2' }, kyc === 'rejected' ? 'האימות נדחה – נסה שוב' : 'שלב 1 · אימות זהות'),
@@ -1489,7 +1507,7 @@ function viewCash() {
     h('div', { class: 'L-hero', style: 'background:radial-gradient(120% 120% at 50% 0%, #0f5a3a, #04140d)' }, h('span', {}, 'היתרה שלך'), h('b', { class: 'num' }, shekel(w.balance)), h('span', {}, `הופקד ב-24 שעות: ${shekel(w.deposits24h)} · הפסד נטו 30 יום: ${shekel(Math.max(0, w.netLoss30d))}`)),
     kycBox,
     ok ? h('form', { class: 'L-search', onsubmit: (e) => { e.preventDefault(); const v = e.target.elements.vc.value.trim(); if (v) netSend({ t: 'redeem', code: v }); e.target.reset(); } },
-      h('span', { 'aria-hidden': 'true' }, '🎟️'), h('input', { name: 'vc', placeholder: 'קוד הפקדה SB-XXXXX-XXXXX', 'aria-label': 'קוד הפקדה', autocomplete: 'off', style: 'direction:ltr;text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הפקד')) : null,
+      LI('ticket'), h('input', { name: 'vc', placeholder: 'קוד הפקדה SB-XXXXX-XXXXX', 'aria-label': 'קוד הפקדה', autocomplete: 'off', style: 'direction:ltr;text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הפקד')) : null,
     h('h2', { class: 'L-h2' }, 'שולחנות · מול יריב אונליין'),
     h('div', { class: 'L-list' }, tables.map((a) => h('div', { class: 'L-tc', style: 'grid-template-columns: 104px 1fr' },
       h('div', { class: 'L-st ' + (a.locked ? 'ann' : 'reg') }, h('span', { class: 'L-stl' }, a.locked ? 'נעול' : a.waiting ? 'יריב מחכה!' : 'פתוח'), h('b', { class: 'num' }, shekel(a.entry))),
@@ -1497,7 +1515,7 @@ function viewCash() {
         h('div', { class: 'L-tn' }, h('span', {}, a.name)),
         h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, a.mode === 'duplicate' ? `שש בש כפול · ${a.length} סבבים` : `מאץ' עד ${a.length}`), h('span', { class: 'L-sp' }), h('span', { class: 'L-prize' }, '🏆 ' + shekel(a.prize))),
         h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, `עמלה ${shekel(a.fee)} · מס על הרווח מנוכה במקור`)),
-        a.locked ? h('span', { class: 'faint' }, '🔒 ' + a.locked) : h('button', { class: 'L-btn sm', disabled: !ok || w.balance < a.entry || null, onclick: () => netSend({ t: 'joinArena', arenaId: a.id, clientSeed: seedHex() }) }, w.balance < a.entry ? 'אין מספיק יתרה' : NET.queued ? 'מחפש יריב…' : `שחק · ${shekel(a.entry)}`))))),
+        a.locked ? h('span', { class: 'faint' }, LI('lock'), ' ' + a.locked) : h('button', { class: 'L-btn sm', disabled: !ok || w.balance < a.entry || null, onclick: () => netSend({ t: 'joinArena', arenaId: a.id, clientSeed: seedHex() }) }, w.balance < a.entry ? 'אין מספיק יתרה' : NET.queued ? 'מחפש יריב…' : `שחק · ${shekel(a.entry)}`))))),
     ok ? h('form', { class: 'L-col', onsubmit: (e) => { e.preventDefault(); const v = Math.round(Number(e.target.elements.wa.value) * 100); if (v > 0) netSend({ t: 'withdraw', amount: v }); e.target.reset(); } },
       h('h2', { class: 'L-h2' }, 'משיכה'),
       h('div', { class: 'L-search' }, h('input', { name: 'wa', type: 'number', min: 50, placeholder: 'סכום ₪ (מינימום 50)', 'aria-label': 'סכום משיכה' }), h('button', { class: 'L-btn sm' }, 'בקש משיכה')),

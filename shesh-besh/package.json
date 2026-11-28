@@ -14,5 +14,10 @@
     "ws": "^8.18.0"
   },
   "type": "module",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
+    "lucide-static": "^0.460.0"
+  }
 }

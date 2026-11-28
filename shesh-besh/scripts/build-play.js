@@ -14,7 +14,17 @@ for (const f of ['board.js', 'game.js', 'bot.js']) {
 }
 const tpl = fs.readFileSync(path.join(root, 'play/template.html'), 'utf8');
 const icons = fs.readFileSync(path.join(root, 'play/icons.json'), 'utf8');
-const body = tpl.replace('/*ENGINE*/', () => engine).replace('/*ICONSDATA*/', () => `const ICONS = ${icons};`);
+const b64 = (f) => 'data:image/jpeg;base64,' + fs.readFileSync(path.join(root, 'play/assets', f)).toString('base64');
+const TEX = { walnut: b64('walnut.jpg'), ash: b64('ash.jpg'), cherry: b64('cherry.jpg') };
+const AVATARS = fs.readFileSync(path.join(root, 'play/assets/avatars.json'), 'utf8');
+const LUCIDE_NAMES = ['volume-2', 'volume-x', 'ticket', 'users', 'search', 'wallet', 'key-round', 'swords', 'target', 'scale', 'star', 'award', 'palette', 'coins', 'shield', 'badge-check', 'lock', 'hourglass'];
+const LUCIDE = {};
+for (const n of LUCIDE_NAMES) {
+  const svg = fs.readFileSync(path.join(root, 'node_modules/lucide-static/icons', n + '.svg'), 'utf8');
+  LUCIDE[n] = svg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '').trim();
+}
+const assets = `const TEX = ${JSON.stringify(TEX)};\nconst AVATARS = ${AVATARS};\nconst LUCIDE = ${JSON.stringify(LUCIDE)};`;
+const body = tpl.replace('/*ENGINE*/', () => engine).replace('/*ICONSDATA*/', () => `const ICONS = ${icons};\n${assets}`);
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist/play-artifact.html'), body);
 fs.writeFileSync(path.join(root, 'public/play.html'), `<!doctype html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n${body}\n</body>\n</html>\n`);
