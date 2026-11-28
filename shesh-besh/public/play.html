@@ -373,8 +373,24 @@ body.light { background: #0b1220; color: #f3efe6; }
 .L-main.enter > * > :nth-child(2) { animation-delay: .04s; } .L-main.enter > * > :nth-child(3) { animation-delay: .08s; } .L-main.enter > * > :nth-child(4) { animation-delay: .12s; } .L-main.enter > * > :nth-child(n+5) { animation-delay: .16s; }
 @keyframes rise { from { transform: translateY(14px); opacity: 0; } }
 svg.board .mv { transform-box: fill-box; transform-origin: center; }
+#fx { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 65; }
+.fx-flash { position: fixed; inset: 0; pointer-events: none; z-index: 64; background: radial-gradient(circle at 50% 50%, var(--c), transparent 72%); animation: fxflash .6s ease-out forwards; }
+@keyframes fxflash { from { opacity: 1; } to { opacity: 0; } }
+.R-fire { width: 1.1em; height: 1.1em; vertical-align: -.2em; fill: #ff9a3c; }
+/* colourful & playful */
+body.light { background: #1b1250; }
+.L { --g: #3cc94f; --g-d: #22923a; --card: #3a2c9a;
+  background: radial-gradient(110% 55% at 50% -8%, rgba(150,110,255,.45), transparent 62%), radial-gradient(80% 40% at 100% 100%, rgba(255,90,170,.18), transparent 60%), linear-gradient(180deg, #2b1d82, #170f4a 75%); }
+.L-head { background: rgba(32,21,100,.9); }
+.L-chip, .L-search, .L-mini, .L-club, .L-tc, .L-seg button, .L-sum, .L-field input:not([type="range"]), .L-btn.ghost, .L-create {
+  background: linear-gradient(180deg, #4534b3, #34268f); border-color: rgba(255,255,255,.14);
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,.18), 0 4px 0 #1d1462, 0 10px 18px rgba(10,5,40,.4); }
+.L-tabs { background: rgba(23,15,74,.96); } .L-zone { background: #2a1d82; }
+.L-tab.on { color: #ffd23f; }
+.L-btn { background: linear-gradient(180deg, #55dd66, #33b845); }
+.L-createArt { background: radial-gradient(120% 100% at 50% 0%, #6a54e8, #2a1d82); }
 body.light #toast { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
-@media (min-width: 761px) { body.light { background: #e9ebef; } .L { box-shadow: 0 0 0 1px var(--line); } }
+@media (min-width: 761px) { body.light { background: radial-gradient(90% 70% at 50% 0%, #2b1d82, #0f0a33); } .L { box-shadow: 0 0 60px rgba(0,0,0,.5); } }
 
 .li { width: 1.15em; height: 1.15em; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .av { display: block; border-radius: 50%; overflow: hidden; } .av svg { width: 100%; height: 100%; display: block; }
@@ -1257,11 +1273,43 @@ function tone(freq, dur, type = 'sine', vol = .12, when = 0) {
   } catch { /* no audio */ }
 }
 const buzz = (ms) => { try { navigator.vibrate?.(ms); } catch { /* none */ } };
+const jit = (v, p = .08) => v * (1 + (Math.random() * 2 - 1) * p);
+function actx() { audio.ctx ??= new (window.AudioContext || window.webkitAudioContext)(); if (audio.ctx.state === 'suspended') audio.ctx.resume(); return audio.ctx; }
+// filtered noise burst (wood, dice clicks, cracks)
+function noise(dur, { type = 'bandpass', freq = 1000, q = 1, vol = .2, when = 0, attack = .002 } = {}) {
+  if (!audio.on) return;
+  try {
+    const c = actx(); const t0 = c.currentTime + when; const len = Math.ceil(c.sampleRate * dur);
+    const buf = c.createBuffer(1, len, c.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(); src.buffer = buf; const f = c.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+    const g = c.createGain(); g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + attack); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    src.connect(f).connect(g).connect(c.destination); src.start(t0); src.stop(t0 + dur + .02);
+  } catch { /* no audio */ }
+}
+// pitch sweep (thumps, pops, booms)
+function sweep(f0, f1, dur, type = 'sine', vol = .2, when = 0) {
+  if (!audio.on) return;
+  try {
+    const c = actx(); const t0 = c.currentTime + when; const o = c.createOscillator(); const g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0 + dur + .02);
+  } catch { /* no audio */ }
+}
 const sfx = {
-  dice() { for (let i = 0; i < 6; i++) tone(170 + Math.random() * 300, .05, 'square', .045, i * .045); buzz(18); },
-  click() { tone(560, .06, 'triangle', .1); },
-  hit() { tone(130, .2, 'sawtooth', .08); buzz(30); },
-  off() { tone(880, .08, 'triangle', .08); },
+  dice() { for (let i = 0; i < 4; i++) noise(.035, { freq: jit(2600, .25), q: 5, vol: .14, when: i * jit(.05, .3) }); buzz(12); }, // shake in the cup
+  rattle(v = .5) { noise(.03, { freq: jit(3000, .25), q: 4, vol: .06 + v * .22 }); sweep(jit(700, .15), 380, .03, 'triangle', .04 + v * .05); },
+  settle() { noise(.05, { freq: jit(1700, .1), q: 3, vol: .22 }); sweep(jit(260), 150, .06, 'sine', .14); },
+  tock(hgt = 0) { noise(.06, { freq: jit(1150 + hgt * 110, .1), q: 3, vol: .32 }); sweep(jit(230 + hgt * 14), 115, .08, 'sine', .22); },
+  pick() { noise(.025, { type: 'highpass', freq: jit(2600), vol: .1 }); tone(jit(980), .04, 'sine', .05); },
+  pop() { sweep(jit(380), jit(760), .07, 'sine', .11); },
+  thud() { sweep(jit(130), 38, .34, 'sine', .55); noise(.2, { type: 'lowpass', freq: 520, vol: .45 }); noise(.045, { type: 'highpass', freq: 3200, vol: .28 }); buzz([18, 30, 26]); },
+  offN(n = 0) { this.tock(2); tone(jit(523 * 2 ** (Math.min(n, 14) / 12), .01), .16, 'triangle', .12, .02); },
+  doubles() { [784, 988, 1175].forEach((f, i) => tone(jit(f, .01), .14, 'triangle', .09, i * .06)); noise(.3, { type: 'highpass', freq: 6000, vol: .05, attack: .05 }); },
+  six6() { sweep(110, 36, .5, 'sine', .55); [523, 659, 784, 1046, 1318, 1568].forEach((f, i) => tone(jit(f, .006), .26, 'triangle', .12, .05 + i * .07)); noise(.8, { type: 'highpass', freq: 5500, vol: .08, attack: .1 }); buzz([30, 40, 60]); },
+  click() { this.tock(0); },
+  hit() { this.thud(); },
+  off() { this.offN(0); },
   coin() { [988, 1319].forEach((f, i) => tone(f, .12, 'square', .05, i * .08)); },
   win() { [523, 659, 784, 1046].forEach((f, i) => tone(f, .28, 'triangle', .12, i * .12)); buzz(60); },
   lose() { [392, 330].forEach((f, i) => tone(f, .3, 'sine', .08, i * .15)); },
@@ -1275,6 +1323,139 @@ function confetti() {
   const parts = Array.from({ length: 180 }, () => ({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - .5) * 16, vy: Math.random() * -13 - 4, s: 4 + Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)], r: Math.random() * 6 }));
   let t = 0;
   (function f() { x.clearRect(0, 0, innerWidth, innerHeight); for (const p of parts) { p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += .2; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore(); } if (t++ < 160) requestAnimationFrame(f); else x.clearRect(0, 0, innerWidth, innerHeight); })();
+}
+
+// =====================================================================
+// FX — juice engine. Fixed-step simulation (FX_DT) kept apart from drawing.
+// States: IDLE (no loop) · RUNNING · HITSTOP (sim frozen + WAAPI paused)
+// =====================================================================
+const FX_DT = 1 / 120;
+const FX = { state: 'IDLE', parts: [], trauma: 0, t: 0, acc: 0, last: 0, raf: 0, cv: null, cx: null, stopUntil: 0, paused: [] };
+const rnd = (a, b) => a + Math.random() * (b - a);
+const fxBoard = () => document.querySelector('.T-board > svg.board');
+function fxAt(bx, by, fn) { const m = fxBoard()?.getScreenCTM(); if (!m) return; const p = new DOMPoint(bx, by).matrixTransform(m); fn(p.x, p.y, m.a); }
+function fxCanvas() {
+  if (!FX.cv) { FX.cv = h('canvas', { id: 'fx', 'aria-hidden': 'true' }); document.body.append(FX.cv); FX.cx = FX.cv.getContext('2d'); }
+  const d = devicePixelRatio || 1; const W = Math.round(innerWidth * d); const H = Math.round(innerHeight * d);
+  if (FX.cv.width !== W || FX.cv.height !== H) { FX.cv.width = W; FX.cv.height = H; }
+  FX.cx.setTransform(d, 0, 0, d, 0, 0);
+}
+function fxKick() { if (FX.raf) return; if (FX.state === 'IDLE') FX.state = 'RUNNING'; FX.last = performance.now(); FX.raf = requestAnimationFrame(fxLoop); }
+function fxLoop(now) {
+  let dt = Math.min(.05, (now - FX.last) / 1000); FX.last = now;
+  if (FX.state === 'HITSTOP') { if (now < FX.stopUntil) dt = 0; else { FX.state = 'RUNNING'; FX.paused.forEach((a) => { try { a.play(); } catch { /* gone */ } }); FX.paused = []; } }
+  FX.acc += dt;
+  while (FX.acc >= FX_DT) { fxUpdate(FX_DT); FX.acc -= FX_DT; }
+  fxDraw();
+  if (FX.parts.length || FX.trauma > 0 || FX.state === 'HITSTOP' || diceBusy()) FX.raf = requestAnimationFrame(fxLoop);
+  else { FX.raf = 0; FX.state = 'IDLE'; const svg = fxBoard(); if (svg) { svg.style.translate = ''; svg.style.rotate = ''; } FX.cx?.clearRect(0, 0, innerWidth, innerHeight); }
+}
+function fxUpdate(dt) {
+  FX.t += dt; FX.trauma = Math.max(0, FX.trauma - dt * 1.7);
+  for (const p of FX.parts) { const k = Math.pow(p.drag, dt); p.vx *= k; p.vy *= k; p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += p.vr * dt; p.life -= dt; }
+  FX.parts = FX.parts.filter((p) => p.life > 0);
+  diceUpdate(dt);
+}
+function fxDraw() {
+  fxCanvas(); const x = FX.cx; x.clearRect(0, 0, innerWidth, innerHeight);
+  for (const p of FX.parts) {
+    const a = Math.min(1, p.life / p.fade); x.save(); x.globalAlpha = a * p.alpha; x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.color;
+    if (p.kind === 'dust') { x.beginPath(); x.arc(0, 0, p.s * (1.7 - a * .7), 0, 7); x.fill(); }
+    else if (p.kind === 'spark') { const s = p.s * (.6 + a * .4); x.beginPath(); x.moveTo(0, -s); x.lineTo(s * .22, -s * .22); x.lineTo(s, 0); x.lineTo(s * .22, s * .22); x.lineTo(0, s); x.lineTo(-s * .22, s * .22); x.lineTo(-s, 0); x.lineTo(-s * .22, -s * .22); x.closePath(); x.fill(); }
+    else { x.scale(1, Math.cos(p.r * 2.3)); x.fillRect(-p.s / 2, -p.s / 5, p.s, p.s / 2.5); } // splinter / confetti flips as it spins
+    x.restore();
+  }
+  const svg = fxBoard();
+  if (svg) { const k = FX.trauma * FX.trauma * 10; svg.style.translate = k > .05 ? `${(Math.sin(FX.t * 71) + Math.sin(FX.t * 37)) * k * .5}px ${(Math.cos(FX.t * 59) + Math.sin(FX.t * 23)) * k * .5}px` : ''; svg.style.rotate = k > .05 ? `${Math.sin(FX.t * 43) * k * .07}deg` : ''; }
+  diceDraw();
+}
+function burst(x, y, n, o) {
+  if (reduced) return;
+  for (let i = 0; i < n; i++) {
+    const a = rnd(o.a0 ?? 0, o.a1 ?? Math.PI * 2); const sp = rnd(o.v0, o.v1);
+    FX.parts.push({ kind: o.kind, x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: o.g ?? 0, drag: o.drag ?? .05, r: rnd(0, 6), vr: rnd(-14, 14), s: rnd(o.s0, o.s1), life: rnd(o.l0, o.l1), fade: o.fade ?? .25, alpha: o.alpha ?? 1, color: o.colors[Math.floor(Math.random() * o.colors.length)] });
+  }
+  fxKick();
+}
+function shake(tr) { if (reduced) return; FX.trauma = Math.min(1, FX.trauma + tr); fxKick(); }
+function hitstop(ms) { if (reduced) return; FX.state = 'HITSTOP'; FX.stopUntil = performance.now() + ms; FX.paused = document.getAnimations().filter((a) => a.playState === 'running'); FX.paused.forEach((a) => a.pause()); fxKick(); }
+function flash(color) { if (reduced) return; const el = h('div', { class: 'fx-flash', style: `--c:${color}` }); document.body.append(el); setTimeout(() => el.remove(), 700); }
+const GOLD = ['#ffd23f', '#fff1a8', '#ffb020', '#ffe680'];
+const JUICE = {
+  land(x, y, hgt) { fxAt(x, y, (sx, sy, k) => burst(sx, sy + 14 * k, 9, { kind: 'dust', v0: 50, v1: 140, a0: Math.PI * .85, a1: Math.PI * 2.15, g: -30, drag: .02, s0: 2 + 3 * k, s1: 3 + 6 * k, l0: .28, l1: .5, alpha: .45, colors: ['#fff4dc', '#f1dcb2'] })); sfx.tock(hgt); },
+  hit(x, y) {
+    hitstop(48); shake(.6); flash('rgba(255,90,60,.28)');
+    fxAt(x, y, (sx, sy) => { burst(sx, sy, 24, { kind: 'chip', v0: 200, v1: 560, g: 1100, drag: .25, s0: 5, s1: 12, l0: .55, l1: .95, colors: ['#7a3a17', '#a4602d', '#5a2a10', '#d49a5e'] }); burst(sx, sy, 12, { kind: 'spark', v0: 90, v1: 300, drag: .04, s0: 6, s1: 11, l0: .22, l1: .42, colors: ['#ffffff', '#fff3c4', '#ff8a5c'] }); });
+    sfx.thud();
+  },
+  off(x, y, n) { fxAt(x, y, (sx, sy) => burst(sx, sy, 16, { kind: 'spark', v0: 70, v1: 260, g: -80, drag: .08, s0: 4, s1: 9, l0: .4, l1: .75, colors: GOLD })); shake(.12); sfx.offN(n); },
+  doubles(x, y) { fxAt(x, y, (sx, sy) => burst(sx, sy, 26, { kind: 'spark', v0: 120, v1: 380, drag: .05, s0: 5, s1: 10, l0: .4, l1: .8, colors: GOLD })); shake(.22); sfx.doubles(); },
+  six6(x, y) {
+    hitstop(70); flash('rgba(255,210,63,.6)'); shake(.75);
+    fxAt(x, y, (sx, sy) => { burst(sx, sy, 60, { kind: 'spark', v0: 160, v1: 640, drag: .06, s0: 6, s1: 13, l0: .6, l1: 1.1, colors: GOLD }); burst(sx, sy, 70, { kind: 'chip', v0: 250, v1: 700, a0: Math.PI * 1.1, a1: Math.PI * 1.9, g: 900, drag: .4, s0: 7, s1: 13, l0: 1, l1: 1.6, colors: ['#ffd23f', '#ff5a8a', '#4fd1ff', '#6dff8a', '#b78cff'] }); });
+    sfx.six6(); setTimeout(() => banner('דאבל שש!', 'הקוביות של הבית', 'gold'), 90);
+  },
+};
+
+// ---------- dice: thrown from the roller's side, fixed-step physics, survive re-renders ----------
+const DICE = new Map(); // key -> { t, T, frames: [[{x,y,a,f}...] per die], events: [{t,v}], els, vals, center, fired }
+function diceThrow(key, targets, vals, fromMe, box) {
+  if (reduced) return;
+  const paths = []; const events = []; let T = 0;
+  targets.forEach((tg, i) => {
+    const r = tg.sz / 2; const fr = [];
+    let x = fromMe ? box.x1 - r - rnd(0, 40) : box.x0 + r + rnd(0, 40); let y = fromMe ? box.y1 - r - 2 : box.y0 + r + 2;
+    const ax = tg.x + rnd(-60, 60) - x; const ay = tg.y + rnd(-50, 50) - y; const L = Math.hypot(ax, ay) || 1; const sp = rnd(1150, 1450);
+    let vx = (ax / L) * sp; let vy = (ay / L) * sp; let a = rnd(0, 360); let dist = 0; let f = 1 + Math.floor(Math.random() * 6); let t = 0;
+    while (t < 1.1) {
+      vx *= Math.exp(-3.4 * FX_DT); vy *= Math.exp(-3.4 * FX_DT);
+      x += vx * FX_DT; y += vy * FX_DT; t += FX_DT;
+      const v = Math.hypot(vx, vy);
+      if (x < box.x0 + r) { x = box.x0 + r; vx = -vx * .55; if (i === 0 || v > 200) events.push({ t, v: Math.min(1, v / 900) }); }
+      if (x > box.x1 - r) { x = box.x1 - r; vx = -vx * .55; if (i === 0 || v > 200) events.push({ t, v: Math.min(1, v / 900) }); }
+      if (y < box.y0 + r) { y = box.y0 + r; vy = -vy * .55; events.push({ t, v: Math.min(1, v / 900) }); }
+      if (y > box.y1 - r) { y = box.y1 - r; vy = -vy * .55; events.push({ t, v: Math.min(1, v / 900) }); }
+      a += (vx >= 0 ? 1 : -1) * v * .55 * FX_DT; dist += v * FX_DT;
+      if (dist > tg.sz * .85) { dist = 0; f = 1 + ((f + 1 + Math.floor(Math.random() * 4)) % 6); }
+      fr.push({ x, y, a, f });
+      if (v < 26 && t > .35) break;
+    }
+    // bend the whole path so it comes to rest exactly where the layout wants the die
+    const last = fr[fr.length - 1]; const dx = tg.x - last.x; const dy = tg.y - last.y; const da = Math.round(last.a / 90) * 90 - last.a; const n = fr.length;
+    fr.forEach((p, k) => { const u = k / (n - 1); const e = u * u * (3 - 2 * u); p.x += dx * e; p.y += dy * e; p.a += da * e; if (u > .72) p.f = vals[i]; p.dx = p.x - tg.x; p.dy = p.y - tg.y; });
+    T = Math.max(T, n * FX_DT); paths.push(fr);
+  });
+  events.sort((p, q) => p.t - q.t);
+  DICE.set(key, { t: 0, T, frames: paths, events, ev: 0, els: [], vals, center: { x: targets.reduce((s, q) => s + q.x, 0) / targets.length, y: targets[0].y }, fired: false });
+  sfx.dice(); fxKick();
+}
+function diceAttach(key, els) { const d = DICE.get(key); if (d && !d.fired) { d.els = els; d.shown = []; } }
+function diceBusy() { for (const d of DICE.values()) if (!d.fired) return true; return false; }
+function diceUpdate(dt) {
+  for (const [key, d] of DICE) {
+    if (d.fired) { DICE.delete(key); continue; }
+    d.t += dt;
+    while (d.ev < d.events.length && d.events[d.ev].t <= d.t) sfx.rattle(d.events[d.ev++].v);
+    if (d.t >= d.T + .16) {
+      d.fired = true; sfx.settle();
+      d.els.forEach((el) => { el.g.style.transform = ''; });
+      const [a, b] = d.vals; const live = d.els[0]?.g.isConnected;
+      if (live && a === b) (a === 6 ? JUICE.six6 : JUICE.doubles)(d.center.x, d.center.y);
+    }
+  }
+}
+function diceDraw() {
+  for (const d of DICE.values()) {
+    if (d.fired) continue;
+    d.els.forEach((el, i) => {
+      const fr = d.frames[i]; if (!fr || !el.g.isConnected) return;
+      const k = Math.min(fr.length - 1, Math.floor(d.t / FX_DT)); const p = fr[k];
+      const air = Math.max(0, 1 - d.t / .3); const land = d.t > fr.length * FX_DT ? Math.max(0, 1 - (d.t - fr.length * FX_DT) / .16) : 0;
+      const sx = 1 + air * .35 + land * .16; const sy = 1 + air * .35 - land * .16;
+      el.g.style.transform = `translate(${p.dx}px, ${p.dy}px) rotate(${p.a}deg) scale(${sx}, ${sy})`;
+      if (d.shown[i] !== p.f) { d.shown[i] = p.f; const nd = dieSVG(p.f); for (const at of ['x', 'y', 'width', 'height']) nd.setAttribute(at, el.die.getAttribute(at)); el.die.replaceWith(nd); el.die = nd; }
+    });
+  }
 }
 
 // =====================================================================
@@ -1318,7 +1499,7 @@ const CL = Object.assign({ clubs: [], tours: [], nick: 'שחקן ' + Math.floor(
 P.tickets ??= { s2: 0, final: 0, live: 0 };
 P.stats.clubTours ??= 0;
 const saveCL = () => { if (!ONLINE) store.set('clubs', CL); };
-const st = { screen: P.seenGuide ? 'home' : 'guide', guideStep: 0, tourHook: null, clubId: null, tourId: null, search: '' };
+const st = { screen: 'home', guideStep: 0, tourHook: null, clubId: null, tourId: null, search: '' };
 function go(screen, extra = {}) { Object.assign(st, extra); st.screen = screen; stopTimers(); render(); window.scrollTo?.(0, 0); }
 function render() {
   const dark = st.screen === 'table' || st.screen === 'guide';
@@ -1765,8 +1946,8 @@ function enterArena(a) {
   const opp = a.opp[Math.floor(Math.random() * a.opp.length)];
   vsScreen(opp, a.bot, () => startMatch({ mode: a.mode, len: a.len, level: a.bot, oppName: opp, arena: a, label: a.name }), a.entry);
 }
-function practice() {
-  const lv = level(P.xp) >= 6 ? 'strong' : 'intermediate';
+function practice(first) {
+  const lv = first === true ? 'beginner' : level(P.xp) >= 6 ? 'strong' : 'intermediate';
   const nm = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
   vsScreen(nm, lv, () => startMatch({ mode: 'duplicate', len: 1, level: lv, oppName: nm, arena: null, label: 'אימון' }), 0);
 }
@@ -1800,7 +1981,7 @@ function step() {
     const seat = actor(g, b); if (!seat) return;
     const key = b + ':' + seat; if (G.pending.has(key)) return;
     const m0 = G.M;
-    if (seat === 'B') { G.pending.add(key); G.timers.push(setTimeout(() => { G.pending.delete(key); if (G.M === m0) botStep(g, b); }, 700)); }
+    if (seat === 'B') { G.pending.add(key); G.timers.push(setTimeout(() => { G.pending.delete(key); if (G.M === m0) botStep(g, b); }, g.phase === 'move' ? 1050 : 650)); }
     else if (g.phase === 'roll' && g.rollIsForced()) { G.pending.add(key); G.timers.push(setTimeout(() => { G.pending.delete(key); if (G.M === m0 && g.phase === 'roll' && actor(g, b) === 'A') { g.roll(g.turn); sfx.dice(); step(); } }, 420)); }
   });
 }
@@ -1820,7 +2001,7 @@ function botStep(g, b) {
   else if (g.phase === 'move') {
     const c = g.turn; const before = g.state; const i = chooseSequence(g.legal, c, lv); const mv = g.legal[i].moves; g.move(c, mv);
     G.last.set(b, { color: c, moves: mv });
-    if (g.state.bar[other(c)] > before.bar[other(c)]) { sfx.hit(); if (Math.random() < .35) emote('B', '😏'); } else sfx.click();
+    if (g.state.bar[other(c)] > before.bar[other(c)] && Math.random() < .35) setTimeout(() => emote('B', '😏'), 900);
   }
   step();
 }
@@ -1880,16 +2061,16 @@ function nextMoves(g, b) {
 function playMove(g, b, mv) {
   const p = getPartial(g, b); const before = p.state;
   p.state = applyMove(p.state, g.turn, mv); p.moves.push({ from: mv.from, to: mv.to }); p.remaining.splice(mv.dieIndex, 1);
-  if (p.state.bar[other(g.turn)] > before.bar[other(g.turn)]) { sfx.hit(); track('hits'); } else if (mv.to === OFF) { sfx.off(); track('borne'); } else sfx.click();
+  if (p.state.bar[other(g.turn)] > before.bar[other(g.turn)]) track('hits'); else if (mv.to === OFF) track('borne');
   G.selected = null;
-  if (p.moves.length === g.legal[0].moves.length) { const c = g.turn; const k = stateKey(p.state); const idx = g.legal.findIndex((l) => stateKey(l.state) === k); const q = idx >= 0 ? moveError(g.legal, c, idx) : null; if (q && !q.forced && q.rank === 0 && g.legal.length >= 4) setTimeout(() => banner('מהלך יפה!', 'המהלך הכי טוב בעמדה'), 80); g.move(c, p.moves); G.last.set(b, { color: c, moves: p.moves.slice() }); G.partial.delete(b); step(); }
+  if (p.moves.length === g.legal[0].moves.length) { const c = g.turn; const k = stateKey(p.state); const idx = g.legal.findIndex((l) => stateKey(l.state) === k); const q = idx >= 0 ? moveError(g.legal, c, idx) : null; if (q && !q.forced && q.rank === 0 && g.legal.length >= 4) setTimeout(() => banner('בול.', 'המהלך הכי טוב בעמדה'), 80); g.move(c, p.moves); G.last.set(b, { color: c, moves: p.moves.slice() }); G.partial.delete(b); step(); }
   else render();
 }
 function onPoint(g, b, idx) {
   const moves = nextMoves(g, b); if (!moves.length) return;
   if (G.selected && G.selected.b === b) { const ch = moves.filter((m) => m.from === G.selected.from && m.to === idx).sort((x, y) => x.die - y.die); if (ch.length) { playMove(g, b, ch[0]); return; } }
   const from = moves.filter((m) => m.from === idx);
-  if (from.length) { const dests = [...new Set(from.map((m) => m.to))]; if (dests.length === 1 && G.selected?.b === b && G.selected.from === idx) { playMove(g, b, from[0]); return; } G.selected = { b, from: idx }; }
+  if (from.length) { const dests = [...new Set(from.map((m) => m.to))]; if (dests.length === 1 && G.selected?.b === b && G.selected.from === idx) { playMove(g, b, from[0]); return; } G.selected = { b, from: idx }; sfx.pick(); }
   else G.selected = null;
   render();
 }
@@ -1976,9 +2157,14 @@ function drawBoard(g, b, mini = false) {
       const mineTurn = seatOf(g.turn, b) === 'A'; const cx = mineTurn ? colX(9) : colX(3); const key = `${b}:${g.rollIndex}`; const fresh = !G.rolled.has(key); if (fresh) G.rolled.add(key);
       const dd = g.dice[0] === g.dice[1] ? [g.dice[0], g.dice[0], g.dice[0], g.dice[0]] : g.dice;
       const rem = p ? p.remaining.slice() : null;
+      const els = []; const tg = [];
       dd.forEach((v, k) => { let used = false; if (rem) { const j = rem.indexOf(v); if (j >= 0) rem.splice(j, 1); else used = true; }
-        const sz = dd.length > 2 ? 40 : 50; const x = cx - (dd.length * (sz + 8)) / 2 + k * (sz + 8); const gg = S('g', { class: 'sdie' + (fresh ? ' roll' : ''), opacity: used ? .3 : 1 });
-        const die = dieSVG(v); die.setAttribute('x', x); die.setAttribute('y', BH / 2 - sz / 2); die.setAttribute('width', sz); die.setAttribute('height', sz); gg.append(die); svg.append(gg); });
+        const sz = dd.length > 2 ? 40 : 50; const x = cx - (dd.length * (sz + 8)) / 2 + k * (sz + 8); const gg = S('g', { class: 'sdie', opacity: used ? .3 : 1, filter: 'url(#chkShadow)' });
+        const die = dieSVG(v); die.setAttribute('x', x); die.setAttribute('y', BH / 2 - sz / 2); die.setAttribute('width', sz); die.setAttribute('height', sz); gg.append(die); svg.append(gg);
+        els.push({ g: gg, die }); tg.push({ x: x + sz / 2, y: BH / 2, sz }); });
+      const dkey = `${b}:${g.rollIndex}:${g.dice.join('')}`;
+      if (fresh) diceThrow(dkey, tg, dd, mineTurn, mineTurn ? { x0: colX(6) + 4, x1: colX(11) + COLW - 4, y0: PAD + 4, y1: BH - PAD - 4 } : { x0: PAD + 4, x1: colX(5) + COLW - 4, y0: PAD + 4, y1: BH - PAD - 4 });
+      diceAttach(dkey, els);
     }
   }
   if (!mini) for (const [idx, x, w] of [[BAR, PAD + COLW * 6, BARW], [OFF, ox, tw]]) {
@@ -1989,35 +2175,55 @@ function drawBoard(g, b, mini = false) {
   return svg;
 }
 // ---------- physical movement: diff the previous drawing and slide what moved ----------
-const ANIM = { prev: new Map(), screen: null };
+const ANIM = { prev: new Map(), screen: null, fly: [] };
+const MOVE_KF = (dx, dy) => [
+  { transform: `translate(${dx}px, ${dy}px) scale(1)` },
+  { transform: `translate(${dx * .5}px, ${dy * .5 - 30}px) scale(1.18)`, offset: .5 },
+  { transform: 'translate(0, 0) scale(1.12, .86)', offset: .86 },
+  { transform: 'translate(0, 0) scale(.97, 1.04)', offset: .94 },
+  { transform: 'translate(0, 0) scale(1)' },
+];
+function flyEl(el, f, now) {
+  el.classList.add('mv'); el.parentNode.append(el); // above the other checkers while in the air
+  el.animate(MOVE_KF(f.dx, f.dy), { duration: f.dur, delay: f.start - now, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'backwards' });
+}
 function animateDiff(b, places, svg) {
   const prev = ANIM.prev.get(b); ANIM.prev.set(b, places);
-  if (!prev || !svg.isConnected || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!svg.isConnected) return;
+  const now = performance.now();
+  // 1) a re-render mid-flight: pick the same checkers up again where they are
+  ANIM.fly = ANIM.fly.filter((f) => f.start + f.dur > now);
+  for (const f of ANIM.fly) { if (f.b !== b) continue; const el = (places.get(f.key) || []).filter((o) => o.c === f.c)[f.ord]?.el; if (el) flyEl(el, f, now); }
+  if (!prev) return;
+  // 2) diff previous drawing against this one
   const losses = []; const gains = [];
   for (const k of new Set([...prev.keys(), ...places.keys()])) {
     const a = prev.get(k) || []; const z = places.get(k) || [];
     for (const c of ['w', 'b']) { const pa = a.filter((o) => o.c === c); const pz = z.filter((o) => o.c === c);
-      for (let i = pz.length; i < pa.length; i++) losses.push(pa[i]);
-      for (let i = pa.length; i < pz.length; i++) gains.push(pz[i]); }
+      for (let i = pz.length; i < pa.length; i++) losses.push({ ...pa[i], key: k });
+      for (let i = pa.length; i < pz.length; i++) gains.push({ ...pz[i], key: k, ord: i }); }
   }
   if (!gains.length || gains.length > 6) return;
   const cnt = { w: 0, b: 0 }; gains.forEach((g) => cnt[g.c]++); const mover = cnt.w >= cnt.b ? 'w' : 'b';
-  gains.sort((x, y) => (x.c === mover ? 0 : 1) - (y.c === mover ? 0 : 1));
-  let t = 0;
-  for (const gn of gains) {
-    let best = -1; let bd = Infinity;
-    losses.forEach((l, j) => { if (l.c !== gn.c) return; const d = Math.hypot(l.x - gn.x, l.y - gn.y); if (d < bd) { bd = d; best = j; } });
-    if (best < 0) continue; const src = losses.splice(best, 1)[0];
-    const dx = src.x - gn.x; const dy = src.y - gn.y; const dur = Math.min(520, 260 + Math.hypot(dx, dy) * .35);
-    const hitDelay = gn.c !== mover ? 0.9 * t : 0;
-    gn.el.classList.add('mv'); gn.el.parentNode.append(gn.el); // fly above other checkers
-    gn.el.animate([
-      { transform: `translate(${dx}px, ${dy}px) scale(1)` },
-      { transform: `translate(${dx * .5}px, ${dy * .5 - 26}px) scale(1.16)`, offset: .5 },
-      { transform: 'translate(0, 0) scale(.94)', offset: .88 },
-      { transform: 'translate(0, 0) scale(1)' },
-    ], { duration: dur, delay: gn.c === mover ? t : hitDelay, easing: 'cubic-bezier(.45,.05,.35,1)', fill: 'backwards' });
-    if (gn.c === mover) t += dur * .75;
+  const pair = (gn) => { let best = -1; let bd = Infinity; losses.forEach((l, j) => { if (l.c !== gn.c) return; const d = Math.hypot(l.x - gn.x, l.y - gn.y); if (d < bd) { bd = d; best = j; } }); return best < 0 ? null : losses.splice(best, 1)[0]; };
+  const moves = gains.filter((g) => g.c === mover).map((gn) => ({ gn, src: pair(gn) })).filter((m) => m.src);
+  const hits = gains.filter((g) => g.c !== mover).map((gn) => ({ gn, src: pair(gn) })).filter((m) => m.src);
+  const hitKeys = new Set(hits.map((m) => m.src.key));
+  let t = now;
+  for (const m of moves) {
+    const dx = m.src.x - m.gn.x; const dy = m.src.y - m.gn.y; const dur = reduced ? 0 : Math.min(560, 300 + Math.hypot(dx, dy) * .32);
+    m.end = t + dur; const f = { b, key: m.gn.key, c: m.gn.c, ord: m.gn.ord, dx, dy, dur, start: t };
+    if (!reduced) { ANIM.fly.push(f); flyEl(m.gn.el, f, now); }
+    const { x, y, key, ord } = m.gn;
+    setTimeout(() => { if (hitKeys.has(key)) JUICE.hit(x, y); else if (key === 'off') JUICE.off(x, y, ord); else JUICE.land(x, y, ord); }, m.end - now);
+    t += dur * .7;
+  }
+  for (const m of hits) {
+    const lander = moves.find((q) => q.gn.key === m.src.key); const st0 = lander ? lander.end + 40 : now;
+    const dx = m.src.x - m.gn.x; const dy = m.src.y - m.gn.y; const dur = reduced ? 0 : 420;
+    const f = { b, key: m.gn.key, c: m.gn.c, ord: m.gn.ord, dx, dy, dur, start: st0 };
+    if (!reduced) { ANIM.fly.push(f); flyEl(m.gn.el, f, now); }
+    setTimeout(() => sfx.tock(-2), st0 + dur - now);
   }
 }
 
@@ -2095,7 +2301,7 @@ function viewTable() {
   const stake = cfg.arena ? cfg.arena.entry : cfg.stake || 0;
   // first-move banner per game
   const gk = `${M.kind === 'duplicate' ? M.rounds.length : M.games.length}:${b}`;
-  if (!G.opened?.has(gk) && g.plies === 0 && g.phase === 'move') { (G.opened ??= new Set()).add(gk); setTimeout(() => banner(mine ? 'אתה מתחיל!' : 'היריב מתחיל', null, mine ? 'gold' : 'plain'), 60); }
+  if (!G.opened?.has(gk) && g.plies === 0 && g.phase === 'move') { (G.opened ??= new Set()).add(gk); setTimeout(() => banner(mine ? 'אתה פותח' : 'הוא פותח', null, mine ? 'gold' : 'plain'), 60); }
   const tutorial = mine && g.phase === 'move' && P.stats.games === 0 && !P.skipTut && !(p && p.moves.length);
   const emoteBar = G.showEmotes ? h('div', { class: 'T-emotes', role: 'group', 'aria-label': 'תגובות' }, ['👏', '🔥', '🤔', '😅', '🎲', '👍'].map((e) => h('button', { 'aria-label': 'תגובה ' + e, onclick: () => { G.showEmotes = false; emote('A', e); if (Math.random() < .4) setTimeout(() => emote('B', ['👍', '😄', '🙏', '😤'][Math.floor(Math.random() * 4)]), 900); } }, e))) : null;
   return h('div', { class: 'T' },
@@ -2129,13 +2335,13 @@ function resultScreen({ won, draw, xp, delta, prizeLine, again, close, cash }) {
     h('div', { class: 'V-half blue' }), h('div', { class: 'V-half red' }),
     h('div', { class: 'R-top' },
       h('div', { class: 'R-p' + (won ? ' win' : '') }, ringAvatar('blue', CL.nick, lv, { coins: P.coins }), h('b', {}, CL.nick)),
-      h('div', { class: 'R-mid' }, h('h2', { id: 'res-t' }, draw ? 'תיקו!' : won ? 'ניצחת!' : 'הפסד'), h('div', { class: 'R-score num' }, `${M.score.A}:${M.score.B}`),
+      h('div', { class: 'R-mid' }, h('h2', { id: 'res-t' }, (M._line ??= draw ? 'שוויון מושלם.' : won ? ['שיעור פרטי.', 'נקי.', 'הלוח שלך.', 'כמו שעון.'][Math.floor(Math.random() * 4)] : ['הפעם לא.', 'כמעט.', 'היה צמוד.', 'עוד סיבוב?'][Math.floor(Math.random() * 4)])), h('div', { class: 'R-score num' }, `${M.score.A}:${M.score.B}`),
         h('div', { class: 'R-xp' }, ICON('star-medal', 'R-star'), h('b', { class: 'num' }, `+${xp} XP`), h('span', { class: 'R-xpbar' }, h('i', { style: `width:${pct}%` })), h('small', { class: 'num' }, `רמה ${lv} · ${pct}%`))),
       h('div', { class: 'R-p' + (!won && !draw ? ' win' : '') }, ringAvatar('red', G.cfg.oppName, { beginner: 1, intermediate: 3, strong: 6, expert: 10 }[G.cfg.level] || 2), h('b', {}, G.cfg.oppName))),
-    h('div', { class: 'R-gain num' }, prizeLine ? h('span', { class: 'gold' }, prizeLine) : null, h('span', {}, `דירוג ${delta >= 0 ? '+' : ''}${delta}`), P.run >= 2 ? h('span', {}, `🔥 ${P.run} ברצף`) : null),
-    h('p', { class: 'R-why' }, draw ? 'שיחקתם באותה רמה בדיוק, עם אותן קוביות.' : M.kind === 'duplicate' ? 'אותן קוביות בדיוק לשניכם. ההבדל היה במהלכים.' : won ? 'משחק חזק.' : 'שווה לנסות שוב.'),
+    h('div', { class: 'R-gain num' }, prizeLine ? h('span', { class: 'gold' }, prizeLine) : null, h('span', {}, `דירוג ${delta >= 0 ? '+' : ''}${delta}`), P.run >= 2 ? h('span', {}, ICON('fire', 'R-fire'), ` ${P.run} ברצף`) : null),
+    h('p', { class: 'R-why' }, draw ? 'שיחקתם באותה רמה בדיוק, עם אותן קוביות.' : M.kind === 'duplicate' ? 'אותן קוביות בדיוק לשניכם. ההבדל היה במהלכים.' : won ? null : 'אותן קוביות. מה היית עושה אחרת?'),
     cash && !won ? h('p', { class: 'R-why' }, 'לא מומלץ לנסות "להחזיר" הפסד בכסף. אפשר להגדיר מגבלות.') : null,
-    h('div', { class: 'R-acts' }, cash ? h('button', { class: 'btn', onclick: close }, 'ללובי') : [h('button', { class: 'btn jade big', onclick: again }, 'המשחק הבא'), h('button', { class: 'btn ghost', onclick: close }, 'ללובי')]));
+    h('div', { class: 'R-acts' }, cash ? h('button', { class: 'btn', onclick: close }, 'ללובי') : [h('button', { class: 'btn jade big', onclick: again }, 'עוד אחד'), h('button', { class: 'btn ghost', onclick: close }, 'ללובי')]));
 }
 
 // =====================================================================
@@ -2198,6 +2404,7 @@ function onNet(m) {
     case 'welcome':
       if (m.token) store.set(TOKEN_KEY, m.token);
       $('#reg')?.remove(); syncMe(m.user); refreshLobby();
+      if (m.token && !P.stats.games) { P.seenGuide = true; save(); setTimeout(() => practice(true), 250); }
       if (m.gift) toast(`+${m.gift.amount} מטבעות · מתנה יומית (רצף ${m.gift.streak})`);
       if (st.screen !== 'table') render();
       break;
