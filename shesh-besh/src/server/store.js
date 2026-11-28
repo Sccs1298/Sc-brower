@@ -35,3 +35,34 @@ export class Store {
     this.save();
   }
 }
+
+/**
+ * PostgreSQL-backed store (e.g. Neon free tier). Keeps the same in-memory model and
+ * persists the whole document as one JSONB row, debounced. Good for the beta's scale;
+ * move to proper tables before real money.
+ */
+export class PgStore extends Store {
+  static async open(url) {
+    const { default: pg } = await import('pg');
+    const pool = new pg.Pool({ connectionString: url, ssl: url.includes('localhost') ? false : { rejectUnauthorized: false }, max: 2 });
+    await pool.query('CREATE TABLE IF NOT EXISTS app_state (id text PRIMARY KEY, data jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())');
+    const s = new PgStore(null);
+    s.pool = pool;
+    const r = await pool.query("SELECT data FROM app_state WHERE id = 'main'");
+    if (r.rows[0]) s.data = { ...s.data, ...r.rows[0].data };
+    return s;
+  }
+
+  save() {
+    clearTimeout(this._timer);
+    this._timer = setTimeout(() => this.flush().catch((e) => console.error('pg save failed', e.message)), 1000);
+  }
+
+  async flush() {
+    if (!this.pool) return;
+    await this.pool.query(
+      "INSERT INTO app_state (id, data, updated_at) VALUES ('main', $1, now()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()",
+      [JSON.stringify(this.data)],
+    );
+  }
+}

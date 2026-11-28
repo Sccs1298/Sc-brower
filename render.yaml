@@ -1,0 +1,18 @@
+# Render Blueprint — deploys the beta server (shesh-besh/) as a free web service.
+# Render dashboard → New → Blueprint → pick this repo. Then set DATABASE_URL (Neon) in the service's Environment tab.
+services:
+  - type: web
+    name: double-six
+    runtime: node
+    plan: free
+    rootDir: shesh-besh
+    buildCommand: npm ci && node scripts/build-play.js
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false

@@ -6,7 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
-import { Store } from './store.js';
+import { Store, PgStore } from './store.js';
 import { App, TERMS_VERSION, TOURNAMENT_TYPES } from './app.js';
 import { realMoneyConfig } from './realmoney.js';
 
@@ -16,7 +16,8 @@ const DB_FILE = process.env.DB_FILE || path.join(root, 'data', 'db.json');
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || null;
 const RATE_LIMIT = Number(process.env.RATE_LIMIT || 40);
 
-const store = new Store(DB_FILE);
+const store = process.env.DATABASE_URL ? await PgStore.open(process.env.DATABASE_URL) : new Store(DB_FILE);
+console.log(`storage: ${process.env.DATABASE_URL ? 'postgres' : DB_FILE}`);
 store.data.config ??= { salt: crypto.randomBytes(16).toString('hex') };
 const cashCfg = realMoneyConfig(process.env); // throws if REAL_MONEY=1 without LEGAL_APPROVAL_REF
 const app = new App(store, { salt: store.data.config.salt, cashCfg });
@@ -138,9 +139,14 @@ wss.on('connection', (ws, req) => {
         case 'queue': return send({ t: 'queued', ...app.queue(user, msg) });
         case 'cancelQueue': app.cancelQueue(user.id); return send({ t: 'queued', matched: false, cancelled: true });
         case 'act': app.act(user, msg); return;
-        case 'tournaments': return send({ t: 'tournaments', list: app.listTournaments() });
-        case 'joinTournament': app.joinTournament(user, { ...msg, country }); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments() });
-        case 'leaveTournament': app.leaveTournament(user, msg); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments() });
+        case 'tournaments': return send({ t: 'tournaments', list: app.listTournaments(user) });
+        case 'clubs': return send({ t: 'clubs', list: app.myClubs(user) });
+        case 'createClub': return send({ t: 'club', club: app.createClub(user, msg) });
+        case 'joinClub': return send({ t: 'club', club: app.joinClub(user, msg) });
+        case 'club': return send({ t: 'club', club: app.clubView(user, msg.id) });
+        case 'createClubTournament': app.createClubTournament(user, msg); return send({ t: 'club', club: app.clubView(user, msg.clubId) });
+        case 'joinTournament': app.joinTournament(user, { ...msg, country }); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments(user) });
+        case 'leaveTournament': app.leaveTournament(user, msg); send(meMsg()); return send({ t: 'tournaments', list: app.listTournaments(user) });
         case 'limits': app.setLimits(user, msg); return send(meMsg());
         case 'leaderboard': return send({ t: 'leaderboard', list: app.leaderboard() });
         case 'wallet': return send({ t: 'wallet', wallet: app.wallet(user) });
@@ -166,7 +172,7 @@ wss.on('connection', (ws, req) => {
 });
 
 setInterval(() => app.tick(), 30_000).unref();
-for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => { store.flush(); process.exit(0); });
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, async () => { try { await store.flush(); } finally { process.exit(0); } });
 
 server.listen(PORT, () => console.log(`shesh-besh beta on http://localhost:${PORT}`));
 export { server, app };

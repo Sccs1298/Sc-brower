@@ -23,6 +23,10 @@ export const TOURNAMENT_TYPES = {
   // fixed published prize split, 10% "rake" simulated to test the accounting flow.
   'points-dup': { name: 'טורניר נקודות בטא – שש בש כפול', currency: 'POINTS', mode: 'duplicate', length: 2, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
   'points-classic7': { name: 'טורניר נקודות בטא – מאץ\' עד 7', currency: 'POINTS', mode: 'classic', length: 7, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
+  // Ladder (no money): Stage 1 → ticket to Stage 2 → ticket to Final → ticket to a live event.
+  's1-dup': { name: 'שלב 1 · שש בש כפול', stage: 's1', currency: 'POINTS', mode: 'duplicate', length: 1, size: 4, entryFee: 100, botFill: true, payout: [], prizeTicket: 's2' },
+  's2-dup': { name: 'שלב 2 · כפול 2 סבבים', stage: 's2', currency: 'POINTS', mode: 'duplicate', length: 2, size: 4, entryFee: 0, entryTicket: 's2', botFill: false, payout: [], prizeTicket: 'final' },
+  'final-dup': { name: 'גמר · כפול 2 סבבים', stage: 'final', currency: 'POINTS', mode: 'duplicate', length: 2, size: 8, entryFee: 0, entryTicket: 'final', botFill: false, payout: [], prizeTicket: 'live' },
   // Real-money (ILS, agorot). Created only when the real-money gate is open. Humans only, skill formats only.
   'cash-dup': { name: 'טורניר ₪20 – שש בש כפול (2 סבבים)', currency: 'ILS', mode: 'duplicate', length: 2, size: 4, entryFee: 2000, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
   'cash-classic7': { name: 'טורניר ₪50 – מאץ\' עד 7', currency: 'ILS', mode: 'classic', length: 7, size: 4, entryFee: 5000, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
@@ -151,6 +155,7 @@ export class App {
       id: u.id, name: u.name, rating: u.rating, games: u.games, wins: u.wins, trophies: u.trophies,
       balance: this.ledger.balance(`user:${u.id}`), limits: u.limits,
       avgError: this.fair.avgError(u), termsVersion: u.termsVersion,
+      tickets: u.tickets || { s2: 0, final: 0, live: 0 },
       xp: u.xp || 0, level: levelFromXp(u.xp), nextLevelXp: xpForLevel(levelFromXp(u.xp) + 1), streak: u.streak || 0,
       cashBalance: this.cash.cfg.enabled ? this.cash.ledger.balance(`user:${u.id}`) : null,
     };
@@ -423,6 +428,10 @@ export class App {
     const open = Object.values(this.tournaments).find((t) => t.type === type && t.status === 'registering');
     if (open) return open;
     const def = TOURNAMENT_TYPES[type];
+    return this._createTournament(type, def);
+  }
+
+  _createTournament(type, def, extra = {}) {
     const id = 't_' + crypto.randomBytes(5).toString('hex');
     const t = {
       id, type, ...def, status: 'registering', players: [], createdAt: new Date().toISOString(),
@@ -438,8 +447,12 @@ export class App {
         humansOnly: !def.botFill,
         prizeTax: def.currency === 'ILS' ? `ניכוי מס במקור ${Math.round(this.cash.cfg.prizeTaxRate * 100)}% מהרווח נטו` : null,
         tiebreak: 'סבבים נוספים, ואז ממוצע שגיאה נמוך יותר (מדד מיומנות)',
+        entryTicket: def.entryTicket || null,
+        prizeTicket: def.prizeTicket || null,
+        hostFeePct: extra.hostFeePct || 0,
       },
     };
+    Object.assign(t, extra);
     this.tournaments[id] = t;
     this.store.save();
     return t;
@@ -464,10 +477,11 @@ export class App {
     }
   }
 
-  listTournaments() {
+  listTournaments(u = null) {
     return Object.values(this.tournaments)
       .filter((t) => !['done', 'aborted'].includes(t.status) || Date.now() - new Date(t.finishedAt || 0).getTime() < 3600_000)
-      .map((t) => ({ id: t.id, type: t.type, name: t.name, currency: t.currency || 'POINTS', mode: t.mode, length: t.length, size: t.size, status: t.status, players: t.players.map((p) => p.name), rules: t.rules, results: t.results, botFill: t.botFill }));
+      .filter((t) => !t.clubId || (u && this.store.data.clubs?.[t.clubId]?.members.includes(u.id)))
+      .map((t) => ({ id: t.id, type: t.type, name: t.name, stage: t.stage || (t.clubId ? 'club' : null), clubId: t.clubId || null, hostName: t.hostName || null, currency: t.currency || 'POINTS', mode: t.mode, length: t.length, size: t.size, status: t.status, players: t.players.map((p) => p.name), rules: t.rules, results: t.results, botFill: t.botFill }));
   }
 
   joinTournament(u, { id, clientSeed, country }) {
@@ -477,6 +491,12 @@ export class App {
     if (!t || t.status !== 'registering') throw new Error('הטורניר אינו פתוח להרשמה');
     if (t.players.some((p) => p.userId === u.id)) throw new Error('כבר נרשמת');
     if (this._inMatch(u.id)) throw new Error('כבר יש לך משחק פעיל');
+    if (t.clubId && !this.store.data.clubs?.[t.clubId]?.members.includes(u.id)) throw new Error('הטורניר פתוח לחברי המועדון בלבד');
+    if (t.entryTicket) {
+      u.tickets ??= { s2: 0, final: 0, live: 0 };
+      if (!(u.tickets[t.entryTicket] > 0)) throw new Error('אין לך כרטיס מתאים');
+      u.tickets[t.entryTicket]--;
+    }
     if (this._isCash(t)) {
       this.cash.enterTournament(u, t, country);
     } else if (t.entryFee > 0) {
@@ -504,6 +524,7 @@ export class App {
     const i = t.players.findIndex((p) => p.userId === u.id);
     if (i < 0) throw new Error('אינך רשום');
     t.players.splice(i, 1);
+    if (t.entryTicket) u.tickets[t.entryTicket]++;
     if (this._isCash(t)) {
       this.cash.refundEntry(u.id, t);
     } else if (t.entryFee > 0) {
@@ -535,9 +556,10 @@ export class App {
     const rated = t.players.map((p) => ({ ...p, rating: p.userId ? this.store.data.users[p.userId].rating : 0 }))
       .sort((a, b) => b.rating - a.rating);
     t.players = rated;
-    const pairs = [[rated[0], rated[3]], [rated[1], rated[2]]];
+    const n = rated.length;
+    const pairs = Array.from({ length: n / 2 }, (_, i) => [rated[i], rated[n - 1 - i]]);
     t.rounds.push(pairs.map(([a, b]) => ({ a, b, matchId: null, winner: null })));
-    this._ensureOpenTournament(t.type);
+    if (!t.clubId) this._ensureOpenTournament(t.type);
     this._launchRound(t);
   }
 
@@ -573,8 +595,8 @@ export class App {
     const round = t.rounds[t.rounds.length - 1];
     if (round.some((m) => !m.winner)) return;
     if (round.length > 1) {
-      const [x, y] = round.map((m) => m.winner);
-      t.rounds.push([{ a: x, b: y, matchId: null, winner: null }]);
+      const w = round.map((m) => m.winner);
+      t.rounds.push(Array.from({ length: w.length / 2 }, (_, i) => ({ a: w[2 * i], b: w[2 * i + 1], matchId: null, winner: null })));
       this._launchRound(t);
       return;
     }
@@ -594,16 +616,25 @@ export class App {
       t.results = { ranking: ranking.map((p) => p.name), prizes: r.prizes.map((x) => ({ ...x, amount: x.net, label: ILS(x.net) })), rake: r.rake, pool: r.pool, currency: 'ILS' };
       this.store.audit('tournament-done', { tournamentId: t.id, results: t.results });
       this.store.save();
-      for (const p of t.players) if (p.userId) this.send(p.userId, { t: 'tournament', tournament: this.listTournaments().find((x) => x.id === t.id) });
+      for (const p of t.players) if (p.userId) this.send(p.userId, { t: 'tournament', tournament: this.listTournaments(this.store.data.users[p.userId]).find((x) => x.id === t.id) });
       return;
     }
+    if (t.prizeTicket) {
+      const champ = ranking[0];
+      if (champ?.userId) { const cu = this.store.data.users[champ.userId]; cu.tickets ??= { s2: 0, final: 0, live: 0 }; cu.tickets[t.prizeTicket]++; }
+    }
     const pool = this.ledger.balance(`pool:${t.id}`);
-    const rake = Math.floor((pool * (t.rakePct || 0)) / 100);
+    const feePct = t.clubId ? (t.hostFeePct || 0) : (t.rakePct || 0);
+    const rake = Math.floor((pool * feePct) / 100);
+    const hostShare = t.clubId && t.hostId ? Math.round(rake * 0.7) : 0;
     const prizes = [];
-    if (pool > 0) {
+    if (pool > 0 && t.prizeTicket) {
+      this.ledger.post('payout', [{ account: `pool:${t.id}`, amount: -pool }, { account: 'house:rake', amount: pool }], { tournamentId: t.id });
+    } else if (pool > 0) {
       const net = pool - rake;
       const entries = [{ account: `pool:${t.id}`, amount: -pool }];
-      if (rake) entries.push({ account: 'house:rake', amount: rake });
+      if (rake - hostShare) entries.push({ account: 'house:rake', amount: rake - hostShare });
+      if (hostShare) entries.push({ account: `user:${t.hostId}`, amount: hostShare });
       let paid = 0;
       t.payout.forEach((share, i) => {
         const p = ranking[i];
@@ -617,10 +648,60 @@ export class App {
     }
     const champ = ranking[0];
     if (champ?.userId) this.store.data.users[champ.userId].trophies++;
-    t.results = { ranking: ranking.map((p) => p.name), prizes, rake, pool };
+    t.results = { ranking: ranking.map((p) => p.name), prizes, rake, pool, hostShare, prizeTicket: t.prizeTicket || null };
     this.store.audit('tournament-done', { tournamentId: t.id, results: t.results });
     this.store.save();
-    for (const p of t.players) if (p.userId) this.send(p.userId, { t: 'tournament', tournament: this.listTournaments().find((x) => x.id === t.id) });
+    for (const p of t.players) if (p.userId) this.send(p.userId, { t: 'tournament', tournament: this.listTournaments(this.store.data.users[p.userId]).find((x) => x.id === t.id) });
+  }
+
+  // ---------- clubs ----------
+  _clubs() { return (this.store.data.clubs ??= {}); }
+
+  createClub(u, { name, logo }) {
+    this._assertMayPlay(u);
+    name = String(name || '').trim().slice(0, 24);
+    if (name.length < 2) throw new Error('שם המועדון קצר מדי');
+    const owned = Object.values(this._clubs()).filter((c) => c.ownerId === u.id).length;
+    if (owned >= 5) throw new Error('אפשר לפתוח עד 5 מועדונים');
+    const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code; do { code = Array.from(crypto.randomBytes(6), (b) => A[b % A.length]).join(''); } while (Object.values(this._clubs()).some((c) => c.code === code));
+    const c = { id: 'c_' + crypto.randomBytes(5).toString('hex'), name, logo: String(logo || 'die').slice(0, 16), ownerId: u.id, ownerName: u.name, code, members: [u.id], createdAt: new Date().toISOString() };
+    this._clubs()[c.id] = c; this.store.save();
+    return this.clubView(u, c.id);
+  }
+
+  joinClub(u, { code }) {
+    const c = Object.values(this._clubs()).find((x) => x.code === String(code || '').trim().toUpperCase());
+    if (!c) throw new Error('קוד מועדון לא נמצא');
+    if (!c.members.includes(u.id)) { if (c.members.length >= 500) throw new Error('המועדון מלא'); c.members.push(u.id); this.store.save(); }
+    return this.clubView(u, c.id);
+  }
+
+  myClubs(u) {
+    return Object.values(this._clubs()).filter((c) => c.members.includes(u.id)).map((c) => ({ id: c.id, name: c.name, logo: c.logo, members: c.members.length, owner: c.ownerId === u.id, open: Object.values(this.tournaments).filter((t) => t.clubId === c.id && t.status === 'registering').length }));
+  }
+
+  clubView(u, id) {
+    const c = this._clubs()[id];
+    if (!c || !c.members.includes(u.id)) throw new Error('מועדון לא נמצא');
+    return { id: c.id, name: c.name, logo: c.logo, code: c.code, owner: c.ownerId === u.id, ownerName: c.ownerName,
+      members: c.members.map((m) => this.store.data.users[m]?.name).filter(Boolean),
+      tournaments: this.listTournaments(u).filter((t) => t.clubId === c.id) };
+  }
+
+  createClubTournament(u, { clubId, name, mode, length, size, entryFee, hostFeePct }) {
+    const c = this._clubs()[clubId];
+    if (!c || c.ownerId !== u.id) throw new Error('רק המארח יכול לפתוח טורניר במועדון');
+    this._validMode(mode, length);
+    size = Number(size); entryFee = Math.floor(Number(entryFee) || 0); hostFeePct = Math.floor(Number(hostFeePct) || 0);
+    if (![2, 4, 8].includes(size)) throw new Error('מספר שחקנים לא חוקי');
+    if (entryFee < 0 || entryFee > 5000) throw new Error('דמי כניסה בין 0 ל-5,000 נקודות');
+    if (hostFeePct < 0 || hostFeePct > 15) throw new Error('עמלת מארח בין 0% ל-15%');
+    const open = Object.values(this.tournaments).filter((t) => t.clubId === c.id && ['registering', 'running'].includes(t.status)).length;
+    if (open >= 10) throw new Error('יותר מדי טורנירים פתוחים במועדון');
+    const def = { name: String(name || '').trim().slice(0, 28) || `טורניר ${c.name}`, currency: 'POINTS', mode, length: Number(length), size, entryFee, botFill: entryFee === 0, rakePct: 0, payout: size > 2 ? [0.7, 0.3] : [1] };
+    const t = this._createTournament('club', def, { clubId: c.id, hostId: u.id, hostName: u.name, hostFeePct });
+    return this.listTournaments(u).find((x) => x.id === t.id);
   }
 
   // ---------- public data ----------
