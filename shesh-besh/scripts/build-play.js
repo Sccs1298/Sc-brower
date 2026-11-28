@@ -13,7 +13,8 @@ for (const f of ['board.js', 'game.js', 'bot.js']) {
   engine += `// ---- engine/${f} ----\n${s}\n`;
 }
 const tpl = fs.readFileSync(path.join(root, 'play/template.html'), 'utf8');
-const body = tpl.replace('/*ENGINE*/', () => engine);
+const icons = fs.readFileSync(path.join(root, 'play/icons.json'), 'utf8');
+const body = tpl.replace('/*ENGINE*/', () => engine).replace('/*ICONSDATA*/', () => `const ICONS = ${icons};`);
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist/play-artifact.html'), body);
 fs.writeFileSync(path.join(root, 'public/play.html'), `<!doctype html>\n<html lang="he" dir="rtl">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n${body}\n</body>\n</html>\n`);
