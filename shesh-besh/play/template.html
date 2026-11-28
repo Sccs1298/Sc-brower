@@ -328,6 +328,44 @@ body.light #app { padding: 0; height: auto; min-height: 100%; }
 .L-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: .78rem; color: #8b9098; font-weight: 700; padding: 4px 0; }
 .L-tab.on { color: #111; }
 .L button:focus-visible, .L input:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+/* ---------- game-feel lobby: dark felt, chunky pressable controls ---------- */
+body.light { background: #0b1220; color: #f3efe6; }
+.L { --line: rgba(255,255,255,.09); --muted: #9aa4b8; --card: #172033; --ink: #f4efe4; --g: #22b573; --g-d: #148a55; --g-bg: rgba(34,181,115,.14); --blue: #5aa2ff; --blue-bg: rgba(90,162,255,.14); --gray: #59606e; --gray-bg: rgba(255,255,255,.06);
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(255,196,92,.10), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #121b2e, #0b1220 70%); }
+.L-head { background: rgba(11,18,32,.88); backdrop-filter: blur(10px); border-bottom-color: rgba(255,255,255,.06); }
+.L-av { box-shadow: 0 0 0 2px #e0b04a, 0 4px 10px rgba(0,0,0,.5); }
+.L-chip, .L-search, .L-mini, .L-club, .L-tc, .L-seg button, .L-sum, .L-field input:not([type="range"]), .L-btn.ghost, .L-create {
+  background: linear-gradient(180deg, #1c2740, #151d30); border-color: rgba(255,255,255,.08); color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 6px 16px rgba(0,0,0,.35); }
+.L-chip.tk { border-color: rgba(176,140,255,.35); color: #c9b2ff; }
+.L-tn { background: rgba(255,255,255,.06); }
+.L-st { background: rgba(34,181,115,.12); color: #7fe3b3; }
+.L-st.ann { background: rgba(255,255,255,.06); color: #c9ccd3; } .L-st.run { background: rgba(90,162,255,.12); color: #9cc6ff; } .L-st.done { background: rgba(255,255,255,.04); color: #7c8290; }
+.L-createArt { background: radial-gradient(120% 100% at 50% 0%, #2a3a5c, #111827); }
+.L-tickets div { background: rgba(176,140,255,.08); border-color: rgba(176,140,255,.25); } .L-tickets b { color: #c9b2ff; }
+.L-mic { background: rgba(255,255,255,.07); color: #e0b04a; }
+.L-result { background: rgba(224,176,74,.1); border-color: rgba(224,176,74,.4); }
+.L-match .l { color: #6c7280; } .L-prize { color: #c9a2ff; } .L-chev { color: #5d6575; }
+.L-tabs { background: rgba(10,15,27,.94); backdrop-filter: blur(10px); border-top-color: rgba(255,255,255,.07); }
+.L-zone { background: #0f1729; border-color: rgba(255,255,255,.08); color: #ffd36b; }
+.L-tab { color: #6f7889; } .L-tab.on { color: #ffd36b; } .L-tab.on svg { filter: drop-shadow(0 0 6px rgba(255,211,107,.6)); }
+@media (min-width: 761px) { body.light { background: #070b14; } }
+/* chunky, pressable buttons */
+.L-btn { box-shadow: 0 4px 0 var(--g-d), 0 8px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .07s, box-shadow .07s, filter .15s; }
+.L-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--g-d), 0 3px 8px rgba(0,0,0,.35); }
+.L-btn.ghost { box-shadow: 0 4px 0 #0a0f1b, inset 0 1px 0 rgba(255,255,255,.06); }
+.L-mini, .L-club, .L-tc, .L-mrow, .L-tab, .L-chip, .L-lg, .T-rb, .L-seg button { transition: transform .08s ease, filter .15s; }
+.L-mini:active, .L-club:active, .L-tc:active, .L-mrow:active, .L-tab:active, .L-chip:active, .L-lg:active, .T-rb:active, .L-seg button:active { transform: scale(.96); filter: brightness(1.15); }
+@media (hover: hover) { .L-mini:hover, .L-club:hover, .L-tc:hover { filter: brightness(1.12); } }
+/* screen entrance (only when the screen changes) */
+.L-main.enter > * > * { animation: rise .32s cubic-bezier(.2,.9,.3,1.15) backwards; }
+.L-main.enter > * > :nth-child(2) { animation-delay: .04s; } .L-main.enter > * > :nth-child(3) { animation-delay: .08s; } .L-main.enter > * > :nth-child(4) { animation-delay: .12s; } .L-main.enter > * > :nth-child(n+5) { animation-delay: .16s; }
+@keyframes rise { from { transform: translateY(14px); opacity: 0; } }
+svg.board .mv { transform-box: fill-box; transform-origin: center; }
 body.light #toast { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 761px) { body.light { background: #e9ebef; } .L { box-shadow: 0 0 0 1px var(--line); } }
 
@@ -621,9 +659,10 @@ function render() {
   const dark = st.screen === 'table' || st.screen === 'guide';
   document.body.classList.toggle('light', !dark);
   document.body.classList.toggle('on-table', st.screen === 'table');
-  if (dark) { $('#app').replaceChildren(topbar(), h('main', { class: 'stage' }, (st.screen === 'table' ? viewTable : viewGuide)())); return; }
+  if (dark) { ANIM.screen = st.screen; $('#app').replaceChildren(topbar(), h('main', { class: 'stage' }, (st.screen === 'table' ? viewTable : viewGuide)())); return; }
   const views = { cash: viewCash, home: viewClubHome, live: viewLive, s1: () => viewStage('s1'), s2: () => viewStage('s2'), final: () => viewStage('final'), me: viewMe, clubNew: viewClubNew, club: viewClub, tourNew: viewTourNew, tour: viewTour };
-  $('#app').replaceChildren(h('div', { class: 'L' }, lobbyHeader(), h('main', { class: 'L-main' }, (views[st.screen] || viewClubHome)()), tabbar()));
+  const changed = ANIM.screen !== st.screen; ANIM.screen = st.screen;
+  $('#app').replaceChildren(h('div', { class: 'L' }, lobbyHeader(), h('main', { class: 'L-main' + (changed ? ' enter' : '') }, (views[st.screen] || viewClubHome)()), tabbar()));
 }
 function logo() {
   const svg = S('svg', { viewBox: '0 0 40 40', 'aria-hidden': 'true' });
@@ -1223,7 +1262,7 @@ function checker(svg, cx, cy, color, lit, r = CR) {
   g.append(S('circle', { cx, cy, r, fill: color === 'w' ? 'url(#chkW)' : 'url(#chkB)', stroke: lit ? 'var(--brass-hi)' : color === 'w' ? '#8b7b58' : '#000', 'stroke-width': lit ? 4 : 1.2 }));
   g.append(S('circle', { cx, cy, r: r * .7, fill: 'none', stroke: color === 'w' ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.14)', 'stroke-width': 2 }));
   g.append(S('ellipse', { cx: cx - r * .25, cy: cy - r * .35, rx: r * .42, ry: r * .2, fill: 'rgba(255,255,255,' + (color === 'w' ? '.75' : '.18') + ')' }));
-  svg.append(g);
+  svg.append(g); return g;
 }
 function drawBoard(g, b, mini = false) {
   const me = colorOf('A', b); const op = other(me);
@@ -1237,6 +1276,7 @@ function drawBoard(g, b, mini = false) {
   const last = G.last.get(b); const lastPts = new Set();
   if (last && !p) for (const m of last.moves) { if (m.from !== BAR) lastPts.add(toOwn(me, toAbs(last.color, m.from))); if (m.to !== OFF) lastPts.add(toOwn(me, toAbs(last.color, m.to))); }
   const svg = S('svg', { class: 'board', viewBox: `0 0 ${BW + OFFW} ${BH}`, role: mini ? 'img' : 'group', 'aria-label': `לוח ${b + 1}` });
+  const places = new Map(); const put = (key, el, x, y, c) => { if (!mini) { if (!places.has(key)) places.set(key, []); places.get(key).push({ el, x, y, c }); } };
   boardDefs(svg);
   if (!woodFill(svg, 'rect', { width: BW + OFFW, height: BH, rx: 18 }, 'texWalnut', '#7a3214', .85)) svg.append(S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: 'url(#frame)' }), S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: '#a0703a', filter: 'url(#grain)' }));
   if (!woodFill(svg, 'rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6 }, 'texCherry', '#fff1d6', .35)) svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6, fill: 'url(#field)' }));
@@ -1250,7 +1290,7 @@ function drawBoard(g, b, mini = false) {
     if (dests.has(i) || sel === i) svg.append(S('polygon', { points: tri, fill: 'rgba(255,215,122,.28)', stroke: 'var(--brass-hi)', 'stroke-width': 2.5 }));
     const nMe = ownCount(s, me, i); const nOp = oppCount(s, me, i); const n = nMe || nOp; const c = nMe ? me : op;
     const stp = n > 5 ? Math.min((tip - 2 * CR + 8) / (n - 1), 2 * CR) : 2 * CR;
-    for (let k = 0; k < n; k++) checker(svg, x + COLW / 2, top ? PAD + CR + 2 + k * stp : BH - PAD - CR - 2 - k * stp, c, srcs.has(i) && sel == null && k === n - 1);
+    for (let k = 0; k < n; k++) { const cy = top ? PAD + CR + 2 + k * stp : BH - PAD - CR - 2 - k * stp; put(i, checker(svg, x + COLW / 2, cy, c, srcs.has(i) && sel == null && k === n - 1), x + COLW / 2, cy, c); }
     if (dests.has(i)) { const k = Math.min(n, 4); svg.append(S('circle', { cx: x + COLW / 2, cy: top ? PAD + CR + 2 + k * 2 * CR : BH - PAD - CR - 2 - k * 2 * CR, r: 9, fill: 'var(--brass-hi)', class: 'dest' })); }
     if (!mini) {
       svg.append(S('text', { x: x + COLW / 2, y: top ? 15 : BH - 6, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: 'rgba(255,240,210,.55)' }, i + 1));
@@ -1261,10 +1301,10 @@ function drawBoard(g, b, mini = false) {
     }
   }
   const bx = PAD + COLW * 6 + BARW / 2;
-  for (const [c, top] of [[op, true], [me, false]]) { const n = s.bar[c]; const lit = c === me && srcs.has(BAR); for (let k = 0; k < Math.min(n, 4); k++) checker(svg, bx, top ? BH / 2 - 36 - k * 34 : BH / 2 + 36 + k * 34, c, lit && k === Math.min(n, 4) - 1, 17); if (n > 4) svg.append(S('text', { x: bx, y: top ? BH / 2 - 12 : BH / 2 + 20, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 800 }, '×' + n)); }
+  for (const [c, top] of [[op, true], [me, false]]) { const n = s.bar[c]; const lit = c === me && srcs.has(BAR); for (let k = 0; k < Math.min(n, 4); k++) { const cy = top ? BH / 2 - 36 - k * 34 : BH / 2 + 36 + k * 34; put('bar', checker(svg, bx, cy, c, lit && k === Math.min(n, 4) - 1, 17), bx, cy, c); } if (n > 4) svg.append(S('text', { x: bx, y: top ? BH / 2 - 12 : BH / 2 + 20, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 800 }, '×' + n)); }
   const ox = BW + 2; const tw = OFFW - 6;
   svg.append(S('rect', { x: ox, y: PAD, width: tw, height: BH - 2 * PAD, rx: 8, fill: dests.has(OFF) ? 'rgba(255,215,122,.35)' : 'rgba(0,0,0,.35)', stroke: dests.has(OFF) ? 'var(--brass-hi)' : 'none', 'stroke-width': 2.5 }));
-  for (const [c, top] of [[op, true], [me, false]]) for (let k = 0; k < s.off[c]; k++) svg.append(S('rect', { x: ox + 6, y: top ? PAD + 6 + k * 13 : BH - PAD - 16 - k * 13, width: tw - 12, height: 10, rx: 3, fill: c === 'w' ? '#efe4c8' : '#2b2420', stroke: '#000', 'stroke-opacity': .4 }));
+  for (const [c, top] of [[op, true], [me, false]]) for (let k = 0; k < s.off[c]; k++) { const y = top ? PAD + 6 + k * 13 : BH - PAD - 16 - k * 13; const r = S('rect', { x: ox + 6, y, width: tw - 12, height: 10, rx: 3, fill: c === 'w' ? '#efe4c8' : '#2b2420', stroke: '#000', 'stroke-opacity': .4 }); svg.append(r); put('off', r, ox + tw / 2, y + 5, c); }
   if (!mini) {
     for (const hx of [colX(3), colX(9)]) svg.append(S('text', { x: hx, y: BH / 2 + 10, 'text-anchor': 'middle', 'font-size': 34, 'font-family': 'Secular One, sans-serif', fill: 'rgba(90,50,20,.13)' }, 'דאבל שש'));
     if (g.dice && g.phase === 'move') {
@@ -1280,7 +1320,40 @@ function drawBoard(g, b, mini = false) {
     const r = S('rect', { x, y: BH / 2, width: w, height: BH / 2 - PAD, fill: 'transparent', class: 'pt-hit', role: 'button', tabindex: (idx === BAR ? srcs.has(BAR) : dests.has(OFF)) ? 0 : -1, 'aria-label': idx === BAR ? 'בר' : 'הוצאה' });
     r.addEventListener('click', () => onPoint(g, b, idx)); svg.append(r);
   }
+  if (!mini) requestAnimationFrame(() => animateDiff(b, places, svg));
   return svg;
+}
+// ---------- physical movement: diff the previous drawing and slide what moved ----------
+const ANIM = { prev: new Map(), screen: null };
+function animateDiff(b, places, svg) {
+  const prev = ANIM.prev.get(b); ANIM.prev.set(b, places);
+  if (!prev || !svg.isConnected || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const losses = []; const gains = [];
+  for (const k of new Set([...prev.keys(), ...places.keys()])) {
+    const a = prev.get(k) || []; const z = places.get(k) || [];
+    for (const c of ['w', 'b']) { const pa = a.filter((o) => o.c === c); const pz = z.filter((o) => o.c === c);
+      for (let i = pz.length; i < pa.length; i++) losses.push(pa[i]);
+      for (let i = pa.length; i < pz.length; i++) gains.push(pz[i]); }
+  }
+  if (!gains.length || gains.length > 6) return;
+  const cnt = { w: 0, b: 0 }; gains.forEach((g) => cnt[g.c]++); const mover = cnt.w >= cnt.b ? 'w' : 'b';
+  gains.sort((x, y) => (x.c === mover ? 0 : 1) - (y.c === mover ? 0 : 1));
+  let t = 0;
+  for (const gn of gains) {
+    let best = -1; let bd = Infinity;
+    losses.forEach((l, j) => { if (l.c !== gn.c) return; const d = Math.hypot(l.x - gn.x, l.y - gn.y); if (d < bd) { bd = d; best = j; } });
+    if (best < 0) continue; const src = losses.splice(best, 1)[0];
+    const dx = src.x - gn.x; const dy = src.y - gn.y; const dur = Math.min(520, 260 + Math.hypot(dx, dy) * .35);
+    const hitDelay = gn.c !== mover ? 0.9 * t : 0;
+    gn.el.classList.add('mv'); gn.el.parentNode.append(gn.el); // fly above other checkers
+    gn.el.animate([
+      { transform: `translate(${dx}px, ${dy}px) scale(1)` },
+      { transform: `translate(${dx * .5}px, ${dy * .5 - 26}px) scale(1.16)`, offset: .5 },
+      { transform: 'translate(0, 0) scale(.94)', offset: .88 },
+      { transform: 'translate(0, 0) scale(1)' },
+    ], { duration: dur, delay: gn.c === mover ? t : hitDelay, easing: 'cubic-bezier(.45,.05,.35,1)', fill: 'backwards' });
+    if (gn.c === mover) t += dur * .75;
+  }
 }
 
 /*ICONSDATA*/
