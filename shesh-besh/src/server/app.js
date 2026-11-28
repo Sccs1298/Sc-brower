@@ -299,7 +299,7 @@ export class App {
       if (a.currency === 'POINTS' && levelFromXp(u?.xp) < a.minLevel) locked = `נפתח ברמה ${a.minLevel}`;
       if (a.currency === 'ILS') {
         if ((u?.games || 0) < this.cash.cfg.minGamesForCash) locked = `נפתח אחרי ${this.cash.cfg.minGamesForCash} משחקים מדורגים`;
-        else if (a.minRating && (u?.rating || 0) < a.minRating) locked = `נפתח בדירוג ${a.minRating}`;
+        else if (a.minRating && !this.cash.cfg.noRatingGate && (u?.rating || 0) < a.minRating) locked = `נפתח בדירוג ${a.minRating}`;
         else if (u?.kyc?.status !== 'verified') locked = 'נדרש אימות זהות';
       }
       const pot = a.entry * 2; const fee = Math.floor((pot * a.rakePct) / 100);
@@ -757,9 +757,15 @@ export class App {
         houseRake: this.cash.ledger.balance('house:rake'),
         taxWithheld: this.cash.ledger.balance('house:tax'),
         pendingWithdrawals: Object.values(this.store.data.withdrawals || {}).filter((w) => w.status === 'pending'),
-        pendingKyc: Object.values(this.store.data.users).filter((u) => u.kyc?.status === 'pending').map((u) => ({ id: u.id, name: u.name })),
+        pendingKyc: Object.values(this.store.data.users).filter((u) => u.kyc?.status === 'pending').map((u) => ({ id: u.id, name: u.name, fullName: u.kyc.fullName, idLast3: u.kyc.idLast3, at: u.kyc.submittedAt })),
       },
     };
+  }
+
+  adminUsers(q = '') {
+    q = String(q).trim().toLowerCase();
+    return Object.values(this.store.data.users).filter((u) => !q || u.name.toLowerCase().includes(q)).slice(0, 50)
+      .map((u) => ({ id: u.id, name: u.name, kyc: u.kyc?.status || 'none', fullName: u.kyc?.fullName || null, cash: this.cash.ledger.balance(`user:${u.id}`), points: this.ledger.balance(`user:${u.id}`), games: u.games }));
   }
 
   // ---------- real money (wallet) ----------

@@ -1278,7 +1278,7 @@ function render() {
   document.body.classList.toggle('light', !dark);
   document.body.classList.toggle('on-table', st.screen === 'table');
   if (dark) { $('#app').replaceChildren(topbar(), h('main', { class: 'stage' }, (st.screen === 'table' ? viewTable : viewGuide)())); return; }
-  const views = { home: viewClubHome, live: viewLive, s1: () => viewStage('s1'), s2: () => viewStage('s2'), final: () => viewStage('final'), me: viewMe, clubNew: viewClubNew, club: viewClub, tourNew: viewTourNew, tour: viewTour };
+  const views = { cash: viewCash, home: viewClubHome, live: viewLive, s1: () => viewStage('s1'), s2: () => viewStage('s2'), final: () => viewStage('final'), me: viewMe, clubNew: viewClubNew, club: viewClub, tourNew: viewTourNew, tour: viewTour };
   $('#app').replaceChildren(h('div', { class: 'L' }, lobbyHeader(), h('main', { class: 'L-main' }, (views[st.screen] || viewClubHome)()), tabbar()));
 }
 function logo() {
@@ -1323,7 +1323,7 @@ function tabIcon(k, on) {
   return s;
 }
 function tabbar() {
-  const cur = ['club', 'clubNew', 'tourNew', 'tour'].includes(st.screen) ? 'home' : st.screen;
+  const cur = ['club', 'clubNew', 'tourNew', 'tour', 'cash'].includes(st.screen) ? 'home' : st.screen;
   return h('nav', { class: 'L-tabs', 'aria-label': 'ניווט' },
     h('div', { class: 'L-zone' }, 'הדרך לגמר'),
     TABS.map(([id, label, ic]) => h('button', { class: 'L-tab' + (cur === id ? ' on' : ''), 'aria-current': cur === id ? 'page' : null, onclick: () => go(id) }, tabIcon(ic, cur === id), h('span', {}, label))));
@@ -1414,6 +1414,8 @@ function viewClubHome() {
       h('button', { class: 'L-btn', onclick: () => go('clubNew') }, 'צור מועדון')),
     h('button', { class: 'L-banner', onclick: () => go('s1') },
       h('div', {}, h('b', {}, 'הדרך לגמר'), h('span', {}, 'שלב 1 ← שלב 2 ← גמר ← אירוע חי בתל אביב')), h('span', { class: 'L-banner-cta' }, 'התחל ›')),
+    ONLINE && NET.cashEnabled ? h('button', { class: 'L-banner', style: 'background:radial-gradient(120% 140% at 0% 0%, #0f5a3a, #04140d 65%)', onclick: () => { netSend({ t: 'wallet' }); go('cash'); } },
+      h('div', {}, h('b', {}, '💰 שולחנות כסף'), h('span', {}, NET.wallet ? `יתרה ${shekel(NET.wallet.balance)} · ₪10 עד ₪100 מול יריב אונליין` : '₪10 עד ₪100 מול יריב אונליין')), h('span', { class: 'L-banner-cta' }, 'כניסה ›')) : null,
     ONLINE ? h('form', { class: 'L-search', onsubmit: (e) => { e.preventDefault(); const v = e.target.elements.jc.value.trim(); if (v) { st.pendingClub = true; netSend({ t: 'joinClub', code: v }); } } },
       h('span', { 'aria-hidden': 'true' }, '🔑'), h('input', { name: 'jc', placeholder: 'יש לך קוד מועדון? הזן כאן', 'aria-label': 'קוד מועדון', autocomplete: 'off', style: 'text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הצטרף')) : null,
     h('div', { class: 'L-row2' },
@@ -2040,7 +2042,7 @@ function resultScreen({ won, draw, xp, delta, prizeLine, again, close, cash }) {
 // Offline (e.g. a single-file preview), everything stays local with bots.
 // =====================================================================
 let ONLINE = false;
-const NET = { ws: null, me: null, clubs: [], tours: [], queued: false, ratingAtStart: null };
+const NET = { ws: null, me: null, clubs: [], tours: [], queued: false, ratingAtStart: null, cashEnabled: false, wallet: null, arenas: [] };
 const TOKEN_KEY = 'token';
 const netSend = (m) => { try { NET.ws?.readyState === 1 && NET.ws.send(JSON.stringify(m)); } catch { /* closed */ } };
 const seedHex = () => Array.from(crypto.getRandomValues(new Uint8Array(12)), (b) => b.toString(16).padStart(2, '0')).join('');
@@ -2052,6 +2054,7 @@ function netConnect() {
   const giveUp = setTimeout(() => { if (!ONLINE) try { ws.close(); } catch { /* */ } }, 3000);
   ws.onopen = () => {
     clearTimeout(giveUp); ONLINE = true; NET.ws = ws;
+    fetch('/api/config').then((r) => r.json()).then((c) => { NET.cashEnabled = !!c.realMoney; if (st.screen !== 'table') render(); }).catch(() => {});
     const token = store.get(TOKEN_KEY, null);
     if (token) netSend({ t: 'auth', token }); else showRegister();
   };
@@ -2087,7 +2090,7 @@ function syncMe(u) {
   NET.me = u; P.coins = u.balance; P.tickets = { ...(u.tickets || { s2: 0, final: 0, live: 0 }) };
   P.rating = u.rating; P.xp = Math.max(P.xp, u.xp || 0); CL.nick = u.name;
 }
-function refreshLobby() { netSend({ t: 'me' }); netSend({ t: 'clubs' }); netSend({ t: 'tournaments' }); }
+function refreshLobby() { netSend({ t: 'me' }); netSend({ t: 'clubs' }); netSend({ t: 'tournaments' }); if (NET.cashEnabled) { netSend({ t: 'wallet' }); netSend({ t: 'arenas' }); } }
 
 function onNet(m) {
   switch (m.t) {
@@ -2116,8 +2119,54 @@ function onNet(m) {
     case 'levelUp': setTimeout(() => showLevelUp(m.level), 600); break;
     case 'reminder': toast(`⏰ אתה משחק כבר ${m.minutes} דקות. זה זמן טוב להפסקה.`); break;
     case 'match': onMatchView(m.view); break;
+    case 'wallet': NET.wallet = m.wallet; netSend({ t: 'arenas' }); if (st.screen === 'cash') render(); break;
+    case 'arenas': NET.arenas = m.list; if (st.screen === 'cash') render(); break;
+    case 'arenaResult': { const pz = m.payout?.prize; if (m.winner === m.you && pz) toast(`🏆 זכית ${shekel(pz.net)}${pz.tax ? ` (אחרי ניכוי מס ${shekel(pz.tax)})` : ''}`); netSend({ t: 'wallet' }); break; }
     default: break;
   }
+}
+
+
+// ---------- real-money screen (online) ----------
+function viewCash() {
+  const w = NET.wallet;
+  const back = h('div', { class: 'L-bar' }, h('button', { class: 'L-back', onclick: () => go('home'), 'aria-label': 'חזרה' }, '›'), h('h1', {}, 'שולחנות כסף'));
+  if (!w) return h('div', { class: 'L-col' }, back, h('p', { class: 'L-empty' }, 'טוען…'));
+  const kyc = w.kyc.status;
+  const kycBox = kyc === 'verified' ? h('div', { class: 'L-sum' }, h('div', {}, h('span', {}, 'אימות זהות'), h('b', {}, '✅ מאושר')), h('div', { class: 'sub' }, h('span', {}, w.kyc.fullName), h('span', {}, 'ת"ז ••' + w.kyc.idLast3)))
+    : kyc === 'pending' ? h('p', { class: 'L-result' }, h('b', {}, '⏳ ממתין לאישור המפעיל'), h('span', {}, 'אחרי האישור תוכל להפקיד ולשחק על כסף.'))
+    : h('form', { class: 'L-col', onsubmit: (e) => { e.preventDefault(); const f = e.target.elements; netSend({ t: 'kyc', fullName: f.fn.value, idNumber: f.idn.value, birthDate: f.dob.value }); } },
+      h('h2', { class: 'L-h2' }, kyc === 'rejected' ? 'האימות נדחה – נסה שוב' : 'שלב 1 · אימות זהות'),
+      h('label', { class: 'L-field', for: 'fn' }, 'שם מלא', h('input', { id: 'fn', name: 'fn', required: true, autocomplete: 'name' })),
+      h('label', { class: 'L-field', for: 'idn' }, 'תעודת זהות', h('input', { id: 'idn', name: 'idn', required: true, inputmode: 'numeric' })),
+      h('label', { class: 'L-field', for: 'dob' }, 'תאריך לידה', h('input', { id: 'dob', name: 'dob', type: 'date', required: true })),
+      h('button', { class: 'L-btn wide' }, 'שלח לאישור'));
+  const ok = kyc === 'verified';
+  const tables = NET.arenas.filter((a) => a.currency === 'ILS');
+  return h('div', { class: 'L-col' }, back,
+    h('div', { class: 'L-hero', style: 'background:radial-gradient(120% 120% at 50% 0%, #0f5a3a, #04140d)' }, h('span', {}, 'היתרה שלך'), h('b', { class: 'num' }, shekel(w.balance)), h('span', {}, `הופקד ב-24 שעות: ${shekel(w.deposits24h)} · הפסד נטו 30 יום: ${shekel(Math.max(0, w.netLoss30d))}`)),
+    kycBox,
+    ok ? h('form', { class: 'L-search', onsubmit: (e) => { e.preventDefault(); const v = e.target.elements.vc.value.trim(); if (v) netSend({ t: 'redeem', code: v }); e.target.reset(); } },
+      h('span', { 'aria-hidden': 'true' }, '🎟️'), h('input', { name: 'vc', placeholder: 'קוד הפקדה SB-XXXXX-XXXXX', 'aria-label': 'קוד הפקדה', autocomplete: 'off', style: 'direction:ltr;text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הפקד')) : null,
+    h('h2', { class: 'L-h2' }, 'שולחנות · מול יריב אונליין'),
+    h('div', { class: 'L-list' }, tables.map((a) => h('div', { class: 'L-tc', style: 'grid-template-columns: 104px 1fr' },
+      h('div', { class: 'L-st ' + (a.locked ? 'ann' : 'reg') }, h('span', { class: 'L-stl' }, a.locked ? 'נעול' : a.waiting ? 'יריב מחכה!' : 'פתוח'), h('b', { class: 'num' }, shekel(a.entry))),
+      h('div', { class: 'L-ti' },
+        h('div', { class: 'L-tn' }, h('span', {}, a.name)),
+        h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, a.mode === 'duplicate' ? `שש בש כפול · ${a.length} סבבים` : `מאץ' עד ${a.length}`), h('span', { class: 'L-sp' }), h('span', { class: 'L-prize' }, '🏆 ' + shekel(a.prize))),
+        h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, `עמלה ${shekel(a.fee)} · מס על הרווח מנוכה במקור`)),
+        a.locked ? h('span', { class: 'faint' }, '🔒 ' + a.locked) : h('button', { class: 'L-btn sm', disabled: !ok || w.balance < a.entry || null, onclick: () => netSend({ t: 'joinArena', arenaId: a.id, clientSeed: seedHex() }) }, w.balance < a.entry ? 'אין מספיק יתרה' : NET.queued ? 'מחפש יריב…' : `שחק · ${shekel(a.entry)}`))))),
+    ok ? h('form', { class: 'L-col', onsubmit: (e) => { e.preventDefault(); const v = Math.round(Number(e.target.elements.wa.value) * 100); if (v > 0) netSend({ t: 'withdraw', amount: v }); e.target.reset(); } },
+      h('h2', { class: 'L-h2' }, 'משיכה'),
+      h('div', { class: 'L-search' }, h('input', { name: 'wa', type: 'number', min: 50, placeholder: 'סכום ₪ (מינימום 50)', 'aria-label': 'סכום משיכה' }), h('button', { class: 'L-btn sm' }, 'בקש משיכה')),
+      w.pendingWithdrawals.length ? h('p', { class: 'L-note' }, 'ממתין: ' + w.pendingWithdrawals.map((x) => shekel(x.amount)).join(', ')) : null,
+      h('p', { class: 'L-note' }, 'הכסף מועבר רק לחשבון על שם בעל הזהות המאומתת.')) : null,
+    ok ? h('form', { class: 'L-col', onsubmit: (e) => { e.preventDefault(); const f = e.target.elements; const v = (x) => (x.value === '' ? null : Math.round(Number(x.value) * 100)); netSend({ t: 'cashLimits', depositDaily: v(f.ld), lossMonthly: v(f.ll) }); toast('המגבלות נשמרו (העלאה נכנסת לתוקף אחרי 24 שעות)'); } },
+      h('h2', { class: 'L-h2' }, 'משחק אחראי'),
+      h('div', { class: 'L-row2' }, h('label', { class: 'L-field', for: 'ld' }, 'הפקדה יומית ₪', h('input', { id: 'ld', name: 'ld', type: 'number', min: 0, value: w.limits?.depositDaily != null ? w.limits.depositDaily / 100 : '' })),
+        h('label', { class: 'L-field', for: 'll' }, 'הפסד חודשי ₪', h('input', { id: 'll', name: 'll', type: 'number', min: 0, value: w.limits?.lossMonthly != null ? w.limits.lossMonthly / 100 : '' }))),
+      h('button', { class: 'L-btn ghost' }, 'שמור מגבלות')) : null,
+    w.history.length ? h('div', { class: 'L-sum num' }, w.history.slice().reverse().slice(0, 12).map((x) => h('div', {}, h('span', {}, ({ deposit: 'הפקדה', entry: 'כניסה', payout: 'זכייה', refund: 'החזר', 'withdraw-hold': 'משיכה' }[x.kind] || x.kind) + ' · ' + new Date(x.at).toLocaleDateString('he-IL')), h('b', { style: `color:${x.amount >= 0 ? 'var(--g)' : 'var(--red)'}` }, (x.amount >= 0 ? '+' : '') + shekel(x.amount))))) : null);
 }
 
 // ----- live match adapter: makes a server view look like the local engine objects -----

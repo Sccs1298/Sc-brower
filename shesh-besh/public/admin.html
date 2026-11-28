@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ניהול · דאבל שש</title>
+<style>
+:root{--g:#17a467;--line:#e2e4e8;--muted:#6b7079;--red:#d1342a}
+*{box-sizing:border-box}body{margin:0;font-family:Assistant,"Segoe UI",Arial,sans-serif;background:#f3f4f6;color:#16181b;padding:16px}
+main{max-width:900px;margin:0 auto;display:grid;gap:14px}h1{margin:0}h2{margin:0 0 8px;font-size:1.1rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+input,select,button{font:inherit;padding:9px 12px;border-radius:10px;border:1px solid var(--line)}button{background:var(--g);color:#fff;border:0;font-weight:700;cursor:pointer}
+button.r{background:var(--red)}button.g2{background:#fff;color:#16181b;border:1px solid var(--line)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.row>*{flex:1;min-width:120px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{text-align:right;padding:6px;border-bottom:1px solid var(--line)}
+.code{font-family:ui-monospace,monospace;font-size:1.4rem;letter-spacing:.1em;direction:ltr;text-align:center;padding:10px;border:2px dashed var(--g);border-radius:10px;user-select:all}
+.muted{color:var(--muted);font-size:.85rem}.warn{background:#fff6e0;border-color:#f0d58a}
+</style></head><body><main>
+<h1>ניהול · דאבל שש</h1>
+<div class="card warn" id="mode"></div>
+<div class="card" id="login"><h2>כניסה</h2><div class="row"><input id="tok" type="password" placeholder="ADMIN_TOKEN מ-Render"><button id="go">כניסה</button></div>
+<p class="muted">את ה-ADMIN_TOKEN מוצאים ב-Render ← double-six ← Environment.</p></div>
+<div id="panel" hidden>
+  <div class="card"><h2>יצירת קוד הפקדה</h2>
+    <div class="row"><label>סכום ₪<input id="amt" type="number" min="10" max="1000" value="100"></label><label>שחקן (כינוי, לא חובה)<input id="vuser" placeholder="ריק = כל שחקן מאומת"></label><label>הערה (למשל: ביט מ...)<input id="note"></label><button id="mk">צור קוד</button></div>
+    <div id="newcode"></div></div>
+  <div class="card"><h2>אימותי זהות ממתינים</h2><div id="kyc"></div><p class="muted">רק מי שתאשר כאן יוכל לשחק על כסף.</p></div>
+  <div class="card"><h2>משיכות ממתינות</h2><div id="wd"></div><p class="muted">אישור = העברת הכסף מחוץ לאפליקציה (ביט/העברה לחשבון על שם השחקן) ואז לחיצה על "שולם".</p></div>
+  <div class="card"><h2>שחקנים</h2><div class="row"><input id="q" placeholder="חיפוש כינוי"><button class="g2" id="qs">חפש</button></div><div id="users"></div></div>
+  <div class="card"><h2>קודים</h2><div id="codes"></div></div>
+  <div class="card"><h2>מאזן</h2><div id="stats"></div></div>
+</div></main>
+<script src="/admin.js"></script></body></html>

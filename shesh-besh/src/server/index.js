@@ -84,6 +84,7 @@ const server = http.createServer((req, res) => {
         return json(res, 200, v);
       }
       if (p === '/admin/vouchers') return json(res, 200, app.cash.listVouchers());
+      if (p === '/admin/users') return json(res, 200, app.adminUsers(url.searchParams.get('q') || ''));
       if (req.method === 'POST' && p === '/admin/withdrawal') {
         app.cash.reviewWithdrawal(url.searchParams.get('id'), url.searchParams.get('approve') !== '0')
           .then((w) => json(res, 200, w)).catch((e) => json(res, 400, { error: e.message }));

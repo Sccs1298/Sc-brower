@@ -1,5 +1,4 @@
 # Render Blueprint — deploys the beta server (shesh-besh/) as a free web service.
-# Render dashboard → New → Blueprint → pick this repo. Then set DATABASE_URL (Neon) in the service's Environment tab.
 services:
   - type: web
     name: double-six
@@ -16,3 +15,15 @@ services:
         generateValue: true
       - key: DATABASE_URL
         sync: false
+      # Real-money mode — enabled by the owner on 2026-11-28, who accepted the legal risk.
+      # NO legal opinion exists yet. Cash play is limited to players the admin approves (manual KYC).
+      - key: REAL_MONEY
+        value: "1"
+      - key: LEGAL_APPROVAL_REF
+        value: "OWNER-ACCEPTED-RISK-2026-11-28-NO-LEGAL-OPINION"
+      - key: PAYMENT_PROVIDER
+        value: "none"
+      - key: MIN_GAMES_FOR_CASH
+        value: "0"
+      - key: CASH_NO_RATING_GATE
+        value: "1"

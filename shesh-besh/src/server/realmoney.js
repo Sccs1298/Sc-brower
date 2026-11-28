@@ -40,7 +40,8 @@ export function realMoneyConfig(env = process.env) {
     prizeTaxRate: Number(env.PRIZE_TAX_RATE ?? 0.25),
     prizeTaxThreshold: Number(env.PRIZE_TAX_THRESHOLD_AGOROT ?? 0),
     autoVerifyKyc: env.KYC_AUTO_VERIFY === '1', // sandbox/testing only
-    minGamesForCash: Number(env.MIN_GAMES_FOR_CASH ?? 10), // rated games before any cash arena
+    minGamesForCash: Number(env.MIN_GAMES_FOR_CASH ?? 10),
+    noRatingGate: env.CASH_NO_RATING_GATE === '1', // internal testing phase only // rated games before any cash arena
     voucherMax: Number(env.VOUCHER_MAX_AGOROT || 100000), // ₪1,000 per code
     allowedCountries: (env.ALLOWED_COUNTRIES || '').split(',').map((s) => s.trim()).filter(Boolean),
   };
@@ -295,7 +296,7 @@ export class CashService {
     this._applyPending(u);
     if (!isSkillFormat(arena.mode, arena.length)) throw new Error('פורמט זה אינו מורשה למשחק בכסף');
     if ((u.games || 0) < this.cfg.minGamesForCash) throw new Error(`זירות כסף נפתחות אחרי ${this.cfg.minGamesForCash} משחקים מדורגים`);
-    if (arena.minRating && (u.rating || 0) < arena.minRating) throw new Error(`הזירה נפתחת בדירוג ${arena.minRating}`);
+    if (arena.minRating && !this.cfg.noRatingGate && (u.rating || 0) < arena.minRating) throw new Error(`הזירה נפתחת בדירוג ${arena.minRating}`);
     const L = u.cashLimits || {};
     if (L.lossMonthly != null && this.netLossSince(u, 30 * DAY) + arena.entry > L.lossMonthly) throw new Error('חריגה ממגבלת ההפסד החודשית שהגדרת');
     this.ledger.post('entry', [{ account: `user:${u.id}`, amount: -arena.entry }, { account: `hold:${holdId}`, amount: arena.entry }], { arena: arena.id });
