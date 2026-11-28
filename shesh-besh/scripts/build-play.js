@@ -17,7 +17,7 @@ const icons = fs.readFileSync(path.join(root, 'play/icons.json'), 'utf8');
 const b64 = (f) => 'data:image/jpeg;base64,' + fs.readFileSync(path.join(root, 'play/assets', f)).toString('base64');
 const TEX = { walnut: b64('walnut.jpg'), ash: b64('ash.jpg'), cherry: b64('cherry.jpg') };
 const AVATARS = fs.readFileSync(path.join(root, 'play/assets/avatars.json'), 'utf8');
-const LUCIDE_NAMES = ['volume-2', 'volume-x', 'ticket', 'users', 'search', 'wallet', 'key-round', 'swords', 'target', 'scale', 'star', 'award', 'palette', 'coins', 'shield', 'badge-check', 'lock', 'hourglass'];
+const LUCIDE_NAMES = ['volume-2', 'volume-x', 'ticket', 'users', 'search', 'wallet', 'key-round', 'swords', 'target', 'scale', 'star', 'award', 'palette', 'coins', 'shield', 'badge-check', 'lock', 'hourglass', 'undo-2'];
 const LUCIDE = {};
 for (const n of LUCIDE_NAMES) {
   const svg = fs.readFileSync(path.join(root, 'node_modules/lucide-static/icons', n + '.svg'), 'utf8');

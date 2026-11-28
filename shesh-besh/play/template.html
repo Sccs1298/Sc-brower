@@ -366,6 +366,13 @@ body.light { background: #0b1220; color: #f3efe6; }
 .L-main.enter > * > :nth-child(2) { animation-delay: .04s; } .L-main.enter > * > :nth-child(3) { animation-delay: .08s; } .L-main.enter > * > :nth-child(4) { animation-delay: .12s; } .L-main.enter > * > :nth-child(n+5) { animation-delay: .16s; }
 @keyframes rise { from { transform: translateY(14px); opacity: 0; } }
 svg.board .mv { transform-box: fill-box; transform-origin: center; }
+.T { grid-template-rows: 40px minmax(0, 1fr) !important; gap: 4px !important; }
+.T-top { padding: 0 10px !important; border-radius: 0 0 18px 18px; overflow: visible; }
+.T-top .T-av { width: 50px; height: 50px; margin-block: -4px -14px; z-index: 2; }
+.T-board > svg.board { filter: drop-shadow(0 14px 22px rgba(0,0,0,.65)); }
+.T-undo { position: absolute; top: 50%; left: 78%; translate: -50% -50%; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #ff7a7a, #c8102e); border: 3px solid #fff; color: #fff; box-shadow: 0 5px 0 #7a0817, 0 10px 18px rgba(0,0,0,.45); animation: popIn .25s cubic-bezier(.2,1.6,.4,1); z-index: 4; }
+.T-undo .li { width: 22px; height: 22px; stroke-width: 3; } .T-undo:active { translate: -50% calc(-50% + 3px); box-shadow: 0 2px 0 #7a0817; }
+@keyframes popIn { from { scale: .3; opacity: 0; } }
 #fx { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 65; }
 .fx-flash { position: fixed; inset: 0; pointer-events: none; z-index: 64; background: radial-gradient(circle at 50% 50%, var(--c), transparent 72%); animation: fxflash .6s ease-out forwards; }
 @keyframes fxflash { from { opacity: 1; } to { opacity: 0; } }
@@ -578,15 +585,17 @@ const xpFor = (lv) => 40 * (lv - 1) ** 2;
 const DAY = 86400000;
 
 const PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[28, 28], [50, 50], [72, 72]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]], 5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]], 6: [[28, 26], [72, 26], [28, 50], [72, 50], [28, 74], [72, 74]] };
-function dieSVG(n, cls = '') {
+const DIE_SKIN = { ivory: ['#fffdf6', '#e3d6b6', '#9c8a60', '#231c14'], gold: ['#ffe7a3', '#c9952c', '#7a5417', '#231c14'], red: ['#f0464a', '#8e0f19', '#5a0710', '#fff6ee'] };
+function dieSVG(n, cls = '', skin) {
   const svg = S('svg', { viewBox: '0 0 100 100', class: cls, role: 'img', 'aria-label': `קובייה ${n}` });
   const id = 'dg' + Math.random().toString(36).slice(2, 7);
-  const gold = P.dice === 'gold';
+  const [c0, c1, edge, pip] = DIE_SKIN[skin || (P.dice === 'gold' ? 'gold' : 'ivory')];
   const g = S('linearGradient', { id, x1: 0, y1: 0, x2: 1, y2: 1 });
-  g.append(S('stop', { offset: '0', 'stop-color': gold ? '#ffe7a3' : '#fffdf6' }), S('stop', { offset: '1', 'stop-color': gold ? '#c9952c' : '#e3d6b6' }));
+  g.append(S('stop', { offset: '0', 'stop-color': c0 }), S('stop', { offset: '1', 'stop-color': c1 }));
   const d = S('defs'); d.append(g); svg.append(d);
-  svg.append(S('rect', { x: 4, y: 4, width: 92, height: 92, rx: 20, fill: `url(#${id})`, stroke: gold ? '#7a5417' : '#9c8a60', 'stroke-width': 2 }));
-  for (const [x, y] of PIPS[n] || []) svg.append(S('circle', { cx: x, cy: y, r: 8.5, fill: n === 1 ? '#b3261e' : '#231c14' }));
+  svg.append(S('rect', { x: 4, y: 4, width: 92, height: 92, rx: 22, fill: `url(#${id})`, stroke: edge, 'stroke-width': 2.5 }));
+  svg.append(S('rect', { x: 12, y: 9, width: 70, height: 12, rx: 6, fill: 'rgba(255,255,255,.28)' })); // top sheen
+  for (const [x, y] of PIPS[n] || []) svg.append(S('circle', { cx: x, cy: y, r: 9, fill: pip }));
   return svg;
 }
 function coinSVG() {
@@ -788,7 +797,7 @@ function diceDraw() {
       const air = Math.max(0, 1 - d.t / .3); const land = d.t > fr.length * FX_DT ? Math.max(0, 1 - (d.t - fr.length * FX_DT) / .16) : 0;
       const sx = 1 + air * .35 + land * .16; const sy = 1 + air * .35 - land * .16;
       el.g.style.transform = `translate(${p.dx}px, ${p.dy}px) rotate(${p.a}deg) scale(${sx}, ${sy})`;
-      if (d.shown[i] !== p.f) { d.shown[i] = p.f; const nd = dieSVG(p.f); for (const at of ['x', 'y', 'width', 'height']) nd.setAttribute(at, el.die.getAttribute(at)); el.die.replaceWith(nd); el.die = nd; }
+      if (d.shown[i] !== p.f) { d.shown[i] = p.f; const nd = dieSVG(p.f, '', el.skin); for (const at of ['x', 'y', 'width', 'height']) nd.setAttribute(at, el.die.getAttribute(at)); el.die.replaceWith(nd); el.die = nd; }
     });
   }
 }
@@ -1413,7 +1422,7 @@ function onPoint(g, b, idx) {
 // =====================================================================
 // TABLE
 // =====================================================================
-const BW = 780; const BH = 540; const COLW = 54; const BARW = 42; const PAD = 22; const OFFW = 50; const CR = 21;
+const BW = 780; const BH = 540; const COLW = 54; const BARW = 42; const PAD = 22; const OFFW = 50; const CR = 24.5;
 const colX = (c) => PAD + c * COLW + (c >= 6 ? BARW : 0);
 const pos = (i) => (i <= 11 ? { col: 11 - i, top: false } : { col: i - 12, top: true });
 function boardDefs(svg) {
@@ -1422,7 +1431,8 @@ function boardDefs(svg) {
   const lg = (id, [a, b], x2 = 0, y2 = 1) => { const g = S('linearGradient', { id, x1: 0, y1: 0, x2, y2 }); g.append(S('stop', { offset: 0, 'stop-color': a }), S('stop', { offset: 1, 'stop-color': b })); return g; };
   const rg = (id, a, b, c) => { const g = S('radialGradient', { id, cx: '38%', cy: '32%', r: '70%' }); g.append(S('stop', { offset: 0, 'stop-color': a }), S('stop', { offset: .55, 'stop-color': b }), S('stop', { offset: 1, 'stop-color': c })); return g; };
   d.append(lg('frame', sk.frame), lg('field', sk.field), lg('ptA', sk.a), lg('ptB', sk.b), lg('barG', sk.frame, 1, 0));
-  d.append(rg('chkW', '#ffffff', '#ececec', '#a9abae'), rg('chkB', '#5a5a60', '#232327', '#060607'));
+  d.append(rg('chkW', '#ffffff', '#f1efe9', '#c9c5bb'), rg('chkB', '#5b5d66', '#26272c', '#0b0b0e'));
+  d.append(lg('rimW', ['#ffffff', '#a8a49a']), lg('rimB', ['#6b6d76', '#050507']));
   const f = S('filter', { id: 'grain' }); f.append(S('feTurbulence', { type: 'fractalNoise', baseFrequency: '.9 .04', numOctaves: 2, seed: 3 }), S('feColorMatrix', { values: '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .2 0' }), S('feComposite', { operator: 'in', in2: 'SourceGraphic' }));
   const sh = S('filter', { id: 'chkShadow', x: '-30%', y: '-30%', width: '160%', height: '160%' }); sh.append(S('feDropShadow', { dx: 0, dy: 3, stdDeviation: 2.2, 'flood-opacity': .55 }));
   if (sk.id === 'classic' && typeof TEX !== 'undefined') {
@@ -1439,10 +1449,12 @@ function woodFill(svg, tag, attrs, tex, tint, op) {
   return true;
 }
 function checker(svg, cx, cy, color, lit, r = CR) {
-  const g = S('g', { filter: 'url(#chkShadow)' });
-  g.append(S('circle', { cx, cy, r, fill: color === 'w' ? 'url(#chkW)' : 'url(#chkB)', stroke: lit ? 'var(--brass-hi)' : color === 'w' ? '#8b7b58' : '#000', 'stroke-width': lit ? 4 : 1.2 }));
-  g.append(S('circle', { cx, cy, r: r * .7, fill: 'none', stroke: color === 'w' ? 'rgba(0,0,0,.12)' : 'rgba(255,255,255,.14)', 'stroke-width': 2 }));
-  g.append(S('ellipse', { cx: cx - r * .25, cy: cy - r * .35, rx: r * .42, ry: r * .2, fill: 'rgba(255,255,255,' + (color === 'w' ? '.75' : '.18') + ')' }));
+  const w = color === 'w'; const g = S('g', { filter: 'url(#chkShadow)' });
+  g.append(S('circle', { cx, cy, r, fill: w ? 'url(#rimW)' : 'url(#rimB)', stroke: lit ? 'var(--brass-hi)' : w ? '#8f8a7e' : '#000', 'stroke-width': lit ? 4 : 1 })); // bevelled rim
+  g.append(S('circle', { cx, cy: cy + r * .04, r: r * .8, fill: w ? 'url(#chkW)' : 'url(#chkB)' })); // face
+  g.append(S('circle', { cx, cy, r: r * .8, fill: 'none', stroke: w ? 'rgba(0,0,0,.18)' : 'rgba(0,0,0,.7)', 'stroke-width': 1.2 }));
+  g.append(S('circle', { cx, cy, r: r * .52, fill: 'none', stroke: w ? 'rgba(0,0,0,.07)' : 'rgba(255,255,255,.07)', 'stroke-width': 1.5 }));
+  g.append(S('path', { d: `M ${cx - r * .62} ${cy - r * .2} A ${r * .66} ${r * .66} 0 0 1 ${cx + r * .2} ${cy - r * .62}`, fill: 'none', stroke: `rgba(255,255,255,${w ? .95 : .35})`, 'stroke-width': r * .12, 'stroke-linecap': 'round' })); // specular
   svg.append(g); return g;
 }
 function drawBoard(g, b, mini = false) {
@@ -1463,6 +1475,7 @@ function drawBoard(g, b, mini = false) {
   if (!woodFill(svg, 'rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6 }, 'texCherry', '#fff1d6', .35)) svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6, fill: 'url(#field)' }));
   svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6, fill: 'none', stroke: 'rgba(0,0,0,.35)', 'stroke-width': 3 }));
   svg.append(S('rect', { x: PAD + COLW * 6, y: PAD - 6, width: BARW, height: BH - 2 * PAD + 12, rx: 4, fill: 'url(#barG)' }));
+  if (!mini) for (const hy of [BH * .24, BH * .76]) { const hx = PAD + COLW * 6 + BARW / 2 - 7; svg.append(S('rect', { x: hx, y: hy - 16, width: 14, height: 32, rx: 3, fill: '#c9a24a', stroke: '#6e5217', 'stroke-width': 1.2 }), S('line', { x1: hx + 7, y1: hy - 14, x2: hx + 7, y2: hy + 14, stroke: '#6e5217', 'stroke-width': 1.5 }), S('circle', { cx: hx + 7, cy: hy - 10, r: 1.6, fill: '#6e5217' }), S('circle', { cx: hx + 7, cy: hy + 10, r: 1.6, fill: '#6e5217' })); }
   for (let i = 0; i < 24; i++) {
     const { col, top } = pos(i); const x = colX(col); const tip = 205;
     const tri = top ? `${x + 2},${PAD} ${x + COLW - 2},${PAD} ${x + COLW / 2},${PAD + tip}` : `${x + 2},${BH - PAD} ${x + COLW - 2},${BH - PAD} ${x + COLW / 2},${BH - PAD - tip}`;
@@ -1482,21 +1495,25 @@ function drawBoard(g, b, mini = false) {
     }
   }
   const bx = PAD + COLW * 6 + BARW / 2;
-  for (const [c, top] of [[op, true], [me, false]]) { const n = s.bar[c]; const lit = c === me && srcs.has(BAR); for (let k = 0; k < Math.min(n, 4); k++) { const cy = top ? BH / 2 - 36 - k * 34 : BH / 2 + 36 + k * 34; put('bar', checker(svg, bx, cy, c, lit && k === Math.min(n, 4) - 1, 17), bx, cy, c); } if (n > 4) svg.append(S('text', { x: bx, y: top ? BH / 2 - 12 : BH / 2 + 20, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 800 }, '×' + n)); }
+  for (const [c, top] of [[op, true], [me, false]]) { const n = s.bar[c]; const lit = c === me && srcs.has(BAR); for (let k = 0; k < Math.min(n, 4); k++) { const cy = top ? BH / 2 - 36 - k * 34 : BH / 2 + 36 + k * 34; put('bar', checker(svg, bx, cy, c, lit && k === Math.min(n, 4) - 1, 19), bx, cy, c); } if (n > 4) svg.append(S('text', { x: bx, y: top ? BH / 2 - 12 : BH / 2 + 20, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 800 }, '×' + n)); }
   const ox = BW + 2; const tw = OFFW - 6;
   svg.append(S('rect', { x: ox, y: PAD, width: tw, height: BH - 2 * PAD, rx: 8, fill: dests.has(OFF) ? 'rgba(255,215,122,.35)' : 'rgba(0,0,0,.35)', stroke: dests.has(OFF) ? 'var(--brass-hi)' : 'none', 'stroke-width': 2.5 }));
   for (const [c, top] of [[op, true], [me, false]]) for (let k = 0; k < s.off[c]; k++) { const y = top ? PAD + 6 + k * 13 : BH - PAD - 16 - k * 13; const r = S('rect', { x: ox + 6, y, width: tw - 12, height: 10, rx: 3, fill: c === 'w' ? '#efe4c8' : '#2b2420', stroke: '#000', 'stroke-opacity': .4 }); svg.append(r); put('off', r, ox + tw / 2, y + 5, c); }
   if (!mini) {
+    for (const [c, top] of [[op, true], [me, false]]) { const y = top ? BH / 2 - 34 : BH / 2 + 8; svg.append(S('rect', { x: ox + 3, y, width: tw - 6, height: 26, rx: 5, fill: 'rgba(0,0,0,.55)', stroke: 'rgba(255,255,255,.15)' }), S('text', { x: ox + tw / 2, y: y + 18, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 800, fill: c === me ? '#9cc4ff' : '#ff9aaa' }, pipCount(s, c))); }
     for (const hx of [colX(3), colX(9)]) svg.append(S('text', { x: hx, y: BH / 2 + 10, 'text-anchor': 'middle', 'font-size': 34, 'font-family': 'Secular One, sans-serif', fill: 'rgba(90,50,20,.13)' }, 'דאבל שש'));
     if (g.dice && g.phase === 'move') {
       const mineTurn = seatOf(g.turn, b) === 'A'; const cx = mineTurn ? colX(9) : colX(3); const key = `${b}:${g.rollIndex}`; const fresh = !G.rolled.has(key); if (fresh) G.rolled.add(key);
       const dd = g.dice[0] === g.dice[1] ? [g.dice[0], g.dice[0], g.dice[0], g.dice[0]] : g.dice;
       const rem = p ? p.remaining.slice() : null;
       const els = []; const tg = [];
+      const skin = mineTurn ? 'red' : undefined; const seed = hashStr(`${b}:${g.rollIndex}:${g.dice.join('')}`);
       dd.forEach((v, k) => { let used = false; if (rem) { const j = rem.indexOf(v); if (j >= 0) rem.splice(j, 1); else used = true; }
-        const sz = dd.length > 2 ? 40 : 50; const x = cx - (dd.length * (sz + 8)) / 2 + k * (sz + 8); const gg = S('g', { class: 'sdie', opacity: used ? .3 : 1, filter: 'url(#chkShadow)' });
-        const die = dieSVG(v); die.setAttribute('x', x); die.setAttribute('y', BH / 2 - sz / 2); die.setAttribute('width', sz); die.setAttribute('height', sz); gg.append(die); svg.append(gg);
-        els.push({ g: gg, die }); tg.push({ x: x + sz / 2, y: BH / 2, sz }); });
+        const sz = dd.length > 2 ? 32 : 38; const x = cx - (dd.length * (sz + 14)) / 2 + k * (sz + 14); const y = BH / 2 - sz / 2 + (((seed >> (k * 3)) & 7) - 3.5) * 3;
+        const rot = (((seed >> (k * 5 + 2)) & 31) - 15) * 1.6; const gg = S('g', { class: 'sdie', opacity: used ? .3 : 1, filter: 'url(#chkShadow)' });
+        const gr = S('g', { transform: `rotate(${rot} ${x + sz / 2} ${y + sz / 2})` });
+        const die = dieSVG(v, '', skin); die.setAttribute('x', x); die.setAttribute('y', y); die.setAttribute('width', sz); die.setAttribute('height', sz); gr.append(die); gg.append(gr); svg.append(gg);
+        els.push({ g: gg, die, skin }); tg.push({ x: x + sz / 2, y: y + sz / 2, sz }); });
       const dkey = `${b}:${g.rollIndex}:${g.dice.join('')}`;
       if (fresh) diceThrow(dkey, tg, dd, mineTurn, mineTurn ? { x0: colX(6) + 4, x1: colX(11) + COLW - 4, y0: PAD + 4, y1: BH - PAD - 4 } : { x0: PAD + 4, x1: colX(5) + COLW - 4, y0: PAD + 4, y1: BH - PAD - 4 });
       diceAttach(dkey, els);
@@ -1507,6 +1524,8 @@ function drawBoard(g, b, mini = false) {
     r.addEventListener('click', () => onPoint(g, b, idx)); svg.append(r);
   }
   if (!mini) requestAnimationFrame(() => animateDiff(b, places, svg));
+  const lastLog = g.log?.[g.log.length - 1];
+  if (!mini && lastLog?.t === 'pass') { const k = `${b}:${g.log.length}`; if (!G.passShown?.has(k)) { (G.passShown ??= new Set()).add(k); setTimeout(() => banner('אין מהלך אפשרי', null, 'plain'), 650); } }
   return svg;
 }
 // ---------- physical movement: diff the previous drawing and slide what moved ----------
@@ -1647,11 +1666,12 @@ function viewTable() {
         ob != null ? h('button', { class: 'T-mini' + (actor(bs[ob], ob) === 'A' ? ' hot' : ''), onclick: () => { G.view = ob; G.selected = null; render(); }, 'aria-label': `עבור ללוח ${ob + 1}` }, drawBoard(bs[ob], ob, true), h('span', {}, `לוח ${ob + 1}${actor(bs[ob], ob) === 'A' ? ' · תורך!' : ''}`)) : null),
       h('div', { class: 'T-board' }, drawBoard(g, b),
         tutorial ? h('div', { class: 'T-tut' }, h('b', {}, 'תורך'), h('span', {}, 'לחץ על כלי זוהר כדי להתחיל, ואז על היעד שלו'), h('button', { onclick: () => { P.skipTut = true; save(); render(); } }, 'דלג על ההדרכה')) : null,
-        (canDouble || (mine && g.phase === 'doubled') || (p && p.moves.length)) ? h('div', { class: 'T-acts' },
+        (canDouble || (mine && g.phase === 'doubled')) ? h('div', { class: 'T-acts' },
           canDouble ? h('button', { class: 'btn', onclick: act(() => { g.roll(me); sfx.dice(); }) }, 'הטל קוביות') : null,
           canDouble ? h('button', { class: 'btn ghost', onclick: act(() => g.double(me)) }, `הכפל ×${g.cube.value * 2}`) : null,
           mine && g.phase === 'doubled' ? [h('b', { class: 'T-q' }, `היריב מכפיל ל-${g.cube.value * 2}`), h('button', { class: 'btn', onclick: act(() => g.take(me)) }, 'קבל'), h('button', { class: 'btn red', onclick: act(() => g.drop(me)) }, 'ותר')] : null,
-          p && p.moves.length ? h('button', { class: 'btn ghost sm', onclick: () => { G.partial.delete(b); G.selected = null; render(); } }, 'בטל מהלך') : null) : null),
+          null) : null,
+        p && p.moves.length ? h('button', { class: 'T-undo', 'aria-label': 'בטל מהלך', onclick: () => { G.partial.delete(b); G.selected = null; sfx.pop(); render(); } }, LI('undo-2')) : null),
       h('div', { class: 'T-right' },
         h('button', { class: 'T-rb', 'aria-label': 'תגובות', onclick: () => { G.showEmotes = !G.showEmotes; render(); } }, ICON('chat-bubble')),
         emoteBar,
