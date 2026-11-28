@@ -1,0 +1,1019 @@
+<title>שש בש כפול</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Frank+Ruhl+Libre:wght@700;900&family=Assistant:wght@400;600;700;800&display=swap">
+<style>
+/* Concept: a night-time Israeli backgammon tour — from the neighbourhood café to the Rothschild rooftop.
+   Landscape-first game shell: top bar · stage. Single deliberate dark world (baize, brass, ivory, ebony). */
+:root {
+  color-scheme: dark;
+  --baize: #0d2a1f; --baize-2: #12382a; --baize-deep: #061610;
+  --ink: #f3ead6; --ink-dim: #b9b29e; --ink-faint: #85907f;
+  --brass: #e0b04a; --brass-hi: #ffd77a; --brass-lo: #8c6418;
+  --ivory: #f7efdc; --ebony: #1b1714; --ruby: #d2493a; --jade: #4fe09a; --sky: #7cc4ff; --violet: #b18cff;
+  --panel: rgba(6, 20, 15, .78); --panel-line: rgba(224, 176, 74, .26);
+  --display: "Secular One", "Frank Ruhl Libre", "Arial Hebrew", sans-serif;
+  --serif: "Frank Ruhl Libre", "David", Georgia, serif;
+  --body: "Assistant", "Segoe UI", Arial, sans-serif;
+  --bar-h: 58px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; direction: rtl; overflow-x: hidden;
+  background: radial-gradient(120% 90% at 50% 0%, var(--baize-2) 0%, var(--baize) 50%, var(--baize-deep) 100%) fixed, var(--baize);
+}
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .16; z-index: 0;
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px), repeating-linear-gradient(-45deg, rgba(0,0,0,.2) 0 1px, transparent 1px 4px); }
+#app { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column;
+  padding-left: max(14px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); padding-block: 8px 10px; }
+.stage { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+button { font: inherit; cursor: pointer; border: 0; color: inherit; background: none; }
+button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; border-radius: 8px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-dim); } .faint { color: var(--ink-faint); font-size: .82rem; }
+.eyebrow { font-size: .7rem; letter-spacing: .14em; color: var(--brass); font-weight: 800; }
+.btn { font-family: var(--display); font-size: 1rem; padding: 10px 20px; border-radius: 999px; color: #2a1b02; white-space: nowrap;
+  background: linear-gradient(180deg, var(--brass-hi), var(--brass) 55%, var(--brass-lo)); box-shadow: 0 4px 0 #5e420c, 0 10px 22px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6); transition: transform .08s, box-shadow .08s, filter .2s; }
+.btn:hover { filter: brightness(1.07); } .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #5e420c, 0 4px 12px rgba(0,0,0,.4); }
+.btn.ghost { background: rgba(255,255,255,.06); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--panel-line); }
+.btn.ghost[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--brass-hi); color: var(--brass-hi); }
+.btn.red { background: linear-gradient(180deg, #ff8a72, var(--ruby) 60%, #7c1f12); color: #fff; box-shadow: 0 4px 0 #551208, 0 10px 22px rgba(0,0,0,.45); }
+.btn.jade { background: linear-gradient(180deg, #a6ffd0, var(--jade) 55%, #1d7c50); box-shadow: 0 4px 0 #0f4a2f, 0 10px 22px rgba(0,0,0,.45); }
+.btn.sm { font-size: .85rem; padding: 7px 13px; } .btn[disabled] { opacity: .4; pointer-events: none; }
+input, select { font: inherit; color: var(--ink); background: rgba(0,0,0,.35); border: 1.5px solid var(--panel-line); border-radius: 10px; padding: 9px 11px; width: 100%; }
+label.f { display: flex; flex-direction: column; gap: 3px; font-size: .8rem; color: var(--ink-dim); font-weight: 700; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 16px; padding: 14px; box-shadow: 0 18px 44px rgba(0,0,0,.35); min-width: 0; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; } .row > * { flex: 1; min-width: 110px; }
+.acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.notice { border-radius: 12px; padding: 10px 12px; background: rgba(124,196,255,.08); border: 1px solid rgba(124,196,255,.35); color: #d7ecff; font-size: .88rem; }
+.notice.warn { background: rgba(224,176,74,.1); border-color: var(--panel-line); color: var(--ink); }
+
+/* ---------- top bar ---------- */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; height: var(--bar-h); flex: none; }
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-size: 1.25rem; white-space: nowrap; }
+.brand svg { width: 34px; height: 34px; }
+.hudchips { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; background: rgba(0,0,0,.4); border: 1px solid var(--panel-line); font-weight: 800; font-size: .88rem; white-space: nowrap; }
+.chip .coin { width: 18px; height: 18px; }
+.chip.cash { color: var(--brass-hi); } .chip.lvl { color: var(--sky); } .chip.demo { color: var(--violet); border-color: rgba(177,140,255,.4); }
+.xpbar { width: 70px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
+.xpbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sky), #c3e4ff); }
+
+/* ---------- home ---------- */
+.home { display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: 14px; }
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.profile { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; }
+.avatar { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: 1.4rem; flex: none;
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,.25), 0 6px 16px rgba(0,0,0,.4); background: radial-gradient(circle at 35% 30%, #fff, var(--ivory) 45%, #cbbf9f); color: #3a2c12; }
+.avatar.bot { background: radial-gradient(circle at 35% 30%, #5a514a, var(--ebony) 60%); color: var(--brass-hi); }
+.mission { display: grid; gap: 4px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.07); }
+.mission .top { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: .9rem; }
+.prog { height: 7px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
+.prog i { display: block; height: 100%; background: linear-gradient(90deg, var(--brass-lo), var(--brass-hi)); transition: width .6s; }
+.prog.done i { background: linear-gradient(90deg, #1d7c50, var(--jade)); }
+.main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.mainhead { display: flex; justify-content: space-between; align-items: end; gap: 10px; flex-wrap: wrap; }
+.mainhead h2 { font-family: var(--display); font-size: clamp(1.5rem, 3.4vw, 2.3rem); color: var(--ivory); }
+.tabs { display: inline-flex; background: rgba(0,0,0,.35); border-radius: 999px; padding: 4px; border: 1px solid var(--panel-line); }
+.tabs button { padding: 6px 14px; border-radius: 999px; font-weight: 800; color: var(--ink-dim); }
+.tabs button[aria-pressed="true"] { background: var(--brass); color: #2a1b02; }
+.carousel { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(200px, 23%); gap: 14px; overflow-x: auto; padding: 4px 2px 12px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.arena { scroll-snap-align: start; position: relative; border-radius: 20px; overflow: hidden; min-height: 250px; display: flex; flex-direction: column; justify-content: flex-end; text-align: start;
+  border: 1px solid rgba(255,255,255,.12); box-shadow: 0 16px 40px rgba(0,0,0,.45); transition: transform .15s; }
+.arena:hover:not(.locked) { transform: translateY(-5px); }
+.arena svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+.arena .info { position: relative; padding: 12px 14px; background: linear-gradient(180deg, transparent, rgba(0,0,0,.82) 40%); display: grid; gap: 4px; }
+.arena h3 { font-family: var(--display); font-size: 1.35rem; color: #fff; text-shadow: 0 2px 8px #000; }
+.arena .stake { display: flex; justify-content: space-between; gap: 6px; font-weight: 800; font-size: .88rem; align-items: center; }
+.arena .stake .coin { width: 16px; height: 16px; vertical-align: -3px; }
+.arena .prize { color: var(--brass-hi); }
+.arena .fmt { font-size: .78rem; color: #e0d8c4; }
+.arena.locked { filter: grayscale(.85) brightness(.6); }
+.arena .lock { position: absolute; top: 10px; inset-inline-start: 10px; background: rgba(0,0,0,.7); border-radius: 999px; padding: 3px 10px; font-size: .78rem; font-weight: 800; }
+.arena .badge { position: absolute; top: 10px; inset-inline-end: 10px; background: var(--brass); color: #2a1b02; border-radius: 999px; padding: 2px 10px; font-size: .72rem; font-weight: 800; }
+.quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.qtile { text-align: start; display: grid; gap: 2px; padding: 12px 14px; border-radius: 14px; background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(0,0,0,.25)); border: 1px solid var(--panel-line); }
+.qtile b { font-family: var(--display); font-size: 1.05rem; color: var(--ivory); }
+.qtile span { color: var(--ink-dim); font-size: .82rem; }
+
+/* ---------- table ---------- */
+.table { display: grid; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr) minmax(150px, 210px); grid-template-rows: minmax(0, 1fr); gap: 12px; height: 100%; min-height: 260px; align-items: stretch; }
+.pside { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; justify-content: space-between; overflow-y: auto; scrollbar-width: none; }
+.pcard { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: center; padding: 10px; border-radius: 14px; background: var(--panel); border: 1px solid var(--panel-line); position: relative; }
+.pcard.turn { box-shadow: 0 0 0 2px var(--brass), 0 0 26px rgba(224,176,74,.35); }
+.pcard .nm { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pcard .sub { font-size: .75rem; color: var(--ink-faint); }
+.bubble { position: absolute; top: -14px; inset-inline-end: 8px; font-size: 1.6rem; animation: pop 2s forwards; pointer-events: none; }
+@keyframes pop { 0% { transform: scale(.2); opacity: 0; } 15% { transform: scale(1.2); opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-16px); opacity: 0; } }
+.scorebig { text-align: center; font-family: var(--display); }
+.scorebig .s { font-size: 2.1rem; color: var(--ivory); line-height: 1; }
+.scorebig .m { font-family: var(--body); font-size: .72rem; color: var(--brass); font-weight: 800; letter-spacing: .06em; }
+.center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; min-height: 0; gap: 6px; }
+.boardwrap { position: relative; width: 100%; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.boardwrap svg.board { max-width: 100%; max-height: 100%; width: auto; height: 100%; aspect-ratio: 830 / 540; direction: ltr; touch-action: manipulation; user-select: none; filter: drop-shadow(0 20px 30px rgba(0,0,0,.55)); }
+.boardlabel { font-family: var(--display); font-size: .95rem; display: flex; gap: 10px; align-items: center; }
+.status { font-family: var(--body); font-weight: 800; font-size: .82rem; padding: 3px 11px; border-radius: 999px; background: rgba(0,0,0,.4); }
+.status.go { background: var(--brass); color: #2a1b02; animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(224,176,74,.18); } }
+.dicebox { display: flex; gap: 8px; align-items: center; justify-content: center; min-height: 54px; flex-wrap: wrap; }
+.dicebox svg { width: 50px; height: 50px; filter: drop-shadow(0 6px 6px rgba(0,0,0,.45)); }
+.dicebox svg.used { opacity: .25; filter: none; }
+.dicebox svg.roll { animation: tumble .55s cubic-bezier(.3,1.4,.5,1); }
+@keyframes tumble { 0% { transform: translateY(-30px) rotate(-220deg) scale(.6); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.minib { border-radius: 12px; padding: 6px; background: var(--panel); border: 1px solid var(--panel-line); text-align: center; display: grid; gap: 4px; }
+.minib svg { width: 100%; height: auto; display: block; direction: ltr; pointer-events: none; }
+.minib.hot { box-shadow: 0 0 0 2px var(--jade); }
+.emotes { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+.emotes button { font-size: 1.2rem; width: 36px; height: 36px; border-radius: 10px; background: rgba(0,0,0,.35); border: 1px solid var(--panel-line); }
+.meta { font-size: .75rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; text-align: center; }
+.pt-hit { cursor: pointer; outline: none; }
+
+/* ---------- VS / modals ---------- */
+.overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(2,10,7,.75); padding: 14px; }
+.overlay .card { max-width: 520px; width: 100%; max-height: 100%; overflow: auto; text-align: center; display: grid; gap: 10px; padding: 22px; border-radius: 22px;
+  background: linear-gradient(180deg, #173b2d, #0b2219); border: 1px solid var(--brass); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.overlay h2 { font-family: var(--display); font-size: 2.2rem; color: var(--brass-hi); }
+.vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; width: min(640px, 100%); }
+.vs .side { align-items: center; text-align: center; animation: slideA .5s cubic-bezier(.2,1.3,.4,1); }
+.vs .side.b { animation-name: slideB; }
+.vs .avatar { width: 92px; height: 92px; font-size: 2.4rem; }
+.vs .x { font-family: var(--display); font-size: 3.4rem; color: var(--brass-hi); text-shadow: 0 0 30px rgba(224,176,74,.7); animation: zoom .6s .2s both; }
+@keyframes slideA { from { transform: translateX(120px); opacity: 0; } } @keyframes slideB { from { transform: translateX(-120px); opacity: 0; } }
+@keyframes zoom { from { transform: scale(3); opacity: 0; } }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.cal div { border-radius: 10px; padding: 8px 2px; background: rgba(0,0,0,.35); border: 1px solid var(--panel-line); font-size: .75rem; font-weight: 800; }
+.cal div b { display: block; font-family: var(--display); font-size: 1rem; color: var(--brass-hi); }
+.cal .done { opacity: .45; } .cal .today { background: var(--brass); color: #2a1b02; } .cal .today b { color: #2a1b02; }
+.gain { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; font-weight: 800; }
+.gain span { padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.35); border: 1px solid var(--panel-line); }
+
+/* ---------- lists / grids ---------- */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.badgec { padding: 10px; border-radius: 14px; background: rgba(0,0,0,.3); border: 1px solid var(--panel-line); display: grid; gap: 2px; text-align: center; }
+.badgec .ic { font-size: 1.8rem; } .badgec b { font-size: .9rem; } .badgec span { font-size: .75rem; color: var(--ink-faint); }
+.badgec.off { opacity: .35; filter: grayscale(1); }
+.skins { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.skin { border-radius: 12px; overflow: hidden; border: 2px solid transparent; background: rgba(0,0,0,.3); text-align: center; padding-bottom: 6px; font-size: .8rem; font-weight: 800; display: grid; gap: 6px; }
+.skin[aria-pressed="true"] { border-color: var(--brass-hi); }
+.skin.off { opacity: .4; }
+.skin .sw { height: 54px; display: grid; grid-template-columns: repeat(4, 1fr); }
+.hist { width: 100%; border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.hist td { padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.hist td:last-child { text-align: left; font-weight: 800; }
+.plus { color: var(--jade); } .minus { color: #ff9b8a; }
+.balance { font-family: var(--display); font-size: clamp(2rem, 5vw, 2.8rem); color: var(--brass-hi); line-height: 1; }
+.codebox { font-family: ui-monospace, Menlo, monospace; font-size: 1.3rem; letter-spacing: .12em; padding: 10px; border-radius: 10px; background: rgba(0,0,0,.45); border: 1.5px dashed var(--brass); text-align: center; user-select: all; direction: ltr; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: .88rem; } .kv dt { color: var(--ink-faint); } .kv dd { margin: 0; font-weight: 700; }
+.slide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; align-items: center; }
+.slide h2 { font-family: var(--serif); font-weight: 900; font-size: clamp(1.5rem, 3.2vw, 2.3rem); line-height: 1.1; color: var(--ivory); }
+.slide p { margin: 8px 0 0; color: var(--ink-dim); max-width: 60ch; }
+.big { font-family: var(--display); font-size: clamp(2.6rem, 6vw, 4.4rem); color: var(--brass-hi); line-height: 1; }
+.law { font-family: var(--serif); color: var(--ivory); border-inline-start: 3px solid var(--brass); padding: 6px 12px; background: rgba(0,0,0,.25); border-radius: 0 10px 10px 0; }
+.bars { display: grid; gap: 10px; }
+.bar .lbl { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; font-size: .88rem; }
+.bar .track { height: 16px; border-radius: 8px; background: rgba(0,0,0,.4); overflow: hidden; position: relative; }
+.bar .fill { position: absolute; inset: 0 0 0 auto; width: 0; border-radius: 8px; background: linear-gradient(90deg, var(--brass-lo), var(--brass-hi)); transition: width 1.1s cubic-bezier(.2,.8,.2,1); }
+.bar .fill.weak { background: linear-gradient(90deg, #7c1f12, var(--ruby)); } .bar .fill.tie { background: linear-gradient(90deg, #1f7a52, var(--jade)); }
+.conds { display: grid; gap: 8px; }
+.cond { display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid var(--panel-line); }
+.cond .k { font-family: var(--display); font-size: 1.4rem; color: var(--brass); width: 30px; text-align: center; }
+.counter { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; text-align: center; }
+.counter div { background: rgba(0,0,0,.3); border-radius: 12px; padding: 8px 4px; border: 1px solid var(--panel-line); font-size: .8rem; }
+.counter b { display: block; font-family: var(--display); font-size: 1.8rem; color: var(--ivory); }
+.dots { display: flex; flex-wrap: wrap; gap: 4px; min-height: 14px; } .dots i { width: 11px; height: 11px; border-radius: 50%; }
+.dots i.t { background: var(--jade); } .dots i.w { background: var(--brass); } .dots i.l { background: var(--ruby); }
+.steps { display: flex; gap: 6px; justify-content: center; } .steps button { width: 30px; height: 7px; border-radius: 4px; background: rgba(255,255,255,.15); }
+.steps button[aria-current="step"] { background: var(--brass); }
+
+/* ---------- rotate prompt & responsive ---------- */
+#rotate { position: fixed; inset: 0; z-index: 90; display: none; place-items: center; text-align: center; padding: 24px; background: var(--baize-deep); }
+#rotate .ph { width: 70px; height: 110px; border: 4px solid var(--brass); border-radius: 14px; margin: 0 auto 18px; animation: rot 2.2s ease-in-out infinite; }
+@keyframes rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+@media (orientation: portrait) and (max-width: 760px) { body:not(.portrait-ok) #rotate { display: grid; } }
+@media (max-width: 900px) { .home { grid-template-columns: minmax(190px, 230px) minmax(0, 1fr); } .carousel { grid-auto-columns: minmax(180px, 42%); } }
+@media (max-height: 480px) {
+  :root { --bar-h: 44px; } body { font-size: 14px; } .arena { min-height: 190px; } .brand span { display: none; }
+  .table { grid-template-columns: minmax(118px, 160px) minmax(0, 1fr) minmax(118px, 160px); gap: 8px; }
+  .dicebox svg { width: 38px; height: 38px; } .dicebox { min-height: 40px; } .avatar { width: 36px; height: 36px; font-size: 1rem; }
+  .pcard { padding: 6px; } .scorebig .s { font-size: 1.6rem; } .emotes button { width: 30px; height: 30px; font-size: 1rem; }
+  .btn { padding: 8px 14px; font-size: .9rem; } .mission { padding: 5px 0; }
+  .pside { gap: 6px; } .pside .meta, .boardlabel > span:first-child { display: none; } .pcard .sub { display: none; } .scorebig .m { font-size: .65rem; }
+}
+@media (orientation: portrait) { .home, .table { grid-template-columns: 1fr; } .table { height: auto; grid-template-rows: none; } .boardwrap svg.board { width: 100%; height: auto; } }
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; }
+#toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%) translateY(20px); z-index: 70; background: var(--ivory); color: #2a1b02; font-weight: 800; padding: 9px 18px; border-radius: 999px; opacity: 0; transition: .25s; pointer-events: none; max-width: calc(100vw - 32px); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+#toast.show { opacity: 1; transform: translateX(-50%); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div id="app"></div>
+<div id="rotate" role="dialog" aria-label="סובב את המכשיר">
+  <div><div class="ph" aria-hidden="true"></div>
+    <h2 style="font-family:var(--display);font-size:1.6rem">סובב את הטלפון לרוחב</h2>
+    <p class="muted">המשחק מעוצב למסך שוכב.</p>
+    <button class="btn ghost sm" id="portrait-ok">המשך בכל זאת</button></div>
+</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/*ENGINE*/
+
+// =====================================================================
+// Data: study numbers, arenas, missions, achievements, skins
+// =====================================================================
+const STUDY = { intermediate: { single: 72.1, match7: 97.0, dup3: 88.3, weakSingle: 27.9, weakMatch7: 3.0 }, beginner: { single: 93.0, match7: 100.0, dup3: 99.8 } };
+const BOT_RATING = { beginner: 1300, intermediate: 1500, strong: 1650, expert: 1800 };
+const ARENAS = [
+  { id: 'cafe', name: 'קפה השכונה', cur: 'coins', entry: 50, mode: 'classic', len: 3, minLevel: 1, bot: 'beginner', scene: 'cafe', opp: ['שמעון מהמכולת', 'רחל מהקומה השנייה', 'מוטי הדוור'] },
+  { id: 'shuk', name: 'שוק הכרמל', cur: 'coins', entry: 200, mode: 'duplicate', len: 1, minLevel: 3, bot: 'intermediate', scene: 'shuk', opp: ['אבי מהדוכן', 'סיגל התבלינים', 'ג׳קי הפירות'] },
+  { id: 'yafo', name: 'נמל יפו', cur: 'coins', entry: 1000, mode: 'classic', len: 5, minLevel: 6, bot: 'strong', scene: 'yafo', opp: ['קפטן נסים', 'דורית מהמזח', 'אלברט הדייג'] },
+  { id: 'roof', name: 'גג רוטשילד', cur: 'coins', entry: 5000, mode: 'duplicate', len: 2, minLevel: 10, bot: 'expert', scene: 'roof', opp: ['ליאור המשקיע', 'מאיה מהסטארטאפ', 'ד״ר גל'] },
+  { id: 'ils10', name: 'שולחן ₪10', cur: 'ils', entry: 1000, mode: 'duplicate', len: 2, minRating: 0, bot: 'strong', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
+  { id: 'ils25', name: 'שולחן ₪25', cur: 'ils', entry: 2500, mode: 'classic', len: 7, minRating: 1550, bot: 'strong', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
+  { id: 'ils50', name: 'שולחן ₪50', cur: 'ils', entry: 5000, mode: 'duplicate', len: 2, minRating: 1600, bot: 'expert', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
+  { id: 'ils100', name: 'שולחן ₪100', cur: 'ils', entry: 10000, mode: 'classic', len: 7, minRating: 1700, bot: 'expert', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
+];
+const RAKE = 10; const TAX = 0.25; const CASH_MIN_GAMES = 10;
+const DAILY = [100, 125, 150, 175, 200, 225, 250];
+const MISSION_POOL = [
+  { id: 'play3', t: 'שחק 3 משחקים', ev: 'games', n: 3, coins: 120, xp: 30 },
+  { id: 'win2', t: 'נצח 2 משחקים', ev: 'wins', n: 2, coins: 180, xp: 40 },
+  { id: 'dup1', t: 'נצח סבב שש בש כפול', ev: 'dupWins', n: 1, coins: 200, xp: 50 },
+  { id: 'hit5', t: 'הכה 5 כלים של היריב', ev: 'hits', n: 5, coins: 120, xp: 30 },
+  { id: 'off30', t: 'הוצא 30 כלים מהלוח', ev: 'borne', n: 30, coins: 150, xp: 35 },
+  { id: 'arena2', t: 'שחק 2 משחקים בזירה', ev: 'arenaGames', n: 2, coins: 150, xp: 40 },
+  { id: 'gammon', t: 'נצח בגמון', ev: 'gammons', n: 1, coins: 250, xp: 60 },
+];
+const ACHIEVEMENTS = [
+  { id: 'first', ic: '🎲', t: 'ניצחון ראשון', d: 'נצח משחק אחד', test: (p) => p.stats.wins >= 1 },
+  { id: 'ten', ic: '🔟', t: 'עשירייה', d: '10 ניצחונות', test: (p) => p.stats.wins >= 10 },
+  { id: 'fifty', ic: '🏅', t: 'חמישים', d: '50 ניצחונות', test: (p) => p.stats.wins >= 50 },
+  { id: 'twin', ic: '♊', t: 'תאומים', d: 'סיים סבב כפול בתיקו', test: (p) => p.stats.dupTies >= 1 },
+  { id: 'gam', ic: '⚡', t: 'גמון', d: 'נצח בגמון', test: (p) => p.stats.gammons >= 1 },
+  { id: 'bg', ic: '💥', t: 'בקגמון', d: 'נצח בבקגמון', test: (p) => p.stats.backgammons >= 1 },
+  { id: 'hitter', ic: '🎯', t: 'צלף', d: 'הכה 50 כלים', test: (p) => p.stats.hits >= 50 },
+  { id: 'tour', ic: '🗺️', t: 'טיול שכונות', d: 'שחק בכל זירות המטבעות', test: (p) => ARENAS.filter((a) => a.cur === 'coins').every((a) => p.stats.arenas[a.id]) },
+  { id: 'hot3', ic: '🔥', t: 'על הגל', d: '3 ניצחונות ברצף', test: (p) => p.bestRun >= 3 },
+  { id: 'lvl5', ic: '⭐', t: 'רמה 5', d: 'הגע לרמה 5', test: (p) => level(p.xp) >= 5 },
+  { id: 'lvl10', ic: '🌟', t: 'רמה 10', d: 'הגע לרמה 10', test: (p) => level(p.xp) >= 10 },
+  { id: 'week', ic: '📅', t: 'שבוע מלא', d: '7 ימי כניסה ברצף', test: (p) => p.streak >= 7 },
+];
+const SKINS = [
+  { id: 'classic', t: 'קלאסי', lv: 1, frame: ['#6b3f1d', '#2c170a'], field: ['#1d5a43', '#0f3a2b'], a: ['#c75a34', '#7a2410'], b: ['#f2e2bd', '#c7ab78'] },
+  { id: 'ebony', t: 'הובנה', lv: 3, frame: ['#2b2b2b', '#0b0b0b'], field: ['#3a1f14', '#1f0f09'], a: ['#d6a24a', '#7c5418'], b: ['#e9e1cf', '#a89b80'] },
+  { id: 'marble', t: 'שיש', lv: 6, frame: ['#c9c3b8', '#7f786c'], field: ['#e9e6df', '#c8c3b8'], a: ['#2f5d8a', '#163552'], b: ['#b9894a', '#7a5524'] },
+  { id: 'desert', t: 'מדבר', lv: 10, frame: ['#8a5a2b', '#4a2e12'], field: ['#d9b07a', '#b5874f'], a: ['#8a2f1c', '#521a0e'], b: ['#f6e7c8', '#d7c09a'] },
+  { id: 'royal', t: 'מלכותי', lv: 15, frame: ['#3a2a52', '#1a1028'], field: ['#2a1f45', '#150f26'], a: ['#e0b04a', '#8c6418'], b: ['#d8d0ff', '#9f93d6'] },
+];
+
+// =====================================================================
+// helpers
+// =====================================================================
+const $ = (s, r = document) => r.querySelector(s);
+const h = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const k of kids.flat(Infinity)) if (k != null && k !== false) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+};
+const NS = 'http://www.w3.org/2000/svg';
+const S = (tag, attrs = {}, text) => { const e = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text != null) e.textContent = text; return e; };
+const shekel = (ag) => '₪' + (ag / 100).toLocaleString('he-IL', { minimumFractionDigits: ag % 100 ? 2 : 0, maximumFractionDigits: 2 });
+const fmt = (n) => Number(n).toLocaleString('he-IL');
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('sbk2:' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('sbk2:' + k, JSON.stringify(v)); } catch { /* storage blocked */ } },
+};
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const today = () => new Date().toISOString().slice(0, 10);
+const level = (xp) => Math.floor(Math.sqrt((xp || 0) / 40)) + 1;
+const xpFor = (lv) => 40 * (lv - 1) ** 2;
+const DAY = 86400000;
+
+const PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[28, 28], [50, 50], [72, 72]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]], 5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]], 6: [[28, 26], [72, 26], [28, 50], [72, 50], [28, 74], [72, 74]] };
+function dieSVG(n, cls = '') {
+  const svg = S('svg', { viewBox: '0 0 100 100', class: cls, role: 'img', 'aria-label': `קובייה ${n}` });
+  const id = 'dg' + Math.random().toString(36).slice(2, 7);
+  const gold = P.dice === 'gold';
+  const g = S('linearGradient', { id, x1: 0, y1: 0, x2: 1, y2: 1 });
+  g.append(S('stop', { offset: '0', 'stop-color': gold ? '#ffe7a3' : '#fffdf6' }), S('stop', { offset: '1', 'stop-color': gold ? '#c9952c' : '#e3d6b6' }));
+  const d = S('defs'); d.append(g); svg.append(d);
+  svg.append(S('rect', { x: 4, y: 4, width: 92, height: 92, rx: 20, fill: `url(#${id})`, stroke: gold ? '#7a5417' : '#9c8a60', 'stroke-width': 2 }));
+  for (const [x, y] of PIPS[n] || []) svg.append(S('circle', { cx: x, cy: y, r: 8.5, fill: n === 1 ? '#b3261e' : '#231c14' }));
+  return svg;
+}
+function coinSVG() {
+  const s = S('svg', { viewBox: '0 0 20 20', class: 'coin', 'aria-hidden': 'true' });
+  s.append(S('circle', { cx: 10, cy: 10, r: 9, fill: '#e0b04a', stroke: '#8c6418', 'stroke-width': 1.5 }), S('circle', { cx: 10, cy: 10, r: 5.5, fill: 'none', stroke: '#8c6418', 'stroke-width': 1.2 }));
+  return s;
+}
+
+// ---------- sound & haptics ----------
+const audio = { ctx: null, on: store.get('sound', true) };
+function tone(freq, dur, type = 'sine', vol = .12, when = 0) {
+  if (!audio.on) return;
+  try {
+    audio.ctx ??= new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = audio.ctx.currentTime + when;
+    const o = audio.ctx.createOscillator(); const g = audio.ctx.createGain();
+    o.type = type; o.frequency.value = freq; g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(audio.ctx.destination); o.start(t0); o.stop(t0 + dur);
+  } catch { /* no audio */ }
+}
+const buzz = (ms) => { try { navigator.vibrate?.(ms); } catch { /* none */ } };
+const sfx = {
+  dice() { for (let i = 0; i < 6; i++) tone(170 + Math.random() * 300, .05, 'square', .045, i * .045); buzz(18); },
+  click() { tone(560, .06, 'triangle', .1); },
+  hit() { tone(130, .2, 'sawtooth', .08); buzz(30); },
+  off() { tone(880, .08, 'triangle', .08); },
+  coin() { [988, 1319].forEach((f, i) => tone(f, .12, 'square', .05, i * .08)); },
+  win() { [523, 659, 784, 1046].forEach((f, i) => tone(f, .28, 'triangle', .12, i * .12)); buzz(60); },
+  lose() { [392, 330].forEach((f, i) => tone(f, .3, 'sine', .08, i * .15)); },
+  level() { [523, 784, 1046, 1568].forEach((f, i) => tone(f, .22, 'triangle', .11, i * .09)); },
+};
+function confetti() {
+  if (reduced) return;
+  const c = $('#confetti'); const x = c.getContext('2d');
+  c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio; x.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  const cols = ['#ffd77a', '#e0b04a', '#f7efdc', '#4fe09a', '#d2493a', '#7cc4ff'];
+  const parts = Array.from({ length: 180 }, () => ({ x: innerWidth / 2, y: innerHeight / 3, vx: (Math.random() - .5) * 16, vy: Math.random() * -13 - 4, s: 4 + Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)], r: Math.random() * 6 }));
+  let t = 0;
+  (function f() { x.clearRect(0, 0, innerWidth, innerHeight); for (const p of parts) { p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += .2; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore(); } if (t++ < 160) requestAnimationFrame(f); else x.clearRect(0, 0, innerWidth, innerHeight); })();
+}
+
+// =====================================================================
+// Persistent player state (this browser only)
+// =====================================================================
+const P = Object.assign({
+  coins: 500, xp: 0, rating: 1500, streak: 0, lastDaily: null, run: 0, bestRun: 0,
+  stats: { games: 0, wins: 0, dupWins: 0, dupTies: 0, hits: 0, borne: 0, gammons: 0, backgammons: 0, arenaGames: 0, arenas: {} },
+  missions: null, ach: {}, skin: 'classic', dice: 'ivory', lastRefill: 0, seenGuide: false,
+}, store.get('player', {}));
+const W$ = Object.assign({ balance: 0, kyc: null, limits: { depositDaily: null, lossMonthly: null }, excludedUntil: null, history: [] }, store.get('wallet', {}));
+const OP = Object.assign({ codes: [], unlockAll: false }, store.get('operator', {}));
+const save = () => { store.set('player', P); store.set('wallet', W$); store.set('operator', OP); };
+
+function ensureMissions() {
+  if (P.missions?.date === today()) return;
+  let seed = [...today()].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const pool = MISSION_POOL.slice(); const pick = [];
+  while (pick.length < 3) { seed = (seed * 1103515245 + 12345) >>> 0; pick.push(pool.splice(seed % pool.length, 1)[0]); }
+  P.missions = { date: today(), list: pick.map((m) => ({ id: m.id, p: 0, claimed: false })) };
+  save();
+}
+function track(ev, n = 1) {
+  if (ev in P.stats) P.stats[ev] += n;
+  ensureMissions();
+  for (const m of P.missions.list) { const def = MISSION_POOL.find((x) => x.id === m.id); if (def.ev === ev) m.p = Math.min(def.n, m.p + n); }
+}
+function checkAchievements() {
+  const fresh = [];
+  for (const a of ACHIEVEMENTS) if (!P.ach[a.id] && a.test(P)) { P.ach[a.id] = Date.now(); fresh.push(a); }
+  if (fresh.length) { save(); fresh.forEach((a, i) => setTimeout(() => { toast(`${a.ic} הישג חדש: ${a.t}`); sfx.coin(); }, 700 + i * 1400)); }
+}
+function addXp(n) { const before = level(P.xp); P.xp += n; save(); const after = level(P.xp); if (after > before) setTimeout(() => showLevelUp(after), 900); }
+function addCoins(n, why) { P.coins += n; if (n > 0) sfx.coin(); save(); if (why) toast(`${n > 0 ? '+' : ''}${fmt(n)} מטבעות · ${why}`); }
+
+// =====================================================================
+// Shell
+// =====================================================================
+const st = { screen: P.seenGuide ? 'home' : 'guide', guideStep: 0, homeTab: 'coins', tour: null, tourHook: null, lastCode: null };
+function go(screen) { st.screen = screen; stopTimers(); render(); }
+function render() {
+  const views = { guide: viewGuide, home: viewHome, table: viewTable, wallet: viewWallet, profile: viewProfile, tours: viewTours };
+  $('#app').replaceChildren(topbar(), h('main', { class: 'stage' }, views[st.screen]()));
+}
+function logo() {
+  const svg = S('svg', { viewBox: '0 0 40 40', 'aria-hidden': 'true' });
+  svg.append(S('rect', { x: 2, y: 8, width: 22, height: 22, rx: 5, fill: '#f7efdc', transform: 'rotate(-12 13 19)' }), S('rect', { x: 16, y: 10, width: 22, height: 22, rx: 5, fill: '#e0b04a', transform: 'rotate(10 27 21)' }));
+  for (const [cx, cy] of [[9, 14], [17, 24], [23, 16], [27, 21], [31, 26]]) svg.append(S('circle', { cx, cy, r: 2.2, fill: '#231c14' }));
+  return svg;
+}
+function topbar() {
+  const lv = level(P.xp); const pct = Math.min(100, ((P.xp - xpFor(lv)) / (xpFor(lv + 1) - xpFor(lv))) * 100);
+  const inGame = st.screen === 'table';
+  return h('header', { class: 'topbar' },
+    h('button', { class: 'brand', onclick: () => (inGame && !G.M.over ? confirmLeave() : go('home')), 'aria-label': 'למסך הבית' }, logo(), h('span', {}, 'שש בש כפול')),
+    h('div', { class: 'hudchips' },
+      h('button', { class: 'chip lvl', onclick: () => !inGame && go('profile'), 'aria-label': `רמה ${lv}` }, `⭐ ${lv}`, h('span', { class: 'xpbar' }, h('i', { style: `width:${pct}%` }))),
+      h('span', { class: 'chip num', title: 'מטבעות אימון: חינם, ללא ערך כספי' }, coinSVG(), fmt(P.coins)),
+      h('button', { class: 'chip cash num', onclick: () => !inGame && go('wallet') }, '👛 ', shekel(W$.balance)),
+      h('span', { class: 'chip demo' }, 'הדגמה'),
+      inGame ? null : h('button', { class: 'chip', onclick: () => { st.guideStep = 0; go('guide'); }, 'aria-label': 'למה זה חוקי' }, '⚖️'),
+      h('button', { class: 'chip', 'aria-label': audio.on ? 'השתק' : 'הפעל צלילים', onclick: () => { audio.on = !audio.on; store.set('sound', audio.on); render(); } }, audio.on ? '🔊' : '🔈')));
+}
+function confirmLeave() {
+  document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' }, h('div', { class: 'card' }, h('h2', {}, 'לצאת מהמשחק?'), h('p', { class: 'muted' }, 'יציאה באמצע נחשבת להפסד, ודמי הכניסה לא יוחזרו.'),
+    h('div', { class: 'acts', style: 'justify-content:center' }, h('button', { class: 'btn ghost', onclick: () => $('.overlay')?.remove() }, 'הישאר'), h('button', { class: 'btn red', onclick: () => { $('.overlay')?.remove(); stopTimers(); for (let k = 0; k < 40 && !G.M.over; k++) { G.M.boards().forEach((g, b) => { if (g.phase !== 'over') g.resign(colorOf('A', b)); }); G.M.settle(); } step(); } }, 'צא')))));
+}
+
+// =====================================================================
+// Arena scenes (original illustrations, drawn in SVG)
+// =====================================================================
+function scene(kind) {
+  const s = S('svg', { class: 'scene', viewBox: '0 0 240 300', preserveAspectRatio: 'xMidYMid slice', 'aria-hidden': 'true' });
+  const sky = { cafe: ['#f6b56b', '#b6532d'], shuk: ['#ffcf6e', '#d27a2c'], yafo: ['#ff9a6b', '#3b4f8c'], roof: ['#1b2550', '#05070f'], gold: ['#3a2a07', '#0e0a02'] }[kind];
+  const id = 'sk' + kind + Math.random().toString(36).slice(2, 6);
+  const d = S('defs'); const g = S('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 }); g.append(S('stop', { offset: 0, 'stop-color': sky[0] }), S('stop', { offset: 1, 'stop-color': sky[1] })); d.append(g); s.append(d);
+  s.append(S('rect', { width: 240, height: 300, fill: `url(#${id})` }));
+  if (kind === 'cafe') {
+    s.append(S('circle', { cx: 190, cy: 60, r: 26, fill: '#ffe2a8', opacity: .8 }), S('rect', { x: 0, y: 120, width: 240, height: 180, fill: '#e9d3a7' }));
+    for (let i = 0; i < 8; i++) s.append(S('rect', { x: i * 30, y: 105, width: 30, height: 28, fill: i % 2 ? '#c2402e' : '#f7efdc' }));
+    s.append(S('rect', { x: 30, y: 160, width: 70, height: 70, fill: '#5a3a1e' }), S('rect', { x: 140, y: 160, width: 70, height: 60, fill: '#2f5d8a' }));
+    for (const x of [40, 120, 190]) s.append(S('ellipse', { cx: x, cy: 255, rx: 26, ry: 7, fill: '#3b2a18' }), S('rect', { x: x - 2, y: 255, width: 4, height: 30, fill: '#3b2a18' }));
+    s.append(S('rect', { x: 110, y: 238, width: 16, height: 14, rx: 3, fill: '#fff' }));
+  } else if (kind === 'shuk') {
+    for (let i = 0; i < 4; i++) s.append(S('polygon', { points: `${i * 64 - 10},110 ${i * 64 + 54},110 ${i * 64 + 44},80 ${i * 64},80`, fill: ['#2d7d46', '#c2402e', '#2f5d8a', '#e0b04a'][i] }), S('rect', { x: i * 64 - 6, y: 110, width: 56, height: 120, fill: '#7a4b22' }));
+    const fr = ['#ff7a2f', '#ffd23f', '#d1342f', '#6fbf3a', '#8e44ad'];
+    for (let i = 0; i < 40; i++) s.append(S('circle', { cx: 10 + (i % 10) * 24, cy: 200 + Math.floor(i / 10) * 14, r: 7, fill: fr[i % 5] }));
+    s.append(S('rect', { x: 0, y: 255, width: 240, height: 45, fill: '#3a2814' }));
+  } else if (kind === 'yafo') {
+    s.append(S('circle', { cx: 60, cy: 140, r: 34, fill: '#ffd28a', opacity: .9 }), S('rect', { x: 0, y: 160, width: 240, height: 140, fill: '#2b4a7a' }));
+    for (let i = 0; i < 6; i++) s.append(S('path', { d: `M0 ${180 + i * 18} Q 60 ${174 + i * 18} 120 ${180 + i * 18} T 240 ${180 + i * 18}`, stroke: 'rgba(255,255,255,.25)', fill: 'none' }));
+    s.append(S('rect', { x: 100, y: 110, width: 120, height: 50, fill: '#c9a26b' }), S('rect', { x: 150, y: 60, width: 26, height: 100, fill: '#d8b98a' }), S('polygon', { points: '146,60 180,60 163,36', fill: '#a37a45' }), S('circle', { cx: 163, cy: 80, r: 8, fill: '#fff' }));
+    s.append(S('path', { d: 'M30 200 h60 l-10 16 h-40z', fill: '#f7efdc' }), S('rect', { x: 58, y: 168, width: 3, height: 32, fill: '#f7efdc' }), S('polygon', { points: '61,170 82,196 61,196', fill: '#e0b04a' }));
+  } else if (kind === 'roof') {
+    for (let i = 0; i < 50; i++) s.append(S('circle', { cx: (i * 53) % 240, cy: (i * 37) % 120, r: i % 7 ? .9 : 1.6, fill: '#fff', opacity: .7 }));
+    s.append(S('circle', { cx: 190, cy: 50, r: 16, fill: '#f3ead6' }));
+    for (const [x, y, w] of [[0, 120, 40], [40, 90, 30], [70, 140, 36], [106, 70, 34], [140, 110, 40], [180, 85, 30], [210, 130, 30]]) {
+      s.append(S('rect', { x, y, width: w, height: 300 - y, fill: '#0d1430' }));
+      for (let k = 0; k < 14; k++) s.append(S('rect', { x: x + 4 + (k % 3) * (w / 3 - 1), y: y + 8 + Math.floor(k / 3) * 14, width: 5, height: 7, fill: (k * x) % 3 ? '#ffd77a' : '#28335e' }));
+    }
+    s.append(S('rect', { x: 0, y: 236, width: 240, height: 64, fill: '#1c1410' }), S('path', { d: 'M0 226 Q 120 246 240 226', stroke: '#6d5a2c', fill: 'none' }));
+    for (let i = 0; i < 9; i++) s.append(S('circle', { cx: 14 + i * 27, cy: 230, r: 4, fill: '#ffd77a' }));
+  } else {
+    s.append(S('ellipse', { cx: 120, cy: 260, rx: 150, ry: 60, fill: '#0c3a26' }));
+    for (let i = 0; i < 18; i++) s.append(S('circle', { cx: 120 + Math.cos(i) * (40 + i * 3), cy: 120 + Math.sin(i * 1.3) * 40, r: 14 - i * .4, fill: '#e0b04a', stroke: '#8c6418', 'stroke-width': 2, opacity: .8 }));
+    s.append(S('text', { x: 120, y: 150, 'text-anchor': 'middle', 'font-size': 64, 'font-family': 'Secular One, sans-serif', fill: '#ffd77a', opacity: .9 }, '₪'));
+  }
+  return s;
+}
+
+// =====================================================================
+// HOME
+// =====================================================================
+function arenaLock(a) {
+  if (a.cur === 'coins') return level(P.xp) >= a.minLevel || OP.unlockAll ? null : `נפתח ברמה ${a.minLevel}`;
+  if (OP.unlockAll) return W$.kyc ? null : 'נדרש אימות זהות';
+  if (!W$.kyc) return 'נדרש אימות זהות';
+  if (P.stats.games < CASH_MIN_GAMES) return `נפתח אחרי ${CASH_MIN_GAMES} משחקים (${P.stats.games})`;
+  if (P.rating < a.minRating) return `נפתח בדירוג ${a.minRating}`;
+  return null;
+}
+function viewHome() {
+  ensureMissions();
+  const lv = level(P.xp);
+  const list = ARENAS.filter((a) => (st.homeTab === 'coins' ? a.cur === 'coins' : a.cur === 'ils'));
+  const arenaCard = (a) => {
+    const lock = arenaLock(a); const money = a.cur === 'ils';
+    const prize = Math.floor(a.entry * 2 * (100 - RAKE) / 100);
+    return h('button', { class: 'arena' + (lock ? ' locked' : ''), onclick: () => (lock ? toast(lock) : enterArena(a)), 'aria-label': `${a.name}${lock ? ' · ' + lock : ''}` },
+      scene(a.scene),
+      lock ? h('span', { class: 'lock' }, '🔒 ' + lock) : null,
+      !lock && a.mode === 'duplicate' ? h('span', { class: 'badge' }, 'כפול') : null,
+      h('div', { class: 'info' },
+        h('h3', {}, a.name),
+        h('div', { class: 'fmt' }, a.mode === 'duplicate' ? `שש בש כפול · ${a.len === 1 ? 'סבב' : a.len + ' סבבים'}` : `מאץ' עד ${a.len}`),
+        h('div', { class: 'stake num' }, h('span', {}, money ? 'כניסה ' + shekel(a.entry) : [coinSVG(), ' ' + fmt(a.entry)]), h('span', { class: 'prize' }, '🏆 ' + (money ? shekel(prize) : fmt(prize))))));
+  };
+  const ms = P.missions.list.map((m) => {
+    const def = MISSION_POOL.find((x) => x.id === m.id); const done = m.p >= def.n;
+    return h('div', { class: 'mission' },
+      h('div', { class: 'top' }, h('span', {}, def.t), h('span', { class: 'num faint' }, `${m.p}/${def.n}`)),
+      h('div', { class: 'prog' + (done ? ' done' : '') }, h('i', { style: `width:${(m.p / def.n) * 100}%` })),
+      done && !m.claimed ? h('button', { class: 'btn jade sm', onclick: () => { m.claimed = true; addXp(def.xp); addCoins(def.coins, 'משימה הושלמה'); checkAchievements(); render(); } }, `קבל ${def.coins} + ${def.xp} XP`)
+        : m.claimed ? h('span', { class: 'faint' }, '✓ נאסף') : h('span', { class: 'faint' }, `פרס: ${def.coins} מטבעות · ${def.xp} XP`));
+  });
+  const canRefill = P.coins < 50 && Date.now() - P.lastRefill > 3600_000;
+  return h('div', { class: 'home' },
+    h('aside', { class: 'side' },
+      h('div', { class: 'panel profile' }, h('div', { class: 'avatar' }, '★'),
+        h('div', {}, h('div', { style: 'font-weight:800' }, 'השחקן שלי'), h('div', { class: 'faint num' }, `רמה ${lv} · דירוג ${P.rating} · ${P.stats.wins}/${P.stats.games} ניצחונות`),
+          P.run >= 2 ? h('div', { style: 'color:var(--brass-hi);font-weight:800' }, `🔥 ${P.run} ברצף`) : null)),
+      h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'משימות היום'), ms),
+      h('div', { class: 'panel', style: 'display:grid;gap:6px' }, h('div', { class: 'eyebrow' }, 'מתנה יומית'),
+        h('div', { class: 'faint' }, `רצף: ${P.streak} ימים · מחר: ${DAILY[Math.min(P.streak, 6)]} מטבעות`),
+        canRefill ? h('button', { class: 'btn ghost sm', onclick: () => { P.lastRefill = Date.now(); addCoins(200, 'מילוי חינם'); render(); } }, 'מילוי חינם · 200') : null)),
+    h('section', { class: 'main' },
+      h('div', { class: 'mainhead' },
+        h('div', {}, h('div', { class: 'eyebrow' }, 'זירות'), h('h2', {}, st.homeTab === 'coins' ? 'לאן יוצאים הערב?' : 'שולחנות כסף')),
+        h('div', { class: 'tabs', role: 'group', 'aria-label': 'סוג זירה' },
+          h('button', { 'aria-pressed': String(st.homeTab === 'coins'), onclick: () => { st.homeTab = 'coins'; render(); } }, 'מטבעות'),
+          h('button', { 'aria-pressed': String(st.homeTab === 'ils'), onclick: () => { st.homeTab = 'ils'; render(); } }, '₪ כסף'))),
+      st.homeTab === 'ils' ? h('div', { class: 'notice' }, 'הדגמה: הכסף מדומה. השולחנות נפתחים לפי דירוג ומספר משחקים, לא לפי כמה הפקדת. משחקים רק בפורמטים של מיומנות. בגרסה האמיתית היריבים הם בני אדם.') : null,
+      h('div', { class: 'carousel' }, list.map(arenaCard)),
+      h('div', { class: 'quick' },
+        h('button', { class: 'qtile', onclick: practice }, h('b', {}, '🎯 אימון חופשי'), h('span', {}, 'כפול נגד בוט, בלי מטבעות')),
+        h('button', { class: 'qtile', onclick: () => go('tours') }, h('b', {}, '🏆 טורנירים'), h('span', {}, '4 שחקנים · ₪20 / ₪50')),
+        h('button', { class: 'qtile', onclick: () => go('profile') }, h('b', {}, '🎖️ הישגים ולוחות'), h('span', {}, `${Object.keys(P.ach).length}/${ACHIEVEMENTS.length} הישגים`)),
+        h('button', { class: 'qtile', onclick: () => go('wallet') }, h('b', {}, '👛 ארנק וקוד הפקדה'), h('span', {}, W$.kyc ? 'מאומת · ' + shekel(W$.balance) : 'אימות זהות')),
+        h('button', { class: 'qtile', onclick: () => { st.guideStep = 0; go('guide'); } }, h('b', {}, '⚖️ למה זה חוקי'), h('span', {}, 'החוק, הסטטיסטיקה וניסוי חי')))));
+}
+function maybeDaily() {
+  if (P.lastDaily === today() || $('.overlay')) return;
+  const yest = new Date(Date.now() - DAY).toISOString().slice(0, 10);
+  const streak = P.lastDaily === yest ? P.streak + 1 : 1;
+  const idx = (streak - 1) % 7; const amount = DAILY[idx];
+  const claim = () => { P.streak = streak; P.lastDaily = today(); $('.overlay')?.remove(); addCoins(amount, `מתנה יומית · יום ${streak}`); checkAchievements(); render(); };
+  document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'dg-t' },
+    h('div', { class: 'card' }, h('div', { class: 'eyebrow' }, 'ברוך שובך'), h('h2', { id: 'dg-t' }, 'מתנה יומית'),
+      h('div', { class: 'cal' }, DAILY.map((v, i) => h('div', { class: i < idx ? 'done' : i === idx ? 'today' : '' }, `יום ${i + 1}`, h('b', { class: 'num' }, v)))),
+      h('p', { class: 'muted' }, 'הסכומים קבועים וידועים מראש. למטבעות האימון אין ערך כספי.'),
+      h('button', { class: 'btn', onclick: claim }, `אסוף ${amount} מטבעות`))));
+}
+function showLevelUp(lv) {
+  sfx.level(); confetti();
+  const newArena = ARENAS.find((a) => a.cur === 'coins' && a.minLevel === lv); const newSkin = SKINS.find((s) => s.lv === lv);
+  document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' }, h('div', { class: 'card' }, h('div', { class: 'eyebrow' }, 'עלית רמה'), h('h2', {}, `רמה ${lv}!`),
+    newArena ? h('p', {}, 'נפתחה זירה חדשה: ', h('b', {}, newArena.name)) : null, newSkin ? h('p', {}, 'נפתח לוח חדש: ', h('b', {}, newSkin.t)) : null,
+    h('button', { class: 'btn', onclick: () => { $('.overlay')?.remove(); checkAchievements(); render(); } }, 'מעולה'))));
+}
+
+// =====================================================================
+// GUIDE (legal + statistics + live experiment)
+// =====================================================================
+function bar(label, value, cls = '') {
+  const fill = h('span', { class: 'fill ' + cls });
+  requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = value + '%'; }));
+  return h('div', { class: 'bar' }, h('div', { class: 'lbl' }, h('span', {}, label), h('span', { class: 'num' }, value.toFixed(1) + '%')), h('div', { class: 'track' }, fill));
+}
+const cond = (k, t, d) => h('div', { class: 'cond' }, h('span', { class: 'k' }, k), h('div', {}, h('b', {}, t), h('div', { class: 'muted' }, d)));
+const SLIDES = [
+  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'לפני שמתחילים'), h('h2', {}, 'יש קוביות. אז זה מזל?'), h('p', {}, 'כולם יודעים שבשש בש יש מזל, וכולם יודעים שהאלוף מהשכונה מנצח כמעט תמיד. בדקנו מה באמת קובע, ב-18,000 התמודדויות מדודות. כמה דקות קריאה, וניסוי שאפשר להריץ כאן.')),
+    h('div', { style: 'text-align:center' }, h('div', { class: 'big' }, '18,000'), h('div', { class: 'muted' }, 'התמודדויות בסימולציה'), h('div', { class: 'big', style: 'margin-top:10px' }, '100%'), h('div', { class: 'muted' }, 'תיקו בין שחקנים שווים, בשש בש כפול'))],
+  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'החוק בשתי שורות'), h('h2', {}, 'הימור אסור דורש שני תנאים יחד'),
+    h('p', { class: 'law' }, '"משחק אסור" הוא משחק שבו אפשר לזכות בכסף, בשווה כסף או בטובת הנאה, והתוצאות תלויות יותר בגורל מאשר בהבנה או ביכולת.'), h('p', { class: 'faint' }, 'סעיף 224 לחוק העונשין, התשל"ז-1977')),
+    h('div', { class: 'conds' }, cond('1', 'זכייה בכסף או בשווה כסף', 'מטבעות אימון: חינם, אי אפשר לקנות או לפדות אותם. התנאי לא מתקיים.'), cond('2', 'המזל קובע יותר מהיכולת', 'כאן נכנסת הסטטיסטיקה, בשקפים הבאים.'))],
+  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'שש בש רגיל'), h('h2', {}, 'במשחק בודד המזל עוד מורגש'), h('p', {}, 'מומחה מול שחקן בינוני: במשחק בודד המומחה מנצח ב-72%. במאץ\' עד 7 הוא מנצח ב-97%, כי לאורך זמן היכולת מכריעה.')),
+    h('div', { class: 'bars' }, bar('מומחה מול בינוני · משחק בודד', STUDY.intermediate.single), bar('הבינוני ניצח · משחק בודד', STUDY.intermediate.weakSingle, 'weak'), bar('מומחה מול בינוני · מאץ\' עד 7', STUDY.intermediate.match7), bar('הבינוני ניצח · מאץ\' עד 7', STUDY.intermediate.weakMatch7, 'weak'))],
+  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'הפתרון'), h('h2', {}, 'שני לוחות, אותן קוביות'), h('p', {}, 'בשש בש כפול משחקים שני לוחות במקביל. בלוח 1 אתה לבן, בלוח 2 אתה שחור. רצף הקוביות זהה בשני הלוחות, כך שכל אחד מקבל בדיוק את המזל של היריב. מה שנשאר להכריע הוא איך שיחקת.')),
+    h('div', { class: 'grid2' }, ['לוח 1 · אתה לבן', 'לוח 2 · אתה שחור'].map((t) => h('div', { class: 'panel', style: 'text-align:center' }, h('b', {}, t), h('div', { class: 'dicebox' }, dieSVG(6), dieSVG(4)))))],
+  slideExperiment,
+  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'המספרים המלאים'), h('h2', {}, 'ככל שהפורמט ארוך יותר, היכולת קובעת'), h('p', {}, 'ציון השחקן החזק לפי פורמט (תיקו נספר כחצי). 50% פירושו מטבע, 100% פירושו מיומנות טהורה.')),
+    h('div', { class: 'bars' }, bar('שני שחקנים שווים · כפול · תיקו', 100, 'tie'), bar('מומחה מול מתחיל · משחק בודד', STUDY.beginner.single), bar('מומחה מול מתחיל · כפול 3 סבבים', STUDY.beginner.dup3), bar('מומחה מול מתחיל · מאץ\' עד 7', STUDY.beginner.match7), bar('מומחה מול בינוני · כפול 3 סבבים', STUDY.intermediate.dup3))],
+  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'ומה עם כסף?'), h('h2', {}, 'איך בנוי מצב הכסף'), h('p', {}, 'בכסף אמיתי תנאי 1 מתקיים, ולכן הכל בנוי כך שתנאי 2 לא יתקיים: היכולת היא שקובעת.')),
+    h('div', { class: 'conds' }, cond('✓', 'רק פורמטים ארוכים', 'כפול 2 סבבים לפחות, או מאץ\' עד 7. אין כסף על משחק בודד.'), cond('✓', 'שחקן מול שחקן', 'הבית לא משחק נגדך. הפרס הוא קופת דמי הכניסה, פחות עמלה קבועה של 10%.'),
+      cond('✓', 'בלי מזל מובנה', 'אין גלגלי מזל, תיבות הפתעה או בונוסים אקראיים. הכל קבוע ושקוף.'), cond('✓', 'שמירה עליך', 'אימות זהות, גיל 18 ומעלה, מגבלות הפקדה והפסד, והחרגה עצמית.'),
+      h('div', { class: 'notice warn' }, 'מצב הכסף האמיתי ייפתח לציבור רק אחרי חוות דעת משפטית כתובה. כאן הכסף מדומה.'))],
+];
+function slideExperiment() {
+  const out = h('div', { style: 'display:grid;gap:10px' }, h('div', { class: 'faint' }, 'בחר ניסוי. הוא רץ כאן בדפדפן, עם המנוע של המשחק.'));
+  const run = (strong, weak, title) => {
+    const tally = { t: 0, w: 0, l: 0 };
+    const nums = h('div', { class: 'counter' }, h('div', {}, h('b', { class: 'num' }, '0'), 'תיקו'), h('div', {}, h('b', { class: 'num' }, '0'), 'החזק ניצח'), h('div', {}, h('b', { class: 'num' }, '0'), 'החלש ניצח'));
+    const dots = h('div', { class: 'dots', 'aria-hidden': 'true' });
+    out.replaceChildren(h('b', {}, title), nums, dots);
+    let k = 0;
+    const tick = () => {
+      if (k++ >= 24 || st.screen !== 'guide') return;
+      const m = new DuplicateMatch({ pairs: 1, cube: false, maxExtra: 0, gameDiceFn: diceFactory(crypto.getRandomValues(new Uint32Array(1))[0]) });
+      m.boards().forEach((g, b) => autoplay(g, (c) => (m.seatOf(c, b) === 'A' ? strong : weak)));
+      m.settle();
+      const r = m.winner === 'draw' ? 't' : m.winner === 'A' ? 'w' : 'l'; tally[r]++;
+      const bb = nums.querySelectorAll('b'); bb[0].textContent = tally.t; bb[1].textContent = tally.w; bb[2].textContent = tally.l;
+      dots.append(h('i', { class: r })); setTimeout(tick, 25);
+    };
+    tick();
+  };
+  return [h('div', {}, h('div', { class: 'eyebrow' }, 'תבדוק בעצמך'), h('h2', {}, 'ניסוי חי: 24 סבבים כפולים'),
+    h('p', {}, 'ניסוי א\': אותו בוט נגד עצמו. אם המזל היה משפיע, היינו רואים ניצחונות לשני הצדדים.'), h('p', {}, 'ניסוי ב\': מומחה נגד מתחיל.'),
+    h('div', { class: 'acts', style: 'margin-top:10px' }, h('button', { class: 'btn sm', onclick: () => run('expert', 'expert', 'מומחה מול מומחה') }, 'הרץ ניסוי א\''), h('button', { class: 'btn ghost sm', onclick: () => run('expert', 'beginner', 'מומחה מול מתחיל') }, 'הרץ ניסוי ב\''))), out];
+}
+function autoplay(g, levelOf) { let n = 0; while (g.phase !== 'over' && n++ < 3000) { if (g.phase === 'roll') g.roll(g.turn); else if (g.phase === 'move') { const i = chooseSequence(g.legal, g.turn, levelOf(g.turn)); g.move(g.turn, g.legal[i].moves); } } }
+function viewGuide() {
+  const i = st.guideStep; const last = i === SLIDES.length - 1;
+  const finish = () => { P.seenGuide = true; save(); go('home'); setTimeout(maybeDaily, 300); };
+  return h('div', { style: 'display:grid;gap:12px;max-width:1100px;margin:0 auto' },
+    h('div', { class: 'steps', role: 'tablist', 'aria-label': 'שלבי המדריך' }, SLIDES.map((_, k) => h('button', { 'aria-label': `שלב ${k + 1}`, 'aria-current': k === i ? 'step' : null, onclick: () => { st.guideStep = k; render(); } }))),
+    h('article', { class: 'panel slide', 'aria-live': 'polite' }, SLIDES[i]()),
+    h('div', { class: 'acts', style: 'justify-content:space-between' },
+      h('button', { class: 'btn ghost sm', onclick: finish }, 'דלג'),
+      h('div', { class: 'acts' }, i > 0 ? h('button', { class: 'btn ghost', onclick: () => { st.guideStep--; render(); } }, 'הקודם') : null,
+        last ? h('button', { class: 'btn', onclick: finish }, 'יאללה לשחק') : h('button', { class: 'btn', onclick: () => { st.guideStep++; render(); } }, 'הבא'))));
+}
+
+// =====================================================================
+// GAME CONTROLLER
+// =====================================================================
+function hash32(a, b, c, d) { let x = 0x9e3779b9 ^ a; for (const y of [b, c, d]) { x = Math.imul(x ^ y, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16; } return x >>> 0; }
+function diceFactory(seed) { return (gk) => (ri) => { const o = []; let k = 0; while (o.length < 2) { const v = hash32(seed, gk, ri, k++) & 0xff; if (v < 252) o.push((v % 6) + 1); } return o; }; }
+const G = { M: null, cfg: null, timers: [], pending: new Set(), partial: new Map(), selected: null, last: new Map(), rolled: new Set(), view: 0, ended: false, bubbles: {} };
+function stopTimers() { G.timers.forEach(clearTimeout); G.timers = []; G.pending = new Set(); }
+
+function enterArena(a) {
+  if (a.cur === 'coins') {
+    if (P.coins < a.entry) return toast('אין מספיק מטבעות. השלם משימה או קבל מילוי חינם');
+    P.coins -= a.entry; P.stats.arenas[a.id] = (P.stats.arenas[a.id] || 0) + 1;
+  } else {
+    if (excluded()) return toast('החשבון בהחרגה עצמית');
+    if (W$.balance < a.entry) { toast('אין מספיק יתרה. הזן קוד הפקדה בארנק'); return go('wallet'); }
+    const loss = Math.max(0, -sumKind(['entry', 'prize', 'refund'], 30 * DAY));
+    if (W$.limits.lossMonthly != null && loss + a.entry > W$.limits.lossMonthly) return toast('חריגה ממגבלת ההפסד החודשית שהגדרת');
+    ledger('entry', -a.entry, `דמי כניסה · ${a.name}`);
+  }
+  save();
+  const opp = a.opp[Math.floor(Math.random() * a.opp.length)];
+  vsScreen(opp, a.bot, () => startMatch({ mode: a.mode, len: a.len, level: a.bot, oppName: opp, arena: a, label: a.name }));
+}
+function practice() {
+  const lv = level(P.xp) >= 6 ? 'strong' : 'intermediate';
+  startMatch({ mode: 'duplicate', len: 1, level: lv, oppName: lv === 'strong' ? 'בוט חזק' : 'בוט בינוני', arena: null, label: 'אימון' });
+}
+function vsScreen(opp, bot, next) {
+  const ov = h('div', { class: 'overlay', role: 'dialog', 'aria-label': 'נמצא יריב' },
+    h('div', { class: 'vs' },
+      h('div', { class: 'side' }, h('div', { class: 'avatar' }, '★'), h('b', {}, 'אתה'), h('span', { class: 'faint num' }, `דירוג ${P.rating}`)),
+      h('div', { class: 'x' }, 'VS'),
+      h('div', { class: 'side b' }, h('div', { class: 'avatar bot' }, opp[0]), h('b', {}, opp), h('span', { class: 'faint num' }, `בוט · ${BOT_RATING[bot]}`))));
+  document.body.append(ov); sfx.dice();
+  setTimeout(() => { ov.remove(); next(); }, reduced ? 300 : 1700);
+}
+function startMatch(cfg) {
+  stopTimers();
+  const seed = crypto.getRandomValues(new Uint32Array(1))[0];
+  G.cfg = cfg; G.ended = false; G.view = 0; G.bubbles = {};
+  G.M = cfg.mode === 'duplicate' ? new DuplicateMatch({ pairs: cfg.len, cube: false, gameDiceFn: diceFactory(seed) }) : new ClassicMatch({ target: cfg.len, cube: cfg.len > 1, gameDiceFn: diceFactory(seed) });
+  G.partial = new Map(); G.selected = null; G.last = new Map(); G.rolled = new Set();
+  st.screen = 'table';
+  step();
+}
+const colorOf = (seat, b) => (G.M.kind === 'duplicate' ? G.M.colorOf(seat, b) : G.M.colorOf(seat));
+const seatOf = (color, b) => (G.M.kind === 'duplicate' ? G.M.seatOf(color, b) : G.M.seatOf(color));
+const actor = (g, b) => (g.phase === 'over' ? null : seatOf(g.phase === 'doubled' ? other(g.turn) : g.turn, b));
+
+function step() {
+  G.M.boards().forEach((g, b) => noteGameEnd(g, b));
+  const before = G.M.kind === 'duplicate' ? G.M.rounds.length : G.M.games.length;
+  G.M.settle();
+  const after = G.M.kind === 'duplicate' ? G.M.rounds.length : G.M.games.length;
+  if (after !== before) { G.partial = new Map(); G.last = new Map(); G.view = 0; toast(G.M.kind === 'duplicate' ? `סבב ${after}` : `משחק ${after} · ${G.M.score.A}:${G.M.score.B}`); }
+  if (G.M.kind === 'duplicate' && !G.M.over) {
+    const bs = G.M.boards();
+    if (actor(bs[G.view], G.view) !== 'A' && !G.partial.get(G.view)?.moves.length) { const o = bs.findIndex((g, b) => actor(g, b) === 'A'); if (o >= 0) G.view = o; }
+  }
+  if (st.screen === 'table') render();
+  if (G.M.over) { if (!G.ended) { G.ended = true; setTimeout(finishMatch, 500); } return; }
+  G.M.boards().forEach((g, b) => {
+    const seat = actor(g, b); if (!seat) return;
+    const key = b + ':' + seat; if (G.pending.has(key)) return;
+    const m0 = G.M;
+    if (seat === 'B') { G.pending.add(key); G.timers.push(setTimeout(() => { G.pending.delete(key); if (G.M === m0) botStep(g, b); }, 700)); }
+    else if (g.phase === 'roll' && g.rollIsForced()) { G.pending.add(key); G.timers.push(setTimeout(() => { G.pending.delete(key); if (G.M === m0 && g.phase === 'roll' && actor(g, b) === 'A') { g.roll(g.turn); sfx.dice(); step(); } }, 420)); }
+  });
+}
+function noteGameEnd(g, b) {
+  if (g._counted || g.phase !== 'over') return;
+  g._counted = true;
+  if (g.result.winner === colorOf('A', b) && g.result.reason !== 'drop' && g.result.reason !== 'resign') {
+    if (g.result.multiplier >= 2) track('gammons');
+    if (g.result.multiplier === 3) P.stats.backgammons++;
+  }
+}
+function botStep(g, b) {
+  if (g.phase === 'over' || actor(g, b) !== 'B') return;
+  const lv = G.cfg.level;
+  if (g.phase === 'doubled') { const me = colorOf('B', b); if (shouldTake(g.state, me, lv)) { g.take(me); toast('היריב קיבל את ההכפלה'); } else { g.drop(me); toast('היריב ויתר'); } }
+  else if (g.phase === 'roll') { if (g.canDouble(g.turn) && shouldDouble(g.state, g.turn, lv)) { g.double(g.turn); toast(`היריב מכפיל ל-${g.cube.value * 2}!`); } else { g.roll(g.turn); sfx.dice(); } }
+  else if (g.phase === 'move') {
+    const c = g.turn; const before = g.state; const i = chooseSequence(g.legal, c, lv); const mv = g.legal[i].moves; g.move(c, mv);
+    G.last.set(b, { color: c, moves: mv });
+    if (g.state.bar[other(c)] > before.bar[other(c)]) { sfx.hit(); if (Math.random() < .35) emote('B', '😏'); } else sfx.click();
+  }
+  step();
+}
+function emote(seat, e) { G.bubbles[seat] = { e }; if (st.screen === 'table') render(); setTimeout(() => { if (G.bubbles[seat]?.e === e) { delete G.bubbles[seat]; if (st.screen === 'table') render(); } }, 2000); }
+
+function finishMatch() {
+  const M = G.M; const cfg = G.cfg; const a = cfg.arena;
+  const won = M.winner === 'A'; const draw = M.winner === 'draw';
+  if (st.tourHook) { const f = st.tourHook; st.tourHook = null; track('games'); if (won) track('wins'); save(); f(M.winner); return; }
+  track('games'); if (won) track('wins'); if (a) track('arenaGames');
+  if (M.kind === 'duplicate') { if (won) track('dupWins'); if (draw) P.stats.dupTies++; }
+  P.run = won ? P.run + 1 : 0; P.bestRun = Math.max(P.bestRun, P.run);
+  const exp = 1 / (1 + 10 ** ((BOT_RATING[cfg.level] - P.rating) / 400));
+  const delta = Math.round((M.kind === 'duplicate' ? 32 : 24) * ((won ? 1 : draw ? .5 : 0) - exp));
+  P.rating += delta;
+  const xp = 10 + (won ? 15 : 0) + (a ? 10 : 0) + (M.kind === 'duplicate' ? 5 : 0);
+  let prizeLine = null;
+  if (a) {
+    const net = Math.floor(a.entry * 2 * (100 - RAKE) / 100);
+    const payout = won ? net : draw ? a.entry : 0;
+    if (a.cur === 'coins') { if (payout) addCoins(payout); prizeLine = payout ? `+${fmt(payout)} מטבעות` : null; }
+    else if (payout) {
+      const tax = won ? Math.floor(Math.max(0, payout - a.entry) * TAX) : 0;
+      ledger(won ? 'prize' : 'refund', payout - tax, won ? `זכייה · ${a.name}${tax ? ` (אחרי ניכוי מס ${shekel(tax)})` : ''}` : `החזר דמי כניסה (תיקו) · ${a.name}`);
+      prizeLine = `+${shekel(payout - tax)}`;
+    }
+  }
+  save(); addXp(xp);
+  if (won) { sfx.win(); confetti(); } else if (!draw) sfx.lose();
+  const cash = a?.cur === 'ils';
+  const close = () => { $('.overlay')?.remove(); go('home'); checkAchievements(); };
+  const again = () => { $('.overlay')?.remove(); checkAchievements(); if (a) enterArena(a); else practice(); };
+  document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'res-t' },
+    h('div', { class: 'card' },
+      h('h2', { id: 'res-t' }, draw ? 'תיקו' : won ? 'ניצחת!' : 'הפעם לא'),
+      h('div', { class: 'num', style: 'font-family:var(--display);font-size:1.9rem' }, `${M.score.A} : ${M.score.B}`),
+      h('p', { class: 'muted' }, draw ? 'שיחקתם באותה רמה בדיוק, עם אותן קוביות.' : M.kind === 'duplicate' ? 'עם אותן קוביות בדיוק. ההבדל היה במהלכים.' : won ? 'משחק חזק.' : 'שווה לנסות שוב באימון.'),
+      h('div', { class: 'gain num' }, prizeLine ? h('span', { style: 'color:var(--brass-hi)' }, prizeLine) : null, h('span', { style: 'color:var(--sky)' }, `+${xp} XP`), h('span', {}, `דירוג ${delta >= 0 ? '+' : ''}${delta}`), P.run >= 2 ? h('span', {}, `🔥 ${P.run} ברצף`) : null),
+      cash && !won ? h('p', { class: 'faint' }, 'הפסד בכסף אמיתי הוא חלק מהמשחק. לא מומלץ לנסות "להחזיר" אותו. אפשר להגדיר מגבלות בארנק.') : null,
+      h('div', { class: 'acts', style: 'justify-content:center' },
+        cash ? h('button', { class: 'btn', onclick: close }, 'ללובי')
+          : [h('button', { class: 'btn', onclick: again }, a ? `שוב ב${a.name}` : 'עוד משחק'), h('button', { class: 'btn ghost', onclick: close }, 'ללובי')]))));
+}
+
+// ----- move entry -----
+const fullDice = (d) => (d[0] === d[1] ? [d[0], d[0], d[0], d[0]] : [...d]);
+function getPartial(g, b) { let p = G.partial.get(b); if (!p || p.rollIndex !== g.rollIndex || p.plies !== g.plies) { p = { state: g.state, moves: [], remaining: fullDice(g.dice), rollIndex: g.rollIndex, plies: g.plies }; G.partial.set(b, p); } return p; }
+function sourcesOf(s, c) { if (s.bar[c] > 0) return [BAR]; const o = []; for (let i = 23; i >= 0; i--) if (ownCount(s, c, i) > 0) o.push(i); return o; }
+function reachable(s, c, rem, finals, full, used) {
+  if (used === full) return finals.has(stateKey(s));
+  const tried = new Set();
+  for (let i = 0; i < rem.length; i++) { if (tried.has(rem[i])) continue; tried.add(rem[i]);
+    for (const from of sourcesOf(s, c)) { const to = singleTarget(s, c, from, rem[i]); if (to === null) continue; const r2 = rem.slice(); r2.splice(i, 1); if (reachable(applyMove(s, c, { from, to }), c, r2, finals, full, used + 1)) return true; } }
+  return false;
+}
+function nextMoves(g, b) {
+  if (g.phase !== 'move' || actor(g, b) !== 'A') return [];
+  const c = g.turn; const p = getPartial(g, b); const full = g.legal[0].moves.length;
+  if (p.moves.length >= full) return [];
+  const finals = new Set(g.legal.map((l) => stateKey(l.state))); const out = []; const tried = new Set();
+  for (let i = 0; i < p.remaining.length; i++) { const die = p.remaining[i]; if (tried.has(die)) continue; tried.add(die);
+    for (const from of sourcesOf(p.state, c)) { const to = singleTarget(p.state, c, from, die); if (to === null) continue; const r2 = p.remaining.slice(); r2.splice(i, 1);
+      if (reachable(applyMove(p.state, c, { from, to }), c, r2, finals, full, p.moves.length + 1)) out.push({ from, to, die, dieIndex: i }); } }
+  return out;
+}
+function playMove(g, b, mv) {
+  const p = getPartial(g, b); const before = p.state;
+  p.state = applyMove(p.state, g.turn, mv); p.moves.push({ from: mv.from, to: mv.to }); p.remaining.splice(mv.dieIndex, 1);
+  if (p.state.bar[other(g.turn)] > before.bar[other(g.turn)]) { sfx.hit(); track('hits'); } else if (mv.to === OFF) { sfx.off(); track('borne'); } else sfx.click();
+  G.selected = null;
+  if (p.moves.length === g.legal[0].moves.length) { const c = g.turn; g.move(c, p.moves); G.last.set(b, { color: c, moves: p.moves.slice() }); G.partial.delete(b); step(); }
+  else render();
+}
+function onPoint(g, b, idx) {
+  const moves = nextMoves(g, b); if (!moves.length) return;
+  if (G.selected && G.selected.b === b) { const ch = moves.filter((m) => m.from === G.selected.from && m.to === idx).sort((x, y) => x.die - y.die); if (ch.length) { playMove(g, b, ch[0]); return; } }
+  const from = moves.filter((m) => m.from === idx);
+  if (from.length) { const dests = [...new Set(from.map((m) => m.to))]; if (dests.length === 1 && G.selected?.b === b && G.selected.from === idx) { playMove(g, b, from[0]); return; } G.selected = { b, from: idx }; }
+  else G.selected = null;
+  render();
+}
+
+// =====================================================================
+// TABLE
+// =====================================================================
+const BW = 780; const BH = 540; const COLW = 54; const BARW = 42; const PAD = 22; const OFFW = 50; const CR = 21;
+const colX = (c) => PAD + c * COLW + (c >= 6 ? BARW : 0);
+const pos = (i) => (i <= 11 ? { col: 11 - i, top: false } : { col: i - 12, top: true });
+function boardDefs(svg) {
+  const sk = SKINS.find((x) => x.id === P.skin) || SKINS[0];
+  const d = S('defs');
+  const lg = (id, [a, b], x2 = 0, y2 = 1) => { const g = S('linearGradient', { id, x1: 0, y1: 0, x2, y2 }); g.append(S('stop', { offset: 0, 'stop-color': a }), S('stop', { offset: 1, 'stop-color': b })); return g; };
+  const rg = (id, a, b, c) => { const g = S('radialGradient', { id, cx: '38%', cy: '32%', r: '70%' }); g.append(S('stop', { offset: 0, 'stop-color': a }), S('stop', { offset: .55, 'stop-color': b }), S('stop', { offset: 1, 'stop-color': c })); return g; };
+  d.append(lg('frame', sk.frame), lg('field', sk.field), lg('ptA', sk.a), lg('ptB', sk.b), lg('barG', sk.frame, 1, 0));
+  d.append(rg('chkW', '#ffffff', '#efe4c8', '#b9a983'), rg('chkB', '#5d544c', '#221d19', '#0a0807'));
+  const f = S('filter', { id: 'grain' }); f.append(S('feTurbulence', { type: 'fractalNoise', baseFrequency: '.9 .04', numOctaves: 2, seed: 3 }), S('feColorMatrix', { values: '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .2 0' }), S('feComposite', { operator: 'in', in2: 'SourceGraphic' }));
+  const sh = S('filter', { id: 'chkShadow', x: '-30%', y: '-30%', width: '160%', height: '160%' }); sh.append(S('feDropShadow', { dx: 0, dy: 3, stdDeviation: 2.2, 'flood-opacity': .55 }));
+  d.append(f, sh); svg.append(d);
+}
+function checker(svg, cx, cy, color, lit, r = CR) {
+  const g = S('g', { filter: 'url(#chkShadow)' });
+  g.append(S('circle', { cx, cy, r, fill: color === 'w' ? 'url(#chkW)' : 'url(#chkB)', stroke: lit ? 'var(--brass-hi)' : color === 'w' ? '#8b7b58' : '#000', 'stroke-width': lit ? 4 : 1.2 }));
+  g.append(S('circle', { cx, cy, r: r * .62, fill: 'none', stroke: color === 'w' ? 'rgba(120,100,60,.45)' : 'rgba(255,255,255,.12)', 'stroke-width': 1.5 }));
+  svg.append(g);
+}
+function drawBoard(g, b, mini = false) {
+  const me = colorOf('A', b); const op = other(me);
+  const mine = !mini && actor(g, b) === 'A';
+  const p = mine && g.phase === 'move' ? getPartial(g, b) : null;
+  const s = p ? p.state : g.state;
+  const moves = p ? nextMoves(g, b) : [];
+  const srcs = new Set(moves.map((m) => m.from));
+  const sel = !mini && G.selected && G.selected.b === b ? G.selected.from : null;
+  const dests = new Set(sel != null ? moves.filter((m) => m.from === sel).map((m) => m.to) : []);
+  const last = G.last.get(b); const lastPts = new Set();
+  if (last && !p) for (const m of last.moves) { if (m.from !== BAR) lastPts.add(toOwn(me, toAbs(last.color, m.from))); if (m.to !== OFF) lastPts.add(toOwn(me, toAbs(last.color, m.to))); }
+  const svg = S('svg', { class: 'board', viewBox: `0 0 ${BW + OFFW} ${BH}`, role: mini ? 'img' : 'group', 'aria-label': `לוח ${b + 1}` });
+  boardDefs(svg);
+  svg.append(S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: 'url(#frame)' }), S('rect', { width: BW + OFFW, height: BH, rx: 18, fill: '#a0703a', filter: 'url(#grain)' }));
+  svg.append(S('rect', { x: PAD, y: PAD, width: COLW * 12 + BARW, height: BH - 2 * PAD, rx: 6, fill: 'url(#field)' }));
+  svg.append(S('rect', { x: PAD + COLW * 6, y: PAD - 6, width: BARW, height: BH - 2 * PAD + 12, rx: 4, fill: 'url(#barG)' }));
+  for (let i = 0; i < 24; i++) {
+    const { col, top } = pos(i); const x = colX(col); const tip = 205;
+    const tri = top ? `${x + 2},${PAD} ${x + COLW - 2},${PAD} ${x + COLW / 2},${PAD + tip}` : `${x + 2},${BH - PAD} ${x + COLW - 2},${BH - PAD} ${x + COLW / 2},${BH - PAD - tip}`;
+    svg.append(S('polygon', { points: tri, fill: i % 2 ? 'url(#ptA)' : 'url(#ptB)', opacity: .95 }));
+    if (lastPts.has(i)) svg.append(S('polygon', { points: tri, fill: 'rgba(124,196,255,.22)' }));
+    if (dests.has(i) || sel === i) svg.append(S('polygon', { points: tri, fill: 'rgba(255,215,122,.28)', stroke: 'var(--brass-hi)', 'stroke-width': 2.5 }));
+    const nMe = ownCount(s, me, i); const nOp = oppCount(s, me, i); const n = nMe || nOp; const c = nMe ? me : op;
+    const stp = n > 5 ? Math.min((tip - 2 * CR + 8) / (n - 1), 2 * CR) : 2 * CR;
+    for (let k = 0; k < n; k++) checker(svg, x + COLW / 2, top ? PAD + CR + 2 + k * stp : BH - PAD - CR - 2 - k * stp, c, srcs.has(i) && sel == null && k === n - 1);
+    if (dests.has(i)) { const k = Math.min(n, 4); svg.append(S('circle', { cx: x + COLW / 2, cy: top ? PAD + CR + 2 + k * 2 * CR : BH - PAD - CR - 2 - k * 2 * CR, r: 9, fill: 'var(--brass-hi)', class: 'dest' })); }
+    if (!mini) {
+      svg.append(S('text', { x: x + COLW / 2, y: top ? 15 : BH - 6, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: 'rgba(255,240,210,.55)' }, i + 1));
+      const hit = S('rect', { x, y: top ? PAD : BH / 2, width: COLW, height: BH / 2 - PAD, fill: 'transparent', class: 'pt-hit', tabindex: srcs.has(i) || dests.has(i) ? 0 : -1, role: 'button', 'aria-label': `נקודה ${i + 1}: ${nMe ? `${nMe} שלך` : nOp ? `${nOp} של היריב` : 'ריקה'}${srcs.has(i) ? ' · אפשר להזיז' : ''}${dests.has(i) ? ' · יעד' : ''}` });
+      hit.addEventListener('click', () => onPoint(g, b, i));
+      hit.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPoint(g, b, i); } });
+      svg.append(hit);
+    }
+  }
+  const bx = PAD + COLW * 6 + BARW / 2;
+  for (const [c, top] of [[op, true], [me, false]]) { const n = s.bar[c]; const lit = c === me && srcs.has(BAR); for (let k = 0; k < Math.min(n, 4); k++) checker(svg, bx, top ? BH / 2 - 36 - k * 34 : BH / 2 + 36 + k * 34, c, lit && k === Math.min(n, 4) - 1, 17); if (n > 4) svg.append(S('text', { x: bx, y: top ? BH / 2 - 12 : BH / 2 + 20, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 800 }, '×' + n)); }
+  const ox = BW + 2; const tw = OFFW - 6;
+  svg.append(S('rect', { x: ox, y: PAD, width: tw, height: BH - 2 * PAD, rx: 8, fill: dests.has(OFF) ? 'rgba(255,215,122,.35)' : 'rgba(0,0,0,.35)', stroke: dests.has(OFF) ? 'var(--brass-hi)' : 'none', 'stroke-width': 2.5 }));
+  for (const [c, top] of [[op, true], [me, false]]) for (let k = 0; k < s.off[c]; k++) svg.append(S('rect', { x: ox + 6, y: top ? PAD + 6 + k * 13 : BH - PAD - 16 - k * 13, width: tw - 12, height: 10, rx: 3, fill: c === 'w' ? '#efe4c8' : '#2b2420', stroke: '#000', 'stroke-opacity': .4 }));
+  if (!mini) for (const [idx, x, w] of [[BAR, PAD + COLW * 6, BARW], [OFF, ox, tw]]) {
+    const r = S('rect', { x, y: BH / 2, width: w, height: BH / 2 - PAD, fill: 'transparent', class: 'pt-hit', role: 'button', tabindex: (idx === BAR ? srcs.has(BAR) : dests.has(OFF)) ? 0 : -1, 'aria-label': idx === BAR ? 'בר' : 'הוצאה' });
+    r.addEventListener('click', () => onPoint(g, b, idx)); svg.append(r);
+  }
+  return svg;
+}
+function pcard(seat) {
+  const me = seat === 'A';
+  const anyTurn = G.M.boards().some((g, b) => actor(g, b) === seat);
+  const bub = G.bubbles[seat];
+  return h('div', { class: 'pcard' + (anyTurn ? ' turn' : '') },
+    h('div', { class: 'avatar' + (me ? '' : ' bot') }, me ? '★' : (G.cfg.oppName || '?')[0]),
+    h('div', { style: 'min-width:0' }, h('div', { class: 'nm' }, me ? 'אתה' : G.cfg.oppName), h('div', { class: 'sub num' }, me ? `דירוג ${P.rating}` : `בוט · ${BOT_RATING[G.cfg.level]}`)),
+    bub ? h('span', { class: 'bubble', 'aria-hidden': 'true' }, bub.e) : null);
+}
+function viewTable() {
+  const M = G.M; const cfg = G.cfg; const bs = M.boards();
+  const b = Math.min(G.view, bs.length - 1); const g = bs[b];
+  const me = colorOf('A', b); const opc = other(me);
+  const mine = actor(g, b) === 'A';
+  const p = mine && g.phase === 'move' ? getPartial(g, b) : null;
+  const key = `${b}:${g.rollIndex}`; const fresh = g.dice && !G.rolled.has(key); if (fresh) G.rolled.add(key);
+  const dice = g.dice ? (g.dice[0] === g.dice[1] ? [0, 1, 2, 3].map((k) => dieSVG(g.dice[0], (fresh ? 'roll ' : '') + (p && k < 4 - p.remaining.length ? 'used' : ''))) : g.dice.map((d) => dieSVG(d, (fresh ? 'roll ' : '') + (p && !p.remaining.includes(d) ? 'used' : '')))) : [];
+  const canDouble = mine && g.canDouble(me);
+  const act = (fn) => () => { fn(); step(); };
+  const reasons = { single: 'רגיל', gammon: 'גמון ×2', backgammon: 'בקגמון ×3', drop: 'ויתור', resign: 'פרישה' };
+  let status = 'היריב משחק…'; let hot = false;
+  if (g.phase === 'over') status = `${g.result.winner === me ? 'ניצחת' : 'הפסדת'} ${g.result.points} · ${reasons[g.result.reason]}`;
+  else if (mine && g.phase === 'doubled') { status = `הכפלה ל-${g.cube.value * 2}!`; hot = true; }
+  else if (mine) { status = g.phase === 'move' ? 'תורך' : 'להטיל או להכפיל?'; hot = true; }
+  const kind = M.kind === 'duplicate' ? (M.pairs === 1 ? 'כפול · סבב' : `כפול · סבב ${M.rounds.length}/${M.pairs}`) : (M.target === 1 ? 'משחק בודד' : `מאץ' עד ${M.target}`);
+  const ob = M.kind === 'duplicate' ? 1 - b : null;
+  return h('div', { class: 'table' },
+    h('div', { class: 'pside' },
+      pcard('B'),
+      ob != null ? h('button', { class: 'minib' + (actor(bs[ob], ob) === 'A' ? ' hot' : ''), onclick: () => { G.view = ob; G.selected = null; render(); }, 'aria-label': `עבור ללוח ${ob + 1}` },
+        h('span', { class: 'faint' }, `לוח ${ob + 1} · ${colorOf('A', ob) === 'w' ? 'לבן' : 'שחור'}${actor(bs[ob], ob) === 'A' ? ' · תורך!' : ''}`), drawBoard(bs[ob], ob, true)) : null,
+      h('div', { class: 'emotes', role: 'group', 'aria-label': 'תגובות' }, ['👏', '🔥', '🤔', '😅', '🎲'].map((e) => h('button', { 'aria-label': 'תגובה ' + e, onclick: () => { emote('A', e); if (Math.random() < .4) setTimeout(() => emote('B', ['👍', '😄', '🙏', '😤'][Math.floor(Math.random() * 4)]), 900); } }, e)))),
+    h('div', { class: 'center' },
+      h('div', { class: 'boardlabel' }, h('span', {}, M.kind === 'duplicate' ? `לוח ${b + 1} · אתה ${me === 'w' ? 'לבן' : 'שחור'}` : `אתה ${me === 'w' ? 'לבן' : 'שחור'}`), h('span', { class: 'status' + (hot ? ' go' : '') }, status)),
+      h('div', { class: 'boardwrap' }, drawBoard(g, b))),
+    h('div', { class: 'pside' },
+      h('div', { class: 'scorebig' }, h('div', { class: 's num' }, `${M.score.A} : ${M.score.B}`), h('div', { class: 'm' }, `${cfg.label} · ${kind}`)),
+      h('div', { class: 'dicebox' }, dice),
+      h('div', { class: 'acts', style: 'justify-content:center' },
+        canDouble ? h('button', { class: 'btn', onclick: act(() => { g.roll(me); sfx.dice(); }) }, 'הטל') : null,
+        canDouble ? h('button', { class: 'btn ghost sm', onclick: act(() => g.double(me)) }, `הכפל ×${g.cube.value * 2}`) : null,
+        mine && g.phase === 'doubled' ? h('button', { class: 'btn sm', onclick: act(() => g.take(me)) }, 'קבל') : null,
+        mine && g.phase === 'doubled' ? h('button', { class: 'btn red sm', onclick: act(() => g.drop(me)) }, 'ותר') : null,
+        p && p.moves.length ? h('button', { class: 'btn ghost sm', onclick: () => { G.partial.delete(b); G.selected = null; render(); } }, 'בטל מהלך') : null),
+      h('div', { class: 'meta' }, `פיפס ${pipCount(g.state, me)} · ${pipCount(g.state, opc)}${g.cubeEnabled ? ` · קובייה ×${g.cube.value}` : ''}${g.crawford ? ' · קרופורד' : ''}`),
+      pcard('A')));
+}
+
+// =====================================================================
+// WALLET (demo money · deposit codes instead of a terminal)
+// =====================================================================
+function validIsraeliId(id) { const s = String(id || '').replace(/\D/g, ''); if (s.length < 5 || s.length > 9) return false; const p = s.padStart(9, '0'); let sum = 0; for (let i = 0; i < 9; i++) { let d = Number(p[i]) * ((i % 2) + 1); if (d > 9) d -= 9; sum += d; } return sum % 10 === 0; }
+function ledger(kind, amount, note) { W$.balance += amount; W$.history.unshift({ at: Date.now(), kind, amount, note }); W$.history = W$.history.slice(0, 50); save(); }
+const sumKind = (kinds, ms) => W$.history.filter((x) => kinds.includes(x.kind) && Date.now() - x.at < ms).reduce((a, x) => a + x.amount, 0);
+const excluded = () => W$.excludedUntil && W$.excludedUntil > Date.now();
+function makeCode() { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; const r = crypto.getRandomValues(new Uint8Array(10)); const s = Array.from(r, (b) => A[b % A.length]).join(''); return `SB-${s.slice(0, 5)}-${s.slice(5)}`; }
+function redeem(code) {
+  code = String(code || '').trim().toUpperCase();
+  if (!W$.kyc) return toast('צריך לאמת זהות לפני הפקדה');
+  if (excluded()) return toast('החשבון בהחרגה עצמית');
+  const c = OP.codes.find((x) => x.code === code);
+  if (!c || c.used) return toast('קוד לא תקין או שכבר נוצל');
+  if (c.exp < Date.now()) return toast('תוקף הקוד פג');
+  if (W$.limits.depositDaily != null && sumKind(['deposit'], DAY) + c.amount > W$.limits.depositDaily) return toast('חריגה ממגבלת ההפקדה היומית שהגדרת');
+  c.used = Date.now(); ledger('deposit', c.amount, `הפקדה בקוד ··${code.slice(-4)}`); sfx.coin(); toast(`הופקדו ${shekel(c.amount)}`); render();
+}
+function viewWallet() {
+  const w = W$;
+  const kycPanel = w.kyc
+    ? h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'אימות זהות'), h('h3', {}, '✅ מאומת'), h('p', { class: 'muted' }, `${w.kyc.name} · ת"ז ‎•••••${w.kyc.last3}`))
+    : h('form', { class: 'panel', style: 'display:grid;gap:8px', onsubmit: (e) => {
+      e.preventDefault(); const f = e.target.elements; const name = f.kname.value.trim(); const dob = new Date(f.kdob.value);
+      if (name.split(/\s+/).length < 2) return toast('יש להזין שם פרטי ושם משפחה');
+      if (!validIsraeliId(f.kid.value)) return toast('מספר תעודת הזהות לא תקין');
+      if (!(Date.now() - dob.getTime() >= 18 * 365.2425 * DAY)) return toast('משחק בכסף מגיל 18 בלבד');
+      w.kyc = { name, last3: String(f.kid.value).slice(-3), at: Date.now() }; save(); toast('הזהות אומתה'); render();
+    } }, h('div', { class: 'eyebrow' }, 'שלב 1 · אימות זהות'),
+    h('div', { class: 'row' }, h('label', { class: 'f', for: 'kname' }, 'שם מלא', h('input', { id: 'kname', name: 'kname', required: true, autocomplete: 'name' })),
+      h('label', { class: 'f', for: 'kid' }, 'תעודת זהות', h('input', { id: 'kid', name: 'kid', inputmode: 'numeric', required: true })),
+      h('label', { class: 'f', for: 'kdob' }, 'תאריך לידה', h('input', { id: 'kdob', name: 'kdob', type: 'date', required: true }))),
+    h('div', { class: 'acts' }, h('button', { class: 'btn sm' }, 'אמת'), h('span', { class: 'faint' }, 'ת"ז לבדיקה: 000000018')));
+  return h('div', { style: 'display:grid;gap:12px' },
+    h('div', { class: 'mainhead' }, h('div', {}, h('div', { class: 'eyebrow' }, 'ארנק'), h('h2', {}, 'הארנק שלי')), h('button', { class: 'btn ghost sm', onclick: () => go('home') }, 'חזרה')),
+    h('div', { class: 'notice' }, 'עד שיחובר מסוף סליקה, ההפקדה נעשית בקוד: המפעיל מקבל תשלום (ביט, העברה או מזומן, עם קבלה), מנפיק קוד חד-פעמי, והשחקן מזין אותו כאן. בהדגמה הכסף מדומה.'),
+    h('div', { class: 'grid2' },
+      h('div', { class: 'panel', style: 'display:grid;gap:8px' },
+        h('div', { class: 'eyebrow' }, 'יתרה'), h('div', { class: 'balance num' }, shekel(w.balance)),
+        h('form', { class: 'row', onsubmit: (e) => { e.preventDefault(); redeem(e.target.elements.code.value); } },
+          h('label', { class: 'f', for: 'code' }, 'קוד הפקדה', h('input', { id: 'code', name: 'code', placeholder: 'SB-XXXXX-XXXXX', autocomplete: 'off', style: 'direction:ltr;text-align:center;letter-spacing:.08em' })),
+          h('button', { class: 'btn', style: 'flex:0' }, 'הפקד')),
+        h('div', { class: 'acts' }, h('button', { class: 'btn ghost sm', disabled: !w.kyc || w.balance < 5000, onclick: () => { ledger('withdraw', -w.balance, 'בקשת משיכה לחשבון על שם בעל החשבון'); toast('בקשת המשיכה התקבלה'); render(); } }, 'משוך הכל'), h('span', { class: 'faint' }, 'מינימום ₪50 · רק לחשבון על שמך'))),
+      kycPanel,
+      h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('div', { class: 'eyebrow' }, '🛠️ מסך מפעיל (הדגמה)'),
+        h('p', { class: 'faint' }, 'בגרסה האמיתית קודים מונפקים בממשק הניהול של השרת: קוד חד-פעמי, עם תוקף, אפשר לשייך למשתמש מסוים, ונרשם ביומן הביקורת.'),
+        h('div', { class: 'acts' }, [10000, 20000, 50000].map((a) => h('button', { class: 'btn sm', onclick: () => { const code = makeCode(); OP.codes.unshift({ code, amount: a, exp: Date.now() + 14 * DAY, used: 0 }); st.lastCode = code; save(); render(); } }, `צור קוד ${shekel(a)}`))),
+        st.lastCode ? h('div', { class: 'codebox', 'aria-label': 'הקוד שנוצר' }, st.lastCode) : null,
+        st.lastCode ? h('div', { class: 'acts' }, h('button', { class: 'btn ghost sm', onclick: () => { try { navigator.clipboard.writeText(st.lastCode).then(() => toast('הועתק'), () => toast('סמן והעתק ידנית')); } catch { toast('סמן והעתק ידנית'); } } }, 'העתק'),
+          h('button', { class: 'btn ghost sm', onclick: () => { $('#code').value = st.lastCode; $('#code').focus(); } }, 'הדבק בשדה ההפקדה')) : null,
+        h('label', { class: 'acts faint' }, h('input', { type: 'checkbox', style: 'width:auto', checked: OP.unlockAll || null, onchange: (e) => { OP.unlockAll = e.target.checked; save(); } }), 'פתח את כל הזירות להדגמה (עדיין נדרש אימות זהות)'),
+        OP.codes.length ? h('table', { class: 'hist' }, h('tbody', {}, OP.codes.slice(0, 6).map((c) => h('tr', {}, h('td', { style: 'direction:ltr;text-align:right' }, '··' + c.code.slice(-4)), h('td', {}, c.used ? 'נוצל' : 'פעיל'), h('td', {}, shekel(c.amount)))))) : null),
+      h('form', { class: 'panel', style: 'display:grid;gap:8px', onsubmit: (e) => {
+        e.preventDefault(); const f = e.target.elements; const val = (x) => (x.value === '' ? null : Math.round(Number(x.value) * 100));
+        const nd = val(f.ldep); const nl = val(f.lloss); const raise = (o, n) => o != null && (n == null || n > o);
+        if (raise(w.limits.depositDaily, nd) || raise(w.limits.lossMonthly, nl)) toast('העלאת מגבלה נכנסת לתוקף רק אחרי 24 שעות'); else toast('נשמר');
+        if (!raise(w.limits.depositDaily, nd)) w.limits.depositDaily = nd; if (!raise(w.limits.lossMonthly, nl)) w.limits.lossMonthly = nl; save(); render();
+      } }, h('div', { class: 'eyebrow' }, 'משחק אחראי'),
+      h('div', { class: 'row' }, h('label', { class: 'f', for: 'ldep' }, 'הפקדה יומית ₪', h('input', { id: 'ldep', name: 'ldep', type: 'number', min: 0, value: w.limits.depositDaily == null ? '' : w.limits.depositDaily / 100 })),
+        h('label', { class: 'f', for: 'lloss' }, 'הפסד חודשי ₪', h('input', { id: 'lloss', name: 'lloss', type: 'number', min: 0, value: w.limits.lossMonthly == null ? '' : w.limits.lossMonthly / 100 }))),
+      h('div', { class: 'acts' }, h('button', { class: 'btn sm' }, 'שמור'), h('button', { type: 'button', class: 'btn red sm', onclick: () => { w.excludedUntil = Date.now() + 7 * DAY; save(); toast('החשבון הוחרג ל-7 ימים'); render(); } }, 'החרגה עצמית · 7 ימים')),
+      excluded() ? h('div', { class: 'notice warn' }, `בהחרגה עד ${new Date(w.excludedUntil).toLocaleDateString('he-IL')}`) : null),
+      h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'תנועות'),
+        w.history.length ? h('table', { class: 'hist' }, h('tbody', {}, w.history.map((x) => h('tr', {}, h('td', {}, new Date(x.at).toLocaleDateString('he-IL')), h('td', {}, x.note), h('td', { class: x.amount >= 0 ? 'plus' : 'minus' }, (x.amount >= 0 ? '+' : '') + shekel(x.amount)))))) : h('p', { class: 'muted' }, 'אין עדיין תנועות.'))));
+}
+
+// =====================================================================
+// PROFILE: achievements + skins
+// =====================================================================
+function viewProfile() {
+  const lv = level(P.xp);
+  return h('div', { style: 'display:grid;gap:12px' },
+    h('div', { class: 'mainhead' }, h('div', {}, h('div', { class: 'eyebrow' }, 'פרופיל'), h('h2', {}, `רמה ${lv} · דירוג ${P.rating}`)), h('button', { class: 'btn ghost sm', onclick: () => go('home') }, 'חזרה')),
+    h('div', { class: 'panel' }, h('div', { class: 'eyebrow', style: 'margin-bottom:8px' }, `הישגים · ${Object.keys(P.ach).length}/${ACHIEVEMENTS.length}`),
+      h('div', { class: 'badges' }, ACHIEVEMENTS.map((a) => h('div', { class: 'badgec' + (P.ach[a.id] ? '' : ' off') }, h('span', { class: 'ic' }, a.ic), h('b', {}, a.t), h('span', {}, a.d))))),
+    h('div', { class: 'panel' }, h('div', { class: 'eyebrow', style: 'margin-bottom:8px' }, 'לוחות (נפתחים ברמות, לא בקנייה)'),
+      h('div', { class: 'skins' }, SKINS.map((sk) => { const open = lv >= sk.lv; return h('button', { class: 'skin' + (open ? '' : ' off'), 'aria-pressed': String(P.skin === sk.id), onclick: () => { if (!open) return toast(`נפתח ברמה ${sk.lv}`); P.skin = sk.id; save(); render(); } },
+        h('div', { class: 'sw' }, h('i', { style: `background:${sk.frame[0]}` }), h('i', { style: `background:${sk.field[0]}` }), h('i', { style: `background:${sk.a[0]}` }), h('i', { style: `background:${sk.b[0]}` })), open ? sk.t : `🔒 ${sk.t} · רמה ${sk.lv}`); })),
+      h('div', { class: 'acts', style: 'margin-top:10px' }, h('span', { class: 'faint' }, 'קוביות:'),
+        h('button', { class: 'btn ghost sm', 'aria-pressed': String(P.dice === 'ivory'), onclick: () => { P.dice = 'ivory'; save(); render(); } }, 'שנהב'),
+        h('button', { class: 'btn ghost sm', disabled: !P.ach.gam, 'aria-pressed': String(P.dice === 'gold'), onclick: () => { P.dice = 'gold'; save(); render(); } }, P.ach.gam ? 'זהב' : '🔒 זהב (הישג "גמון")'))),
+    h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'סטטיסטיקה'),
+      h('dl', { class: 'kv num' }, ...[['משחקים', P.stats.games], ['ניצחונות', P.stats.wins], ['ניצחונות בכפול', P.stats.dupWins], ['תיקו בכפול', P.stats.dupTies], ['גמון', P.stats.gammons], ['הכאות', P.stats.hits], ['רצף שיא', P.bestRun]].flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, fmt(v))]))));
+}
+
+// =====================================================================
+// CASH TOURNAMENTS (demo)
+// =====================================================================
+const TOURS = [{ id: 'dup20', name: 'כפול ₪20', mode: 'duplicate', len: 2, fee: 2000, desc: 'שש בש כפול · 2 סבבים' }, { id: 'c7_50', name: 'מאץ\' ₪50', mode: 'classic', len: 7, fee: 5000, desc: 'מאץ\' עד 7 עם קוביית הכפלה' }];
+const OPPS = [['דני', 'intermediate'], ['מאיה', 'strong'], ['יוסי', 'beginner'], ['רונית', 'intermediate'], ['אבי', 'strong'], ['נועה', 'beginner']];
+function plan(fee) { const pool = fee * 4; const rake = Math.floor(pool * RAKE / 100); const net = pool - rake; const first = Math.floor(net * .7); const second = net - first; const tax = (g) => Math.floor(Math.max(0, g - fee) * TAX); return { pool, rake, net, first, second, tax1: tax(first), tax2: tax(second) }; }
+function viewTours() {
+  const t = st.tour;
+  if (t) return tourProgress(t);
+  return h('div', { style: 'display:grid;gap:12px' },
+    h('div', { class: 'mainhead' }, h('div', {}, h('div', { class: 'eyebrow' }, 'טורנירים'), h('h2', {}, 'טורנירים על כסף')), h('button', { class: 'btn ghost sm', onclick: () => go('home') }, 'חזרה')),
+    h('div', { class: 'notice' }, 'הדגמה: הכסף מדומה, והיריבים הם בוטים עם שמות. בגרסה האמיתית משחקים רק מול בני אדם.'),
+    h('div', { class: 'grid2' }, TOURS.map((tt) => { const pp = plan(tt.fee); return h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('div', { class: 'eyebrow' }, '4 שחקנים · הדחה'), h('h3', { style: 'font-family:var(--display);font-size:1.4rem' }, tt.name), h('div', { class: 'muted' }, tt.desc),
+      h('dl', { class: 'kv num' }, h('dt', {}, 'דמי כניסה'), h('dd', {}, shekel(tt.fee)), h('dt', {}, 'קופה'), h('dd', {}, shekel(pp.pool)), h('dt', {}, `עמלה ${RAKE}%`), h('dd', {}, shekel(pp.rake)), h('dt', {}, 'מקום 1'), h('dd', {}, `${shekel(pp.first)} (נטו ${shekel(pp.first - pp.tax1)})`), h('dt', {}, 'מקום 2'), h('dd', {}, `${shekel(pp.second)} (נטו ${shekel(pp.second - pp.tax2)})`)),
+      h('button', { class: 'btn', onclick: () => joinTour(tt) }, `הירשם · ${shekel(tt.fee)}`)); })));
+}
+function joinTour(tt) {
+  if (!W$.kyc) { toast('צריך לאמת זהות'); return go('wallet'); }
+  if (excluded()) return toast('החשבון בהחרגה עצמית');
+  if (W$.balance < tt.fee) { toast('אין מספיק יתרה. הזן קוד הפקדה'); return go('wallet'); }
+  ledger('entry', -tt.fee, `דמי כניסה · ${tt.name}`);
+  const ops = OPPS.slice().sort(() => Math.random() - .5).slice(0, 3).map(([name, lv]) => ({ name, level: lv }));
+  st.tour = { def: tt, opps: ops, stage: 'semi', semi2: Math.random() < .5 ? ops[1] : ops[2], result: null }; render();
+}
+function tourProgress(t) {
+  const [o1] = t.opps; const pp = plan(t.def.fee);
+  const play = (opp, label, done) => { st.tourHook = done; startMatch({ mode: t.def.mode, len: t.def.len, level: opp.level, oppName: opp.name, arena: null, label }); };
+  const semi = () => play(o1, t.def.name, (w) => { t.stage = (w === 'A' || (w === 'draw' && Math.random() < .5)) ? 'final' : 'done'; if (t.stage === 'done') t.result = { place: 0 }; st.screen = 'tours'; render(); });
+  const final = () => play(t.semi2, t.def.name + ' · גמר', (w) => { const won = w === 'A' || (w === 'draw' && Math.random() < .5); const gross = won ? pp.first : pp.second; const tax = won ? pp.tax1 : pp.tax2; ledger('prize', gross - tax, `מקום ${won ? 1 : 2} · ${t.def.name}`); t.stage = 'done'; t.result = { place: won ? 1 : 2, gross, tax }; if (won) { confetti(); sfx.win(); } st.screen = 'tours'; render(); });
+  return h('div', { class: 'grid2' },
+    h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('div', { class: 'eyebrow' }, 'טורניר פעיל'), h('h2', { style: 'font-family:var(--display);font-size:1.8rem' }, t.def.name), h('div', { class: 'num muted' }, `קופה ${shekel(pp.pool)} · ${t.opps.map((o) => o.name).join(', ')}`),
+      t.stage === 'semi' ? [h('b', {}, `חצי גמר מול ${o1.name}`), h('button', { class: 'btn', onclick: semi }, 'לשולחן')] : null,
+      t.stage === 'final' ? [h('b', {}, `גמר מול ${t.semi2.name}`), h('button', { class: 'btn', onclick: final }, 'לגמר')] : null),
+    t.stage === 'done' ? h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('h3', { style: 'font-family:var(--display);font-size:1.5rem;color:var(--brass-hi)' }, t.result.place === 1 ? '🏆 זכית!' : t.result.place === 2 ? 'מקום שני' : 'הודחת בחצי הגמר'),
+      h('dl', { class: 'kv num' }, h('dt', {}, 'קופה'), h('dd', {}, shekel(pp.pool)), h('dt', {}, `עמלה ${RAKE}%`), h('dd', {}, '−' + shekel(pp.rake)), t.result.place ? [h('dt', {}, 'פרס'), h('dd', {}, shekel(t.result.gross)), h('dt', {}, `מס ${TAX * 100}% מהרווח`), h('dd', {}, '−' + shekel(t.result.tax)), h('dt', {}, 'לארנק'), h('dd', { style: 'color:var(--brass-hi)' }, shekel(t.result.gross - t.result.tax))] : null),
+      h('div', { class: 'acts' }, h('button', { class: 'btn', onclick: () => { st.tour = null; render(); } }, 'לטורנירים'), h('button', { class: 'btn ghost', onclick: () => go('home') }, 'ללובי'))) : null);
+}
+
+// =====================================================================
+// boot
+// =====================================================================
+$('#portrait-ok').addEventListener('click', () => document.body.classList.add('portrait-ok'));
+addEventListener('keydown', (e) => { if (e.key === 'Escape') { G.selected = null; if (st.screen === 'table') render(); } });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (st.screen === 'table') render(); }, 150); });
+ensureMissions();
+render();
+if (st.screen === 'home') setTimeout(maybeDaily, 500);
+</script>

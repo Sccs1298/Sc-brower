@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 </head>
 <body>
-<title>שש בש כפול</title>
+<title>דאבל שש</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Frank+Ruhl+Libre:wght@700;900&family=Assistant:wght@400;600;700;800&display=swap">
@@ -199,7 +199,7 @@ label.f { display: flex; flex-direction: column; gap: 3px; font-size: .8rem; col
 #rotate { position: fixed; inset: 0; z-index: 90; display: none; place-items: center; text-align: center; padding: 24px; background: var(--baize-deep); }
 #rotate .ph { width: 70px; height: 110px; border: 4px solid var(--brass); border-radius: 14px; margin: 0 auto 18px; animation: rot 2.2s ease-in-out infinite; }
 @keyframes rot { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
-@media (orientation: portrait) and (max-width: 760px) { body:not(.portrait-ok) #rotate { display: grid; } }
+@media (orientation: portrait) and (max-width: 760px) { body.on-table:not(.portrait-ok) #rotate { display: grid; } }
 @media (max-width: 900px) { .home { grid-template-columns: minmax(190px, 230px) minmax(0, 1fr); } .carousel { grid-auto-columns: minmax(180px, 42%); } }
 @media (max-height: 480px) {
   :root { --bar-h: 44px; } body { font-size: 14px; } .arena { min-height: 190px; } .brand span { display: none; }
@@ -214,6 +214,130 @@ label.f { display: flex; flex-direction: column; gap: 3px; font-size: .8rem; col
 #toast { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%) translateY(20px); z-index: 70; background: var(--ivory); color: #2a1b02; font-weight: 800; padding: 9px 18px; border-radius: 999px; opacity: 0; transition: .25s; pointer-events: none; max-width: calc(100vw - 32px); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 #toast.show { opacity: 1; transform: translateX(-50%); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+/* ---------- light lobby (ClubGG-inspired) ---------- */
+body.light { background: #f3f4f6; color: #16181b; }
+body.light::after { display: none; }
+body.light #app { padding: 0; height: auto; min-height: 100%; }
+.L { --g: #17a467; --g-d: #0e7d4c; --g-bg: #e8f6ee; --red: #d1342a; --red-bg: #fdecea; --blue: #2667d8; --blue-bg: #e9f0fd; --gray: #6f6a62; --gray-bg: #f1eee9;
+  --line: #e2e4e8; --muted: #6b7079; --card: #fff; --ink: #16181b; --gold: #c08a14;
+  font-family: "Assistant", "Segoe UI", Arial, sans-serif; max-width: 760px; margin: 0 auto; min-height: 100vh; background: #fff; display: flex; flex-direction: column; color: var(--ink); }
+.L .faint { color: var(--muted); font-size: .85rem; }
+.L-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: calc(12px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); position: sticky; top: 0; background: #fff; z-index: 5; border-bottom: 1px solid var(--line); }
+.L-me { display: flex; align-items: center; gap: 10px; }
+.L-me b { font-size: 1.05rem; display: block; }
+.L-av { border-radius: 50%; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--line); flex: none; }
+.L-pill { margin-top: 3px; font-size: .78rem; font-weight: 700; background: var(--g-bg); color: var(--g-d); padding: 2px 10px; border-radius: 999px; }
+.L-wallet { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.L-chip { display: inline-flex; align-items: center; gap: 5px; border: 1.5px solid var(--line); border-radius: 999px; padding: 5px 11px; font-size: .88rem; background: #fff; }
+.L-chip .coin { width: 17px; height: 17px; }
+.L-chip.tk { border-color: #d9c7f5; color: #6b3fc9; }
+.L-main { flex: 1; padding: 14px max(16px, env(safe-area-inset-right, 0px)) 110px max(16px, env(safe-area-inset-left, 0px)); }
+.L-col { display: flex; flex-direction: column; gap: 14px; }
+.L-h1, .L-bar h1 { font-size: 1.9rem; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+.L-h2, .L-sec h2 { font-size: 1.2rem; font-weight: 800; margin: 0; }
+.L-bar { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; text-align: center; }
+.L-bar h1 { font-size: 1.35rem; }
+.L-back { font-size: 2rem; line-height: 1; color: var(--ink); width: 40px; height: 40px; }
+.L-sec { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.L-search { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 14px; background: #fff; }
+.L-search input { border: 0; background: transparent; color: var(--ink); padding: 13px 0; font-size: 1rem; outline: none; width: 100%; }
+.L-btn { background: var(--g); color: #fff; font-weight: 800; font-size: 1.05rem; padding: 13px 22px; border-radius: 12px; font-family: inherit; }
+.L-btn:hover { background: var(--g-d); }
+.L-btn.sm { font-size: .9rem; padding: 8px 14px; border-radius: 10px; }
+.L-btn.wide { width: 100%; padding: 16px; font-size: 1.15rem; }
+.L-btn.ghost { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+.L-btn[disabled] { background: #cfe9dc; color: #f4fbf7; pointer-events: none; }
+.L-create { align-self: center; width: min(100%, 360px); background: #fff; border-radius: 22px; padding: 16px; box-shadow: 0 10px 30px rgba(20,30,40,.1); display: grid; gap: 12px; }
+.L-createArt { border-radius: 16px; background: linear-gradient(160deg, #3b4045, #1d2023); color: #fff; display: grid; place-items: center; gap: 8px; padding: 22px 12px; text-align: center; font-weight: 700; font-size: 1.1rem; }
+.L-createArt p { margin: 0; }
+.L-banner { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-radius: 16px; padding: 18px; text-align: start; color: #fff; background: radial-gradient(120% 140% at 0% 0%, #3a2a0a, #0f0d08 60%); }
+.L-banner b { display: block; font-size: 1.6rem; font-weight: 900; color: #ffd36b; }
+.L-banner span { color: #e9dcc0; font-size: .9rem; }
+.L-banner-cta { background: #ffd36b; color: #2a1d02 !important; font-weight: 800; border-radius: 999px; padding: 6px 14px; white-space: nowrap; }
+.L-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.L-mini { text-align: start; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 2px; background: #fff; }
+.L-mini b { font-size: 1rem; } .L-mini span { color: var(--muted); font-size: .82rem; }
+.L-list { display: flex; flex-direction: column; gap: 10px; }
+.L-club { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; text-align: start; padding: 10px; border: 1.5px solid var(--line); border-radius: 16px; background: #fff; }
+.L-club b { display: block; font-size: 1.05rem; } .L-logo { border-radius: 14px; display: block; }
+.L-chev { font-size: 1.6rem; color: #9aa0a8; }
+/* tournament card */
+.L-tc { display: grid; grid-template-columns: 104px 1fr; gap: 10px; text-align: start; padding: 8px; border: 1.5px solid var(--line); border-radius: 16px; background: #fff; position: relative; }
+.L-st { border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; padding-bottom: 8px; background: var(--g-bg); color: var(--g-d); min-height: 88px; }
+.L-st .L-stl { align-self: stretch; background: var(--g); color: #fff; font-weight: 800; font-size: .88rem; padding: 6px 4px; margin-bottom: 4px; }
+.L-st b { font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
+.L-st small { font-size: .78rem; color: inherit; opacity: .85; }
+.L-st.ann { background: var(--gray-bg); color: #3e3a34; } .L-st.ann .L-stl { background: var(--gray); }
+.L-st.run { background: var(--blue-bg); color: var(--blue); } .L-st.run .L-stl { background: var(--blue); }
+.L-st.done { background: #f1f2f4; color: #8b9098; } .L-st.done .L-stl { background: #9aa0a8; }
+.L-st.big { min-width: 120px; min-height: 110px; } .L-st.big b { font-size: 2rem; }
+.L-ti { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.L-tn { display: flex; align-items: center; gap: 6px; background: #e9eef6; border-radius: 8px; padding: 6px 10px; font-weight: 800; font-size: 1rem; overflow: hidden; white-space: nowrap; }
+.L-tn > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+.L-tag { background: #1fb2a3; color: #fff; font-size: .78rem; padding: 2px 8px; border-radius: 6px; flex: none; }
+.L-tag.club { background: #6b3fc9; }
+.L-tr { display: flex; align-items: center; gap: 8px; font-size: .88rem; padding: 0 4px; flex-wrap: wrap; }
+.L-k { color: var(--muted); } .L-v { font-weight: 700; display: inline-flex; align-items: center; } .L-v .coin { width: 15px; height: 15px; }
+.L-sp { flex: 1; }
+.L-prize { color: #8a3fd1; font-weight: 800; }
+.L-mine { position: absolute; top: -8px; inset-inline-start: 12px; background: var(--g); color: #fff; font-size: .72rem; font-weight: 800; padding: 1px 8px; border-radius: 999px; }
+.L-check { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: .92rem; }
+.L-check input { width: 18px; height: 18px; accent-color: var(--g); }
+.L-empty { color: var(--muted); text-align: center; padding: 24px 8px; border: 1.5px dashed var(--line); border-radius: 14px; margin: 0; }
+/* forms */
+.L-field { display: flex; flex-direction: column; gap: 8px; font-weight: 700; font-size: .95rem; }
+.L-field input:not([type="range"]) { font: inherit; font-weight: 400; color: var(--ink); background: #fff; border: 1.5px solid var(--line); border-radius: 12px; padding: 13px 14px; }
+.L-field input[type="range"] { accent-color: var(--g); }
+.L-logos { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 12px; }
+.L-lg { border-radius: 18px; padding: 0; position: relative; outline-offset: 2px; }
+.L-lg svg { width: 100%; height: auto; }
+.L-lg.on { box-shadow: 0 0 0 4px var(--g); }
+.L-lg.on::after { content: "✓"; position: absolute; top: -8px; inset-inline-end: -8px; width: 26px; height: 26px; border-radius: 50%; background: var(--g); color: #fff; display: grid; place-items: center; font-weight: 900; }
+.L-seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.L-seg button { border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 12px; font-weight: 700; background: #fff; color: var(--ink); }
+.L-seg button[aria-pressed="true"] { border-color: var(--g); background: var(--g-bg); color: var(--g-d); }
+.L-sum { border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 14px; display: grid; gap: 6px; background: #fafbfc; }
+.L-sum div { display: flex; justify-content: space-between; } .L-sum .sub { color: var(--muted); font-size: .9rem; padding-inline-start: 10px; }
+.L-note { color: var(--muted); font-size: .85rem; margin: 0; }
+/* club page */
+.L-clubHead { display: flex; gap: 14px; align-items: center; }
+.L-code { font-size: 1rem; margin: 4px 0; }
+.L-link { color: var(--blue); font-weight: 700; padding: 0; }
+/* detail */
+.L-detail { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+.L-dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; flex: 1; min-width: 220px; font-size: .95rem; }
+.L-dl dt { color: var(--muted); } .L-dl dd { margin: 0; font-weight: 700; display: flex; align-items: center; flex-wrap: wrap; gap: 3px; } .L-dl .coin { width: 15px; height: 15px; }
+.L-bracket { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; }
+.L-round { display: flex; flex-direction: column; gap: 8px; min-width: 140px; justify-content: space-around; }
+.L-match { border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; font-size: .88rem; }
+.L-match div { padding: 5px 9px; } .L-match div + div { border-top: 1px solid var(--line); }
+.L-match .w { font-weight: 800; background: var(--g-bg); } .L-match .l { color: #a2a6ad; text-decoration: line-through; } .L-match .me { color: var(--blue); }
+.L-result { border-radius: 14px; padding: 14px; background: #fff8e6; border: 1.5px solid #f0d58a; display: grid; gap: 2px; } .L-result b { font-size: 1.15rem; } .L-result span { color: var(--muted); }
+/* live & me */
+.L-hero { border-radius: 18px; padding: 26px 18px; color: #fff; background: radial-gradient(120% 120% at 50% 0%, #6d1410, #1b0907); display: grid; gap: 4px; text-align: center; }
+.L-hero b { font-size: 1.8rem; font-weight: 900; } .L-hero span { color: #f2d5cf; }
+.L-ev { border-radius: 16px; padding: 14px 16px; color: #fff; background: linear-gradient(120deg, var(--ev), #0d0d0d); display: grid; gap: 8px; }
+.L-ev b { font-size: 1.05rem; } .L-ev dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; margin: 0; font-size: .92rem; } .L-ev dt { color: #d8c9c4; } .L-ev dd { margin: 0; } .L-ev .gold { color: #ffd36b; font-weight: 800; }
+.L-ev .L-btn { justify-self: start; }
+.L-prof { display: grid; justify-items: center; gap: 6px; padding: 8px 0; }
+.L-prof h1 { font-size: 1.5rem; margin: 0; } .L-id { color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 10px; font-size: .85rem; }
+.L-tickets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.L-tickets div { border: 1.5px solid #e4d8f8; border-radius: 14px; padding: 10px 4px; background: #faf7ff; } .L-tickets b { display: block; font-size: 1.6rem; color: #6b3fc9; } .L-tickets span { font-size: .8rem; color: var(--muted); }
+.L-menu { display: flex; flex-direction: column; }
+.L-mrow { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; text-align: start; padding: 12px 2px; border-bottom: 1px solid var(--line); }
+.L-mrow b { display: block; font-size: 1.02rem; } .L-mrow span { color: var(--muted); font-size: .85rem; }
+.L-mic { width: 42px; height: 42px; border-radius: 50%; background: #f3f0fb; display: grid; place-items: center; font-size: 1.2rem; }
+.L-refer { border-radius: 16px; padding: 14px; color: #fff; background: linear-gradient(110deg, #c3261c, #f05a2a); text-align: center; display: grid; gap: 2px; }
+.L-refer b { font-size: 1.4rem; font-weight: 900; } .L-refer span { font-size: .85rem; color: #ffe4d8; }
+/* bottom tab bar */
+.L-tabs { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(760px, 100%); display: grid; grid-template-columns: repeat(6, 1fr); background: #fff; border-top: 1px solid var(--line); padding: 6px 4px calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 10; }
+.L-zone { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); background: #fff; border: 1px solid var(--line); border-bottom: 0; border-radius: 12px 12px 0 0; padding: 2px 26px; font-size: .8rem; font-weight: 800; color: var(--blue); white-space: nowrap; }
+.L-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: .78rem; color: #8b9098; font-weight: 700; padding: 4px 0; }
+.L-tab.on { color: #111; }
+.L button:focus-visible, .L input:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+body.light #toast { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 761px) { body.light { background: #e9ebef; } .L { box-shadow: 0 0 0 1px var(--line); } }
+
 </style>
 
 <div id="app"></div>
@@ -921,7 +1045,7 @@ const ACHIEVEMENTS = [
   { id: 'gam', ic: '⚡', t: 'גמון', d: 'נצח בגמון', test: (p) => p.stats.gammons >= 1 },
   { id: 'bg', ic: '💥', t: 'בקגמון', d: 'נצח בבקגמון', test: (p) => p.stats.backgammons >= 1 },
   { id: 'hitter', ic: '🎯', t: 'צלף', d: 'הכה 50 כלים', test: (p) => p.stats.hits >= 50 },
-  { id: 'tour', ic: '🗺️', t: 'טיול שכונות', d: 'שחק בכל זירות המטבעות', test: (p) => ARENAS.filter((a) => a.cur === 'coins').every((a) => p.stats.arenas[a.id]) },
+  { id: 'tour', ic: '🗺️', t: 'איש מועדון', d: 'שחק בטורניר מועדון', test: (p) => (p.stats.clubTours || 0) >= 1 },
   { id: 'hot3', ic: '🔥', t: 'על הגל', d: '3 ניצחונות ברצף', test: (p) => p.bestRun >= 3 },
   { id: 'lvl5', ic: '⭐', t: 'רמה 5', d: 'הגע לרמה 5', test: (p) => level(p.xp) >= 5 },
   { id: 'lvl10', ic: '🌟', t: 'רמה 10', d: 'הגע לרמה 10', test: (p) => level(p.xp) >= 10 },
@@ -1048,13 +1172,22 @@ function addXp(n) { const before = level(P.xp); P.xp += n; save(); const after =
 function addCoins(n, why) { P.coins += n; if (n > 0) sfx.coin(); save(); if (why) toast(`${n > 0 ? '+' : ''}${fmt(n)} מטבעות · ${why}`); }
 
 // =====================================================================
-// Shell
+// Shell — light lobby (ClubGG-style tabs) + dark table/guide
 // =====================================================================
-const st = { screen: P.seenGuide ? 'home' : 'guide', guideStep: 0, homeTab: 'coins', tour: null, tourHook: null, lastCode: null };
-function go(screen) { st.screen = screen; stopTimers(); render(); }
+const BRAND = 'דאבל שש';
+const CL = Object.assign({ clubs: [], tours: [], nick: 'שחקן ' + Math.floor(1000 + Math.random() * 9000), uid: String(Math.floor(1e7 + Math.random() * 9e7)) }, store.get('clubs', {}));
+P.tickets ??= { s2: 0, final: 0, live: 0 };
+P.stats.clubTours ??= 0;
+const saveCL = () => store.set('clubs', CL);
+const st = { screen: P.seenGuide ? 'home' : 'guide', guideStep: 0, tourHook: null, clubId: null, tourId: null, search: '' };
+function go(screen, extra = {}) { Object.assign(st, extra); st.screen = screen; stopTimers(); render(); window.scrollTo?.(0, 0); }
 function render() {
-  const views = { guide: viewGuide, home: viewHome, table: viewTable, wallet: viewWallet, profile: viewProfile, tours: viewTours };
-  $('#app').replaceChildren(topbar(), h('main', { class: 'stage' }, views[st.screen]()));
+  const dark = st.screen === 'table' || st.screen === 'guide';
+  document.body.classList.toggle('light', !dark);
+  document.body.classList.toggle('on-table', st.screen === 'table');
+  if (dark) { $('#app').replaceChildren(topbar(), h('main', { class: 'stage' }, (st.screen === 'table' ? viewTable : viewGuide)())); return; }
+  const views = { home: viewClubHome, live: viewLive, s1: () => viewStage('s1'), s2: () => viewStage('s2'), final: () => viewStage('final'), me: viewMe, clubNew: viewClubNew, club: viewClub, tourNew: viewTourNew, tour: viewTour };
+  $('#app').replaceChildren(h('div', { class: 'L' }, lobbyHeader(), h('main', { class: 'L-main' }, (views[st.screen] || viewClubHome)()), tabbar()));
 }
 function logo() {
   const svg = S('svg', { viewBox: '0 0 40 40', 'aria-hidden': 'true' });
@@ -1063,125 +1196,315 @@ function logo() {
   return svg;
 }
 function topbar() {
-  const lv = level(P.xp); const pct = Math.min(100, ((P.xp - xpFor(lv)) / (xpFor(lv + 1) - xpFor(lv))) * 100);
   const inGame = st.screen === 'table';
   return h('header', { class: 'topbar' },
-    h('button', { class: 'brand', onclick: () => (inGame && !G.M.over ? confirmLeave() : go('home')), 'aria-label': 'למסך הבית' }, logo(), h('span', {}, 'שש בש כפול')),
+    h('button', { class: 'brand', onclick: () => (inGame && !G.M.over ? confirmLeave() : go('home')), 'aria-label': 'ללובי' }, logo(), h('span', {}, BRAND)),
     h('div', { class: 'hudchips' },
-      h('button', { class: 'chip lvl', onclick: () => !inGame && go('profile'), 'aria-label': `רמה ${lv}` }, `⭐ ${lv}`, h('span', { class: 'xpbar' }, h('i', { style: `width:${pct}%` }))),
-      h('span', { class: 'chip num', title: 'מטבעות אימון: חינם, ללא ערך כספי' }, coinSVG(), fmt(P.coins)),
-      h('button', { class: 'chip cash num', onclick: () => !inGame && go('wallet') }, '👛 ', shekel(W$.balance)),
-      h('span', { class: 'chip demo' }, 'הדגמה'),
-      inGame ? null : h('button', { class: 'chip', onclick: () => { st.guideStep = 0; go('guide'); }, 'aria-label': 'למה זה חוקי' }, '⚖️'),
+      h('span', { class: 'chip num', title: 'מטבעות – ללא ערך כספי' }, coinSVG(), fmt(P.coins)),
       h('button', { class: 'chip', 'aria-label': audio.on ? 'השתק' : 'הפעל צלילים', onclick: () => { audio.on = !audio.on; store.set('sound', audio.on); render(); } }, audio.on ? '🔊' : '🔈')));
 }
 function confirmLeave() {
-  document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' }, h('div', { class: 'card' }, h('h2', {}, 'לצאת מהמשחק?'), h('p', { class: 'muted' }, 'יציאה באמצע נחשבת להפסד, ודמי הכניסה לא יוחזרו.'),
+  document.body.append(h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true' }, h('div', { class: 'card' }, h('h2', {}, 'לצאת מהמשחק?'), h('p', { class: 'muted' }, 'יציאה באמצע נחשבת להפסד.'),
     h('div', { class: 'acts', style: 'justify-content:center' }, h('button', { class: 'btn ghost', onclick: () => $('.overlay')?.remove() }, 'הישאר'), h('button', { class: 'btn red', onclick: () => { $('.overlay')?.remove(); stopTimers(); for (let k = 0; k < 40 && !G.M.over; k++) { G.M.boards().forEach((g, b) => { if (g.phase !== 'over') g.resign(colorOf('A', b)); }); G.M.settle(); } step(); } }, 'צא')))));
 }
+function avatar(size = 46) {
+  const s = S('svg', { viewBox: '0 0 46 46', width: size, height: size, class: 'L-av', 'aria-hidden': 'true' });
+  s.append(S('circle', { cx: 23, cy: 23, r: 23, fill: '#1f2a24' }), S('circle', { cx: 23, cy: 18, r: 8, fill: '#e9d3b0' }), S('path', { d: 'M8 40c3-9 9-12 15-12s12 3 15 12', fill: '#e9d3b0' }), S('path', { d: 'M15 16c1-6 15-7 16 0-4-3-12-3-16 0z', fill: '#2b2119' }));
+  return s;
+}
+function lobbyHeader() {
+  const t = P.tickets;
+  return h('header', { class: 'L-head' },
+    h('div', { class: 'L-me' }, avatar(), h('div', {}, h('b', {}, CL.nick), h('button', { class: 'L-pill', onclick: () => go('me') }, `רמה ${level(P.xp)} ›`))),
+    h('div', { class: 'L-wallet' },
+      h('span', { class: 'L-chip', title: 'מטבעות' }, coinSVG(), h('b', { class: 'num' }, fmt(P.coins))),
+      h('button', { class: 'L-chip tk', onclick: () => go('me'), title: 'כרטיסים' }, '🎟️ ', h('b', { class: 'num' }, t.s2 + t.final + t.live), ' כרטיסים')));
+}
+const TABS = [['home', 'מועדון', 'club'], ['live', 'אירוע חי', 'star'], ['s1', 'שלב 1', '1'], ['s2', 'שלב 2', '2'], ['final', 'גמר', 'F'], ['me', 'אני', 'me']];
+function tabIcon(k, on) {
+  const s = S('svg', { viewBox: '0 0 28 28', width: 26, height: 26, 'aria-hidden': 'true' });
+  const c = on ? '#111' : '#8b9098';
+  if (k === 'club') { for (const [x, y] of [[14, 8], [8.5, 14.5], [19.5, 14.5]]) s.append(S('circle', { cx: x, cy: y, r: 5, fill: on ? c : 'none', stroke: c, 'stroke-width': 1.8 })); s.append(S('path', { d: 'M14 14v9m-3 0h6', stroke: c, 'stroke-width': 1.8, fill: 'none' })); }
+  else if (k === 'star') s.append(S('path', { d: 'M14 3l3.2 7 7.6.7-5.7 5 1.7 7.5L14 19.3 7.2 23.2 8.9 15.7 3.2 10.7l7.6-.7z', fill: on ? c : 'none', stroke: c, 'stroke-width': 1.8, 'stroke-linejoin': 'round' }));
+  else if (k === 'me') s.append(S('circle', { cx: 14, cy: 9, r: 5, fill: on ? c : 'none', stroke: c, 'stroke-width': 1.8 }), S('path', { d: 'M5 25c1-6 5-9 9-9s8 3 9 9z', fill: on ? c : 'none', stroke: c, 'stroke-width': 1.8 }));
+  else { s.append(S('rect', { x: 3, y: 7, width: 22, height: 14, rx: 7, fill: on ? '#111' : 'none', stroke: c, 'stroke-width': 1.8 }), S('text', { x: 14, y: 18, 'text-anchor': 'middle', 'font-size': 10, 'font-weight': 800, fill: on ? '#fff' : c, 'font-family': 'Assistant, sans-serif' }, k)); }
+  return s;
+}
+function tabbar() {
+  const cur = ['club', 'clubNew', 'tourNew', 'tour'].includes(st.screen) ? 'home' : st.screen;
+  return h('nav', { class: 'L-tabs', 'aria-label': 'ניווט' },
+    h('div', { class: 'L-zone' }, 'הדרך לגמר'),
+    TABS.map(([id, label, ic]) => h('button', { class: 'L-tab' + (cur === id ? ' on' : ''), 'aria-current': cur === id ? 'page' : null, onclick: () => go(id) }, tabIcon(ic, cur === id), h('span', {}, label))));
+}
 
-// =====================================================================
-// Arena scenes (original illustrations, drawn in SVG)
-// =====================================================================
-function scene(kind) {
-  const s = S('svg', { class: 'scene', viewBox: '0 0 240 300', preserveAspectRatio: 'xMidYMid slice', 'aria-hidden': 'true' });
-  const sky = { cafe: ['#f6b56b', '#b6532d'], shuk: ['#ffcf6e', '#d27a2c'], yafo: ['#ff9a6b', '#3b4f8c'], roof: ['#1b2550', '#05070f'], gold: ['#3a2a07', '#0e0a02'] }[kind];
-  const id = 'sk' + kind + Math.random().toString(36).slice(2, 6);
-  const d = S('defs'); const g = S('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 }); g.append(S('stop', { offset: 0, 'stop-color': sky[0] }), S('stop', { offset: 1, 'stop-color': sky[1] })); d.append(g); s.append(d);
-  s.append(S('rect', { width: 240, height: 300, fill: `url(#${id})` }));
-  if (kind === 'cafe') {
-    s.append(S('circle', { cx: 190, cy: 60, r: 26, fill: '#ffe2a8', opacity: .8 }), S('rect', { x: 0, y: 120, width: 240, height: 180, fill: '#e9d3a7' }));
-    for (let i = 0; i < 8; i++) s.append(S('rect', { x: i * 30, y: 105, width: 30, height: 28, fill: i % 2 ? '#c2402e' : '#f7efdc' }));
-    s.append(S('rect', { x: 30, y: 160, width: 70, height: 70, fill: '#5a3a1e' }), S('rect', { x: 140, y: 160, width: 70, height: 60, fill: '#2f5d8a' }));
-    for (const x of [40, 120, 190]) s.append(S('ellipse', { cx: x, cy: 255, rx: 26, ry: 7, fill: '#3b2a18' }), S('rect', { x: x - 2, y: 255, width: 4, height: 30, fill: '#3b2a18' }));
-    s.append(S('rect', { x: 110, y: 238, width: 16, height: 14, rx: 3, fill: '#fff' }));
-  } else if (kind === 'shuk') {
-    for (let i = 0; i < 4; i++) s.append(S('polygon', { points: `${i * 64 - 10},110 ${i * 64 + 54},110 ${i * 64 + 44},80 ${i * 64},80`, fill: ['#2d7d46', '#c2402e', '#2f5d8a', '#e0b04a'][i] }), S('rect', { x: i * 64 - 6, y: 110, width: 56, height: 120, fill: '#7a4b22' }));
-    const fr = ['#ff7a2f', '#ffd23f', '#d1342f', '#6fbf3a', '#8e44ad'];
-    for (let i = 0; i < 40; i++) s.append(S('circle', { cx: 10 + (i % 10) * 24, cy: 200 + Math.floor(i / 10) * 14, r: 7, fill: fr[i % 5] }));
-    s.append(S('rect', { x: 0, y: 255, width: 240, height: 45, fill: '#3a2814' }));
-  } else if (kind === 'yafo') {
-    s.append(S('circle', { cx: 60, cy: 140, r: 34, fill: '#ffd28a', opacity: .9 }), S('rect', { x: 0, y: 160, width: 240, height: 140, fill: '#2b4a7a' }));
-    for (let i = 0; i < 6; i++) s.append(S('path', { d: `M0 ${180 + i * 18} Q 60 ${174 + i * 18} 120 ${180 + i * 18} T 240 ${180 + i * 18}`, stroke: 'rgba(255,255,255,.25)', fill: 'none' }));
-    s.append(S('rect', { x: 100, y: 110, width: 120, height: 50, fill: '#c9a26b' }), S('rect', { x: 150, y: 60, width: 26, height: 100, fill: '#d8b98a' }), S('polygon', { points: '146,60 180,60 163,36', fill: '#a37a45' }), S('circle', { cx: 163, cy: 80, r: 8, fill: '#fff' }));
-    s.append(S('path', { d: 'M30 200 h60 l-10 16 h-40z', fill: '#f7efdc' }), S('rect', { x: 58, y: 168, width: 3, height: 32, fill: '#f7efdc' }), S('polygon', { points: '61,170 82,196 61,196', fill: '#e0b04a' }));
-  } else if (kind === 'roof') {
-    for (let i = 0; i < 50; i++) s.append(S('circle', { cx: (i * 53) % 240, cy: (i * 37) % 120, r: i % 7 ? .9 : 1.6, fill: '#fff', opacity: .7 }));
-    s.append(S('circle', { cx: 190, cy: 50, r: 16, fill: '#f3ead6' }));
-    for (const [x, y, w] of [[0, 120, 40], [40, 90, 30], [70, 140, 36], [106, 70, 34], [140, 110, 40], [180, 85, 30], [210, 130, 30]]) {
-      s.append(S('rect', { x, y, width: w, height: 300 - y, fill: '#0d1430' }));
-      for (let k = 0; k < 14; k++) s.append(S('rect', { x: x + 4 + (k % 3) * (w / 3 - 1), y: y + 8 + Math.floor(k / 3) * 14, width: 5, height: 7, fill: (k * x) % 3 ? '#ffd77a' : '#28335e' }));
-    }
-    s.append(S('rect', { x: 0, y: 236, width: 240, height: 64, fill: '#1c1410' }), S('path', { d: 'M0 226 Q 120 246 240 226', stroke: '#6d5a2c', fill: 'none' }));
-    for (let i = 0; i < 9; i++) s.append(S('circle', { cx: 14 + i * 27, cy: 230, r: 4, fill: '#ffd77a' }));
-  } else {
-    s.append(S('ellipse', { cx: 120, cy: 260, rx: 150, ry: 60, fill: '#0c3a26' }));
-    for (let i = 0; i < 18; i++) s.append(S('circle', { cx: 120 + Math.cos(i) * (40 + i * 3), cy: 120 + Math.sin(i * 1.3) * 40, r: 14 - i * .4, fill: '#e0b04a', stroke: '#8c6418', 'stroke-width': 2, opacity: .8 }));
-    s.append(S('text', { x: 120, y: 150, 'text-anchor': 'middle', 'font-size': 64, 'font-family': 'Secular One, sans-serif', fill: '#ffd77a', opacity: .9 }, '₪'));
-  }
+// ---------- club logos (placeholder set — replace with purchased illustrations) ----------
+const LOGOS = [
+  { id: 'die', bg: ['#0f7a43', '#063d22'] }, { id: 'cube', bg: ['#1d3fae', '#0a1a55'] }, { id: 'checker', bg: ['#b3261e', '#4a0d09'] },
+  { id: 'board', bg: ['#2b2f36', '#0d0f12'] }, { id: 'crown', bg: ['#6b1d5e', '#260a22'] }, { id: 'cup', bg: ['#7a4a12', '#2c1a05'] }, { id: 'pair', bg: ['#0e5568', '#05222b'] },
+];
+function logoArt(id, size = 64) {
+  const L = LOGOS.find((x) => x.id === id) || LOGOS[0];
+  const s = S('svg', { viewBox: '0 0 100 100', width: size, height: size, class: 'L-logo', 'aria-hidden': 'true' });
+  const gid = 'lg' + Math.random().toString(36).slice(2, 7);
+  const g = S('radialGradient', { id: gid, cx: '50%', cy: '35%', r: '75%' }); g.append(S('stop', { offset: 0, 'stop-color': L.bg[0] }), S('stop', { offset: 1, 'stop-color': L.bg[1] }));
+  const d = S('defs'); d.append(g); s.append(d, S('rect', { width: 100, height: 100, rx: 18, fill: `url(#${gid})` }));
+  const ivory = '#f5ecd7'; const ink = '#1d1712';
+  if (id === 'die' || id === 'pair') {
+    const die = (x, y, r, n) => { s.append(S('rect', { x, y, width: 36, height: 36, rx: 8, fill: ivory, transform: `rotate(${r} ${x + 18} ${y + 18})` })); for (const [px, py] of PIPS[n]) s.append(S('circle', { cx: x + px * .36, cy: y + py * .36, r: 3.3, fill: ink, transform: `rotate(${r} ${x + 18} ${y + 18})` })); };
+    if (id === 'die') die(32, 30, -10, 6); else { die(16, 34, -12, 6); die(48, 28, 12, 6); }
+  } else if (id === 'cube') { s.append(S('rect', { x: 28, y: 28, width: 44, height: 44, rx: 9, fill: ivory }), S('text', { x: 50, y: 61, 'text-anchor': 'middle', 'font-size': 26, 'font-weight': 900, fill: ink, 'font-family': 'Assistant, sans-serif' }, '64')); }
+  else if (id === 'checker') { for (let k = 0; k < 3; k++) s.append(S('ellipse', { cx: 50, cy: 66 - k * 12, rx: 24, ry: 9, fill: k === 2 ? ivory : '#d9cdb2', stroke: '#8a7a5a' })); }
+  else if (id === 'board') { for (let k = 0; k < 6; k++) s.append(S('polygon', { points: `${18 + k * 11},22 ${28 + k * 11},22 ${23 + k * 11},60`, fill: k % 2 ? '#c75a34' : ivory })); s.append(S('circle', { cx: 50, cy: 74, r: 9, fill: ivory })); }
+  else if (id === 'crown') s.append(S('path', { d: 'M22 66l-4-30 18 14 14-22 14 22 18-14-4 30z', fill: '#e8b64a' }), S('rect', { x: 22, y: 68, width: 56, height: 8, rx: 3, fill: '#c9952c' }));
+  else if (id === 'cup') s.append(S('path', { d: 'M32 22h36v14a18 18 0 0 1-36 0z', fill: '#e8b64a' }), S('rect', { x: 45, y: 54, width: 10, height: 12, fill: '#c9952c' }), S('rect', { x: 34, y: 66, width: 32, height: 8, rx: 3, fill: '#e8b64a' }));
   return s;
 }
 
-// =====================================================================
-// HOME
-// =====================================================================
-function arenaLock(a) {
-  if (a.cur === 'coins') return level(P.xp) >= a.minLevel || OP.unlockAll ? null : `נפתח ברמה ${a.minLevel}`;
-  if (OP.unlockAll) return W$.kyc ? null : 'נדרש אימות זהות';
-  if (!W$.kyc) return 'נדרש אימות זהות';
-  if (P.stats.games < CASH_MIN_GAMES) return `נפתח אחרי ${CASH_MIN_GAMES} משחקים (${P.stats.games})`;
-  if (P.rating < a.minRating) return `נפתח בדירוג ${a.minRating}`;
-  return null;
+// ---------- tournaments model ----------
+const MIN = 60000;
+const BOT_NAMES = ['אבי', 'מאיה', 'יוסי', 'רונית', 'דני', 'נועה', 'משה', 'שירן', 'עמית', 'ליאת', 'גיא', 'חן', 'אלון', 'תמר', 'רועי', 'הילה'];
+const LEVEL_FOR = { s1: 'intermediate', s2: 'strong', final: 'expert', club: 'intermediate' };
+function seedSystem() {
+  // Rolling schedule for the ladder (demo): stage tournaments are recreated as they finish.
+  const now = Date.now();
+  const want = [
+    { stage: 's1', name: 'מהיר · כפול', mode: 'duplicate', len: 1, size: 4, entry: { coins: 100 }, prize: { ticket: 's2', n: 1 }, at: 0 },
+    { stage: 's1', name: 'קלאסי עד 3', mode: 'classic', len: 3, size: 4, entry: { coins: 100 }, prize: { ticket: 's2', n: 1 }, at: 0 },
+    { stage: 's1', name: 'כפול · 8 שחקנים', mode: 'duplicate', len: 1, size: 8, entry: { coins: 150 }, prize: { ticket: 's2', n: 2 }, at: 25 },
+    { stage: 's1', name: 'ערב קלאסי', mode: 'classic', len: 3, size: 8, entry: { coins: 150 }, prize: { ticket: 's2', n: 2 }, at: 55 },
+    { stage: 's2', name: 'לפי דרישה · כפול', mode: 'duplicate', len: 2, size: 4, entry: { ticket: 's2' }, prize: { ticket: 'final', n: 1 }, at: 0 },
+    { stage: 's2', name: 'לפי דרישה · עד 5', mode: 'classic', len: 5, size: 4, entry: { ticket: 's2' }, prize: { ticket: 'final', n: 1 }, at: 0 },
+    { stage: 'final', name: 'גמר דצמבר', mode: 'duplicate', len: 2, size: 8, entry: { ticket: 'final' }, prize: { ticket: 'live', n: 1 }, at: 0 },
+  ];
+  for (const w of want) {
+    if (CL.tours.some((t) => !t.clubId && t.stage === w.stage && t.name === w.name && t.status !== 'done')) continue;
+    CL.tours.push({ id: 't' + Math.random().toString(36).slice(2, 8), clubId: null, hostFee: 0, players: [], status: 'open', bracket: null, createdAt: now, startAt: now + w.at * MIN, ...w });
+  }
+  CL.tours = CL.tours.filter((t) => t.status !== 'done' || now - (t.doneAt || 0) < 2 * 3600_000);
+  saveCL();
 }
-function viewHome() {
-  ensureMissions();
-  const lv = level(P.xp);
-  const list = ARENAS.filter((a) => (st.homeTab === 'coins' ? a.cur === 'coins' : a.cur === 'ils'));
-  const arenaCard = (a) => {
-    const lock = arenaLock(a); const money = a.cur === 'ils';
-    const prize = Math.floor(a.entry * 2 * (100 - RAKE) / 100);
-    return h('button', { class: 'arena' + (lock ? ' locked' : ''), onclick: () => (lock ? toast(lock) : enterArena(a)), 'aria-label': `${a.name}${lock ? ' · ' + lock : ''}` },
-      scene(a.scene),
-      lock ? h('span', { class: 'lock' }, '🔒 ' + lock) : null,
-      !lock && a.mode === 'duplicate' ? h('span', { class: 'badge' }, 'כפול') : null,
-      h('div', { class: 'info' },
-        h('h3', {}, a.name),
-        h('div', { class: 'fmt' }, a.mode === 'duplicate' ? `שש בש כפול · ${a.len === 1 ? 'סבב' : a.len + ' סבבים'}` : `מאץ' עד ${a.len}`),
-        h('div', { class: 'stake num' }, h('span', {}, money ? 'כניסה ' + shekel(a.entry) : [coinSVG(), ' ' + fmt(a.entry)]), h('span', { class: 'prize' }, '🏆 ' + (money ? shekel(prize) : fmt(prize))))));
+function tourStatus(t) {
+  if (t.status === 'done') return { cls: 'done', label: 'הסתיים', big: '🏁' };
+  if (t.status === 'running') return { cls: 'run', label: 'רץ', big: `${t.players.length}/${t.size}` };
+  const ms = t.startAt - Date.now();
+  if (ms > 15 * MIN) return { cls: 'ann', label: 'הוכרז', small: 'הרשמה בעוד', big: clock(ms - 15 * MIN) };
+  if (ms > 0) return { cls: 'reg', label: 'נרשמים', big: `${t.players.length}/${t.size}` };
+  return t.players.length ? { cls: 'reg', label: 'נרשמים', big: `${t.players.length}/${t.size}` } : { cls: 'reg', label: 'לפי דרישה', big: `0/${t.size}` };
+}
+const clock = (ms) => { const m = Math.max(0, Math.floor(ms / MIN)); return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m}:${String(Math.floor((ms % MIN) / 1000)).padStart(2, '0')}`; };
+const fmtName = (t) => `${t.mode === 'duplicate' ? `כפול${t.len > 1 ? ' ×' + t.len : ''}` : `עד ${t.len}`} · ${t.size} שחקנים`;
+const entryLabel = (t) => (t.entry.coins != null ? [coinSVG(), ' ' + fmt(t.entry.coins)] : `🎟️ כרטיס ${t.entry.ticket === 's2' ? 'שלב 2' : 'גמר'}`);
+const prizeLabel = (t) => (t.prize.ticket ? `${t.prize.n > 1 ? t.prize.n + '× ' : ''}כרטיס ${{ s2: 'שלב 2', final: 'גמר', live: 'אירוע חי' }[t.prize.ticket]}` : `🏆 ${fmt(pot(t).net)}`);
+function pot(t) { const gross = (t.entry.coins || 0) * t.size; const fee = Math.floor((gross * (t.hostFee || 0)) / 100); return { gross, fee, host: Math.round(fee * 0.7), platform: fee - Math.round(fee * 0.7), net: gross - fee }; }
+
+function tourCard(t) {
+  const s = tourStatus(t); const club = t.clubId && CL.clubs.find((c) => c.id === t.clubId);
+  const mine = t.players.includes(CL.nick);
+  return h('button', { class: 'L-tc', onclick: () => go('tour', { tourId: t.id }) },
+    h('div', { class: 'L-st ' + s.cls }, h('span', { class: 'L-stl' }, s.label), s.small ? h('small', {}, s.small) : null, h('b', { class: 'num' }, s.big)),
+    h('div', { class: 'L-ti' },
+      h('div', { class: 'L-tn' }, t.stage === 's1' ? h('span', { class: 'L-tag' }, 'שלב 1') : null, club ? h('span', { class: 'L-tag club' }, club.name) : null, h('span', {}, t.name)),
+      h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, 'כניסה'), h('span', { class: 'L-v num' }, entryLabel(t)), h('span', { class: 'L-sp' }), h('span', { class: 'L-k' }, '⏰ ' + (t.startAt > Date.now() ? new Date(t.startAt).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }) : 'עכשיו'))),
+      h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, '👥 ' + t.players.length), h('span', { class: 'L-k' }, fmtName(t)), h('span', { class: 'L-sp' }), h('span', { class: 'L-prize' }, prizeLabel(t))),
+      mine ? h('span', { class: 'L-mine' }, '✓ רשום') : null));
+}
+
+// ---------- screens ----------
+function viewClubHome() {
+  const q = st.search.trim();
+  const clubs = CL.clubs.filter((c) => !q || c.name.includes(q));
+  return h('div', { class: 'L-col' },
+    h('label', { class: 'L-search' }, h('span', { 'aria-hidden': 'true' }, '🔍'), h('input', { placeholder: 'חפש מועדון', value: st.search, 'aria-label': 'חיפוש מועדון', oninput: (e) => { st.search = e.target.value; const pos = e.target.selectionStart; render(); const i = $('.L-search input'); i.focus(); i.setSelectionRange(pos, pos); } })),
+    clubs.length ? h('div', { class: 'L-list' }, clubs.map((c) => h('button', { class: 'L-club', onclick: () => go('club', { clubId: c.id }) }, logoArt(c.logo, 56),
+      h('div', {}, h('b', {}, c.name), h('span', { class: 'faint' }, `${c.members.length} חברים · ${CL.tours.filter((t) => t.clubId === c.id && t.status !== 'done').length} טורנירים פתוחים`)), h('span', { class: 'L-chev' }, '‹')))) : null,
+    h('div', { class: 'L-create' },
+      h('div', { class: 'L-createArt' }, logoArt('pair', 120), h('p', {}, 'פתח מועדון והרץ טורנירים משלך')),
+      h('button', { class: 'L-btn', onclick: () => go('clubNew') }, 'צור מועדון')),
+    h('button', { class: 'L-banner', onclick: () => go('s1') },
+      h('div', {}, h('b', {}, 'הדרך לגמר'), h('span', {}, 'שלב 1 ← שלב 2 ← גמר ← אירוע חי בתל אביב')), h('span', { class: 'L-banner-cta' }, 'התחל ›')),
+    h('div', { class: 'L-row2' },
+      h('button', { class: 'L-mini', onclick: practice }, h('b', {}, '🎯 אימון מהיר'), h('span', {}, 'כפול נגד בוט')),
+      h('button', { class: 'L-mini', onclick: () => go('guide', { guideStep: 0 }) }, h('b', {}, '⚖️ למה זה חוקי'), h('span', {}, 'החוק והסטטיסטיקה'))));
+}
+function viewClubNew() {
+  st.newClub ??= { name: '', logo: 'die' };
+  const n = st.newClub;
+  return h('div', { class: 'L-col' },
+    h('div', { class: 'L-bar' }, h('button', { class: 'L-back', onclick: () => go('home'), 'aria-label': 'חזרה' }, '›'), h('h1', {}, 'יצירת מועדון')),
+    h('label', { class: 'L-field', for: 'cname' }, 'שם המועדון', h('input', { id: 'cname', placeholder: 'למשל: המועדון של השכונה', maxlength: 24, value: n.name, oninput: (e) => { n.name = e.target.value; $('#cconfirm').disabled = n.name.trim().length < 2; } })),
+    h('div', { class: 'L-field' }, 'לוגו', h('div', { class: 'L-logos', role: 'radiogroup', 'aria-label': 'לוגו' }, LOGOS.map((L) => h('button', { class: 'L-lg' + (n.logo === L.id ? ' on' : ''), role: 'radio', 'aria-checked': String(n.logo === L.id), 'aria-label': L.id, onclick: () => { n.logo = L.id; render(); } }, logoArt(L.id, 96))))),
+    h('button', { id: 'cconfirm', class: 'L-btn wide', disabled: n.name.trim().length < 2 || null, onclick: () => {
+      const c = { id: 'c' + Math.random().toString(36).slice(2, 8), name: n.name.trim(), logo: n.logo, owner: CL.nick, members: [CL.nick], code: Math.random().toString(36).slice(2, 8).toUpperCase(), createdAt: Date.now() };
+      CL.clubs.unshift(c); saveCL(); st.newClub = null; toast('המועדון נוצר'); go('club', { clubId: c.id });
+    } }, 'אישור'));
+}
+function viewClub() {
+  const c = CL.clubs.find((x) => x.id === st.clubId); if (!c) return viewClubHome();
+  const tours = CL.tours.filter((t) => t.clubId === c.id).sort((a, b) => (a.status === 'done') - (b.status === 'done') || a.startAt - b.startAt);
+  return h('div', { class: 'L-col' },
+    h('div', { class: 'L-bar' }, h('button', { class: 'L-back', onclick: () => go('home'), 'aria-label': 'חזרה' }, '›'), h('h1', {}, c.name)),
+    h('div', { class: 'L-clubHead' }, logoArt(c.logo, 84),
+      h('div', {}, h('div', { class: 'faint' }, `מארח: ${c.owner} · ${c.members.length} חברים`),
+        h('div', { class: 'L-code' }, 'קוד הזמנה: ', h('b', { class: 'num' }, c.code)),
+        h('button', { class: 'L-link', onclick: () => { const txt = `הצטרף למועדון "${c.name}" ב${BRAND}. קוד: ${c.code}`; try { navigator.clipboard.writeText(txt).then(() => toast('ההזמנה הועתקה'), () => toast(txt)); } catch { toast(txt); } } }, 'העתק הזמנה לחברים'))),
+    h('div', { class: 'L-sec' }, h('h2', {}, 'טורנירים'), h('button', { class: 'L-btn sm', onclick: () => go('tourNew', { clubId: c.id }) }, '+ טורניר חדש')),
+    tours.length ? h('div', { class: 'L-list' }, tours.map(tourCard)) : h('p', { class: 'L-empty' }, 'עוד אין טורנירים. פתח את הראשון, קבע כניסה ועמלה, ושלח לחברים את הקוד.'));
+}
+function viewTourNew() {
+  st.newTour ??= { name: '', mode: 'duplicate', len: 1, size: 4, entry: 100, hostFee: 10, start: 0 };
+  const n = st.newTour; const c = CL.clubs.find((x) => x.id === st.clubId);
+  const lens = n.mode === 'duplicate' ? [[1, 'סבב'], [2, '2 סבבים'], [3, '3 סבבים']] : [[1, 'משחק'], [3, 'עד 3'], [5, 'עד 5'], [7, 'עד 7']];
+  if (!lens.some(([v]) => v === n.len)) n.len = lens[0][0];
+  const segs = (opts, val, set) => h('div', { class: 'L-seg', role: 'group' }, opts.map(([v, l]) => h('button', { 'aria-pressed': String(v === val), onclick: () => { set(v); render(); } }, l)));
+  const p = pot({ entry: { coins: n.entry }, size: n.size, hostFee: n.hostFee });
+  return h('div', { class: 'L-col' },
+    h('div', { class: 'L-bar' }, h('button', { class: 'L-back', onclick: () => go('club'), 'aria-label': 'חזרה' }, '›'), h('h1', {}, 'טורניר חדש')),
+    h('label', { class: 'L-field', for: 'tname' }, 'שם', h('input', { id: 'tname', maxlength: 28, placeholder: 'למשל: חמישי בערב', value: n.name, oninput: (e) => { n.name = e.target.value; } })),
+    h('div', { class: 'L-field' }, 'מצב', segs([['duplicate', 'שש בש כפול'], ['classic', 'קלאסי']], n.mode, (v) => { n.mode = v; })),
+    h('div', { class: 'L-field' }, 'אורך', segs(lens, n.len, (v) => { n.len = v; })),
+    h('div', { class: 'L-field' }, 'שחקנים', segs([[2, '2'], [4, '4'], [8, '8']], n.size, (v) => { n.size = v; })),
+    h('div', { class: 'L-field' }, 'דמי כניסה (מטבעות)', segs([[50, '50'], [100, '100'], [250, '250'], [500, '500'], [1000, '1,000']], n.entry, (v) => { n.entry = v; })),
+    h('label', { class: 'L-field', for: 'hfee' }, `עמלת מארח: ${n.hostFee}% (תקרה 15%)`, h('input', { id: 'hfee', type: 'range', min: 0, max: 15, step: 1, value: n.hostFee, oninput: (e) => { n.hostFee = Number(e.target.value); render(); $('#hfee')?.focus(); } })),
+    h('div', { class: 'L-field' }, 'התחלה', segs([[0, 'כשמתמלא'], [10, 'בעוד 10 ד׳'], [30, 'בעוד 30 ד׳'], [60, 'בעוד שעה']], n.start, (v) => { n.start = v; })),
+    h('div', { class: 'L-sum num' },
+      h('div', {}, h('span', {}, 'קופה'), h('b', {}, fmt(p.gross))),
+      h('div', {}, h('span', {}, `עמלה ${n.hostFee}%`), h('b', {}, fmt(p.fee))),
+      h('div', { class: 'sub' }, h('span', {}, '↳ למארח (70%)'), h('b', {}, fmt(p.host))),
+      h('div', { class: 'sub' }, h('span', {}, '↳ לפלטפורמה (30%)'), h('b', {}, fmt(p.platform))),
+      h('div', {}, h('span', {}, n.size > 2 ? 'פרסים: 70% / 30%' : 'למנצח'), h('b', {}, n.size > 2 ? `${fmt(Math.floor(p.net * .7))} / ${fmt(p.net - Math.floor(p.net * .7))}` : fmt(p.net)))),
+    h('p', { class: 'L-note' }, 'כרגע הכל במטבעות ללא ערך כספי. טורנירים בכסף ייפתחו רק אחרי אישור משפטי.'),
+    h('button', { class: 'L-btn wide', onclick: () => {
+      const t = { id: 't' + Math.random().toString(36).slice(2, 8), clubId: c.id, stage: 'club', name: n.name.trim() || 'טורניר ' + c.name, mode: n.mode, len: n.len, size: n.size, entry: { coins: n.entry }, hostFee: n.hostFee, prize: { coins: true }, players: [], status: 'open', bracket: null, createdAt: Date.now(), startAt: Date.now() + n.start * MIN, host: CL.nick };
+      CL.tours.unshift(t); saveCL(); st.newTour = null; toast('הטורניר נפתח'); go('tour', { tourId: t.id });
+    } }, 'פתח טורניר'));
+}
+function viewStage(stage) {
+  const titles = { s1: ['שלב 1', 'טורנירים קצרים. המנצחים עולים לשלב 2.'], s2: ['שלב 2', 'כניסה בכרטיס שלב 2. המנצח עולה לגמר.'], final: ['גמר', 'כניסה בכרטיס גמר. המנצח מקבל כרטיס לאירוע החי.'] };
+  const list = CL.tours.filter((t) => t.stage === stage).sort((a, b) => (a.status === 'done') - (b.status === 'done') || a.startAt - b.startAt);
+  const mineOnly = st.mineOnly;
+  return h('div', { class: 'L-col' },
+    h('div', { class: 'L-sec' }, h('div', {}, h('h1', { class: 'L-h1' }, titles[stage][0]), h('p', { class: 'faint' }, titles[stage][1])),
+      h('label', { class: 'L-check' }, h('input', { type: 'checkbox', checked: mineOnly || null, onchange: (e) => { st.mineOnly = e.target.checked; render(); } }), 'הטורנירים שלי')),
+    h('div', { class: 'L-list' }, list.filter((t) => !mineOnly || t.players.includes(CL.nick)).map(tourCard)));
+}
+function viewLive() {
+  const events = [
+    { name: 'אירוע חי · גמר דאבל שש תל אביב', venue: 'אולם אירועים, תל אביב (דוגמה)', date: 'ינו׳ 2027', need: 'כרטיס אירוע חי', color: '#7a1712' },
+    { name: 'טורניר הצפון', venue: 'חיפה (דוגמה)', date: 'פבר׳ 2027', need: 'כרטיס אירוע חי', color: '#1b2a3a' },
+  ];
+  return h('div', { class: 'L-col' },
+    h('div', { class: 'L-hero' }, h('b', {}, 'אירועים חיים'), h('span', {}, 'טורנירים פיזיים. מגיעים אליהם דרך הסולם, בלי לשלם.')),
+    h('h2', { class: 'L-h2' }, 'לוח אירועים'),
+    events.map((e) => h('div', { class: 'L-ev', style: `--ev:${e.color}` }, h('b', {}, e.name), h('dl', {}, h('dt', {}, 'מקום'), h('dd', {}, e.venue), h('dt', {}, 'מועד'), h('dd', {}, e.date), h('dt', {}, 'כניסה'), h('dd', { class: 'gold' }, e.need)),
+      h('button', { class: 'L-btn sm', onclick: () => (P.tickets.live ? (P.tickets.live--, save(), toast('נרשמת לאירוע! נשלח פרטים')) : toast('צריך כרטיס אירוע חי. מנצחים בגמר ומקבלים')), 'aria-label': 'הרשמה לאירוע' }, P.tickets.live ? 'הירשם עם כרטיס' : 'איך מגיעים?'))),
+    h('p', { class: 'L-note' }, 'הפרסים באירוע החי ממומנים על ידי ספונסר. אין דמי כניסה בכסף.'));
+}
+function viewMe() {
+  const row = (ic, t, sub, on) => h('button', { class: 'L-mrow', onclick: on }, h('span', { class: 'L-mic' }, ic), h('div', {}, h('b', {}, t), sub ? h('span', {}, sub) : null), h('span', { class: 'L-chev' }, '‹'));
+  return h('div', { class: 'L-col' },
+    h('div', { class: 'L-prof' }, avatar(96), h('h1', {}, CL.nick, h('button', { class: 'L-link', 'aria-label': 'שנה כינוי', onclick: () => { const v = (window.prompt?.('כינוי חדש', CL.nick) || '').trim(); if (v.length >= 2) { CL.nick = v.slice(0, 16); saveCL(); render(); } else toast('לשינוי כינוי: בגרסת השרת'); } }, ' ✎')), h('span', { class: 'L-id num' }, 'ID ' + CL.uid)),
+    h('div', { class: 'L-tickets num' }, [['s2', 'שלב 2'], ['final', 'גמר'], ['live', 'אירוע חי']].map(([k, l]) => h('div', {}, h('b', {}, P.tickets[k]), h('span', {}, 'כרטיס ' + l)))),
+    h('div', { class: 'L-menu' },
+      row('⭐', `רמה ${level(P.xp)} · דירוג ${P.rating}`, `${P.stats.wins}/${P.stats.games} ניצחונות`, () => go('me')),
+      row('🎖️', 'הישגים', `${Object.keys(P.ach).length}/${ACHIEVEMENTS.length}`, () => toast(ACHIEVEMENTS.filter((a) => P.ach[a.id]).map((a) => a.ic + ' ' + a.t).join(' · ') || 'עוד אין הישגים')),
+      row('🎨', 'לוח', SKINS.find((s) => s.id === P.skin)?.t, () => { const open = SKINS.filter((s) => level(P.xp) >= s.lv); const i = open.findIndex((s) => s.id === P.skin); P.skin = open[(i + 1) % open.length].id; save(); render(); toast('לוח: ' + SKINS.find((s) => s.id === P.skin).t); }),
+      row('🪙', 'מטבעות', `${fmt(P.coins)} · מילוי חינם כשנגמר`, () => { if (P.coins < 100 && Date.now() - P.lastRefill > 3600_000) { P.lastRefill = Date.now(); addCoins(300, 'מילוי חינם'); render(); } else toast('מילוי חינם זמין כשיש פחות מ-100 מטבעות, פעם בשעה'); }),
+      row('⚖️', 'למה זה חוקי', 'החוק, הסטטיסטיקה וניסוי חי', () => go('guide', { guideStep: 0 })),
+      row('🛡️', 'משחק אחראי', 'מגבלות והחרגה עצמית', () => toast('מגבלות והחרגה עצמית זמינות בגרסת השרת')),
+      row(audio.on ? '🔊' : '🔈', 'צלילים', audio.on ? 'פועל' : 'כבוי', () => { audio.on = !audio.on; store.set('sound', audio.on); render(); })),
+    h('button', { class: 'L-refer', onclick: () => { const txt = `בוא לשחק איתי ${BRAND} – שש בש כפול, בלי מזל. הקוד שלי: ${CL.uid}`; try { navigator.clipboard.writeText(txt).then(() => toast('ההזמנה הועתקה'), () => toast(txt)); } catch { toast(txt); } } }, h('b', {}, 'הזמן חבר'), h('span', {}, 'שניכם מקבלים 300 מטבעות כשהוא משחק את המשחק הראשון')));
+}
+
+// ---------- tournament detail & bracket play ----------
+function viewTour() {
+  const t = CL.tours.find((x) => x.id === st.tourId); if (!t) return viewClubHome();
+  const s = tourStatus(t); const mine = t.players.includes(CL.nick); const p = pot(t);
+  const back = () => (t.clubId ? go('club', { clubId: t.clubId }) : go(t.stage));
+  const canAfford = t.entry.coins != null ? P.coins >= t.entry.coins : P.tickets[t.entry.ticket] > 0;
+  const regOpen = t.status === 'open' && t.startAt - Date.now() <= 15 * MIN;
+  return h('div', { class: 'L-col' },
+    h('div', { class: 'L-bar' }, h('button', { class: 'L-back', onclick: back, 'aria-label': 'חזרה' }, '›'), h('h1', {}, t.name)),
+    h('div', { class: 'L-detail' },
+      h('div', { class: 'L-st big ' + s.cls }, h('span', { class: 'L-stl' }, s.label), s.small ? h('small', {}, s.small) : null, h('b', { class: 'num' }, s.big)),
+      h('dl', { class: 'L-dl num' },
+        h('dt', {}, 'פורמט'), h('dd', {}, fmtName(t)),
+        h('dt', {}, 'כניסה'), h('dd', {}, entryLabel(t)),
+        h('dt', {}, 'פרס'), h('dd', {}, prizeLabel(t)),
+        t.hostFee ? [h('dt', {}, 'עמלה'), h('dd', {}, `${t.hostFee}% · ${fmt(p.fee)} (מארח ${fmt(p.host)} · פלטפורמה ${fmt(p.platform)})`)] : null,
+        h('dt', {}, 'נרשמו'), h('dd', {}, t.players.join(', ') || '—'),
+        h('dt', {}, 'שובר שוויון'), h('dd', {}, 'איכות מהלכים, לא הגרלה'))),
+    t.bracket ? bracketView(t) : null,
+    t.status === 'open' && !mine ? h('button', { class: 'L-btn wide', disabled: !regOpen || !canAfford || null, onclick: () => joinTour(t) }, !regOpen ? 'ההרשמה עוד לא נפתחה' : !canAfford ? (t.entry.coins != null ? 'אין מספיק מטבעות' : 'אין לך כרטיס מתאים') : 'הירשם') : null,
+    t.status === 'open' && mine ? h('button', { class: 'L-btn wide ghost', onclick: () => leaveTour(t) }, 'בטל הרשמה') : null,
+    t.status === 'running' && t.bracket?.next ? h('button', { class: 'L-btn wide', onclick: () => playNext(t) }, `לשולחן · ${t.bracket.next.label} מול ${t.bracket.next.opp}`) : null,
+    t.result ? h('div', { class: 'L-result' }, h('b', {}, t.result.text), t.result.sub ? h('span', {}, t.result.sub) : null) : null);
+}
+function joinTour(t) {
+  if (t.entry.coins != null) { P.coins -= t.entry.coins; } else { P.tickets[t.entry.ticket]--; }
+  t.players.push(CL.nick); save(); saveCL(); sfx.coin(); render();
+  toast('נרשמת. ממלא שחקנים…');
+  setTimeout(() => fillAndStart(t), 1400);
+}
+function leaveTour(t) {
+  t.players = t.players.filter((x) => x !== CL.nick);
+  if (t.entry.coins != null) P.coins += t.entry.coins; else P.tickets[t.entry.ticket]++;
+  save(); saveCL(); render();
+}
+function fillAndStart(t) {
+  if (t.status !== 'open') return;
+  const pool = BOT_NAMES.slice().sort(() => Math.random() - .5);
+  while (t.players.length < t.size) t.players.push(pool.pop() + ' · בוט');
+  const lvls = ['beginner', 'intermediate', 'strong'];
+  t.ratings = Object.fromEntries(t.players.map((p) => [p, p === CL.nick ? P.rating : BOT_RATING[lvls[Math.floor(Math.random() * 3)]] + Math.floor(Math.random() * 120 - 60)]));
+  const order = t.players.slice().sort(() => Math.random() - .5);
+  t.bracket = { rounds: [pairUp(order)], next: null };
+  t.status = 'running'; advance(t); saveCL();
+  if (st.screen === 'tour' && st.tourId === t.id) render(); else toast(`"${t.name}" התחיל!`);
+}
+function pairUp(list) { const r = []; for (let i = 0; i < list.length; i += 2) r.push({ a: list[i], b: list[i + 1], w: null }); return r; }
+const roundLabel = (n) => ({ 1: 'גמר', 2: 'חצי גמר', 4: 'רבע גמר' }[n] || 'סיבוב');
+function simulate(m, t) { const ra = t.ratings[m.a]; const rb = t.ratings[m.b]; m.w = Math.random() < 1 / (1 + 10 ** ((rb - ra) / 400)) ? m.a : m.b; }
+function advance(t) {
+  const R = t.bracket.rounds; const cur = R[R.length - 1];
+  for (const m of cur) if (!m.w && m.a !== CL.nick && m.b !== CL.nick) simulate(m, t);
+  const mineM = cur.find((m) => !m.w && (m.a === CL.nick || m.b === CL.nick));
+  if (mineM) { t.bracket.next = { label: roundLabel(cur.length), opp: mineM.a === CL.nick ? mineM.b : mineM.a }; return; }
+  t.bracket.next = null;
+  if (cur.length === 1) return finishTour(t, cur[0]);
+  R.push(pairUp(cur.map((m) => m.w))); advance(t);
+}
+function playNext(t) {
+  const R = t.bracket.rounds; const cur = R[R.length - 1];
+  const m = cur.find((x) => !x.w && (x.a === CL.nick || x.b === CL.nick));
+  const opp = m.a === CL.nick ? m.b : m.a; const r = t.ratings[opp];
+  const lv = r >= 1720 ? 'expert' : r >= 1580 ? 'strong' : r >= 1400 ? 'intermediate' : 'beginner';
+  st.tourHook = (w) => {
+    const won = w === 'A' || (w === 'draw' && Math.random() < .5);
+    m.w = won ? CL.nick : opp; t.stage === 'club' && (P.stats.clubTours = (P.stats.clubTours || 0) + 1);
+    advance(t); saveCL(); save(); go('tour', { tourId: t.id });
   };
-  const ms = P.missions.list.map((m) => {
-    const def = MISSION_POOL.find((x) => x.id === m.id); const done = m.p >= def.n;
-    return h('div', { class: 'mission' },
-      h('div', { class: 'top' }, h('span', {}, def.t), h('span', { class: 'num faint' }, `${m.p}/${def.n}`)),
-      h('div', { class: 'prog' + (done ? ' done' : '') }, h('i', { style: `width:${(m.p / def.n) * 100}%` })),
-      done && !m.claimed ? h('button', { class: 'btn jade sm', onclick: () => { m.claimed = true; addXp(def.xp); addCoins(def.coins, 'משימה הושלמה'); checkAchievements(); render(); } }, `קבל ${def.coins} + ${def.xp} XP`)
-        : m.claimed ? h('span', { class: 'faint' }, '✓ נאסף') : h('span', { class: 'faint' }, `פרס: ${def.coins} מטבעות · ${def.xp} XP`));
-  });
-  const canRefill = P.coins < 50 && Date.now() - P.lastRefill > 3600_000;
-  return h('div', { class: 'home' },
-    h('aside', { class: 'side' },
-      h('div', { class: 'panel profile' }, h('div', { class: 'avatar' }, '★'),
-        h('div', {}, h('div', { style: 'font-weight:800' }, 'השחקן שלי'), h('div', { class: 'faint num' }, `רמה ${lv} · דירוג ${P.rating} · ${P.stats.wins}/${P.stats.games} ניצחונות`),
-          P.run >= 2 ? h('div', { style: 'color:var(--brass-hi);font-weight:800' }, `🔥 ${P.run} ברצף`) : null)),
-      h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'משימות היום'), ms),
-      h('div', { class: 'panel', style: 'display:grid;gap:6px' }, h('div', { class: 'eyebrow' }, 'מתנה יומית'),
-        h('div', { class: 'faint' }, `רצף: ${P.streak} ימים · מחר: ${DAILY[Math.min(P.streak, 6)]} מטבעות`),
-        canRefill ? h('button', { class: 'btn ghost sm', onclick: () => { P.lastRefill = Date.now(); addCoins(200, 'מילוי חינם'); render(); } }, 'מילוי חינם · 200') : null)),
-    h('section', { class: 'main' },
-      h('div', { class: 'mainhead' },
-        h('div', {}, h('div', { class: 'eyebrow' }, 'זירות'), h('h2', {}, st.homeTab === 'coins' ? 'לאן יוצאים הערב?' : 'שולחנות כסף')),
-        h('div', { class: 'tabs', role: 'group', 'aria-label': 'סוג זירה' },
-          h('button', { 'aria-pressed': String(st.homeTab === 'coins'), onclick: () => { st.homeTab = 'coins'; render(); } }, 'מטבעות'),
-          h('button', { 'aria-pressed': String(st.homeTab === 'ils'), onclick: () => { st.homeTab = 'ils'; render(); } }, '₪ כסף'))),
-      st.homeTab === 'ils' ? h('div', { class: 'notice' }, 'הדגמה: הכסף מדומה. השולחנות נפתחים לפי דירוג ומספר משחקים, לא לפי כמה הפקדת. משחקים רק בפורמטים של מיומנות. בגרסה האמיתית היריבים הם בני אדם.') : null,
-      h('div', { class: 'carousel' }, list.map(arenaCard)),
-      h('div', { class: 'quick' },
-        h('button', { class: 'qtile', onclick: practice }, h('b', {}, '🎯 אימון חופשי'), h('span', {}, 'כפול נגד בוט, בלי מטבעות')),
-        h('button', { class: 'qtile', onclick: () => go('tours') }, h('b', {}, '🏆 טורנירים'), h('span', {}, '4 שחקנים · ₪20 / ₪50')),
-        h('button', { class: 'qtile', onclick: () => go('profile') }, h('b', {}, '🎖️ הישגים ולוחות'), h('span', {}, `${Object.keys(P.ach).length}/${ACHIEVEMENTS.length} הישגים`)),
-        h('button', { class: 'qtile', onclick: () => go('wallet') }, h('b', {}, '👛 ארנק וקוד הפקדה'), h('span', {}, W$.kyc ? 'מאומת · ' + shekel(W$.balance) : 'אימות זהות')),
-        h('button', { class: 'qtile', onclick: () => { st.guideStep = 0; go('guide'); } }, h('b', {}, '⚖️ למה זה חוקי'), h('span', {}, 'החוק, הסטטיסטיקה וניסוי חי')))));
+  startMatch({ mode: t.mode, len: t.len, level: lv, oppName: opp, arena: null, label: t.name });
 }
+function finishTour(t, final) {
+  t.status = 'done'; t.doneAt = Date.now();
+  const champ = final.w; const second = final.a === champ ? final.b : final.a;
+  const iWon = champ === CL.nick; const iSecond = second === CL.nick;
+  if (t.prize.ticket) {
+    if (iWon) { P.tickets[t.prize.ticket] += t.prize.n; confetti(); sfx.win(); }
+    t.result = { text: iWon ? `🏆 ניצחת! קיבלת ${prizeLabel(t)}` : `המנצח: ${champ}`, sub: iWon ? null : 'נסה שוב בטורניר הבא' };
+  } else {
+    const p = pot(t); const first = t.size > 2 ? Math.floor(p.net * .7) : p.net; const sec = t.size > 2 ? p.net - first : 0;
+    if (iWon) { addCoins(first, 'מקום ראשון'); confetti(); sfx.win(); } else if (iSecond && sec) addCoins(sec, 'מקום שני');
+    if (t.host === CL.nick && p.host) addCoins(p.host, 'עמלת מארח');
+    t.result = { text: iWon ? `🏆 ניצחת! +${fmt(first)} מטבעות` : `המנצח: ${champ}`, sub: `פרסים: ${fmt(first)}${sec ? ' / ' + fmt(sec) : ''} · עמלה ${fmt(p.fee)}` };
+  }
+  save(); saveCL(); checkAchievements();
+}
+function bracketView(t) {
+  return h('div', { class: 'L-bracket' }, t.bracket.rounds.map((r) => h('div', { class: 'L-round' }, h('span', { class: 'faint' }, roundLabel(r.length)),
+    r.map((m) => h('div', { class: 'L-match' }, [m.a, m.b].map((p) => h('div', { class: (m.w === p ? 'w' : m.w ? 'l' : '') + (p === CL.nick ? ' me' : '') }, p)))))));
+}
+
 function maybeDaily() {
   if (P.lastDaily === today() || $('.overlay')) return;
   const yest = new Date(Date.now() - DAY).toISOString().slice(0, 10);
@@ -1201,6 +1524,8 @@ function showLevelUp(lv) {
     newArena ? h('p', {}, 'נפתחה זירה חדשה: ', h('b', {}, newArena.name)) : null, newSkin ? h('p', {}, 'נפתח לוח חדש: ', h('b', {}, newSkin.t)) : null,
     h('button', { class: 'btn', onclick: () => { $('.overlay')?.remove(); checkAchievements(); render(); } }, 'מעולה'))));
 }
+
+
 
 // =====================================================================
 // GUIDE (legal + statistics + live experiment)
@@ -1550,137 +1875,18 @@ function viewTable() {
 }
 
 // =====================================================================
-// WALLET (demo money · deposit codes instead of a terminal)
-// =====================================================================
-function validIsraeliId(id) { const s = String(id || '').replace(/\D/g, ''); if (s.length < 5 || s.length > 9) return false; const p = s.padStart(9, '0'); let sum = 0; for (let i = 0; i < 9; i++) { let d = Number(p[i]) * ((i % 2) + 1); if (d > 9) d -= 9; sum += d; } return sum % 10 === 0; }
-function ledger(kind, amount, note) { W$.balance += amount; W$.history.unshift({ at: Date.now(), kind, amount, note }); W$.history = W$.history.slice(0, 50); save(); }
-const sumKind = (kinds, ms) => W$.history.filter((x) => kinds.includes(x.kind) && Date.now() - x.at < ms).reduce((a, x) => a + x.amount, 0);
-const excluded = () => W$.excludedUntil && W$.excludedUntil > Date.now();
-function makeCode() { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; const r = crypto.getRandomValues(new Uint8Array(10)); const s = Array.from(r, (b) => A[b % A.length]).join(''); return `SB-${s.slice(0, 5)}-${s.slice(5)}`; }
-function redeem(code) {
-  code = String(code || '').trim().toUpperCase();
-  if (!W$.kyc) return toast('צריך לאמת זהות לפני הפקדה');
-  if (excluded()) return toast('החשבון בהחרגה עצמית');
-  const c = OP.codes.find((x) => x.code === code);
-  if (!c || c.used) return toast('קוד לא תקין או שכבר נוצל');
-  if (c.exp < Date.now()) return toast('תוקף הקוד פג');
-  if (W$.limits.depositDaily != null && sumKind(['deposit'], DAY) + c.amount > W$.limits.depositDaily) return toast('חריגה ממגבלת ההפקדה היומית שהגדרת');
-  c.used = Date.now(); ledger('deposit', c.amount, `הפקדה בקוד ··${code.slice(-4)}`); sfx.coin(); toast(`הופקדו ${shekel(c.amount)}`); render();
-}
-function viewWallet() {
-  const w = W$;
-  const kycPanel = w.kyc
-    ? h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'אימות זהות'), h('h3', {}, '✅ מאומת'), h('p', { class: 'muted' }, `${w.kyc.name} · ת"ז ‎•••••${w.kyc.last3}`))
-    : h('form', { class: 'panel', style: 'display:grid;gap:8px', onsubmit: (e) => {
-      e.preventDefault(); const f = e.target.elements; const name = f.kname.value.trim(); const dob = new Date(f.kdob.value);
-      if (name.split(/\s+/).length < 2) return toast('יש להזין שם פרטי ושם משפחה');
-      if (!validIsraeliId(f.kid.value)) return toast('מספר תעודת הזהות לא תקין');
-      if (!(Date.now() - dob.getTime() >= 18 * 365.2425 * DAY)) return toast('משחק בכסף מגיל 18 בלבד');
-      w.kyc = { name, last3: String(f.kid.value).slice(-3), at: Date.now() }; save(); toast('הזהות אומתה'); render();
-    } }, h('div', { class: 'eyebrow' }, 'שלב 1 · אימות זהות'),
-    h('div', { class: 'row' }, h('label', { class: 'f', for: 'kname' }, 'שם מלא', h('input', { id: 'kname', name: 'kname', required: true, autocomplete: 'name' })),
-      h('label', { class: 'f', for: 'kid' }, 'תעודת זהות', h('input', { id: 'kid', name: 'kid', inputmode: 'numeric', required: true })),
-      h('label', { class: 'f', for: 'kdob' }, 'תאריך לידה', h('input', { id: 'kdob', name: 'kdob', type: 'date', required: true }))),
-    h('div', { class: 'acts' }, h('button', { class: 'btn sm' }, 'אמת'), h('span', { class: 'faint' }, 'ת"ז לבדיקה: 000000018')));
-  return h('div', { style: 'display:grid;gap:12px' },
-    h('div', { class: 'mainhead' }, h('div', {}, h('div', { class: 'eyebrow' }, 'ארנק'), h('h2', {}, 'הארנק שלי')), h('button', { class: 'btn ghost sm', onclick: () => go('home') }, 'חזרה')),
-    h('div', { class: 'notice' }, 'עד שיחובר מסוף סליקה, ההפקדה נעשית בקוד: המפעיל מקבל תשלום (ביט, העברה או מזומן, עם קבלה), מנפיק קוד חד-פעמי, והשחקן מזין אותו כאן. בהדגמה הכסף מדומה.'),
-    h('div', { class: 'grid2' },
-      h('div', { class: 'panel', style: 'display:grid;gap:8px' },
-        h('div', { class: 'eyebrow' }, 'יתרה'), h('div', { class: 'balance num' }, shekel(w.balance)),
-        h('form', { class: 'row', onsubmit: (e) => { e.preventDefault(); redeem(e.target.elements.code.value); } },
-          h('label', { class: 'f', for: 'code' }, 'קוד הפקדה', h('input', { id: 'code', name: 'code', placeholder: 'SB-XXXXX-XXXXX', autocomplete: 'off', style: 'direction:ltr;text-align:center;letter-spacing:.08em' })),
-          h('button', { class: 'btn', style: 'flex:0' }, 'הפקד')),
-        h('div', { class: 'acts' }, h('button', { class: 'btn ghost sm', disabled: !w.kyc || w.balance < 5000, onclick: () => { ledger('withdraw', -w.balance, 'בקשת משיכה לחשבון על שם בעל החשבון'); toast('בקשת המשיכה התקבלה'); render(); } }, 'משוך הכל'), h('span', { class: 'faint' }, 'מינימום ₪50 · רק לחשבון על שמך'))),
-      kycPanel,
-      h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('div', { class: 'eyebrow' }, '🛠️ מסך מפעיל (הדגמה)'),
-        h('p', { class: 'faint' }, 'בגרסה האמיתית קודים מונפקים בממשק הניהול של השרת: קוד חד-פעמי, עם תוקף, אפשר לשייך למשתמש מסוים, ונרשם ביומן הביקורת.'),
-        h('div', { class: 'acts' }, [10000, 20000, 50000].map((a) => h('button', { class: 'btn sm', onclick: () => { const code = makeCode(); OP.codes.unshift({ code, amount: a, exp: Date.now() + 14 * DAY, used: 0 }); st.lastCode = code; save(); render(); } }, `צור קוד ${shekel(a)}`))),
-        st.lastCode ? h('div', { class: 'codebox', 'aria-label': 'הקוד שנוצר' }, st.lastCode) : null,
-        st.lastCode ? h('div', { class: 'acts' }, h('button', { class: 'btn ghost sm', onclick: () => { try { navigator.clipboard.writeText(st.lastCode).then(() => toast('הועתק'), () => toast('סמן והעתק ידנית')); } catch { toast('סמן והעתק ידנית'); } } }, 'העתק'),
-          h('button', { class: 'btn ghost sm', onclick: () => { $('#code').value = st.lastCode; $('#code').focus(); } }, 'הדבק בשדה ההפקדה')) : null,
-        h('label', { class: 'acts faint' }, h('input', { type: 'checkbox', style: 'width:auto', checked: OP.unlockAll || null, onchange: (e) => { OP.unlockAll = e.target.checked; save(); } }), 'פתח את כל הזירות להדגמה (עדיין נדרש אימות זהות)'),
-        OP.codes.length ? h('table', { class: 'hist' }, h('tbody', {}, OP.codes.slice(0, 6).map((c) => h('tr', {}, h('td', { style: 'direction:ltr;text-align:right' }, '··' + c.code.slice(-4)), h('td', {}, c.used ? 'נוצל' : 'פעיל'), h('td', {}, shekel(c.amount)))))) : null),
-      h('form', { class: 'panel', style: 'display:grid;gap:8px', onsubmit: (e) => {
-        e.preventDefault(); const f = e.target.elements; const val = (x) => (x.value === '' ? null : Math.round(Number(x.value) * 100));
-        const nd = val(f.ldep); const nl = val(f.lloss); const raise = (o, n) => o != null && (n == null || n > o);
-        if (raise(w.limits.depositDaily, nd) || raise(w.limits.lossMonthly, nl)) toast('העלאת מגבלה נכנסת לתוקף רק אחרי 24 שעות'); else toast('נשמר');
-        if (!raise(w.limits.depositDaily, nd)) w.limits.depositDaily = nd; if (!raise(w.limits.lossMonthly, nl)) w.limits.lossMonthly = nl; save(); render();
-      } }, h('div', { class: 'eyebrow' }, 'משחק אחראי'),
-      h('div', { class: 'row' }, h('label', { class: 'f', for: 'ldep' }, 'הפקדה יומית ₪', h('input', { id: 'ldep', name: 'ldep', type: 'number', min: 0, value: w.limits.depositDaily == null ? '' : w.limits.depositDaily / 100 })),
-        h('label', { class: 'f', for: 'lloss' }, 'הפסד חודשי ₪', h('input', { id: 'lloss', name: 'lloss', type: 'number', min: 0, value: w.limits.lossMonthly == null ? '' : w.limits.lossMonthly / 100 }))),
-      h('div', { class: 'acts' }, h('button', { class: 'btn sm' }, 'שמור'), h('button', { type: 'button', class: 'btn red sm', onclick: () => { w.excludedUntil = Date.now() + 7 * DAY; save(); toast('החשבון הוחרג ל-7 ימים'); render(); } }, 'החרגה עצמית · 7 ימים')),
-      excluded() ? h('div', { class: 'notice warn' }, `בהחרגה עד ${new Date(w.excludedUntil).toLocaleDateString('he-IL')}`) : null),
-      h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'תנועות'),
-        w.history.length ? h('table', { class: 'hist' }, h('tbody', {}, w.history.map((x) => h('tr', {}, h('td', {}, new Date(x.at).toLocaleDateString('he-IL')), h('td', {}, x.note), h('td', { class: x.amount >= 0 ? 'plus' : 'minus' }, (x.amount >= 0 ? '+' : '') + shekel(x.amount)))))) : h('p', { class: 'muted' }, 'אין עדיין תנועות.'))));
-}
-
-// =====================================================================
-// PROFILE: achievements + skins
-// =====================================================================
-function viewProfile() {
-  const lv = level(P.xp);
-  return h('div', { style: 'display:grid;gap:12px' },
-    h('div', { class: 'mainhead' }, h('div', {}, h('div', { class: 'eyebrow' }, 'פרופיל'), h('h2', {}, `רמה ${lv} · דירוג ${P.rating}`)), h('button', { class: 'btn ghost sm', onclick: () => go('home') }, 'חזרה')),
-    h('div', { class: 'panel' }, h('div', { class: 'eyebrow', style: 'margin-bottom:8px' }, `הישגים · ${Object.keys(P.ach).length}/${ACHIEVEMENTS.length}`),
-      h('div', { class: 'badges' }, ACHIEVEMENTS.map((a) => h('div', { class: 'badgec' + (P.ach[a.id] ? '' : ' off') }, h('span', { class: 'ic' }, a.ic), h('b', {}, a.t), h('span', {}, a.d))))),
-    h('div', { class: 'panel' }, h('div', { class: 'eyebrow', style: 'margin-bottom:8px' }, 'לוחות (נפתחים ברמות, לא בקנייה)'),
-      h('div', { class: 'skins' }, SKINS.map((sk) => { const open = lv >= sk.lv; return h('button', { class: 'skin' + (open ? '' : ' off'), 'aria-pressed': String(P.skin === sk.id), onclick: () => { if (!open) return toast(`נפתח ברמה ${sk.lv}`); P.skin = sk.id; save(); render(); } },
-        h('div', { class: 'sw' }, h('i', { style: `background:${sk.frame[0]}` }), h('i', { style: `background:${sk.field[0]}` }), h('i', { style: `background:${sk.a[0]}` }), h('i', { style: `background:${sk.b[0]}` })), open ? sk.t : `🔒 ${sk.t} · רמה ${sk.lv}`); })),
-      h('div', { class: 'acts', style: 'margin-top:10px' }, h('span', { class: 'faint' }, 'קוביות:'),
-        h('button', { class: 'btn ghost sm', 'aria-pressed': String(P.dice === 'ivory'), onclick: () => { P.dice = 'ivory'; save(); render(); } }, 'שנהב'),
-        h('button', { class: 'btn ghost sm', disabled: !P.ach.gam, 'aria-pressed': String(P.dice === 'gold'), onclick: () => { P.dice = 'gold'; save(); render(); } }, P.ach.gam ? 'זהב' : '🔒 זהב (הישג "גמון")'))),
-    h('div', { class: 'panel' }, h('div', { class: 'eyebrow' }, 'סטטיסטיקה'),
-      h('dl', { class: 'kv num' }, ...[['משחקים', P.stats.games], ['ניצחונות', P.stats.wins], ['ניצחונות בכפול', P.stats.dupWins], ['תיקו בכפול', P.stats.dupTies], ['גמון', P.stats.gammons], ['הכאות', P.stats.hits], ['רצף שיא', P.bestRun]].flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, fmt(v))]))));
-}
-
-// =====================================================================
-// CASH TOURNAMENTS (demo)
-// =====================================================================
-const TOURS = [{ id: 'dup20', name: 'כפול ₪20', mode: 'duplicate', len: 2, fee: 2000, desc: 'שש בש כפול · 2 סבבים' }, { id: 'c7_50', name: 'מאץ\' ₪50', mode: 'classic', len: 7, fee: 5000, desc: 'מאץ\' עד 7 עם קוביית הכפלה' }];
-const OPPS = [['דני', 'intermediate'], ['מאיה', 'strong'], ['יוסי', 'beginner'], ['רונית', 'intermediate'], ['אבי', 'strong'], ['נועה', 'beginner']];
-function plan(fee) { const pool = fee * 4; const rake = Math.floor(pool * RAKE / 100); const net = pool - rake; const first = Math.floor(net * .7); const second = net - first; const tax = (g) => Math.floor(Math.max(0, g - fee) * TAX); return { pool, rake, net, first, second, tax1: tax(first), tax2: tax(second) }; }
-function viewTours() {
-  const t = st.tour;
-  if (t) return tourProgress(t);
-  return h('div', { style: 'display:grid;gap:12px' },
-    h('div', { class: 'mainhead' }, h('div', {}, h('div', { class: 'eyebrow' }, 'טורנירים'), h('h2', {}, 'טורנירים על כסף')), h('button', { class: 'btn ghost sm', onclick: () => go('home') }, 'חזרה')),
-    h('div', { class: 'notice' }, 'הדגמה: הכסף מדומה, והיריבים הם בוטים עם שמות. בגרסה האמיתית משחקים רק מול בני אדם.'),
-    h('div', { class: 'grid2' }, TOURS.map((tt) => { const pp = plan(tt.fee); return h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('div', { class: 'eyebrow' }, '4 שחקנים · הדחה'), h('h3', { style: 'font-family:var(--display);font-size:1.4rem' }, tt.name), h('div', { class: 'muted' }, tt.desc),
-      h('dl', { class: 'kv num' }, h('dt', {}, 'דמי כניסה'), h('dd', {}, shekel(tt.fee)), h('dt', {}, 'קופה'), h('dd', {}, shekel(pp.pool)), h('dt', {}, `עמלה ${RAKE}%`), h('dd', {}, shekel(pp.rake)), h('dt', {}, 'מקום 1'), h('dd', {}, `${shekel(pp.first)} (נטו ${shekel(pp.first - pp.tax1)})`), h('dt', {}, 'מקום 2'), h('dd', {}, `${shekel(pp.second)} (נטו ${shekel(pp.second - pp.tax2)})`)),
-      h('button', { class: 'btn', onclick: () => joinTour(tt) }, `הירשם · ${shekel(tt.fee)}`)); })));
-}
-function joinTour(tt) {
-  if (!W$.kyc) { toast('צריך לאמת זהות'); return go('wallet'); }
-  if (excluded()) return toast('החשבון בהחרגה עצמית');
-  if (W$.balance < tt.fee) { toast('אין מספיק יתרה. הזן קוד הפקדה'); return go('wallet'); }
-  ledger('entry', -tt.fee, `דמי כניסה · ${tt.name}`);
-  const ops = OPPS.slice().sort(() => Math.random() - .5).slice(0, 3).map(([name, lv]) => ({ name, level: lv }));
-  st.tour = { def: tt, opps: ops, stage: 'semi', semi2: Math.random() < .5 ? ops[1] : ops[2], result: null }; render();
-}
-function tourProgress(t) {
-  const [o1] = t.opps; const pp = plan(t.def.fee);
-  const play = (opp, label, done) => { st.tourHook = done; startMatch({ mode: t.def.mode, len: t.def.len, level: opp.level, oppName: opp.name, arena: null, label }); };
-  const semi = () => play(o1, t.def.name, (w) => { t.stage = (w === 'A' || (w === 'draw' && Math.random() < .5)) ? 'final' : 'done'; if (t.stage === 'done') t.result = { place: 0 }; st.screen = 'tours'; render(); });
-  const final = () => play(t.semi2, t.def.name + ' · גמר', (w) => { const won = w === 'A' || (w === 'draw' && Math.random() < .5); const gross = won ? pp.first : pp.second; const tax = won ? pp.tax1 : pp.tax2; ledger('prize', gross - tax, `מקום ${won ? 1 : 2} · ${t.def.name}`); t.stage = 'done'; t.result = { place: won ? 1 : 2, gross, tax }; if (won) { confetti(); sfx.win(); } st.screen = 'tours'; render(); });
-  return h('div', { class: 'grid2' },
-    h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('div', { class: 'eyebrow' }, 'טורניר פעיל'), h('h2', { style: 'font-family:var(--display);font-size:1.8rem' }, t.def.name), h('div', { class: 'num muted' }, `קופה ${shekel(pp.pool)} · ${t.opps.map((o) => o.name).join(', ')}`),
-      t.stage === 'semi' ? [h('b', {}, `חצי גמר מול ${o1.name}`), h('button', { class: 'btn', onclick: semi }, 'לשולחן')] : null,
-      t.stage === 'final' ? [h('b', {}, `גמר מול ${t.semi2.name}`), h('button', { class: 'btn', onclick: final }, 'לגמר')] : null),
-    t.stage === 'done' ? h('div', { class: 'panel', style: 'display:grid;gap:8px' }, h('h3', { style: 'font-family:var(--display);font-size:1.5rem;color:var(--brass-hi)' }, t.result.place === 1 ? '🏆 זכית!' : t.result.place === 2 ? 'מקום שני' : 'הודחת בחצי הגמר'),
-      h('dl', { class: 'kv num' }, h('dt', {}, 'קופה'), h('dd', {}, shekel(pp.pool)), h('dt', {}, `עמלה ${RAKE}%`), h('dd', {}, '−' + shekel(pp.rake)), t.result.place ? [h('dt', {}, 'פרס'), h('dd', {}, shekel(t.result.gross)), h('dt', {}, `מס ${TAX * 100}% מהרווח`), h('dd', {}, '−' + shekel(t.result.tax)), h('dt', {}, 'לארנק'), h('dd', { style: 'color:var(--brass-hi)' }, shekel(t.result.gross - t.result.tax))] : null),
-      h('div', { class: 'acts' }, h('button', { class: 'btn', onclick: () => { st.tour = null; render(); } }, 'לטורנירים'), h('button', { class: 'btn ghost', onclick: () => go('home') }, 'ללובי'))) : null);
-}
-
-// =====================================================================
 // boot
 // =====================================================================
 $('#portrait-ok').addEventListener('click', () => document.body.classList.add('portrait-ok'));
 addEventListener('keydown', (e) => { if (e.key === 'Escape') { G.selected = null; if (st.screen === 'table') render(); } });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (st.screen === 'table') render(); }, 150); });
+setInterval(() => { if (['s1', 's2', 'final', 'club', 'tour'].includes(st.screen) && !$('.overlay') && document.activeElement?.tagName !== 'INPUT') render(); }, 1000);
+seedSystem();
 ensureMissions();
 render();
-if (st.screen === 'home') setTimeout(maybeDaily, 500);
+function ledger() {}
+const excluded = () => false;
+const sumKind = () => 0;
 </script>
 
 </body>
