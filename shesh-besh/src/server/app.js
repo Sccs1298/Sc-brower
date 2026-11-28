@@ -18,17 +18,17 @@ const MODES = {
 
 export const TOURNAMENT_TYPES = {
   // Free practice: no entry, bots may fill empty seats, prize = trophy + rating only.
-  'free-dup': { name: 'טורניר אימון – שש בש כפול (חינם)', currency: 'POINTS', mode: 'duplicate', length: 1, size: 4, entryFee: 0, botFill: true, payout: [] },
+  'free-dup': { name: 'טורניר אימון – משחק אחד (חינם)', currency: 'POINTS', mode: 'classic', length: 1, size: 4, entryFee: 0, botFill: true, payout: [] },
   // Beta-points tournament: humans only, entry in BETA POINTS (no monetary value),
   // fixed published prize split, 10% "rake" simulated to test the accounting flow.
-  'points-dup': { name: 'טורניר נקודות בטא – שש בש כפול', currency: 'POINTS', mode: 'duplicate', length: 2, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
+  'points-dup': { name: 'טורניר נקודות בטא – מאץ\' עד 3', currency: 'POINTS', mode: 'classic', length: 3, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
   'points-classic7': { name: 'טורניר נקודות בטא – מאץ\' עד 7', currency: 'POINTS', mode: 'classic', length: 7, size: 4, entryFee: 100, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
   // Ladder (no money): Stage 1 → ticket to Stage 2 → ticket to Final → ticket to a live event.
-  's1-dup': { name: 'שלב 1 · שש בש כפול', stage: 's1', currency: 'POINTS', mode: 'duplicate', length: 1, size: 4, entryFee: 100, botFill: true, payout: [], prizeTicket: 's2' },
-  's2-dup': { name: 'שלב 2 · כפול 2 סבבים', stage: 's2', currency: 'POINTS', mode: 'duplicate', length: 2, size: 4, entryFee: 0, entryTicket: 's2', botFill: false, payout: [], prizeTicket: 'final' },
-  'final-dup': { name: 'גמר · כפול 2 סבבים', stage: 'final', currency: 'POINTS', mode: 'duplicate', length: 2, size: 8, entryFee: 0, entryTicket: 'final', botFill: false, payout: [], prizeTicket: 'live' },
+  's1-dup': { name: 'שלב 1 · מאץ\' עד 3', stage: 's1', currency: 'POINTS', mode: 'classic', length: 3, size: 4, entryFee: 100, botFill: true, payout: [], prizeTicket: 's2' },
+  's2-dup': { name: 'שלב 2 · מאץ\' עד 5', stage: 's2', currency: 'POINTS', mode: 'classic', length: 5, size: 4, entryFee: 0, entryTicket: 's2', botFill: false, payout: [], prizeTicket: 'final' },
+  'final-dup': { name: 'גמר · מאץ\' עד 7', stage: 'final', currency: 'POINTS', mode: 'classic', length: 7, size: 8, entryFee: 0, entryTicket: 'final', botFill: false, payout: [], prizeTicket: 'live' },
   // Real-money (ILS, agorot). Created only when the real-money gate is open. Humans only, skill formats only.
-  'cash-dup': { name: 'טורניר ₪20 – שש בש כפול (2 סבבים)', currency: 'ILS', mode: 'duplicate', length: 2, size: 4, entryFee: 2000, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
+  'cash-dup': { name: 'טורניר ₪20 – מאץ\' עד 7', currency: 'ILS', mode: 'classic', length: 7, size: 4, entryFee: 2000, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
   'cash-classic7': { name: 'טורניר ₪50 – מאץ\' עד 7', currency: 'ILS', mode: 'classic', length: 7, size: 4, entryFee: 5000, botFill: false, rakePct: 10, payout: [0.7, 0.3] },
 };
 for (const [k, t] of Object.entries(TOURNAMENT_TYPES)) {
@@ -40,12 +40,12 @@ for (const [k, t] of Object.entries(TOURNAMENT_TYPES)) {
 // Cash arenas (ILS) unlock by RATING and games played — never by spending — and use skill formats only.
 export const ARENAS = [
   { id: 'cafe', name: 'קפה השכונה', currency: 'POINTS', entry: 50, mode: 'classic', length: 3, minLevel: 1, rakePct: 10 },
-  { id: 'shuk', name: 'שוק הכרמל', currency: 'POINTS', entry: 200, mode: 'duplicate', length: 1, minLevel: 3, rakePct: 10 },
+  { id: 'shuk', name: 'שוק הכרמל', currency: 'POINTS', entry: 200, mode: 'classic', length: 3, minLevel: 3, rakePct: 10 },
   { id: 'yafo', name: 'נמל יפו', currency: 'POINTS', entry: 1000, mode: 'classic', length: 5, minLevel: 6, rakePct: 10 },
-  { id: 'roof', name: 'גג רוטשילד', currency: 'POINTS', entry: 5000, mode: 'duplicate', length: 2, minLevel: 10, rakePct: 10 },
-  { id: 'ils10', name: 'שולחן ₪10', currency: 'ILS', entry: 1000, mode: 'duplicate', length: 2, minRating: 0, rakePct: 10 },
+  { id: 'roof', name: 'גג רוטשילד', currency: 'POINTS', entry: 5000, mode: 'classic', length: 7, minLevel: 10, rakePct: 10 },
+  { id: 'ils10', name: 'שולחן ₪10', currency: 'ILS', entry: 1000, mode: 'classic', length: 7, minRating: 0, rakePct: 10 },
   { id: 'ils25', name: 'שולחן ₪25', currency: 'ILS', entry: 2500, mode: 'classic', length: 7, minRating: 1550, rakePct: 10 },
-  { id: 'ils50', name: 'שולחן ₪50', currency: 'ILS', entry: 5000, mode: 'duplicate', length: 2, minRating: 1600, rakePct: 10 },
+  { id: 'ils50', name: 'שולחן ₪50', currency: 'ILS', entry: 5000, mode: 'classic', length: 7, minRating: 1600, rakePct: 10 },
   { id: 'ils100', name: 'שולחן ₪100', currency: 'ILS', entry: 10000, mode: 'classic', length: 7, minRating: 1700, rakePct: 10 },
 ];
 for (const a of ARENAS) if (a.currency === 'ILS' && !isSkillFormat(a.mode, a.length)) throw new Error(`cash arena ${a.id} must use a skill format`);
@@ -692,6 +692,7 @@ export class App {
   createClubTournament(u, { clubId, name, mode, length, size, entryFee, hostFeePct }) {
     const c = this._clubs()[clubId];
     if (!c || c.ownerId !== u.id) throw new Error('רק המארח יכול לפתוח טורניר במועדון');
+    mode = 'classic'; // product plays regular backgammon only
     this._validMode(mode, length);
     size = Number(size); entryFee = Math.floor(Number(entryFee) || 0); hostFeePct = Math.floor(Number(hostFeePct) || 0);
     if (![2, 4, 8].includes(size)) throw new Error('מספר שחקנים לא חוקי');

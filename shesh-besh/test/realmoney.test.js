@@ -156,7 +156,7 @@ test('cash arena: holds, pot to winner minus fee and tax, cancel refunds', async
   app.joinArena(a, { arenaId: 'ils10' });
   assert.equal(app.joinArena(b, { arenaId: 'ils10' }).matched, true);
   const s = [...app.sessions.values()].find((x) => !x.ended);
-  assert.equal(s.config.mode, 'duplicate'); assert.ok(s.config.length >= 2);
+  assert.equal(s.config.mode, 'classic'); assert.ok(s.config.length >= 7);
   // A seat = a (first in queue). a resigns everything → b wins.
   resignAll(app, a, s.id);
   const pot = 2000; const fee = 200; const gross = 1800; const tax = Math.floor((gross - 1000) * 0.25);

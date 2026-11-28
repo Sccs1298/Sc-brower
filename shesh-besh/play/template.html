@@ -466,7 +466,7 @@ body.on-table .topbar { display: none; }
 .T-pot { display: grid; justify-items: center; gap: 0; padding: 4px 18px; border-radius: 0 0 16px 16px; background: #0b1226; border: 1px solid #2c3f73; border-top: 0; }
 .T-pot > b, .T-pot { font-family: var(--display); font-size: 1.25rem; } .T-pot .coin { width: 22px; height: 22px; vertical-align: -4px; } .T-pot small { font-family: var(--body); font-size: .72rem; color: #9fb0e0; }
 .T-pot { grid-auto-flow: row; } .T-pot > :first-child { display: inline-flex; }
-.T-mid { display: grid; grid-template-columns: minmax(64px, 140px) minmax(0, 1fr) 64px; gap: 10px; min-height: 0; }
+.T-mid { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; gap: 10px; min-height: 0; }
 .T-left, .T-right { display: flex; flex-direction: column; align-items: center; gap: 10px; justify-content: center; min-height: 0; }
 .T-cube { width: 48px; height: 48px; border-radius: 10px; background: linear-gradient(145deg, #f4f1ea, #c9c3b6); color: #3a3530; font-family: var(--display); font-size: 1.2rem; display: grid; place-items: center; box-shadow: 0 6px 12px rgba(0,0,0,.5); }
 .T-mini { display: grid; gap: 4px; justify-items: center; padding: 6px; border-radius: 12px; background: rgba(255,255,255,.06); border: 1px solid #2c3f73; color: #cfd8ff; font-size: .78rem; font-weight: 800; width: 100%; }
@@ -489,7 +489,7 @@ body.on-table .topbar { display: none; }
 .T-tut b { color: #e08a00; font-family: var(--display); font-size: 1rem; } .T-tut button { pointer-events: auto; white-space: nowrap; justify-self: start; color: #2667d8; font-weight: 800; padding: 0; }
 svg.board .sdie { transform-box: fill-box; transform-origin: center; }
 svg.board .sdie.roll { animation: tumble .55s cubic-bezier(.3,1.4,.5,1); }
-@media (max-height: 480px) { .V.res { gap: 6px; } .R-star, .R-why { display: none; } .R-p .V-ring { width: 64px; } .R-p .V-coin { display: none; } .R-mid h2 { font-size: 1.7rem; } .R-score { font-size: 2rem; } .R-xpbar { width: 120px; } .btn.big { font-size: 1.1rem; padding: 10px 28px; } .T-av { width: 44px; height: 44px; border-width: 3px; } .T-rb { width: 42px; height: 42px; } .T-mid { grid-template-columns: minmax(56px, 110px) minmax(0, 1fr) 48px; gap: 6px; } .T-top { padding: 4px 10px; } .T-stripes { height: 10px; } .T-pot > b, .T-pot { font-size: 1rem; } .V-foot p { display: none; } }
+@media (max-height: 480px) { .V.res { gap: 6px; } .R-star, .R-why { display: none; } .R-p .V-ring { width: 64px; } .R-p .V-coin { display: none; } .R-mid h2 { font-size: 1.7rem; } .R-score { font-size: 2rem; } .R-xpbar { width: 120px; } .btn.big { font-size: 1.1rem; padding: 10px 28px; } .T-av { width: 44px; height: 44px; border-width: 3px; } .T-rb { width: 42px; height: 42px; } .T-mid { grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 6px; } .T-top { padding: 4px 10px; } .T-stripes { height: 10px; } .T-pot > b, .T-pot { font-size: 1rem; } .V-foot p { display: none; } }
 @media (orientation: portrait) { .T { height: auto; } .T-mid { grid-template-columns: 1fr; } .T-left, .T-right { flex-direction: row; flex-wrap: wrap; } .T-mini { width: 140px; } .T-board > svg.board { width: 100%; height: auto; } .V { grid-template-columns: 1fr; grid-template-rows: auto; overflow-y: auto; } }
 
 </style>
@@ -514,12 +514,12 @@ const STUDY = { intermediate: { single: 72.1, match7: 97.0, dup3: 88.3, weakSing
 const BOT_RATING = { beginner: 1300, intermediate: 1500, strong: 1650, expert: 1800 };
 const ARENAS = [
   { id: 'cafe', name: 'קפה השכונה', cur: 'coins', entry: 50, mode: 'classic', len: 3, minLevel: 1, bot: 'beginner', scene: 'cafe', opp: ['שמעון מהמכולת', 'רחל מהקומה השנייה', 'מוטי הדוור'] },
-  { id: 'shuk', name: 'שוק הכרמל', cur: 'coins', entry: 200, mode: 'duplicate', len: 1, minLevel: 3, bot: 'intermediate', scene: 'shuk', opp: ['אבי מהדוכן', 'סיגל התבלינים', 'ג׳קי הפירות'] },
+  { id: 'shuk', name: 'שוק הכרמל', cur: 'coins', entry: 200, mode: 'classic', len: 3, minLevel: 3, bot: 'intermediate', scene: 'shuk', opp: ['אבי מהדוכן', 'סיגל התבלינים', 'ג׳קי הפירות'] },
   { id: 'yafo', name: 'נמל יפו', cur: 'coins', entry: 1000, mode: 'classic', len: 5, minLevel: 6, bot: 'strong', scene: 'yafo', opp: ['קפטן נסים', 'דורית מהמזח', 'אלברט הדייג'] },
-  { id: 'roof', name: 'גג רוטשילד', cur: 'coins', entry: 5000, mode: 'duplicate', len: 2, minLevel: 10, bot: 'expert', scene: 'roof', opp: ['ליאור המשקיע', 'מאיה מהסטארטאפ', 'ד״ר גל'] },
-  { id: 'ils10', name: 'שולחן ₪10', cur: 'ils', entry: 1000, mode: 'duplicate', len: 2, minRating: 0, bot: 'strong', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
+  { id: 'roof', name: 'גג רוטשילד', cur: 'coins', entry: 5000, mode: 'classic', len: 7, minLevel: 10, bot: 'expert', scene: 'roof', opp: ['ליאור המשקיע', 'מאיה מהסטארטאפ', 'ד״ר גל'] },
+  { id: 'ils10', name: 'שולחן ₪10', cur: 'ils', entry: 1000, mode: 'classic', len: 7, minRating: 0, bot: 'strong', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
   { id: 'ils25', name: 'שולחן ₪25', cur: 'ils', entry: 2500, mode: 'classic', len: 7, minRating: 1550, bot: 'strong', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
-  { id: 'ils50', name: 'שולחן ₪50', cur: 'ils', entry: 5000, mode: 'duplicate', len: 2, minRating: 1600, bot: 'expert', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
+  { id: 'ils50', name: 'שולחן ₪50', cur: 'ils', entry: 5000, mode: 'classic', len: 7, minRating: 1600, bot: 'expert', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
   { id: 'ils100', name: 'שולחן ₪100', cur: 'ils', entry: 10000, mode: 'classic', len: 7, minRating: 1700, bot: 'expert', scene: 'gold', opp: ['יריב · בוט הדגמה'] },
 ];
 const RAKE = 10; const TAX = 0.25; const CASH_MIN_GAMES = 10;
@@ -527,7 +527,7 @@ const DAILY = [100, 125, 150, 175, 200, 225, 250];
 const MISSION_POOL = [
   { id: 'play3', t: 'שחק 3 משחקים', ev: 'games', n: 3, coins: 120, xp: 30 },
   { id: 'win2', t: 'נצח 2 משחקים', ev: 'wins', n: 2, coins: 180, xp: 40 },
-  { id: 'dup1', t: 'נצח סבב שש בש כפול', ev: 'dupWins', n: 1, coins: 200, xp: 50 },
+  { id: 'dup1', t: 'נצח מאץ\' עד 3 ומעלה', ev: 'longWins', n: 1, coins: 200, xp: 50 },
   { id: 'hit5', t: 'הכה 5 כלים של היריב', ev: 'hits', n: 5, coins: 120, xp: 30 },
   { id: 'off30', t: 'הוצא 30 כלים מהלוח', ev: 'borne', n: 30, coins: 150, xp: 35 },
   { id: 'arena2', t: 'שחק 2 משחקים בזירה', ev: 'arenaGames', n: 2, coins: 150, xp: 40 },
@@ -537,7 +537,7 @@ const ACHIEVEMENTS = [
   { id: 'first', ic: '🎲', t: 'ניצחון ראשון', d: 'נצח משחק אחד', test: (p) => p.stats.wins >= 1 },
   { id: 'ten', ic: '🔟', t: 'עשירייה', d: '10 ניצחונות', test: (p) => p.stats.wins >= 10 },
   { id: 'fifty', ic: '🏅', t: 'חמישים', d: '50 ניצחונות', test: (p) => p.stats.wins >= 50 },
-  { id: 'twin', ic: '♊', t: 'תאומים', d: 'סיים סבב כפול בתיקו', test: (p) => p.stats.dupTies >= 1 },
+  { id: 'twin', ic: '♊', t: 'מהפך', d: 'נצח מאץ\' אחרי שפיגרת', test: (p) => (p.stats.comebacks || 0) >= 1 },
   { id: 'gam', ic: '⚡', t: 'גמון', d: 'נצח בגמון', test: (p) => p.stats.gammons >= 1 },
   { id: 'bg', ic: '💥', t: 'בקגמון', d: 'נצח בבקגמון', test: (p) => p.stats.backgammons >= 1 },
   { id: 'hitter', ic: '🎯', t: 'צלף', d: 'הכה 50 כלים', test: (p) => p.stats.hits >= 50 },
@@ -934,13 +934,13 @@ function seedSystem() {
   // Rolling schedule for the ladder (demo): stage tournaments are recreated as they finish.
   const now = Date.now();
   const want = [
-    { stage: 's1', name: 'מהיר · כפול', mode: 'duplicate', len: 1, size: 4, entry: { coins: 100 }, prize: { ticket: 's2', n: 1 }, at: 0 },
+    { stage: 's1', name: 'מהיר · משחק אחד', mode: 'classic', len: 1, size: 4, entry: { coins: 100 }, prize: { ticket: 's2', n: 1 }, at: 0 },
     { stage: 's1', name: 'קלאסי עד 3', mode: 'classic', len: 3, size: 4, entry: { coins: 100 }, prize: { ticket: 's2', n: 1 }, at: 0 },
-    { stage: 's1', name: 'כפול · 8 שחקנים', mode: 'duplicate', len: 1, size: 8, entry: { coins: 150 }, prize: { ticket: 's2', n: 2 }, at: 25 },
+    { stage: 's1', name: '8 שחקנים · עד 3', mode: 'classic', len: 3, size: 8, entry: { coins: 150 }, prize: { ticket: 's2', n: 2 }, at: 25 },
     { stage: 's1', name: 'ערב קלאסי', mode: 'classic', len: 3, size: 8, entry: { coins: 150 }, prize: { ticket: 's2', n: 2 }, at: 55 },
-    { stage: 's2', name: 'לפי דרישה · כפול', mode: 'duplicate', len: 2, size: 4, entry: { ticket: 's2' }, prize: { ticket: 'final', n: 1 }, at: 0 },
+    { stage: 's2', name: 'לפי דרישה · עד 3', mode: 'classic', len: 3, size: 4, entry: { ticket: 's2' }, prize: { ticket: 'final', n: 1 }, at: 0 },
     { stage: 's2', name: 'לפי דרישה · עד 5', mode: 'classic', len: 5, size: 4, entry: { ticket: 's2' }, prize: { ticket: 'final', n: 1 }, at: 0 },
-    { stage: 'final', name: 'גמר דצמבר', mode: 'duplicate', len: 2, size: 8, entry: { ticket: 'final' }, prize: { ticket: 'live', n: 1 }, at: 0 },
+    { stage: 'final', name: 'גמר דצמבר', mode: 'classic', len: 7, size: 8, entry: { ticket: 'final' }, prize: { ticket: 'live', n: 1 }, at: 0 },
   ];
   for (const w of want) {
     if (CL.tours.some((t) => !t.clubId && t.stage === w.stage && t.name === w.name && t.status !== 'done')) continue;
@@ -958,7 +958,7 @@ function tourStatus(t) {
   return t.players.length ? { cls: 'reg', label: 'נרשמים', big: `${t.players.length}/${t.size}` } : { cls: 'reg', label: 'לפי דרישה', big: `0/${t.size}` };
 }
 const clock = (ms) => { const m = Math.max(0, Math.floor(ms / MIN)); return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m}:${String(Math.floor((ms % MIN) / 1000)).padStart(2, '0')}`; };
-const fmtName = (t) => `${t.mode === 'duplicate' ? `כפול${t.len > 1 ? ' ×' + t.len : ''}` : `עד ${t.len}`} · ${t.size} שחקנים`;
+const fmtName = (t) => `${t.len > 1 ? `עד ${t.len}` : 'משחק אחד'} · ${t.size} שחקנים`;
 const entryLabel = (t) => (t.entry.coins != null ? [coinSVG(), ' ' + fmt(t.entry.coins)] : `🎟️ כרטיס ${t.entry.ticket === 's2' ? 'שלב 2' : 'גמר'}`);
 const prizeLabel = (t) => (t.prize.ticket ? `${t.prize.n > 1 ? t.prize.n + '× ' : ''}כרטיס ${{ s2: 'שלב 2', final: 'גמר', live: 'אירוע חי' }[t.prize.ticket]}` : `🏆 ${fmt(pot(t).net)}`);
 function pot(t) { const gross = (t.entry.coins || 0) * t.size; const fee = Math.floor((gross * (t.hostFee || 0)) / 100); return { gross, fee, host: Math.round(fee * 0.7), platform: fee - Math.round(fee * 0.7), net: gross - fee }; }
@@ -993,8 +993,8 @@ function viewClubHome() {
     ONLINE ? h('form', { class: 'L-search', onsubmit: (e) => { e.preventDefault(); const v = e.target.elements.jc.value.trim(); if (v) { st.pendingClub = true; netSend({ t: 'joinClub', code: v }); } } },
       LI('key-round'), h('input', { name: 'jc', placeholder: 'יש לך קוד מועדון? הזן כאן', 'aria-label': 'קוד מועדון', autocomplete: 'off', style: 'text-transform:uppercase' }), h('button', { class: 'L-btn sm' }, 'הצטרף')) : null,
     h('div', { class: 'L-row2' },
-      ONLINE ? h('button', { class: 'L-mini', onclick: () => { if (NET.queued) { netSend({ t: 'cancelQueue' }); NET.queued = false; render(); } else netSend({ t: 'queue', mode: 'duplicate', length: 1, clientSeed: seedHex() }); } }, h('b', {}, LI(NET.queued ? 'hourglass' : 'swords'), NET.queued ? ' מחפש… (ביטול)' : ' מול שחקן'), h('span', {}, 'כפול · יריב אמיתי')) : null,
-      h('button', { class: 'L-mini', onclick: practice }, h('b', {}, LI('target'), ' אימון מהיר'), h('span', {}, 'כפול נגד בוט')),
+      ONLINE ? h('button', { class: 'L-mini', onclick: () => { if (NET.queued) { netSend({ t: 'cancelQueue' }); NET.queued = false; render(); } else netSend({ t: 'queue', mode: 'classic', length: 1, clientSeed: seedHex() }); } }, h('b', {}, LI(NET.queued ? 'hourglass' : 'swords'), NET.queued ? ' מחפש… (ביטול)' : ' מול שחקן'), h('span', {}, 'משחק אחד · יריב אמיתי')) : null,
+      h('button', { class: 'L-mini', onclick: practice }, h('b', {}, LI('target'), ' אימון מהיר'), h('span', {}, 'משחק אחד נגד בוט')),
       h('button', { class: 'L-mini', onclick: () => go('guide', { guideStep: 0 }) }, h('b', {}, LI('scale'), ' למה זה חוקי'), h('span', {}, 'החוק והסטטיסטיקה'))));
 }
 function viewClubNew() {
@@ -1024,16 +1024,15 @@ function viewClub() {
     tours.length ? h('div', { class: 'L-list' }, tours.map(tourCard)) : h('p', { class: 'L-empty' }, 'עוד אין טורנירים. פתח את הראשון, קבע כניסה ועמלה, ושלח לחברים את הקוד.'));
 }
 function viewTourNew() {
-  st.newTour ??= { name: '', mode: 'duplicate', len: 1, size: 4, entry: 100, hostFee: 10, start: 0 };
+  st.newTour ??= { name: '', mode: 'classic', len: 3, size: 4, entry: 100, hostFee: 10, start: 0 };
   const n = st.newTour; const c = CL.clubs.find((x) => x.id === st.clubId);
-  const lens = n.mode === 'duplicate' ? [[1, 'סבב'], [2, '2 סבבים'], [3, '3 סבבים']] : [[1, 'משחק'], [3, 'עד 3'], [5, 'עד 5'], [7, 'עד 7']];
+  n.mode = 'classic'; const lens = [[1, 'משחק'], [3, 'עד 3'], [5, 'עד 5'], [7, 'עד 7']];
   if (!lens.some(([v]) => v === n.len)) n.len = lens[0][0];
   const segs = (opts, val, set) => h('div', { class: 'L-seg', role: 'group' }, opts.map(([v, l]) => h('button', { 'aria-pressed': String(v === val), onclick: () => { set(v); render(); } }, l)));
   const p = pot({ entry: { coins: n.entry }, size: n.size, hostFee: n.hostFee });
   return h('div', { class: 'L-col' },
     h('div', { class: 'L-bar' }, h('button', { class: 'L-back', onclick: () => go('club'), 'aria-label': 'חזרה' }, '›'), h('h1', {}, 'טורניר חדש')),
     h('label', { class: 'L-field', for: 'tname' }, 'שם', h('input', { id: 'tname', maxlength: 28, placeholder: 'למשל: חמישי בערב', value: n.name, oninput: (e) => { n.name = e.target.value; } })),
-    h('div', { class: 'L-field' }, 'מצב', segs([['duplicate', 'שש בש כפול'], ['classic', 'קלאסי']], n.mode, (v) => { n.mode = v; })),
     h('div', { class: 'L-field' }, 'אורך', segs(lens, n.len, (v) => { n.len = v; })),
     h('div', { class: 'L-field' }, 'שחקנים', segs([[2, '2'], [4, '4'], [8, '8']], n.size, (v) => { n.size = v; })),
     h('div', { class: 'L-field' }, 'דמי כניסה (מטבעות)', segs([[50, '50'], [100, '100'], [250, '250'], [500, '500'], [1000, '1,000']], n.entry, (v) => { n.entry = v; })),
@@ -1086,7 +1085,7 @@ function viewMe() {
       row(LI('scale'), 'למה זה חוקי', 'החוק, הסטטיסטיקה וניסוי חי', () => go('guide', { guideStep: 0 })),
       row(LI('shield'), 'משחק אחראי', 'מגבלות והחרגה עצמית', () => toast('מגבלות והחרגה עצמית זמינות בגרסת השרת')),
       row(LI(audio.on ? 'volume-2' : 'volume-x'), 'צלילים', audio.on ? 'פועל' : 'כבוי', () => { audio.on = !audio.on; store.set('sound', audio.on); render(); })),
-    h('button', { class: 'L-refer', onclick: () => { const txt = `בוא לשחק איתי ${BRAND} – שש בש כפול, בלי מזל. הקוד שלי: ${CL.uid}`; try { navigator.clipboard.writeText(txt).then(() => toast('ההזמנה הועתקה'), () => toast(txt)); } catch { toast(txt); } } }, h('b', {}, 'הזמן חבר'), h('span', {}, 'שניכם מקבלים 300 מטבעות כשהוא משחק את המשחק הראשון')),
+    h('button', { class: 'L-refer', onclick: () => { const txt = `בוא לשחק איתי ${BRAND} – שש בש של מיומנות. הקוד שלי: ${CL.uid}`; try { navigator.clipboard.writeText(txt).then(() => toast('ההזמנה הועתקה'), () => toast(txt)); } catch { toast(txt); } } }, h('b', {}, 'הזמן חבר'), h('span', {}, 'שניכם מקבלים 300 מטבעות כשהוא משחק את המשחק הראשון')),
     h('p', { class: 'L-note' }, 'אייקונים: game-icons.net (CC BY 3.0) · Lucide (ISC) · דמויות: DiceBear Avataaars (Pablo Stanley) · טקסטורות עץ: Poly Haven (CC0)'));
 }
 
@@ -1215,44 +1214,43 @@ function bar(label, value, cls = '') {
 const cond = (k, t, d) => h('div', { class: 'cond' }, h('span', { class: 'k' }, k), h('div', {}, h('b', {}, t), h('div', { class: 'muted' }, d)));
 const SLIDES = [
   () => [h('div', {}, h('div', { class: 'eyebrow' }, 'לפני שמתחילים'), h('h2', {}, 'יש קוביות. אז זה מזל?'), h('p', {}, 'כולם יודעים שבשש בש יש מזל, וכולם יודעים שהאלוף מהשכונה מנצח כמעט תמיד. בדקנו מה באמת קובע, ב-18,000 התמודדויות מדודות. כמה דקות קריאה, וניסוי שאפשר להריץ כאן.')),
-    h('div', { style: 'text-align:center' }, h('div', { class: 'big' }, '18,000'), h('div', { class: 'muted' }, 'התמודדויות בסימולציה'), h('div', { class: 'big', style: 'margin-top:10px' }, '100%'), h('div', { class: 'muted' }, 'תיקו בין שחקנים שווים, בשש בש כפול'))],
+    h('div', { style: 'text-align:center' }, h('div', { class: 'big' }, '18,000'), h('div', { class: 'muted' }, 'התמודדויות בסימולציה'), h('div', { class: 'big', style: 'margin-top:10px' }, STUDY.beginner.match7 + '%'), h('div', { class: 'muted' }, 'ניצחונות למומחה מול מתחיל, במאץ\' עד 7'))],
   () => [h('div', {}, h('div', { class: 'eyebrow' }, 'החוק בשתי שורות'), h('h2', {}, 'הימור אסור דורש שני תנאים יחד'),
     h('p', { class: 'law' }, '"משחק אסור" הוא משחק שבו אפשר לזכות בכסף, בשווה כסף או בטובת הנאה, והתוצאות תלויות יותר בגורל מאשר בהבנה או ביכולת.'), h('p', { class: 'faint' }, 'סעיף 224 לחוק העונשין, התשל"ז-1977')),
     h('div', { class: 'conds' }, cond('1', 'זכייה בכסף או בשווה כסף', 'מטבעות אימון: חינם, אי אפשר לקנות או לפדות אותם. התנאי לא מתקיים.'), cond('2', 'המזל קובע יותר מהיכולת', 'כאן נכנסת הסטטיסטיקה, בשקפים הבאים.'))],
   () => [h('div', {}, h('div', { class: 'eyebrow' }, 'שש בש רגיל'), h('h2', {}, 'במשחק בודד המזל עוד מורגש'), h('p', {}, 'מומחה מול שחקן בינוני: במשחק בודד המומחה מנצח ב-72%. במאץ\' עד 7 הוא מנצח ב-97%, כי לאורך זמן היכולת מכריעה.')),
     h('div', { class: 'bars' }, bar('מומחה מול בינוני · משחק בודד', STUDY.intermediate.single), bar('הבינוני ניצח · משחק בודד', STUDY.intermediate.weakSingle, 'weak'), bar('מומחה מול בינוני · מאץ\' עד 7', STUDY.intermediate.match7), bar('הבינוני ניצח · מאץ\' עד 7', STUDY.intermediate.weakMatch7, 'weak'))],
-  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'הפתרון'), h('h2', {}, 'שני לוחות, אותן קוביות'), h('p', {}, 'בשש בש כפול משחקים שני לוחות במקביל. בלוח 1 אתה לבן, בלוח 2 אתה שחור. רצף הקוביות זהה בשני הלוחות, כך שכל אחד מקבל בדיוק את המזל של היריב. מה שנשאר להכריע הוא איך שיחקת.')),
-    h('div', { class: 'grid2' }, ['לוח 1 · אתה לבן', 'לוח 2 · אתה שחור'].map((t) => h('div', { class: 'panel', style: 'text-align:center' }, h('b', {}, t), h('div', { class: 'dicebox' }, dieSVG(6), dieSVG(4)))))],
+  () => [h('div', {}, h('div', { class: 'eyebrow' }, 'הפתרון'), h('h2', {}, 'מאץ\' ארוך מקזז את המזל'), h('p', {}, 'בכל הטלה יש מזל, אבל לאורך מאץ\' של כמה משחקים ההטלות הטובות והרעות מתחלקות בערך שווה. מה שנשאר להכריע הוא מאות ההחלטות שקיבלת בדרך: מה להזיז, מתי להכות, מתי להכפיל ומתי לוותר.')),
+    h('div', { class: 'bars' }, bar('מומחה מול בינוני · משחק בודד', STUDY.intermediate.single), bar('מומחה מול בינוני · מאץ\' עד 7', STUDY.intermediate.match7))],
   slideExperiment,
   () => [h('div', {}, h('div', { class: 'eyebrow' }, 'המספרים המלאים'), h('h2', {}, 'ככל שהפורמט ארוך יותר, היכולת קובעת'), h('p', {}, 'ציון השחקן החזק לפי פורמט (תיקו נספר כחצי). 50% פירושו מטבע, 100% פירושו מיומנות טהורה.')),
-    h('div', { class: 'bars' }, bar('שני שחקנים שווים · כפול · תיקו', 100, 'tie'), bar('מומחה מול מתחיל · משחק בודד', STUDY.beginner.single), bar('מומחה מול מתחיל · כפול 3 סבבים', STUDY.beginner.dup3), bar('מומחה מול מתחיל · מאץ\' עד 7', STUDY.beginner.match7), bar('מומחה מול בינוני · כפול 3 סבבים', STUDY.intermediate.dup3))],
+    h('div', { class: 'bars' }, bar('מומחה מול מתחיל · משחק בודד', STUDY.beginner.single), bar('מומחה מול מתחיל · מאץ\' עד 7', STUDY.beginner.match7), bar('מומחה מול בינוני · משחק בודד', STUDY.intermediate.single), bar('מומחה מול בינוני · מאץ\' עד 7', STUDY.intermediate.match7))],
   () => [h('div', {}, h('div', { class: 'eyebrow' }, 'ומה עם כסף?'), h('h2', {}, 'איך בנוי מצב הכסף'), h('p', {}, 'בכסף אמיתי תנאי 1 מתקיים, ולכן הכל בנוי כך שתנאי 2 לא יתקיים: היכולת היא שקובעת.')),
-    h('div', { class: 'conds' }, cond('✓', 'רק פורמטים ארוכים', 'כפול 2 סבבים לפחות, או מאץ\' עד 7. אין כסף על משחק בודד.'), cond('✓', 'שחקן מול שחקן', 'הבית לא משחק נגדך. הפרס הוא קופת דמי הכניסה, פחות עמלה קבועה של 10%.'),
+    h('div', { class: 'conds' }, cond('✓', 'רק פורמטים ארוכים', 'מאץ\' עד 7 לפחות. אין כסף על משחק בודד.'), cond('✓', 'שחקן מול שחקן', 'הבית לא משחק נגדך. הפרס הוא קופת דמי הכניסה, פחות עמלה קבועה של 10%.'),
       cond('✓', 'בלי מזל מובנה', 'אין גלגלי מזל, תיבות הפתעה או בונוסים אקראיים. הכל קבוע ושקוף.'), cond('✓', 'שמירה עליך', 'אימות זהות, גיל 18 ומעלה, מגבלות הפקדה והפסד, והחרגה עצמית.'),
       h('div', { class: 'notice warn' }, 'מצב הכסף האמיתי ייפתח לציבור רק אחרי חוות דעת משפטית כתובה. כאן הכסף מדומה.'))],
 ];
 function slideExperiment() {
   const out = h('div', { style: 'display:grid;gap:10px' }, h('div', { class: 'faint' }, 'בחר ניסוי. הוא רץ כאן בדפדפן, עם המנוע של המשחק.'));
-  const run = (strong, weak, title) => {
+  const run = (strong, weak, title, len, n) => {
     const tally = { t: 0, w: 0, l: 0 };
     const nums = h('div', { class: 'counter' }, h('div', {}, h('b', { class: 'num' }, '0'), 'תיקו'), h('div', {}, h('b', { class: 'num' }, '0'), 'החזק ניצח'), h('div', {}, h('b', { class: 'num' }, '0'), 'החלש ניצח'));
     const dots = h('div', { class: 'dots', 'aria-hidden': 'true' });
     out.replaceChildren(h('b', {}, title), nums, dots);
     let k = 0;
     const tick = () => {
-      if (k++ >= 24 || st.screen !== 'guide') return;
-      const m = new DuplicateMatch({ pairs: 1, cube: false, maxExtra: 0, gameDiceFn: diceFactory(crypto.getRandomValues(new Uint32Array(1))[0]) });
-      m.boards().forEach((g, b) => autoplay(g, (c) => (m.seatOf(c, b) === 'A' ? strong : weak)));
-      m.settle();
+      if (k++ >= n || st.screen !== 'guide') return;
+      const m = new ClassicMatch({ target: len, cube: false, gameDiceFn: diceFactory(crypto.getRandomValues(new Uint32Array(1))[0]) });
+      let guard = 0; while (!m.over && guard++ < 40) { const g = m.current(); autoplay(g, (c) => (m.seatOf(c) === 'A' ? strong : weak)); m.settle(); }
       const r = m.winner === 'draw' ? 't' : m.winner === 'A' ? 'w' : 'l'; tally[r]++;
       const bb = nums.querySelectorAll('b'); bb[0].textContent = tally.t; bb[1].textContent = tally.w; bb[2].textContent = tally.l;
       dots.append(h('i', { class: r })); setTimeout(tick, 25);
     };
     tick();
   };
-  return [h('div', {}, h('div', { class: 'eyebrow' }, 'תבדוק בעצמך'), h('h2', {}, 'ניסוי חי: 24 סבבים כפולים'),
-    h('p', {}, 'ניסוי א\': אותו בוט נגד עצמו. אם המזל היה משפיע, היינו רואים ניצחונות לשני הצדדים.'), h('p', {}, 'ניסוי ב\': מומחה נגד מתחיל.'),
-    h('div', { class: 'acts', style: 'margin-top:10px' }, h('button', { class: 'btn sm', onclick: () => run('expert', 'expert', 'מומחה מול מומחה') }, 'הרץ ניסוי א\''), h('button', { class: 'btn ghost sm', onclick: () => run('expert', 'beginner', 'מומחה מול מתחיל') }, 'הרץ ניסוי ב\''))), out];
+  return [h('div', {}, h('div', { class: 'eyebrow' }, 'תבדוק בעצמך'), h('h2', {}, 'ניסוי חי: משחק בודד מול מאץ\''),
+    h('p', {}, 'מומחה נגד מתחיל. ניסוי א\': 24 משחקים בודדים, שם המזל עוד מנצח לפעמים. ניסוי ב\': 12 מאצ\'ים עד 5, ושם רואים מי באמת קובע.'),
+    h('div', { class: 'acts', style: 'margin-top:10px' }, h('button', { class: 'btn sm', onclick: () => run('expert', 'beginner', '24 משחקים בודדים', 1, 24) }, 'הרץ ניסוי א\''), h('button', { class: 'btn ghost sm', onclick: () => run('expert', 'beginner', '12 מאצ\'ים עד 5', 5, 12) }, 'הרץ ניסוי ב\''))), out];
 }
 function autoplay(g, levelOf) { let n = 0; while (g.phase !== 'over' && n++ < 3000) { if (g.phase === 'roll') g.roll(g.turn); else if (g.phase === 'move') { const i = chooseSequence(g.legal, g.turn, levelOf(g.turn)); g.move(g.turn, g.legal[i].moves); } } }
 function viewGuide() {
@@ -1293,7 +1291,7 @@ function enterArena(a) {
 function practice(first) {
   const lv = first === true ? 'beginner' : level(P.xp) >= 6 ? 'strong' : 'intermediate';
   const nm = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
-  vsScreen(nm, lv, () => startMatch({ mode: 'duplicate', len: 1, level: lv, oppName: nm, arena: null, label: 'אימון' }), 0);
+  vsScreen(nm, lv, () => startMatch({ mode: 'classic', len: 1, level: lv, oppName: nm, arena: null, label: 'אימון' }), 0);
 }
 function startMatch(cfg) {
   stopTimers(); G.online = false;
@@ -1314,6 +1312,7 @@ function step() {
   const before = G.M.kind === 'duplicate' ? G.M.rounds.length : G.M.games.length;
   G.M.settle();
   const after = G.M.kind === 'duplicate' ? G.M.rounds.length : G.M.games.length;
+  if (after !== before && G.M.score && G.M.score.B > G.M.score.A) G.M._wasBehind = true;
   if (after !== before) { G.partial = new Map(); G.last = new Map(); G.view = 0; toast(G.M.kind === 'duplicate' ? `סבב ${after}` : `משחק ${after} · ${G.M.score.A}:${G.M.score.B}`); }
   if (G.M.kind === 'duplicate' && !G.M.over) {
     const bs = G.M.boards();
@@ -1356,7 +1355,7 @@ function finishMatch() {
   const won = M.winner === 'A'; const draw = M.winner === 'draw';
   if (st.tourHook) { const f = st.tourHook; st.tourHook = null; track('games'); if (won) track('wins'); save(); f(M.winner); return; }
   track('games'); if (won) track('wins'); if (a) track('arenaGames');
-  if (M.kind === 'duplicate') { if (won) track('dupWins'); if (draw) P.stats.dupTies++; }
+  if (won && M.target >= 3) track('longWins'); if (won && M._wasBehind) P.stats.comebacks = (P.stats.comebacks || 0) + 1;
   P.run = won ? P.run + 1 : 0; P.bestRun = Math.max(P.bestRun, P.run);
   const exp = 1 / (1 + 10 ** ((BOT_RATING[cfg.level] - P.rating) / 400));
   const delta = Math.round((M.kind === 'duplicate' ? 32 : 24) * ((won ? 1 : draw ? .5 : 0) - exp));
@@ -1591,7 +1590,7 @@ function ICON(name, cls = 'ic') {
 function LI(name, cls = 'li') { const s = S('svg', { viewBox: '0 0 24 24', class: cls, 'aria-hidden': 'true' }); s.innerHTML = LUCIDE[name] || ''; return s; }
 const hashStr = (t) => [...String(t || '')].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
 function avatarFor(name, size = 46) { const d = h('span', { class: 'av', style: `width:${size}px;height:${size}px`, 'aria-hidden': 'true' }); d.innerHTML = AVATARS[hashStr(name) % AVATARS.length]; return d; }
-const TIPS = ['שמור עוגן בבית של היריב, זו רשת הביטחון שלך', 'בנה את הבית לפני שאתה מתחיל להוציא', 'כלי בודד ליד היריב = הזמנה להכאה', 'שש בש כפול: אותן קוביות לשניכם, ההחלטות מכריעות', 'נקודה 5 ונקודה 7 הן הכי חשובות בפתיחה', 'כשאתה מוביל במרוץ, פרק מגע ורוץ הביתה'];
+const TIPS = ['שמור עוגן בבית של היריב, זו רשת הביטחון שלך', 'בנה את הבית לפני שאתה מתחיל להוציא', 'כלי בודד ליד היריב = הזמנה להכאה', 'במאץ\' ארוך המזל מתקזז, ההחלטות מכריעות', 'נקודה 5 ונקודה 7 הן הכי חשובות בפתיחה', 'כשאתה מוביל במרוץ, פרק מגע ורוץ הביתה'];
 const FLAG = '🇮🇱';
 
 function ringAvatar(side, name, lvl, extra = {}) {
@@ -1691,7 +1690,7 @@ function resultScreen({ won, draw, xp, delta, prizeLine, again, close, cash }) {
         h('div', { class: 'R-xp' }, ICON('star-medal', 'R-star'), h('b', { class: 'num' }, `+${xp} XP`), h('span', { class: 'R-xpbar' }, h('i', { style: `width:${pct}%` })), h('small', { class: 'num' }, `רמה ${lv} · ${pct}%`))),
       h('div', { class: 'R-p' + (!won && !draw ? ' win' : '') }, ringAvatar('red', G.cfg.oppName, { beginner: 1, intermediate: 3, strong: 6, expert: 10 }[G.cfg.level] || 2), h('b', {}, G.cfg.oppName))),
     h('div', { class: 'R-gain num' }, prizeLine ? h('span', { class: 'gold' }, prizeLine) : null, h('span', {}, `דירוג ${delta >= 0 ? '+' : ''}${delta}`), P.run >= 2 ? h('span', {}, ICON('fire', 'R-fire'), ` ${P.run} ברצף`) : null),
-    h('p', { class: 'R-why' }, draw ? 'שיחקתם באותה רמה בדיוק, עם אותן קוביות.' : M.kind === 'duplicate' ? 'אותן קוביות בדיוק לשניכם. ההבדל היה במהלכים.' : won ? null : 'אותן קוביות. מה היית עושה אחרת?'),
+    h('p', { class: 'R-why' }, won ? null : 'מה היית עושה אחרת?'),
     cash && !won ? h('p', { class: 'R-why' }, 'לא מומלץ לנסות "להחזיר" הפסד בכסף. אפשר להגדיר מגבלות.') : null,
     h('div', { class: 'R-acts' }, cash ? h('button', { class: 'btn', onclick: close }, 'ללובי') : [h('button', { class: 'btn jade big', onclick: again }, 'עוד אחד'), h('button', { class: 'btn ghost', onclick: close }, 'ללובי')]));
 }
@@ -1813,7 +1812,7 @@ function viewCash() {
       h('div', { class: 'L-st ' + (a.locked ? 'ann' : 'reg') }, h('span', { class: 'L-stl' }, a.locked ? 'נעול' : a.waiting ? 'יריב מחכה!' : 'פתוח'), h('b', { class: 'num' }, shekel(a.entry))),
       h('div', { class: 'L-ti' },
         h('div', { class: 'L-tn' }, h('span', {}, a.name)),
-        h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, a.mode === 'duplicate' ? `שש בש כפול · ${a.length} סבבים` : `מאץ' עד ${a.length}`), h('span', { class: 'L-sp' }), h('span', { class: 'L-prize' }, '🏆 ' + shekel(a.prize))),
+        h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, `מאץ' עד ${a.length}`), h('span', { class: 'L-sp' }), h('span', { class: 'L-prize' }, '🏆 ' + shekel(a.prize))),
         h('div', { class: 'L-tr' }, h('span', { class: 'L-k' }, `עמלה ${shekel(a.fee)} · מס על הרווח מנוכה במקור`)),
         a.locked ? h('span', { class: 'faint' }, LI('lock'), ' ' + a.locked) : h('button', { class: 'L-btn sm', disabled: !ok || w.balance < a.entry || null, onclick: () => netSend({ t: 'joinArena', arenaId: a.id, clientSeed: seedHex() }) }, w.balance < a.entry ? 'אין מספיק יתרה' : NET.queued ? 'מחפש יריב…' : `שחק · ${shekel(a.entry)}`))))),
     ok ? h('form', { class: 'L-col', onsubmit: (e) => { e.preventDefault(); const v = Math.round(Number(e.target.elements.wa.value) * 100); if (v > 0) netSend({ t: 'withdraw', amount: v }); e.target.reset(); } },
